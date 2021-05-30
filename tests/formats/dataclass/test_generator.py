@@ -87,7 +87,7 @@ class DataclassGeneratorTests(FactoryTestCase):
         classes[0].attrs[0].help = "I am a member"
         classes[1].attrs[0].help = "I am a field"
 
-        resolver = DependenciesResolver()
+        resolver = DependenciesResolver({})
 
         actual = self.generator.render_module(resolver, classes)
         expected = (

@@ -13,7 +13,7 @@ class ClassContainerTests(FactoryTestCase):
     def setUp(self):
         super().setUp()
 
-        self.container = ClassContainer()
+        self.container = ClassContainer(config=GeneratorConfig())
 
     def test_initialize(self):
         classes = [
@@ -21,7 +21,7 @@ class ClassContainerTests(FactoryTestCase):
             ClassFactory.create(qname="{xsdata}foo", tag=Tag.COMPLEX_TYPE),
             ClassFactory.create(qname="{xsdata}foobar", tag=Tag.COMPLEX_TYPE),
         ]
-        container = ClassContainer()
+        container = ClassContainer(config=GeneratorConfig())
         container.extend(classes)
 
         expected = {
@@ -123,7 +123,7 @@ class ClassContainerTests(FactoryTestCase):
         mock_class_should_generate.side_effect = [True, False, False, True, False]
 
         classes = ClassFactory.list(5)
-        container = ClassContainer()
+        container = ClassContainer(config=GeneratorConfig())
         container.extend(classes)
 
         expected = [
@@ -137,7 +137,7 @@ class ClassContainerTests(FactoryTestCase):
     def test_filter_classes_with_only_simple_types(self, mock_class_should_generate):
         mock_class_should_generate.return_value = False
         classes = [ClassFactory.enumeration(2), ClassFactory.simple_type()]
-        container = ClassContainer()
+        container = ClassContainer(config=GeneratorConfig())
         container.extend(classes)
         container.filter_classes()
 

@@ -26,7 +26,8 @@ type_duration = AttrTypeFactory.native(DataType.DURATION)
 class FiltersTests(FactoryTestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.filters = Filters()
+        config = GeneratorConfig()
+        self.filters = Filters.from_config(config)
 
     def test_class_name(self):
         self.filters.class_aliases["boom"] = "Bang"

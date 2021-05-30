@@ -3,6 +3,7 @@ from unittest import mock
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.utils import ClassUtils
 from xsdata.codegen.validator import ClassValidator
+from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
 from xsdata.utils.testing import AttrFactory
@@ -16,7 +17,7 @@ class ClassValidatorTests(FactoryTestCase):
     def setUp(self):
         super().setUp()
 
-        self.container = ClassContainer()
+        self.container = ClassContainer(config=GeneratorConfig())
         self.validator = ClassValidator(container=self.container)
 
     @mock.patch.object(ClassValidator, "merge_global_types")

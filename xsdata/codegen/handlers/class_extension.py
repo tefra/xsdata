@@ -1,8 +1,6 @@
-from dataclasses import dataclass
 from typing import Optional
 
-from xsdata.codegen.mixins import ContainerInterface
-from xsdata.codegen.mixins import HandlerInterface
+from xsdata.codegen.mixins import ContainerHandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
@@ -15,11 +13,10 @@ from xsdata.models.enums import NamespaceType
 from xsdata.models.enums import Tag
 
 
-@dataclass
-class ClassExtensionHandler(HandlerInterface):
+class ClassExtensionHandler(ContainerHandlerInterface):
     """Reduce class extensions by copying or creating new attributes."""
 
-    container: ContainerInterface
+    __slots__ = ()
 
     def process(self, target: Class):
         """Iterate and process the target class's extensions in reverser

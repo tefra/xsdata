@@ -1,9 +1,7 @@
 import operator
-from dataclasses import dataclass
 from typing import List
 
-from xsdata.codegen.mixins import ContainerInterface
-from xsdata.codegen.mixins import HandlerInterface
+from xsdata.codegen.mixins import ContainerHandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Class
 from xsdata.models.config import StructureStyle
@@ -13,12 +11,11 @@ from xsdata.utils.namespaces import build_qname
 from xsdata.utils.namespaces import split_qname
 
 
-@dataclass
-class ClassNameConflictHandler(HandlerInterface):
+class ClassNameConflictHandler(ContainerHandlerInterface):
     """Resolve class name conflicts depending the the output structure
     style."""
 
-    container: ContainerInterface
+    __slots__ = ()
 
     def process(self):
         """Search for conflicts either by qualified name or local name

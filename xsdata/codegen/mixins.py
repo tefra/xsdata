@@ -1,4 +1,5 @@
 import abc
+from abc import ABCMeta
 from typing import Callable
 from typing import Iterator
 from typing import List
@@ -9,11 +10,14 @@ from xsdata.models.config import GeneratorConfig
 from xsdata.utils.constants import return_true
 
 
-class ContainerInterface(metaclass=abc.ABCMeta):
+class ContainerInterface(abc.ABC):
     """Wrap a list of classes and expose a simple api for easy access and
     process."""
 
-    config: GeneratorConfig
+    __slots__ = ("config",)
+
+    def __init__(self, config: GeneratorConfig):
+        self.config = config
 
     @abc.abstractmethod
     def iterate(self) -> Iterator[Class]:
@@ -41,9 +45,21 @@ class ContainerInterface(metaclass=abc.ABCMeta):
         """Update the given class qualified name."""
 
 
-class HandlerInterface(metaclass=abc.ABCMeta):
+class HandlerInterface(abc.ABC):
     """Class handler interface."""
+
+    __slots__ = ()
 
     @abc.abstractmethod
     def process(self, target: Class):
         """Process the given target class."""
+
+
+class ContainerHandlerInterface(HandlerInterface, metaclass=ABCMeta):
+    """Class handler interface with access to the complete classes
+    container."""
+
+    __slots__ = ("container",)
+
+    def __init__(self, container: ContainerInterface):
+        self.container = container

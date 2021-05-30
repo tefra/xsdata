@@ -2,6 +2,7 @@ from unittest import mock
 
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import ClassNameConflictHandler
+from xsdata.models.config import GeneratorConfig
 from xsdata.models.config import StructureStyle
 from xsdata.models.enums import Tag
 from xsdata.utils.testing import AttrFactory
@@ -15,7 +16,7 @@ class ClassNameConflictHandlerTests(FactoryTestCase):
     def setUp(self):
         super().setUp()
 
-        self.container = ClassContainer()
+        self.container = ClassContainer(config=GeneratorConfig())
         self.processor = ClassNameConflictHandler(container=self.container)
 
     @mock.patch.object(ClassNameConflictHandler, "rename_classes")

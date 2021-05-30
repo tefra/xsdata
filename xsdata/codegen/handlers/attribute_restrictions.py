@@ -6,6 +6,8 @@ from xsdata.codegen.models import Class
 class AttributeRestrictionsHandler(HandlerInterface):
     """Sanitize attributes restrictions."""
 
+    __slots__ = ()
+
     def process(self, target: Class):
 
         for index, attr in enumerate(target.attrs):

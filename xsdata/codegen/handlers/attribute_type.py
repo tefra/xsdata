@@ -1,13 +1,11 @@
-from dataclasses import dataclass
-from dataclasses import field
 from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Set
 from typing import Tuple
 
+from xsdata.codegen.mixins import ContainerHandlerInterface
 from xsdata.codegen.mixins import ContainerInterface
-from xsdata.codegen.mixins import HandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
@@ -18,13 +16,15 @@ from xsdata.models.enums import DataType
 from xsdata.utils import collections
 
 
-@dataclass
-class AttributeTypeHandler(HandlerInterface):
+class AttributeTypeHandler(ContainerHandlerInterface):
     """Minimize class attributes complexity by filtering and flattening
     types."""
 
-    container: ContainerInterface
-    dependencies: Dict = field(default_factory=dict)
+    __slots__ = ("dependencies",)
+
+    def __init__(self, container: ContainerInterface):
+        super().__init__(container)
+        self.dependencies: Dict = {}
 
     def process(self, target: Class):
         """

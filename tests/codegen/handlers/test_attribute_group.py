@@ -6,6 +6,7 @@ from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Status
 from xsdata.codegen.utils import ClassUtils
 from xsdata.exceptions import AnalyzerValueError
+from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import Tag
 from xsdata.utils.testing import AttrFactory
 from xsdata.utils.testing import ClassFactory
@@ -16,7 +17,7 @@ class AttributeGroupHandlerTests(FactoryTestCase):
     def setUp(self):
         super().setUp()
 
-        container = ClassContainer()
+        container = ClassContainer(config=GeneratorConfig())
         self.processor = AttributeGroupHandler(container=container)
 
     @mock.patch.object(Attr, "is_group", new_callable=mock.PropertyMock)

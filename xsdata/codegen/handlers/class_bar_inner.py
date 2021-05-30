@@ -15,6 +15,8 @@ class ClassBareInnerHandler(HandlerInterface):
            we can replace these references with xs:anySimpleType
     """
 
+    __slots__ = ()
+
     def process(self, target: Class):
         for inner in list(target.inner):
             if not inner.attrs and len(inner.extensions) < 2:

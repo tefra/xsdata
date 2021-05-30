@@ -1,16 +1,13 @@
-from dataclasses import dataclass
 from typing import Optional
 
-from xsdata.codegen.mixins import ContainerInterface
-from xsdata.codegen.mixins import HandlerInterface
+from xsdata.codegen.mixins import ContainerHandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.logger import logger
 
 
-@dataclass
-class AttributeDefaultValueHandler(HandlerInterface):
+class AttributeDefaultValueHandler(ContainerHandlerInterface):
     """
     Sanitize attributes default values.
 
@@ -21,7 +18,7 @@ class AttributeDefaultValueHandler(HandlerInterface):
         4. Convert string literal default value for enum fields.
     """
 
-    container: ContainerInterface
+    __slots__ = ()
 
     def process(self, target: Class):
         for attr in target.attrs:

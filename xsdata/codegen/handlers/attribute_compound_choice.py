@@ -14,6 +14,8 @@ class AttributeCompoundChoiceHandler(HandlerInterface):
     """Group attributes that belong in the same choice and replace them by
     compound fields."""
 
+    __slots__ = ()
+
     def process(self, target: Class):
         groups = group_by(target.attrs, lambda x: x.restrictions.choice)
         for choice, attrs in groups.items():

@@ -9,6 +9,8 @@ class AttributeEffectiveChoiceHandler(HandlerInterface):
     """Look for sequential lists and non list elements and set effective choice
     group for compound fields."""
 
+    __slots__ = ()
+
     def process(self, target: Class):
         groups: List[List[Attr]] = [[]]
         for attr in target.attrs:

@@ -4,6 +4,7 @@ from unittest import mock
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import AttributeOverridesHandler
 from xsdata.codegen.models import Status
+from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import Tag
 from xsdata.utils.testing import AttrFactory
 from xsdata.utils.testing import ClassFactory
@@ -15,7 +16,7 @@ class AttributeOverridesHandlerTests(FactoryTestCase):
     def setUp(self):
         super().setUp()
 
-        self.container = ClassContainer()
+        self.container = ClassContainer(config=GeneratorConfig())
         self.processor = AttributeOverridesHandler(container=self.container)
 
     @mock.patch.object(AttributeOverridesHandler, "resolve_conflict")

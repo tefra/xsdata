@@ -2,6 +2,7 @@ from unittest import mock
 
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import AttributeDefaultValueHandler
+from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import Namespace
 from xsdata.utils.testing import AttrFactory
 from xsdata.utils.testing import AttrTypeFactory
@@ -13,7 +14,7 @@ class AttributeDefaultValueHandlerTests(FactoryTestCase):
     def setUp(self):
         super().setUp()
 
-        container = ClassContainer()
+        container = ClassContainer(config=GeneratorConfig())
         self.processor = AttributeDefaultValueHandler(container=container)
 
     def test_process_attribute_with_enumeration(self):

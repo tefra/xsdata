@@ -3,6 +3,7 @@ from unittest import mock
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import AttributeSubstitutionHandler
 from xsdata.codegen.models import AttrType
+from xsdata.models.config import GeneratorConfig
 from xsdata.utils.namespaces import build_qname
 from xsdata.utils.testing import AttrFactory
 from xsdata.utils.testing import AttrTypeFactory
@@ -14,7 +15,7 @@ class AttributeSubstitutionHandlerTests(FactoryTestCase):
     def setUp(self):
         super().setUp()
 
-        container = ClassContainer()
+        container = ClassContainer(config=GeneratorConfig())
         self.processor = AttributeSubstitutionHandler(container=container)
 
     @mock.patch.object(AttributeSubstitutionHandler, "process_attribute")

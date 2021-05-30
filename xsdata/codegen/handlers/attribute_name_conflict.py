@@ -8,6 +8,8 @@ from xsdata.utils.collections import group_by
 class AttributeNameConflictHandler(HandlerInterface):
     """Resolve attribute name conflicts defined in the class."""
 
+    __slots__ = ()
+
     def process(self, target: Class):
         """Sanitize duplicate attribute names that might exist by applying
         rename strategies."""

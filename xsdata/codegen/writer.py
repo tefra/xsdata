@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import ClassVar
 from typing import Dict
 from typing import List
@@ -12,18 +11,21 @@ from xsdata.logger import logger
 from xsdata.models.config import GeneratorConfig
 
 
-@dataclass
 class CodeWriter:
     """
     Proxy to format generators and files structure creation.
 
-    :param generator:
+    :param generator: Code generator instance
     """
 
-    generator: AbstractGenerator
+    __slots__ = "generator"
+
     generators: ClassVar[Dict[str, Type[AbstractGenerator]]] = {
         "dataclasses": DataclassGenerator,
     }
+
+    def __init__(self, generator: AbstractGenerator):
+        self.generator = generator
 
     def write(self, classes: List[Class]):
         """Iterate over the designated generator outputs and create the

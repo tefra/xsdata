@@ -1,20 +1,17 @@
-from dataclasses import dataclass
 from typing import Any
 from typing import List
 
-from xsdata.codegen.mixins import ContainerInterface
-from xsdata.codegen.mixins import HandlerInterface
+from xsdata.codegen.mixins import ContainerHandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Class
 from xsdata.models.enums import Tag
 from xsdata.utils.namespaces import build_qname
 
 
-@dataclass
-class ClassEnumerationHandler(HandlerInterface):
+class ClassEnumerationHandler(ContainerHandlerInterface):
     """Enumeration class processor."""
 
-    container: ContainerInterface
+    __slots__ = ()
 
     def process(self, target: Class):
         """

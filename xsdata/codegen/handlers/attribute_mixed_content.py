@@ -14,6 +14,8 @@ from xsdata.utils.collections import first
 class AttributeMixedContentHandler(HandlerInterface):
     """Add/Update a wildcard field for classes that support mixed content."""
 
+    __slots__ = ()
+
     @classmethod
     def process(cls, target: Class):
         """Add or update an existing an xs:anyType derived attribute if the

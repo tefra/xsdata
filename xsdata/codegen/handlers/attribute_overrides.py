@@ -1,8 +1,6 @@
 import sys
-from dataclasses import dataclass
 
-from xsdata.codegen.mixins import ContainerInterface
-from xsdata.codegen.mixins import HandlerInterface
+from xsdata.codegen.mixins import ContainerHandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Extension
@@ -11,8 +9,7 @@ from xsdata.utils import collections
 from xsdata.utils.text import alnum
 
 
-@dataclass
-class AttributeOverridesHandler(HandlerInterface):
+class AttributeOverridesHandler(ContainerHandlerInterface):
     """
     Check override attributes are valid.
 
@@ -22,7 +19,7 @@ class AttributeOverridesHandler(HandlerInterface):
         3. The attribute is an invalid override, rename one of them
     """
 
-    container: ContainerInterface
+    __slots__ = ()
 
     def process(self, target: Class):
         for extension in target.extensions:

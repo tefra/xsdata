@@ -1,6 +1,5 @@
 from typing import Dict
 from typing import TextIO
-from xml.sax.handler import ContentHandler
 from xml.sax.saxutils import XMLGenerator
 
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
@@ -15,6 +14,10 @@ class XmlEventWriter(XmlWriter):
     Based on the native python :class:`xml.sax.saxutils.XMLGenerator`
     with support for indentation. Converts sax events directly to xml
     output without storing intermediate result to memory.
+
+    :param config: Configuration instance
+    :param output: Output text stream
+    :param ns_map: User defined namespace prefix-URI map
     """
 
     __slots__ = ("current_level", "pending_end_element")
@@ -29,12 +32,8 @@ class XmlEventWriter(XmlWriter):
 
         self.current_level = 0
         self.pending_end_element = False
-
-    def initialize_handler(self) -> ContentHandler:
-        return XMLGenerator(
-            out=self.output,
-            encoding=self.config.encoding,
-            short_empty_elements=True,
+        self.handler = XMLGenerator(
+            out=self.output, encoding=self.config.encoding, short_empty_elements=True
         )
 
     def start_tag(self, qname: str):

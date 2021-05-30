@@ -1,9 +1,11 @@
+from typing import Dict
 from typing import Generator
-from xml.sax.handler import ContentHandler
+from typing import TextIO
 
 from lxml.etree import tostring
 from lxml.sax import ElementTreeContentHandler
 
+from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.formats.dataclass.serializers.mixins import XmlWriter
 
 
@@ -17,12 +19,18 @@ class LxmlEventWriter(XmlWriter):
     to the output stream. Despite that since it's lxml it's still
     pretty fast and has better support for special characters and
     encodings than native python.
+
+    :param config: Configuration instance
+    :param output: Output text stream
+    :param ns_map: User defined namespace prefix-URI map
     """
 
     __slots__ = ()
 
-    def initialize_handler(self) -> ContentHandler:
-        return ElementTreeContentHandler()
+    def __init__(self, config: SerializerConfig, output: TextIO, ns_map: Dict):
+        super().__init__(config, output, ns_map)
+
+        self.handler = ElementTreeContentHandler()
 
     def write(self, events: Generator):
         super().write(events)

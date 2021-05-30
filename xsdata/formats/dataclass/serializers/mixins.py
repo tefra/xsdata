@@ -40,6 +40,10 @@ class XmlWriter(abc.ABC):
       element is starting in order to build the current element's
       namespace context correctly.
     - Prepares values for serialization.
+
+    :param config: Configuration instance
+    :param output: Output text stream
+    :param ns_map: User defined namespace prefix-URI map
     """
 
     __slots__ = (
@@ -61,11 +65,6 @@ class XmlWriter(abc.ABC):
         output: TextIO,
         ns_map: Dict,
     ):
-        """
-        :param config: Configuration instance
-        :param output: Output text stream
-        :param ns_map: User defined namespace prefix-URI map
-        """
         self.config = config
         self.output = output
         self.ns_map = ns_map
@@ -76,12 +75,7 @@ class XmlWriter(abc.ABC):
         self.ns_context: List[Dict] = []
         self.pending_tag: Optional[Tuple] = None
         self.pending_prefixes: List[List] = []
-
-        self.handler = self.initialize_handler()
-
-    @abc.abstractmethod
-    def initialize_handler(self) -> ContentHandler:
-        """Initialize the content handler instance."""
+        self.handler: ContentHandler
 
     def write(self, events: Generator):
         """

@@ -14,6 +14,15 @@ Code Generation
     examples/compound-fields
 
 
+Advance Topics
+==============
+
+.. toctree::
+    :maxdepth: 1
+
+    examples/custom-property-names
+
+
 Test Suites
 ===========
 

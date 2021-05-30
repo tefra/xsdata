@@ -35,7 +35,19 @@ NoneStr = Optional[str]
 
 
 class ElementNode(XmlNode):
-    """XmlNode for complex elements and dataclasses."""
+    """
+    XmlNode for complex elements and dataclasses.
+
+    :param meta: Model xml metadata
+    :param attrs: Key-value attribute mapping
+    :param ns_map: Namespace prefix-URI map
+    :param config: Parser configuration
+    :param context: Model context provider
+    :param position: The node position of objects cache
+    :param mixed: The node supports mixed content
+    :param derived: The xml element is derived from a base type
+    :param xsi_type: The xml type substitution
+    """
 
     __slots__ = (
         "meta",
@@ -62,18 +74,6 @@ class ElementNode(XmlNode):
         derived: bool = False,
         xsi_type: Optional[str] = None,
     ):
-        """
-        :param meta: Model xml metadata
-        :param attrs: Key-value attribute mapping
-        :param ns_map: Namespace prefix-URI map
-        :param config: Parser configuration
-        :param context: Model context provider
-        :param position: The node position of objects cache
-        :param mixed: The node supports mixed content
-        :param derived: The xml element is derived from a base type
-        :param xsi_type: The xml type substitution
-        """
-
         self.meta = meta
         self.attrs = attrs
         self.ns_map = ns_map
@@ -214,19 +214,16 @@ class WildcardNode(XmlNode):
     The resulting object tree will be a
     :class:`~xsdata.formats.dataclass.models.generics.AnyElement`
     instance.
+
+    :param var: Class field xml var instance
+    :param attrs: Key-value attribute mapping
+    :param ns_map: Namespace prefix-URI map
+    :param position: The node position of objects cache
     """
 
     __slots__ = "var", "attrs", "ns_map", "position"
 
     def __init__(self, var: XmlVar, attrs: Dict, ns_map: Dict, position: int):
-        """
-
-        :param var: Class field xml var instance
-        :param attrs: Key-value attribute mapping
-        :param ns_map: Namespace prefix-URI map
-        :param position: The node position of objects cache
-        """
-
         self.var = var
         self.attrs = attrs
         self.ns_map = ns_map
@@ -266,6 +263,12 @@ class UnionNode(XmlNode):
     The node will record all child events and in the end will replay
     them and try to build all possible objects and sort them by score
     before deciding the winner.
+
+    :param var: Class field xml var instance
+    :param attrs: Key-value attribute mapping
+    :param ns_map: Namespace prefix-URI map
+    :param position: The node position of objects cache
+    :param context: Model context provider
     """
 
     __slots__ = "var", "attrs", "ns_map", "position", "context", "level", "events"
@@ -273,14 +276,6 @@ class UnionNode(XmlNode):
     def __init__(
         self, var: XmlVar, attrs: Dict, ns_map: Dict, position: int, context: XmlContext
     ):
-        """
-        :param var: Class field xml var instance
-        :param attrs: Key-value attribute mapping
-        :param ns_map: Namespace prefix-URI map
-        :param position: The node position of objects cache
-        :param context: Model context provider
-        """
-
         self.var = var
         self.attrs = attrs
         self.ns_map = ns_map
@@ -348,15 +343,16 @@ class UnionNode(XmlNode):
 
 
 class PrimitiveNode(XmlNode):
-    """XmlNode for text elements with primitive values like str, int, float."""
+    """
+    XmlNode for text elements with primitive values like str, int, float.
+
+    :param var: Class field xml var instance
+    :param ns_map: Namespace prefix-URI map
+    """
 
     __slots__ = ("var", "ns_map")
 
     def __init__(self, var: XmlVar, ns_map: Dict):
-        """
-        :param var: Class field xml var instance
-        :param ns_map: Namespace prefix-URI map
-        """
         self.var = var
         self.ns_map = ns_map
 
@@ -384,19 +380,19 @@ class PrimitiveNode(XmlNode):
 
 
 class StandardNode(XmlNode):
-    """XmlNode for any type elements with a standard xsi:type."""
+    """
+    XmlNode for any type elements with a standard xsi:type.
+
+    :param datatype: Standard xsi data type
+    :param ns_map: Namespace prefix-URI map
+    :param derived: Specify whether the value needs to be wrapped with
+        :class:`~xsdata.formats.dataclass.models.generics.DerivedElement`
+    :param nillable: Specify whether the node supports nillable content
+    """
 
     __slots__ = ("datatype", "ns_map", "derived", "nillable")
 
     def __init__(self, datatype: DataType, ns_map: Dict, derived: bool, nillable: bool):
-        """
-
-        :param datatype: Standard xsi data type
-        :param ns_map: Namespace prefix-URI map
-        :param derived: Specify whether the value needs to be wrapped with
-            :class:`~xsdata.formats.dataclass.models.generics.DerivedElement`
-        :param nillable: Specify whether the node supports nillable content
-        """
         self.datatype = datatype
         self.ns_map = ns_map
         self.derived = derived

@@ -109,16 +109,16 @@ class XmlNode(abc.ABC):
 
 
 class XmlHandler:
-    """Abstract content handler."""
+    """
+    Abstract content handler.
+
+    :param parser: The parser instance to feed with events
+    :param clazz: The target binding model, auto located if omitted.
+    """
 
     __slots__ = ("parser", "clazz", "queue", "objects")
 
     def __init__(self, parser: PushParser, clazz: Optional[Type]):
-        """
-        :param parser: The parser instance to feed with events
-        :param clazz: The target binding model. If None the parser will
-            auto locate it from the active xml context instance
-        """
         self.parser = parser
         self.clazz = clazz
         self.queue: List = []

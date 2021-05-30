@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-from dataclasses import field
 from operator import attrgetter
 from typing import Callable
 from typing import Dict
@@ -34,21 +32,16 @@ from xsdata.utils.collections import group_by
 from xsdata.utils.constants import return_true
 
 
-@dataclass
 class ClassContainer(ContainerInterface):
 
-    data: Dict = field(default_factory=dict)
-    config: GeneratorConfig = field(default_factory=GeneratorConfig)
-    pre_processors: List[HandlerInterface] = field(init=False)
-    post_processors: List[HandlerInterface] = field(init=False)
+    __slots__ = ("data", "pre_processors", "post_processors")
 
-    def __post_init__(self):
-        """
-        Initialize all handlers based on the provided configuration.
+    def __init__(self, config: GeneratorConfig):
+        """Initialize a class container instance with its processors based on
+        the the provided configuration."""
+        super().__init__(config)
 
-        The handlers are split into pre and post selection of classes to
-        be generated.
-        """
+        self.data: Dict = {}
         self.pre_processors: List[HandlerInterface] = [
             AttributeGroupHandler(self),
             ClassExtensionHandler(self),

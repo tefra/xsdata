@@ -1,6 +1,4 @@
 import logging
-from dataclasses import dataclass
-from dataclasses import field
 from typing import Dict
 from typing import List
 
@@ -16,14 +14,17 @@ from xsdata.utils.text import alnum
 logger = logging.getLogger(__name__)
 
 
-@dataclass
 class DependenciesResolver:
-    packages: Dict[str, str] = field(default_factory=dict)
-    aliases: Dict[str, str] = field(default_factory=dict)
-    imports: List[Import] = field(default_factory=list)
-    class_list: List[str] = field(init=False, default_factory=list)
-    class_map: Dict[str, Class] = field(init=False, default_factory=dict)
-    package: str = field(init=False)
+
+    __slots__ = ("packages", "aliases", "imports", "class_list", "class_map", "package")
+
+    def __init__(self, packages: Dict[str, str]):
+        self.packages = packages
+
+        self.aliases: Dict[str, str] = {}
+        self.imports: List[Import] = []
+        self.class_list: List[str] = []
+        self.class_map: Dict[str, Class] = {}
 
     def process(self, classes: List[Class]):
         """

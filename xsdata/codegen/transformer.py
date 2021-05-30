@@ -2,12 +2,11 @@ import io
 import json
 import os
 from collections import defaultdict
-from dataclasses import dataclass
-from dataclasses import field
 from pathlib import Path
 from typing import Callable
 from typing import Dict
 from typing import List
+from typing import NamedTuple
 from typing import Optional
 from typing import Tuple
 from urllib.parse import urlparse
@@ -42,8 +41,7 @@ TYPE_XML = 3
 TYPE_JSON = 4
 
 
-@dataclass
-class SupportedType:
+class SupportedType(NamedTuple):
     id: int
     name: str
     match_uri: Callable
@@ -78,7 +76,6 @@ supported_types = [
 ]
 
 
-@dataclass
 class SchemaTransformer:
     """
     Orchestrate the code generation from a list of sources to the output
@@ -88,11 +85,14 @@ class SchemaTransformer:
     :param config: Generator configuration
     """
 
-    print: bool
-    config: GeneratorConfig
-    class_map: Dict[str, List[Class]] = field(init=False, default_factory=dict)
-    processed: List[str] = field(init=False, default_factory=list)
-    preloaded: Dict = field(init=False, default_factory=dict)
+    __slots__ = ("print", "config", "class_map", "processed", "preloaded")
+
+    def __init__(self, print: bool, config: GeneratorConfig):
+        self.print = print
+        self.config = config
+        self.class_map: Dict[str, List[Class]] = {}
+        self.processed: List[str] = []
+        self.preloaded: Dict = {}
 
     def process(self, uris: List[str]):
         sources = defaultdict(list)

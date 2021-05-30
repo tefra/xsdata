@@ -1,8 +1,6 @@
 import sys
 from collections import defaultdict
-from dataclasses import dataclass
 from dataclasses import Field
-from dataclasses import field
 from dataclasses import fields
 from dataclasses import is_dataclass
 from dataclasses import MISSING
@@ -174,12 +172,26 @@ class XmlMetaBuilder:
         return None
 
 
-@dataclass
 class XmlVarBuilder:
-    default_xml_type: str
-    parent_ns: Optional[str] = None
-    element_name_generator: Callable = field(default=return_input)
-    attribute_name_generator: Callable = field(default=return_input)
+
+    __slots__ = (
+        "default_xml_type",
+        "parent_ns",
+        "element_name_generator",
+        "attribute_name_generator",
+    )
+
+    def __init__(
+        self,
+        default_xml_type: str,
+        parent_ns: Optional[str] = None,
+        element_name_generator: Callable = return_input,
+        attribute_name_generator: Callable = return_input,
+    ):
+        self.default_xml_type = default_xml_type
+        self.parent_ns = parent_ns
+        self.element_name_generator = element_name_generator
+        self.attribute_name_generator = attribute_name_generator
 
     def build(
         self,

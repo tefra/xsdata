@@ -6,6 +6,7 @@ from xsdata.codegen.models import Class
 from xsdata.codegen.models import Restrictions
 from xsdata.codegen.models import Status
 from xsdata.codegen.utils import ClassUtils
+from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
 from xsdata.utils.testing import AttrFactory
@@ -18,7 +19,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
     def setUp(self):
         super().setUp()
 
-        container = ClassContainer()
+        container = ClassContainer(config=GeneratorConfig())
         self.processor = AttributeTypeHandler(container=container)
 
     @mock.patch.object(AttributeTypeHandler, "filter_types")

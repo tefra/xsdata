@@ -19,6 +19,8 @@ from xsdata.utils.collections import group_by
 class DataclassGenerator(AbstractGenerator):
     """Python dataclasses code generator."""
 
+    __slots__ = ("env", "filters")
+
     def __init__(self, config: GeneratorConfig):
         """Override generator constructor to set templates directory and
         environment filters."""

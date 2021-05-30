@@ -1,7 +1,5 @@
 import sys
 from collections import defaultdict
-from dataclasses import dataclass
-from dataclasses import field
 from dataclasses import is_dataclass
 from typing import Any
 from typing import Callable
@@ -19,25 +17,33 @@ from xsdata.models.enums import DataType
 from xsdata.utils.constants import return_input
 
 
-@dataclass
 class XmlContext:
     """
     The service provider for binding operations metadata.
 
     :param element_name_generator: Default element name generator
     :param attribute_name_generator: Default attribute name generator
-    :ivar cache: Cache models metadata
-    :ivar xsi_cache: Index models by xsi:type
-    :ivar sys_modules: Number of imported modules
     """
 
-    element_name_generator: Callable = field(default=return_input)
-    attribute_name_generator: Callable = field(default=return_input)
-    cache: Dict[Type, XmlMeta] = field(init=False, default_factory=dict)
-    xsi_cache: Dict[str, List[Type]] = field(
-        init=False, default_factory=lambda: defaultdict(list)
+    __slots__ = (
+        "element_name_generator",
+        "attribute_name_generator",
+        "cache",
+        "xsi_cache",
+        "sys_modules",
     )
-    sys_modules: int = field(init=False, default_factory=int)
+
+    def __init__(
+        self,
+        element_name_generator: Callable = return_input,
+        attribute_name_generator: Callable = return_input,
+    ):
+
+        self.element_name_generator = element_name_generator
+        self.attribute_name_generator = attribute_name_generator
+        self.cache: Dict[Type, XmlMeta] = {}
+        self.xsi_cache: Dict[str, List[Type]] = defaultdict(list)
+        self.sys_modules = 0
 
     def fetch(
         self,

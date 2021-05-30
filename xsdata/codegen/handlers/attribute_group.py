@@ -1,7 +1,4 @@
-from dataclasses import dataclass
-
-from xsdata.codegen.mixins import ContainerInterface
-from xsdata.codegen.mixins import HandlerInterface
+from xsdata.codegen.mixins import ContainerHandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Class
 from xsdata.codegen.utils import ClassUtils
@@ -9,11 +6,10 @@ from xsdata.exceptions import AnalyzerValueError
 from xsdata.models.enums import Tag
 
 
-@dataclass
-class AttributeGroupHandler(HandlerInterface):
+class AttributeGroupHandler(ContainerHandlerInterface):
     """Replace attribute groups with the source class attributes."""
 
-    container: ContainerInterface
+    __slots__ = ()
 
     def process(self, target: Class):
         """

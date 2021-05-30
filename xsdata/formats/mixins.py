@@ -27,8 +27,10 @@ class GeneratorResult(NamedTuple):
     source: str
 
 
-class AbstractGenerator(metaclass=abc.ABCMeta):
+class AbstractGenerator(abc.ABC):
     """Abstract code generator class."""
+
+    __slots__ = "config"
 
     def __init__(self, config: GeneratorConfig):
         """

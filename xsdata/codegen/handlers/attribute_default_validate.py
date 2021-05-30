@@ -18,6 +18,8 @@ class AttributeDefaultValidateHandler(HandlerInterface):
         2. Reset types when roundtrip conversion of fixed value fails
     """
 
+    __slots__ = ()
+
     def process(self, target: Class):
         self.cascade_default_value(target)
         self.reset_unsupported_types(target)

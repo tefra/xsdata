@@ -1,7 +1,5 @@
 import os
 import re
-from dataclasses import dataclass
-from dataclasses import field
 from pathlib import Path
 from typing import Dict
 from typing import Optional
@@ -15,7 +13,6 @@ from xsdata.models.wsdl import Definitions
 from xsdata.models.xsd import Schema
 
 
-@dataclass
 class Downloader:
     """
     Helper class to download a schema or a definitions with all their imports
@@ -24,9 +21,12 @@ class Downloader:
     :param output: Output path
     """
 
-    output: Path
-    base_path: Optional[Path] = field(default=None, init=False)
-    downloaded: Dict = field(default_factory=dict, init=False)
+    __slots__ = ("output", "base_path", "downloaded")
+
+    def __init__(self, output: Path):
+        self.output = output
+        self.base_path: Optional[Path] = None
+        self.downloaded: Dict = {}
 
     def wget(self, uri: str, location: Optional[str] = None):
         """Download handler for any uri input with circular protection."""

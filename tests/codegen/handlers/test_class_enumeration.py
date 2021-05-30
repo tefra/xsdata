@@ -1,5 +1,6 @@
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import ClassEnumerationHandler
+from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
 from xsdata.utils.namespaces import build_qname
@@ -31,7 +32,7 @@ class ClassEnumerationHandlerTests(FactoryTestCase):
         )
         self.target.inner.append(self.inner_enum)
 
-        self.container = ClassContainer()
+        self.container = ClassContainer(config=GeneratorConfig())
         self.container.add(self.target)
         self.container.add(self.root_enum)
         self.processor = ClassEnumerationHandler(container=self.container)

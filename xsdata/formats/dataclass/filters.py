@@ -1,7 +1,5 @@
 import math
 import textwrap
-from dataclasses import dataclass
-from dataclasses import field
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -30,28 +28,66 @@ from xsdata.utils.namespaces import clean_uri
 from xsdata.utils.namespaces import local_name
 
 
-@dataclass
 class Filters:
 
-    class_aliases: Dict = field(default_factory=dict)
-    field_aliases: Dict = field(default_factory=dict)
-    package_aliases: Dict = field(default_factory=dict)
-    module_aliases: Dict = field(default_factory=dict)
+    __slots__ = (
+        "class_aliases",
+        "field_aliases",
+        "package_aliases",
+        "module_aliases",
+        "class_case",
+        "field_case",
+        "constant_case",
+        "package_case",
+        "module_case",
+        "class_safe_prefix",
+        "field_safe_prefix",
+        "constant_safe_prefix",
+        "package_safe_prefix",
+        "module_safe_prefix",
+        "docstring_style",
+        "max_line_length",
+    )
 
-    class_case: Callable = field(default=text.pascal_case)
-    field_case: Callable = field(default=text.snake_case)
-    constant_case: Callable = field(default=text.screaming_snake_case)
-    package_case: Callable = field(default=text.snake_case)
-    module_case: Callable = field(default=text.snake_case)
+    def __init__(
+        self,
+        class_aliases: Dict,
+        field_aliases: Dict,
+        package_aliases: Dict,
+        module_aliases: Dict,
+        class_case: Callable,
+        field_case: Callable,
+        constant_case: Callable,
+        package_case: Callable,
+        module_case: Callable,
+        class_safe_prefix: str,
+        field_safe_prefix: str,
+        constant_safe_prefix: str,
+        package_safe_prefix: str,
+        module_safe_prefix: str,
+        docstring_style: DocstringStyle,
+        max_line_length: int = 79,
+    ):
 
-    class_safe_prefix: str = field(default="type")
-    field_safe_prefix: str = field(default="value")
-    constant_safe_prefix: str = field(default="value")
-    package_safe_prefix: str = field(default="pkg")
-    module_safe_prefix: str = field(default="mod")
+        self.class_aliases = class_aliases
+        self.field_aliases = field_aliases
+        self.package_aliases = package_aliases
+        self.module_aliases = module_aliases
 
-    docstring_style: DocstringStyle = field(default=DocstringStyle.RST)
-    max_line_length: int = field(default=79)
+        self.class_case = class_case
+        self.field_case = field_case
+        self.constant_case = constant_case
+        self.package_case = package_case
+        self.module_case = module_case
+
+        self.class_safe_prefix = class_safe_prefix
+        self.field_safe_prefix = field_safe_prefix
+        self.constant_safe_prefix = constant_safe_prefix
+        self.package_safe_prefix = package_safe_prefix
+        self.module_safe_prefix = module_safe_prefix
+
+        self.docstring_style = docstring_style
+        self.max_line_length = max_line_length
 
     def register(self, env: Environment):
         env.filters.update(

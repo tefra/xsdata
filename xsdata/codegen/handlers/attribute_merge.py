@@ -9,6 +9,8 @@ from xsdata.utils import collections
 class AttributeMergeHandler(HandlerInterface):
     """Merge same type attributes and their restrictions."""
 
+    __slots__ = ()
+
     @classmethod
     def process(cls, target: Class):
         """

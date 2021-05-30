@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
 from typing import Dict
+from typing import NamedTuple
 from typing import Optional
 from typing import Type
 
@@ -13,8 +14,7 @@ from xsdata.formats.dataclass.transports import DefaultTransport
 from xsdata.formats.dataclass.transports import Transport
 
 
-@dataclass(frozen=True)
-class Config:
+class Config(NamedTuple):
     """
     Service configuration class.
 
@@ -36,9 +36,9 @@ class Config:
     @classmethod
     def from_service(cls, obj: Any, **kwargs: Any) -> "Config":
         """Instantiate from a generated service class."""
-
-        keys = ["style", "location", "transport", "soap_action", "input", "output"]
-        return cls(**{key: kwargs.get(key) or getattr(obj, key, None) for key in keys})
+        return cls(
+            **{key: kwargs.get(key) or getattr(obj, key, None) for key in cls._fields}
+        )
 
 
 class TransportTypes:

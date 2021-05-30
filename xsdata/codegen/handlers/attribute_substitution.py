@@ -1,27 +1,25 @@
 from collections import defaultdict
-from dataclasses import dataclass
-from dataclasses import field
 from typing import Dict
 from typing import List
 from typing import Optional
 
+from xsdata.codegen.mixins import ContainerHandlerInterface
 from xsdata.codegen.mixins import ContainerInterface
-from xsdata.codegen.mixins import HandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.codegen.utils import ClassUtils
 from xsdata.utils import collections
 
-Substitutions = Optional[Dict[str, List[Attr]]]
 
-
-@dataclass
-class AttributeSubstitutionHandler(HandlerInterface):
+class AttributeSubstitutionHandler(ContainerHandlerInterface):
     """Apply substitution attributes to the given class recursively."""
 
-    container: ContainerInterface
-    substitutions: Substitutions = field(init=False, default=None)
+    __slots__ = ("substitutions",)
+
+    def __init__(self, container: ContainerInterface):
+        super().__init__(container)
+        self.substitutions: Optional[Dict[str, List[Attr]]] = None
 
     def process(self, target: Class):
         """

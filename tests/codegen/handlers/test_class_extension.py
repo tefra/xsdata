@@ -7,6 +7,7 @@ from xsdata.codegen.models import Restrictions
 from xsdata.codegen.models import Status
 from xsdata.codegen.utils import ClassUtils
 from xsdata.exceptions import CodeGenerationError
+from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
 from xsdata.utils.testing import AttrFactory
@@ -20,7 +21,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
     def setUp(self):
         super().setUp()
 
-        container = ClassContainer()
+        container = ClassContainer(config=GeneratorConfig())
         self.processor = ClassExtensionHandler(container=container)
 
     @mock.patch.object(ClassExtensionHandler, "process_extension")

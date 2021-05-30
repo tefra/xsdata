@@ -1,23 +1,23 @@
-from abc import ABC
-from abc import abstractmethod
-from dataclasses import dataclass
+import abc
 from typing import Any
 from typing import Dict
 
 import requests
 
 
-class Transport(ABC):
-    @abstractmethod
+class Transport(abc.ABC):
+
+    __slots__ = ()
+
+    @abc.abstractmethod
     def get(self, url: str, params: Dict, headers: Dict) -> bytes:
         """Send a GET request."""
 
-    @abstractmethod
+    @abc.abstractmethod
     def post(self, url: str, data: Any, headers: Dict) -> bytes:
         """Send a POST request."""
 
 
-@dataclass
 class DefaultTransport(Transport):
     """
     Default transport based on the requests library.
@@ -25,7 +25,10 @@ class DefaultTransport(Transport):
     :param timeout: Read timeout
     """
 
-    timeout: float = 2.0
+    __slots__ = "timeout"
+
+    def __init__(self, timeout: float = 2.0):
+        self.timeout = timeout
 
     def get(self, url: str, params: Dict, headers: Dict) -> bytes:
         """

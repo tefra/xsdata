@@ -532,7 +532,7 @@ class NodeParser(PushParser):
         qname: str,
         text: NoneStr,
         tail: NoneStr,
-    ) -> Any:
+    ) -> bool:
         """
         End element notification receiver.
 
@@ -546,12 +546,8 @@ class NodeParser(PushParser):
         :param text: Text content
         :param tail: Tail content
         """
-        obj = None
         item = queue.pop()
-        if item.bind(qname, text, tail, objects):
-            obj = objects[-1][1]
-
-        return obj
+        return item.bind(qname, text, tail, objects)
 
 
 @dataclass

@@ -40,7 +40,6 @@ class LxmlEventHandler(XmlHandler):
 
     def process_context(self, context: Iterable) -> Any:
         """Iterate context and push the events to main parser."""
-        obj = None
         for event, element in context:
             if event == EventType.START:
                 self.parser.start(
@@ -52,7 +51,7 @@ class LxmlEventHandler(XmlHandler):
                     element.nsmap,
                 )
             elif event == EventType.END:
-                obj = self.parser.end(
+                self.parser.end(
                     self.queue,
                     self.objects,
                     element.tag,
@@ -66,7 +65,7 @@ class LxmlEventHandler(XmlHandler):
             else:
                 raise XmlHandlerError(f"Unhandled event: `{event}`.")
 
-        return obj
+        return self.objects[-1][1] if self.objects else None
 
 
 class LxmlSaxHandler(SaxHandler):

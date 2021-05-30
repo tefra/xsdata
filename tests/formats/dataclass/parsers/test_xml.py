@@ -47,7 +47,7 @@ class UserXmlParserTests(FactoryTestCase):
         queue = [SkipNode()]
 
         result = self.parser.end(queue, "author", "foobar", None, objects)
-        self.assertIsNone(result)
+        self.assertFalse(result)
         self.assertEqual(0, len(objects))
         self.assertEqual(0, len(queue))
         self.assertEqual(0, mock_emit_event.call_count)

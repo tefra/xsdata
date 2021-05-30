@@ -44,7 +44,7 @@ class PushParser(AbstractParser):
         qname: str,
         text: NoneStr,
         tail: NoneStr,
-    ) -> Any:
+    ) -> bool:
         """
         Parse the last xml node and bind any intermediate objects.
 
@@ -260,7 +260,6 @@ class EventsHandler(XmlHandler):
     def parse(self, source: List[Tuple]) -> Any:
         """Forward the pre-recorded events to the main parser."""
 
-        obj = None
         for event, *args in source:
             if event == EventType.START:
                 qname, attrs, ns_map = args
@@ -274,11 +273,11 @@ class EventsHandler(XmlHandler):
                 )
             elif event == EventType.END:
                 qname, text, tail = args
-                obj = self.parser.end(self.queue, self.objects, qname, text, tail)
+                self.parser.end(self.queue, self.objects, qname, text, tail)
             elif event == EventType.START_NS:
                 prefix, uri = args
                 self.parser.register_namespace(prefix or None, uri)
             else:
                 raise XmlHandlerError(f"Unhandled event: `{event}`.")
 
-        return obj
+        return self.objects[-1][1] if self.objects else None

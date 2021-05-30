@@ -65,11 +65,11 @@ class UserXmlParser(NodeParser):
         qname: str,
         text: Optional[str],
         tail: Optional[str],
-    ) -> Any:
-        obj = super().end(queue, objects, qname, text, tail)
-        if obj:
-            self.emit_event(EventType.END, qname, obj=obj)
-        return obj
+    ) -> bool:
+        result = super().end(queue, objects, qname, text, tail)
+        if result:
+            self.emit_event(EventType.END, qname, obj=objects[-1][1])
+        return result
 
     def emit_event(self, event: str, name: str, **kwargs: Any):
         """

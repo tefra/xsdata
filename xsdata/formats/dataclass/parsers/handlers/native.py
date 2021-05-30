@@ -42,7 +42,6 @@ class XmlEventHandler(XmlHandler):
 
     def process_context(self, context: Iterable) -> Any:
         """Iterate context and push the events to main parser."""
-        obj = None
         ns_map: Dict = {}
         for event, element in context:
             if event == EventType.START:
@@ -56,7 +55,7 @@ class XmlEventHandler(XmlHandler):
                 )
                 ns_map = {}
             elif event == EventType.END:
-                obj = self.parser.end(
+                self.parser.end(
                     self.queue,
                     self.objects,
                     element.tag,
@@ -70,7 +69,7 @@ class XmlEventHandler(XmlHandler):
             else:
                 raise XmlHandlerError(f"Unhandled event: `{event}`.")
 
-        return obj
+        return self.objects[-1][1] if self.objects else None
 
 
 class XmlSaxHandler(SaxHandler, sax.handler.ContentHandler):

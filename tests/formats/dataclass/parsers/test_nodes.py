@@ -728,10 +728,9 @@ class NodeParserTests(TestCase):
         var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo", qname="foo")
         queue.append(PrimitiveNode(var, ns_map={}))
 
-        result = parser.end(queue, objects, "author", "foobar", None)
-        self.assertEqual("result", result)
+        self.assertTrue(parser.end(queue, objects, "author", "foobar", None))
         self.assertEqual(0, len(queue))
-        self.assertEqual(("q", result), objects[-1])
+        self.assertEqual(("q", "result"), objects[-1])
         mock_assemble.assert_called_once_with("author", "foobar", None, objects)
 
     def test_end_with_no_result(self):
@@ -739,8 +738,7 @@ class NodeParserTests(TestCase):
         objects = [("q", "result")]
         queue = [SkipNode()]
 
-        result = parser.end(queue, objects, "author", "foobar", None)
-        self.assertIsNone(result)
+        self.assertFalse(parser.end(queue, objects, "author", "foobar", None))
         self.assertEqual(0, len(queue))
 
     def test_register_namespace(self):

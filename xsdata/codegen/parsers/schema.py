@@ -67,8 +67,9 @@ class SchemaParser(UserXmlParser):
     ) -> Any:
         """Override parent method to set element index and namespaces map."""
         item = queue[-1]
-        obj: Any = super().end(queue, objects, qname, text, tail)
+        super().end(queue, objects, qname, text, tail)
 
+        obj = objects[-1][1]
         self.set_index(obj, self.indices.pop())
         self.set_namespace_map(obj, getattr(item, "ns_map", None))
 

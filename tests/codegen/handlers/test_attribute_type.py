@@ -320,25 +320,30 @@ class AttributeTypeHandlerTests(FactoryTestCase):
     def test_find_dependency(self):
         attr_type = AttrTypeFactory.create(qname="a")
 
-        self.assertIsNone(self.processor.find_dependency(attr_type, Tag.ELEMENT))
-
-        abstract = ClassFactory.create(qname="a", tag=Tag.COMPLEX_TYPE, abstract=True)
-        self.processor.container.add(abstract)
-        self.assertEqual(
-            abstract, self.processor.find_dependency(attr_type, Tag.ELEMENT)
-        )
-
         element = ClassFactory.create(qname="a", tag=Tag.ELEMENT)
-        self.processor.container.add(element)
-        self.assertEqual(
-            element, self.processor.find_dependency(attr_type, Tag.SIMPLE_TYPE)
-        )
+        complex_type = ClassFactory.create(qname="a", tag=Tag.COMPLEX_TYPE)
+        simple_type = ClassFactory.create(qname="a", tag=Tag.SIMPLE_TYPE)
 
-        simple = ClassFactory.create(qname="a", tag=Tag.SIMPLE_TYPE)
-        self.processor.container.add(simple)
-        self.assertEqual(
-            simple, self.processor.find_dependency(attr_type, Tag.SIMPLE_TYPE)
-        )
+        actual = self.processor.find_dependency(attr_type, Tag.ELEMENT)
+        self.assertIsNone(actual)
+
+        self.processor.container.add(simple_type)
+        actual = self.processor.find_dependency(attr_type, Tag.ELEMENT)
+        self.assertEqual(simple_type, actual)
+
+        self.processor.container.add(complex_type)
+        actual = self.processor.find_dependency(attr_type, Tag.ELEMENT)
+        self.assertEqual(complex_type, actual)
+
+        self.processor.container.add(element)
+        actual = self.processor.find_dependency(attr_type, Tag.ELEMENT)
+        self.assertEqual(element, actual)
+
+        actual = self.processor.find_dependency(attr_type, Tag.SIMPLE_TYPE)
+        self.assertEqual(simple_type, actual)
+
+        actual = self.processor.find_dependency(attr_type, Tag.EXTENSION)
+        self.assertEqual(simple_type, actual)
 
     @mock.patch.object(Class, "dependencies")
     def test_cached_dependencies(self, mock_class_dependencies):

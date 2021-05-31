@@ -13,6 +13,7 @@ from xsdata.codegen.models import Status
 from xsdata.codegen.utils import ClassUtils
 from xsdata.logger import logger
 from xsdata.models.enums import DataType
+from xsdata.models.enums import Tag
 from xsdata.utils import collections
 
 
@@ -69,15 +70,16 @@ class AttributeTypeHandler(ContainerHandlerInterface):
         """
         Find dependency for the given attribute and tag.
 
-        Avoid conflicts by search in order:
-            1. Non element/complexType
-            2. Non abstract
-            3. anything
+        Avoid conflicts by selecting any matching type by qname and preferably:
+            1. Match the candidate object tag
+            2. Match element again complexType
+            3. Match non element and complexType
+            4. Anything
         """
         conditions = (
             lambda obj: obj.tag == tag,
+            lambda obj: tag == Tag.ELEMENT and obj.tag == Tag.COMPLEX_TYPE,
             lambda obj: not obj.is_complex,
-            lambda x: not x.abstract,
             lambda x: True,
         )
 

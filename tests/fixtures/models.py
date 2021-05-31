@@ -16,6 +16,7 @@ class TypeA:
 class TypeB:
     x: int
     y: str
+    skip: Optional[str] = field(default=None, metadata={"type": "Ignore"})
 
 
 @dataclass

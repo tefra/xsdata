@@ -31,6 +31,7 @@ class XmlType:
     WILDCARD = sys.intern("Wildcard")
     ATTRIBUTE = sys.intern("Attribute")
     ATTRIBUTES = sys.intern("Attributes")
+    IGNORE = sys.intern("Ignore")
 
 
 class MetaMixin:

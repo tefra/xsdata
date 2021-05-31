@@ -115,16 +115,18 @@ class XmlMetaBuilder:
             attribute_name_generator=attribute_name_generator,
         )
 
-        for index, var in enumerate(fields(clazz)):
-            yield builder.build(
+        for index, _field in enumerate(fields(clazz)):
+            var = builder.build(
                 index,
-                var.name,
-                type_hints[var.name],
-                var.metadata,
-                var.init,
-                cls.default_field_value(var),
+                _field.name,
+                type_hints[_field.name],
+                _field.metadata,
+                _field.init,
+                cls.default_field_value(_field),
                 globalns,
             )
+            if var is not None:
+                yield var
 
     @classmethod
     def build_source_qname(cls, clazz: Type, element_name_generator: Callable) -> str:
@@ -202,10 +204,13 @@ class XmlVarBuilder:
         init: bool,
         default_value: Any,
         globalns: Any,
-    ) -> XmlVar:
+    ) -> Optional[XmlVar]:
         """Build the binding metadata for a dataclass field."""
-        tokens = metadata.get("tokens", False)
         xml_type = metadata.get("type", self.default_xml_type)
+        if xml_type == XmlType.IGNORE:
+            return None
+
+        tokens = metadata.get("tokens", False)
         local_name = metadata.get("name")
         namespace = metadata.get("namespace")
         choices = metadata.get("choices", EMPTY_SEQUENCE)
@@ -236,7 +241,7 @@ class XmlVarBuilder:
             else:  # choice.is_wildcard:
                 wildcards.append(choice)
 
-        var = XmlVar(
+        return XmlVar(
             index=index + 1,
             name=name,
             qname=qname,
@@ -256,8 +261,6 @@ class XmlVarBuilder:
             xml_type=xml_type,
             derived=False,
         )
-
-        return var
 
     def build_choices(
         self, name: str, choices: List[Dict], globalns: Any
@@ -280,6 +283,10 @@ class XmlVarBuilder:
             var = self.build(
                 index, name, type_hint, metadata, True, default_value, globalns
             )
+
+            # It's impossible for choice elements to be ignorable, read above!
+            assert var is not None
+
             var.list_element = True
 
             if var.any_type or any(True for tp in var.types if tp in existing_types):

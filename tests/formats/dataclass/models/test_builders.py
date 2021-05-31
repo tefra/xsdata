@@ -15,6 +15,7 @@ from unittest import TestCase
 
 from tests.fixtures.artists import Artist
 from tests.fixtures.books import BookForm
+from tests.fixtures.models import TypeB
 from tests.fixtures.series import Country
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.models.builders import XmlMetaBuilder
@@ -159,6 +160,13 @@ class XmlMetaBuilderTests(FactoryTestCase):
         self.assertEqual(expected, result)
         for var in result:
             self.assertIsNone(var.clazz)
+
+    def test_build_vars_with_ignore_types(self):
+        result = XmlMetaBuilder.build_vars(TypeB, None, return_input, return_input)
+        self.assertIsInstance(result, Iterator)
+
+        actual = list(result)
+        self.assertEqual(2, len(actual))
 
     def test_default_xml_type(self):
         cls = make_dataclass("a", [("x", int)])

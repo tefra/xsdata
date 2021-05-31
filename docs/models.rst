@@ -143,7 +143,7 @@ binding procedures.
    * - type
      - str
      - The field xml type:
-       ``Text | Element | Elements | Attribute | Wildcard | Attributes``,
+       ``Ignore | Text | Element | Elements | Attribute | Wildcard | Attributes ``,
        default: ``Text`` or ``Element``
    * - nillable
      - bool
@@ -183,6 +183,23 @@ but currently they are only used to troubleshoot the code generator.
 
     If you need to break the namespace inheritance for ``Element`` fields set the
     namespace to an empty string ``namespace=""``.
+
+
+Type: Ignore
+~~~~~~~~~~~~
+
+This type will force the internal xml context instance to ignore the field during
+binding. Make sure your field is declared with `init=False` or with a default value
+otherwise data binding will fail.
+
+
+.. code-block:: python
+
+    index: int = field(
+        default_factory=int,
+        init=False,
+        metadata={"type": "Ignore"},
+    )
 
 
 Type: Element

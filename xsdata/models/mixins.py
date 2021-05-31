@@ -29,8 +29,16 @@ class ElementBase:
     :param ns_map: Namespace prefix-URI map
     """
 
-    index: int = field(default_factory=int, init=False)
-    ns_map: Dict[str, str] = field(default_factory=dict, init=False)
+    index: int = field(
+        default_factory=int,
+        init=False,
+        metadata={"type": "Ignore"},
+    )
+    ns_map: Dict[str, str] = field(
+        default_factory=dict,
+        init=False,
+        metadata={"type": "Ignore"},
+    )
 
     @property
     def class_name(self) -> str:

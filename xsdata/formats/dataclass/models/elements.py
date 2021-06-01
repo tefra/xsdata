@@ -52,7 +52,28 @@ class MetaMixin:
 
 
 class XmlVar(MetaMixin):
-    """Class field binding metadata."""
+    """
+    Class field binding metadata.
+
+    :param index: Field ordering
+    :param name: Field name
+    :param qname: Qualified name
+    :param types: List of all the supported data types
+    :param init:  Include field in the constructor
+    :param mixed:  Field supports mixed content type values
+    :param tokens: Field is derived from xs:list
+    :param format: Value format information
+    :param derived: Wrap parsed values with a generic type
+    :param any_type: Field supports dynamic value types
+    :param nillable: Field supports nillable content
+    :param sequential: Render values in sequential mode
+    :param list_element: Field is a list of elements
+    :param default: Field default value or factory
+    :param xml_Type: Field xml type
+    :param namespaces: List of the supported namespaces
+    :param elements: Mapping of qname-repeatable elements
+    :param wildcards: List of repeatable wildcards
+    """
 
     __slots__ = (
         "index",
@@ -107,27 +128,6 @@ class XmlVar(MetaMixin):
         wildcards: Sequence["XmlVar"],
         **kwargs: Any,
     ):
-        """
-        :param index: Field ordering
-        :param name: Field name
-        :param qname: Qualified name
-        :param types: List of all the supported data types
-        :param init:  Include field in the constructor
-        :param mixed:  Field supports mixed content type values
-        :param tokens: Field is derived from xs:list
-        :param format: Value format information
-        :param derived: Wrap parsed values with a generic type
-        :param any_type: Field supports dynamic value types
-        :param nillable: Field supports nillable content
-        :param sequential: Render values in sequential mode
-        :param list_element: Field is a list of elements
-        :param default: Field default value or factory
-        :param xml_Type: Field xml type
-        :param namespaces: List of the supported namespaces
-        :param elements: Mapping of qname-repeatable elements
-        :param wildcards: List of repeatable wildcards
-        """
-
         self.index = index
         self.name = name
         self.qname = qname
@@ -262,7 +262,21 @@ get_index = operator.attrgetter("index")
 
 
 class XmlMeta(MetaMixin):
-    """Class binding metadata."""
+    """
+    Class binding metadata.
+
+    :param clazz: The dataclass type
+    :param qname: The namespace qualified name.
+    :param source_qname: The source namespace qualified name.
+    :param nillable: Specifies whether an explicit empty value can be assigned.
+    :param mixed_content: Has a wildcard with mixed flag enabled
+    :param text: Text var
+    :param choices: List of compound vars
+    :param elements: Mapping of qname-element vars
+    :param wildcards: List of wildcard vars
+    :param attributes: Mapping of qname-attribute vars
+    :param any_attributes: List of wildcard attributes vars
+    """
 
     __slots__ = (
         "clazz",
@@ -294,21 +308,6 @@ class XmlMeta(MetaMixin):
         any_attributes: Sequence[XmlVar],
         **kwargs: Any,
     ):
-
-        """
-        :param clazz: The dataclass type
-        :param qname: The namespace qualified name.
-        :param source_qname: The source namespace qualified name.
-        :param nillable: Specifies whether an explicit empty value can be assigned.
-        :param mixed_content: Has a wildcard with mixed flag enabled
-        :param text: Text var
-        :param choices: List of compound vars
-        :param elements: Mapping of qname-element vars
-        :param wildcards: List of wildcard vars
-        :param attributes: Mapping of qname-attribute vars
-        :param any_attributes: List of wildcard attributes vars
-        """
-
         self.clazz = clazz
         self.qname = qname
         self.namespace = target_uri(qname)

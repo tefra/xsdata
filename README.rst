@@ -96,18 +96,26 @@ Features
   - Customize behaviour through config
 
 
-Changelog: 21.5 (2021-05-07)
+Changelog: 21.6 (2021-06-01)
 ----------------------------
-- Added output structure style single-package `#469 <https://github.com/tefra/xsdata/issues/469>`_
-- Added support for marshalling array of objects for json `#448 <https://github.com/tefra/xsdata/issues/448>`_
-- Added support to generate code from raw json documents `#445 <https://github.com/tefra/xsdata/issues/445>`_
-- Added docstring style Blank to avoid generating them `#460 <https://github.com/tefra/xsdata/issues/460>`_
-- Added validations for non supported type hints
-- Added support for python 3.10
-- Generate package __all__ lists `#459 <https://github.com/tefra/xsdata/issues/459>`_
-- Generate factory for xs:list enumeration default values `#471 <https://github.com/tefra/xsdata/issues/471>`_
-- Avoid generating prohibited elements with maxOccurs==0 `#478 <https://github.com/tefra/xsdata/issues/478>`_
-- Avoid generating identical overriding fields `#466 <https://github.com/tefra/xsdata/issues/466>`_
-- Fixed flattening base classes if they are also subclasses `#473 <https://github.com/tefra/xsdata/issues/473>`_
-- Fixed unchecked class name conflict resolution `#457 <https://github.com/tefra/xsdata/issues/457>`_
-- Refactored context components to improve binding performance `#476 <https://github.com/tefra/xsdata/issues/476>`_
+- Fixed no args Dict annotation, raising an exception `#494 <https://github.com/tefra/xsdata/issues/494>`_
+- Fixed original name case not working for field names `#498 <https://github.com/tefra/xsdata/issues/498>`_
+- Fixed element type resolution with duplicate name conflicts `#503 <https://github.com/tefra/xsdata/issues/503>`_
+- Added handler to flatten bare inner classes
+- Added the ability for custom types to subclass named tuples
+- Added keyword meta in the reserved words `#491 <https://github.com/tefra/xsdata/issues/491>`_
+- Added new xml type `Ignore` to skip fields during binding `#504 <https://github.com/tefra/xsdata/issues/504>`_
+- Updated generic model DerivedElement.substituted flag with xsi:type
+- Updated core components to improve binding performance
+
+  - Converted almost all internal dataclasses to simple objects with __slots__
+  - Converted the internal xml date/time types to named tuples
+  - Reduced models metadata lookup times and memory footprint
+
+- Updated JSON parser `#495 <https://github.com/tefra/xsdata/issues/495>`_
+
+  - Support failing on unknown properties
+  - Support required properties
+  - Support parser config
+  - Stricter binding process
+  - Enhance DerivedElement support

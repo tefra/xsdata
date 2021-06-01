@@ -1,3 +1,29 @@
+21.6 (2021-06-01)
+-----------------
+- Fixed no args Dict annotation, raising an exception `#494 <https://github.com/tefra/xsdata/issues/494>`_
+- Fixed original name case not working for field names `#498 <https://github.com/tefra/xsdata/issues/498>`_
+- Fixed element type resolution with duplicate name conflicts `#503 <https://github.com/tefra/xsdata/issues/503>`_
+- Added handler to flatten bare inner classes
+- Added the ability for custom types to subclass named tuples
+- Added keyword meta in the reserved words `#491 <https://github.com/tefra/xsdata/issues/491>`_
+- Added new xml type `Ignore` to skip fields during binding `#504 <https://github.com/tefra/xsdata/issues/504>`_
+- Updated generic model DerivedElement.substituted flag with xsi:type
+- Updated core components to improve binding performance
+
+  - Converted almost all internal dataclasses to simple objects with __slots__
+  - Converted the internal xml date/time types to named tuples
+  - Reduced models metadata lookup times and memory footprint
+
+- Updated JSON parser `#495 <https://github.com/tefra/xsdata/issues/495>`_
+
+  - Support failing on unknown properties
+  - Support required properties
+  - Support parser config
+  - Stricter binding process
+  - Enhance DerivedElement support
+- Moved Definitive XML Schema tests to the samples repository
+
+
 21.5 (2021-05-07)
 -----------------
 - Added output structure style single-package `#469 <https://github.com/tefra/xsdata/issues/469>`_

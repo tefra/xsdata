@@ -1,6 +1,6 @@
 import sys
 
-from xsdata.codegen.mixins import ContainerHandlerInterface
+from xsdata.codegen.mixins import RelativeHandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Extension
@@ -9,7 +9,7 @@ from xsdata.utils import collections
 from xsdata.utils.text import alnum
 
 
-class AttributeOverridesHandler(ContainerHandlerInterface):
+class AttributeOverridesHandler(RelativeHandlerInterface):
     """
     Check override attributes are valid.
 

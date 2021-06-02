@@ -10,7 +10,8 @@ from .attribute_overrides import AttributeOverridesHandler
 from .attribute_restrictions import AttributeRestrictionsHandler
 from .attribute_substitution import AttributeSubstitutionHandler
 from .attribute_type import AttributeTypeHandler
-from .class_bar_inner import ClassBareInnerHandler
+from .class_assignment import ClassAssignmentHandler
+from .class_bare_inner import ClassBareInnerHandler
 from .class_enumeration import ClassEnumerationHandler
 from .class_extension import ClassExtensionHandler
 from .class_name_conflict import ClassNameConflictHandler
@@ -28,6 +29,7 @@ __all__ = [
     "AttributeRestrictionsHandler",
     "AttributeSubstitutionHandler",
     "AttributeTypeHandler",
+    "ClassAssignmentHandler",
     "ClassBareInnerHandler",
     "ClassEnumerationHandler",
     "ClassExtensionHandler",

@@ -17,10 +17,12 @@ from xsdata.codegen.handlers import AttributeOverridesHandler
 from xsdata.codegen.handlers import AttributeRestrictionsHandler
 from xsdata.codegen.handlers import AttributeSubstitutionHandler
 from xsdata.codegen.handlers import AttributeTypeHandler
+from xsdata.codegen.handlers import ClassAssignmentHandler
 from xsdata.codegen.handlers import ClassBareInnerHandler
 from xsdata.codegen.handlers import ClassEnumerationHandler
 from xsdata.codegen.handlers import ClassExtensionHandler
 from xsdata.codegen.handlers import ClassNameConflictHandler
+from xsdata.codegen.mixins import ContainerHandlerInterface
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.mixins import HandlerInterface
 from xsdata.codegen.models import Class
@@ -34,7 +36,7 @@ from xsdata.utils.constants import return_true
 
 class ClassContainer(ContainerInterface):
 
-    __slots__ = ("data", "pre_processors", "post_processors")
+    __slots__ = ("data", "pre_processors", "post_processors", "collection_processors")
 
     def __init__(self, config: GeneratorConfig):
         """Initialize a class container instance with its processors based on
@@ -61,6 +63,12 @@ class ClassContainer(ContainerInterface):
             AttributeNameConflictHandler(),
             ClassBareInnerHandler(),
         ]
+
+        self.collection_processors: List[ContainerHandlerInterface] = [
+            ClassNameConflictHandler(self),
+            ClassAssignmentHandler(self),
+        ]
+
         if self.config.output.compound_fields:
             self.post_processors.insert(0, AttributeCompoundChoiceHandler())
 
@@ -100,7 +108,8 @@ class ClassContainer(ContainerInterface):
             1. Run all pre-selection handlers
             2. Filter classes to be actually generated
             3. Run all post-selection handlers
-            4. Resolve any naming conflicts.
+            4. Resolve any naming conflicts
+            5. Assign packages and modules
         """
         for obj in self.iterate():
             if obj.status == Status.RAW:
@@ -111,8 +120,8 @@ class ClassContainer(ContainerInterface):
         for obj in self.iterate():
             self.post_process_class(obj)
 
-        conflict_resolver = ClassNameConflictHandler(self)
-        conflict_resolver.process()
+        for handler in self.collection_processors:
+            handler.run()
 
     def pre_process_class(self, target: Class):
         """Run the pre process handlers for the target class."""

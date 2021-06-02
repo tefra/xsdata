@@ -1,4 +1,3 @@
-import os
 from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import fields
@@ -184,19 +183,6 @@ class ElementBase:
                 yield from (val for val in value if condition(val))
             elif isinstance(value, ElementBase) and condition(value):
                 yield value
-
-
-class ModuleMixin:
-    @property
-    def module(self) -> str:
-        """Return a valid module name based on the instance location uri."""
-        location = getattr(self, "location", None)
-        if not location:
-            raise SchemaValueError(f"{self.__class__.__name__} empty location.")
-
-        module = location.split("/")[-1]
-        name, extension = os.path.splitext(module)
-        return name if extension in (".xsd", ".wsdl") else module
 
 
 def attribute(optional: bool = True, **kwargs: Any) -> Any:

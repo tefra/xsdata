@@ -1,6 +1,6 @@
 from typing import Optional
 
-from xsdata.codegen.mixins import ContainerHandlerInterface
+from xsdata.codegen.mixins import RelativeHandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
@@ -13,7 +13,7 @@ from xsdata.models.enums import NamespaceType
 from xsdata.models.enums import Tag
 
 
-class ClassExtensionHandler(ContainerHandlerInterface):
+class ClassExtensionHandler(RelativeHandlerInterface):
     """Reduce class extensions by copying or creating new attributes."""
 
     __slots__ = ()

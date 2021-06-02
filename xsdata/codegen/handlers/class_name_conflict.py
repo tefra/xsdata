@@ -17,7 +17,7 @@ class ClassNameConflictHandler(ContainerHandlerInterface):
 
     __slots__ = ()
 
-    def process(self):
+    def run(self):
         """Search for conflicts either by qualified name or local name
         depending the configuration and start renaming classes and
         dependencies."""

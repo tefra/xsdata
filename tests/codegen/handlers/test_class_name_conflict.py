@@ -20,7 +20,7 @@ class ClassNameConflictHandlerTests(FactoryTestCase):
         self.processor = ClassNameConflictHandler(container=self.container)
 
     @mock.patch.object(ClassNameConflictHandler, "rename_classes")
-    def test_process(self, mock_rename_classes):
+    def test_run(self, mock_rename_classes):
         classes = [
             ClassFactory.create(qname="{foo}A"),
             ClassFactory.create(qname="{foo}a"),
@@ -29,7 +29,7 @@ class ClassNameConflictHandlerTests(FactoryTestCase):
             ClassFactory.create(qname="b"),
         ]
         self.container.extend(classes)
-        self.processor.process()
+        self.processor.run()
 
         mock_rename_classes.assert_has_calls(
             [
@@ -39,7 +39,7 @@ class ClassNameConflictHandlerTests(FactoryTestCase):
         )
 
     @mock.patch.object(ClassNameConflictHandler, "rename_classes")
-    def test_process_with_single_package_structure(self, mock_rename_classes):
+    def test_run_with_single_package_structure(self, mock_rename_classes):
         classes = [
             ClassFactory.create(qname="{foo}a"),
             ClassFactory.create(qname="{bar}a"),
@@ -48,7 +48,7 @@ class ClassNameConflictHandlerTests(FactoryTestCase):
 
         self.container.config.output.structure = StructureStyle.SINGLE_PACKAGE
         self.container.extend(classes)
-        self.processor.process()
+        self.processor.run()
 
         mock_rename_classes.assert_called_once_with(classes, True)
 

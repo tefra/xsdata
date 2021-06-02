@@ -1,13 +1,13 @@
 from typing import Optional
 
-from xsdata.codegen.mixins import ContainerHandlerInterface
+from xsdata.codegen.mixins import RelativeHandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.logger import logger
 
 
-class AttributeDefaultValueHandler(ContainerHandlerInterface):
+class AttributeDefaultValueHandler(RelativeHandlerInterface):
     """
     Sanitize attributes default values.
 

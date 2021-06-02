@@ -23,15 +23,15 @@ class ElementMapper:
     """Map a schema instance to classes, extensions and attributes."""
 
     @classmethod
-    def map(cls, element: AnyElement) -> List[Class]:
+    def map(cls, element: AnyElement, location: str) -> List[Class]:
         """Map schema children elements to classes."""
 
         assert element.qname is not None
 
-        target_namespace, module = split_qname(element.qname)
-        target = cls.build_class(element, target_namespace)
+        uri, name = split_qname(element.qname)
+        target = cls.build_class(element, uri)
 
-        return list(ClassUtils.flatten(target, module))
+        return list(ClassUtils.flatten(target, f"{location}/{name}"))
 
     @classmethod
     def build_class(cls, element: AnyElement, target_namespace: Optional[str]) -> Class:
@@ -43,7 +43,7 @@ class ElementMapper:
             qname=build_qname(target_namespace, name),
             namespace=cls.select_namespace(namespace, target_namespace),
             tag=Tag.ELEMENT,
-            module="",
+            location="",
         )
         children = [c for c in element.children if isinstance(c, AnyElement)]
         sequential_set = cls.sequential_names(children)

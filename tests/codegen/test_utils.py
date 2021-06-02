@@ -261,7 +261,7 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual(3, len(actual))
 
         for obj in actual:
-            self.assertEqual("xsdata", obj.module)
+            self.assertEqual("xsdata", obj.location)
 
         for attr in target.attrs:
             self.assertEqual(1, len(attr.types))

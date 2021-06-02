@@ -11,6 +11,7 @@ from typing import List
 from typing import Optional
 from typing import Type
 
+from xsdata.exceptions import CodeGenerationError
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.models.enums import DataType
@@ -380,13 +381,14 @@ class Class:
 
     :param qname:
     :param tag:
-    :param module:
+    :param location:
     :param mixed:
     :param abstract:
     :param nillable:
     :param status:
     :param container:
     :param package:
+    :param module:
     :param namespace:
     :param help:
     :param meta_name:
@@ -401,13 +403,14 @@ class Class:
 
     qname: str
     tag: str
-    module: str
+    location: str
     mixed: bool = field(default=False)
     abstract: bool = field(default=False)
     nillable: bool = field(default=False)
     status: Status = field(default=Status.RAW)
     container: Optional[str] = field(default=None)
     package: Optional[str] = field(default=None)
+    module: Optional[str] = field(default=None)
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None)
     meta_name: Optional[str] = field(default=None)
@@ -488,10 +491,15 @@ class Class:
     @property
     def target_module(self) -> str:
         """Return the target module this class is assigned to."""
-        if self.package:
+        if self.package and self.module:
             return f"{self.package}.{self.module}"
 
-        return self.module
+        if self.module:
+            return self.module
+
+        raise CodeGenerationError(
+            f"Class `{self.name}` has not been assigned to a module yet!"
+        )
 
     def clone(self) -> "Class":
         """Return a deep cloned instance."""

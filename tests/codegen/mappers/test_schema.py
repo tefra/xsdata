@@ -142,7 +142,7 @@ class SchemaMapperTests(FactoryTestCase):
 
         element = Element()
         element.ns_map["sm"] = "sm_ns"
-        result = SchemaMapper.build_class(element, "container", "module", "target_ns")
+        result = SchemaMapper.build_class(element, "container", "tests", "target_ns")
 
         mock_build_class_attributes.assert_called_once_with(element, result)
         mock_build_class_extensions.assert_called_once_with(element, result)
@@ -157,7 +157,7 @@ class SchemaMapperTests(FactoryTestCase):
             namespace="foo:name",
             ns_map=element.ns_map,
             package=None,
-            module="module",
+            location="tests",
             substitutions=[
                 build_qname("target_ns", "foo"),
                 build_qname("sm_ns", "bar"),

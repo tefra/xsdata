@@ -160,11 +160,11 @@ class ClassUtils:
         return None
 
     @classmethod
-    def flatten(cls, target: Class, module: str) -> Iterator[Class]:
-        target.module = module
+    def flatten(cls, target: Class, location: str) -> Iterator[Class]:
+        target.location = location
 
         while target.inner:
-            yield from cls.flatten(target.inner.pop(), module)
+            yield from cls.flatten(target.inner.pop(), location)
 
         for attr in target.attrs:
             attr.types = collections.unique_sequence(attr.types, key="qname")

@@ -1,6 +1,7 @@
 import sys
 
 from xsdata.codegen.models import SIMPLE_TYPES
+from xsdata.exceptions import CodeGenerationError
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
@@ -148,10 +149,16 @@ class ClassTests(FactoryTestCase):
     def test_property_target_module(self):
 
         obj = ClassFactory.create()
-        self.assertEqual("tests", obj.target_module)
+        with self.assertRaises(CodeGenerationError) as cm:
+            obj.target_module
 
-        obj.package = ""
-        self.assertEqual("tests", obj.target_module)
+        self.assertEqual(
+            f"Class `{obj.name}` has not been assigned to a module yet!",
+            str(cm.exception),
+        )
+
+        obj.module = "bar"
+        self.assertEqual("bar", obj.target_module)
 
         obj.package = "foo"
-        self.assertEqual("foo.tests", obj.target_module)
+        self.assertEqual("foo.bar", obj.target_module)

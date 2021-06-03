@@ -23,7 +23,11 @@ class ClassTests(FactoryTestCase):
                         AttrTypeFactory.create(
                             qname=build_qname(Namespace.XS.uri, "annotated"),
                             forward=True,
-                        )
+                        ),
+                        AttrTypeFactory.create(
+                            qname="circular",
+                            circular=True,
+                        ),
                     ],
                     choices=[
                         AttrFactory.create(
@@ -60,7 +64,13 @@ class ClassTests(FactoryTestCase):
             inner=[
                 ClassFactory.create(
                     attrs=AttrFactory.list(
-                        2, types=AttrTypeFactory.list(1, qname="{xsdata}foo")
+                        2,
+                        types=[
+                            AttrTypeFactory.create(qname="{xsdata}foo"),
+                            AttrTypeFactory.create(
+                                qname="{xsdata}circular", circular=True
+                            ),
+                        ],
                     )
                 )
             ],
@@ -75,7 +85,10 @@ class ClassTests(FactoryTestCase):
             "{http://www.w3.org/2001/XMLSchema}foobar",
             "{xsdata}foo",
         ]
+
         self.assertCountEqual(expected, list(obj.dependencies()))
+        self.assertIn("circular", list(obj.dependencies(allow_circular=True)))
+        self.assertIn("{xsdata}circular", list(obj.dependencies(allow_circular=True)))
 
     def test_property_has_suffix_attr(self):
         obj = ClassFactory.create()
@@ -148,7 +161,7 @@ class ClassTests(FactoryTestCase):
 
     def test_property_target_module(self):
 
-        obj = ClassFactory.create()
+        obj = ClassFactory.create(module=None, package=None)
         with self.assertRaises(CodeGenerationError) as cm:
             obj.target_module
 

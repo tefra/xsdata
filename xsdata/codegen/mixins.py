@@ -20,7 +20,7 @@ class ContainerInterface(abc.ABC):
         self.config = config
 
     @abc.abstractmethod
-    def iterate(self) -> Iterator[Class]:
+    def __iter__(self) -> Iterator[Class]:
         """Create an iterator for the class map values."""
 
     @abc.abstractmethod

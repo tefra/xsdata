@@ -26,7 +26,7 @@ class ClassNameConflictHandler(ContainerHandlerInterface):
             self.container.config.output.structure == StructureStyle.SINGLE_PACKAGE
         )
         getter = operator.attrgetter("name" if use_name else "qname")
-        groups = group_by(self.container.iterate(), lambda x: text.alnum(getter(x)))
+        groups = group_by(self.container, lambda x: text.alnum(getter(x)))
 
         for classes in groups.values():
             if len(classes) > 1:
@@ -55,7 +55,7 @@ class ClassNameConflictHandler(ContainerHandlerInterface):
         target.meta_name = name
         self.container.reset(target, qname)
 
-        for item in self.container.iterate():
+        for item in self.container:
             self.rename_class_dependencies(item, id(target), target.qname)
 
     def next_qname(self, namespace: str, name: str, use_name: bool) -> str:
@@ -64,9 +64,9 @@ class ClassNameConflictHandler(ContainerHandlerInterface):
         index = 0
 
         if use_name:
-            reserved = {text.alnum(obj.name) for obj in self.container.iterate()}
+            reserved = {text.alnum(obj.name) for obj in self.container}
         else:
-            reserved = {text.alnum(obj.qname) for obj in self.container.iterate()}
+            reserved = {text.alnum(obj.qname) for obj in self.container}
 
         while True:
             index += 1

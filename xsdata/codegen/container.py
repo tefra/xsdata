@@ -17,8 +17,8 @@ from xsdata.codegen.handlers import AttributeOverridesHandler
 from xsdata.codegen.handlers import AttributeRestrictionsHandler
 from xsdata.codegen.handlers import AttributeSubstitutionHandler
 from xsdata.codegen.handlers import AttributeTypeHandler
-from xsdata.codegen.handlers import ClassAssignmentHandler
 from xsdata.codegen.handlers import ClassBareInnerHandler
+from xsdata.codegen.handlers import ClassDesignateHandler
 from xsdata.codegen.handlers import ClassEnumerationHandler
 from xsdata.codegen.handlers import ClassExtensionHandler
 from xsdata.codegen.handlers import ClassNameConflictHandler
@@ -66,17 +66,13 @@ class ClassContainer(ContainerInterface):
 
         self.collection_processors: List[ContainerHandlerInterface] = [
             ClassNameConflictHandler(self),
-            ClassAssignmentHandler(self),
+            ClassDesignateHandler(self),
         ]
 
         if self.config.output.compound_fields:
             self.post_processors.insert(0, AttributeCompoundChoiceHandler())
 
-    @property
-    def class_list(self) -> List[Class]:
-        return list(self.iterate())
-
-    def iterate(self) -> Iterator[Class]:
+    def __iter__(self) -> Iterator[Class]:
         """Create an iterator for the class map values."""
         for items in list(self.data.values()):
             yield from items
@@ -111,13 +107,13 @@ class ClassContainer(ContainerInterface):
             4. Resolve any naming conflicts
             5. Assign packages and modules
         """
-        for obj in self.iterate():
+        for obj in self:
             if obj.status == Status.RAW:
                 self.pre_process_class(obj)
 
         self.filter_classes()
 
-        for obj in self.iterate():
+        for obj in self:
             self.post_process_class(obj)
 
         for handler in self.collection_processors:
@@ -151,7 +147,7 @@ class ClassContainer(ContainerInterface):
         filter classes that should be generated, otherwise leave the container
         as it is."""
 
-        candidates = list(filter(lambda x: x.should_generate, self.iterate()))
+        candidates = list(filter(attrgetter("should_generate"), self))
         if candidates:
             self.data = group_by(candidates, attrgetter("qname"))
 

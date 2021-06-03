@@ -173,7 +173,7 @@ class DefinitionsMapperTests(FactoryTestCase):
             status=Status.PROCESSED,
             tag=Tag.BINDING_OPERATION,
             location="foo.wsdl",
-            package=None,
+            module=None,
             ns_map={"foo": "bar"},
             attrs=[
                 DefinitionsMapper.build_attr(
@@ -715,7 +715,7 @@ class DefinitionsMapperTests(FactoryTestCase):
             qname="body",
             tag=Tag.BINDING_MESSAGE,
             location=target.location,
-            package=None,
+            module=None,
             ns_map=target.ns_map,
         )
         self.assertEqual(expected, actual)

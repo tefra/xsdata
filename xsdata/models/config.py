@@ -34,6 +34,7 @@ class StructureStyle(Enum):
     FILENAMES = "filenames"
     NAMESPACES = "namespaces"
     SINGLE_PACKAGE = "single-package"
+    CLUSTERS = "clusters"
 
 
 class NameCase(Enum):

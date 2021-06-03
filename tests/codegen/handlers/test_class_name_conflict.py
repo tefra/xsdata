@@ -97,7 +97,7 @@ class ClassNameConflictHandlerTests(FactoryTestCase):
 
         mock_rename_class_dependencies.assert_has_calls(
             mock.call(item, id(target), "{foo}_a_3")
-            for item in self.processor.container.iterate()
+            for item in self.processor.container
         )
 
         self.assertEqual([target], self.container.data["{foo}_a_3"])
@@ -117,7 +117,7 @@ class ClassNameConflictHandlerTests(FactoryTestCase):
 
         mock_rename_class_dependencies.assert_has_calls(
             mock.call(item, id(target), "{foo}_a_4")
-            for item in self.processor.container.iterate()
+            for item in self.processor.container
         )
 
         self.assertEqual([target], self.container.data["{foo}_a_4"])

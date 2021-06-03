@@ -1,44 +1,44 @@
-import operator
 import os
 from collections import defaultdict
+from operator import attrgetter
 from pathlib import Path
 from typing import Iterable
 from typing import List
 from urllib.parse import urlparse
+
+from toposort import toposort_flatten
 
 from xsdata.codegen.mixins import ContainerHandlerInterface
 from xsdata.codegen.models import Class
 from xsdata.models.config import StructureStyle
 from xsdata.models.enums import COMMON_SCHEMA_DIR
 from xsdata.utils import collections
+from xsdata.utils.graphs import strongly_connected_components
 from xsdata.utils.package import module_name
 
 
-class ClassAssignmentHandler(ContainerHandlerInterface):
-    """Resolve class name conflicts depending the the output structure
+class ClassDesignateHandler(ContainerHandlerInterface):
+    """Designate classes to packages and modules based on the output structure
     style."""
 
     __slots__ = ()
 
     def run(self):
-        """Search for conflicts either by qualified name or local name
-        depending the configuration and start renaming classes and
-        dependencies."""
-
         structure_style = self.container.config.output.structure
         if structure_style == StructureStyle.NAMESPACES:
-            self.assign_with_namespaces()
+            self.group_by_namespace()
         elif structure_style == StructureStyle.SINGLE_PACKAGE:
-            self.assign_with_package()
+            self.group_all_together()
+        elif structure_style == StructureStyle.CLUSTERS:
+            self.group_by_strong_components()
         else:
-            self.assign_with_filenames()
+            self.group_by_filenames()
 
-    def assign_with_filenames(self):
+    def group_by_filenames(self):
         """Group uris by common path and auto assign package names to all
         classes."""
         package = self.container.config.output.package
-        location_getter = operator.attrgetter("location")
-        class_map = collections.group_by(self.container.iterate(), key=location_getter)
+        class_map = collections.group_by(self.container, key=attrgetter("location"))
         groups = self.group_common_paths(class_map.keys())
 
         for keys in groups:
@@ -54,19 +54,42 @@ class ClassAssignmentHandler(ContainerHandlerInterface):
                 package_name = f"{package}.{suffix}" if suffix else package
                 self.assign(items, package_name, module_name(key))
 
-    def assign_with_namespaces(self):
+    def group_by_namespace(self):
+        """Group classes by their target namespace."""
         package = self.container.config.output.package
-        namespace_getter = operator.attrgetter("target_namespace")
-        groups = collections.group_by(self.container.iterate(), key=namespace_getter)
+        namespace_getter = attrgetter("target_namespace")
+        groups = collections.group_by(self.container, key=namespace_getter)
         for namespace, classes in groups.items():
             self.assign(classes, package, namespace or "")
 
-    def assign_with_package(self):
+    def group_all_together(self):
+        """Group all classes together in the same module."""
         package_parts = self.container.config.output.package.split(".")
         module = package_parts.pop()
         package = ".".join(package_parts)
 
-        self.assign(self.container.iterate(), package, module)
+        self.assign(self.container, package, module)
+
+    def group_by_strong_components(self):
+        """Find circular imports and cluster their classes together."""
+        edges = {}
+        class_map = {}
+        for obj in self.container:
+            edges[obj.qname] = set(obj.dependencies(True))
+            class_map[obj.qname] = obj
+
+        groups = strongly_connected_components(edges)
+        package = self.container.config.output.package
+
+        for group in groups:
+            group_edges = {
+                qname: set(class_map[qname].dependencies()).intersection(group)
+                for qname in group
+            }
+            classes = [class_map[qname] for qname in toposort_flatten(group_edges)]
+            module = classes[0].name
+
+            self.assign(classes, package, module)
 
     @classmethod
     def assign(cls, classes: Iterable[Class], package: str, module: str):

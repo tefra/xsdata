@@ -204,11 +204,13 @@ class AttrType:
         """Shortcut for qname local name."""
         return namespaces.local_name(self.qname)
 
-    @property
-    def is_dependency(self) -> bool:
+    def is_dependency(self, allow_circular: bool) -> bool:
         """Return true if attribute is not a forward/circular references and
         it's not a native python time."""
-        return not (self.forward or self.native or self.circular)
+
+        return not (
+            self.forward or self.native or (not allow_circular and self.circular)
+        )
 
     @property
     def datatype(self) -> Optional[DataType]:
@@ -508,7 +510,7 @@ class Class:
         attrs = [attr.clone() for attr in self.attrs]
         return replace(self, inner=inners, extensions=extensions, attrs=attrs)
 
-    def dependencies(self) -> Iterator[str]:
+    def dependencies(self, allow_circular: bool = False) -> Iterator[str]:
         """
         Return a set of dependencies for the given class.
 
@@ -528,11 +530,11 @@ class Class:
             types.update(tp for choice in attr.choices for tp in choice.types)
 
         for tp in types:
-            if tp.is_dependency:
+            if tp.is_dependency(allow_circular):
                 yield tp.qname
 
         for inner in self.inner:
-            yield from inner.dependencies()
+            yield from inner.dependencies(allow_circular)
 
 
 @dataclass

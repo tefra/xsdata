@@ -44,6 +44,7 @@ class ElementMapperTests(FactoryTestCase):
             qname="{target}root",
             namespace="xsdata",
             location="",
+            module=None,
             ns_map={},
             attrs=[
                 AttrFactory.native(
@@ -88,6 +89,7 @@ class ElementMapperTests(FactoryTestCase):
             qname="{target}root",
             namespace="xsdata",
             location="",
+            module=None,
             ns_map={},
             attrs=[
                 AttrFactory.native(
@@ -125,6 +127,7 @@ class ElementMapperTests(FactoryTestCase):
             qname="root",
             namespace="xsdata",
             location="",
+            module=None,
             mixed=True,
             ns_map={},
             attrs=[

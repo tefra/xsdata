@@ -62,7 +62,7 @@ class AttributeSubstitutionHandler(RelativeHandlerInterface):
         group them by their fully qualified name."""
 
         self.substitutions = defaultdict(list)
-        for obj in self.container.iterate():
+        for obj in self.container:
             for qname in obj.substitutions:
                 attr = self.create_substitution(obj)
                 self.substitutions[qname].append(attr)

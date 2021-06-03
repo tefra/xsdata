@@ -105,9 +105,9 @@ class ClassFactory(Factory):
         attrs: Optional[List[Attr]] = None,
         inner: Optional[List[Class]] = None,
         ns_map: Optional[Dict] = None,
-        location: str = "tests",
+        location: str = "tests.xsd",
         package: Optional[str] = None,
-        module: Optional[str] = None,
+        module: Optional[str] = "tests",
         status: Status = Status.RAW,
         container: Optional[str] = None,
         default: Any = None,
@@ -267,6 +267,10 @@ class AttrFactory(Factory):
             restrictions=restrictions or Restrictions(),
             **kwargs,
         )
+
+    @classmethod
+    def reference(cls, qname: str, **kwargs: Any) -> Attr:
+        return cls.create(types=[AttrTypeFactory.create(qname=qname, **kwargs)])
 
     @classmethod
     def native(cls, datatype: DataType, tag: str = Tag.ELEMENT, **kwargs: Any) -> Attr:

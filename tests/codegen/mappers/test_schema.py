@@ -156,7 +156,7 @@ class SchemaMapperTests(FactoryTestCase):
             nillable=True,
             namespace="foo:name",
             ns_map=element.ns_map,
-            package=None,
+            module=None,
             location="tests",
             substitutions=[
                 build_qname("target_ns", "foo"),

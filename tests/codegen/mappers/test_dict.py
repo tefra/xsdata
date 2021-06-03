@@ -37,6 +37,7 @@ class DictMapperTests(FactoryTestCase):
             tag=Tag.ELEMENT,
             qname="root",
             location="",
+            module=None,
             ns_map={},
             attrs=[
                 AttrFactory.native(
@@ -89,6 +90,7 @@ class DictMapperTests(FactoryTestCase):
             qname="a",
             tag=Tag.ELEMENT,
             location="",
+            module=None,
             ns_map={},
             attrs=[
                 AttrFactory.native(DataType.SHORT, name="sub1"),

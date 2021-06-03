@@ -138,6 +138,8 @@ def download(source: str, output: str):
         "\n\n"
         "namespaces: group classes by the target namespace"
         "\n\n"
+        "clusters: group by strong connected dependencies"
+        "\n\n"
         "single-package: group all classes together"
     ),
     default="filenames",

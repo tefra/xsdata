@@ -10,6 +10,8 @@ from xsdata.utils.collections import group_by
 from xsdata.utils.namespaces import build_qname
 from xsdata.utils.namespaces import split_qname
 
+REQUIRE_UNIQUE_NAMES = (StructureStyle.SINGLE_PACKAGE, StructureStyle.CLUSTERS)
+
 
 class ClassNameConflictHandler(ContainerHandlerInterface):
     """Resolve class name conflicts depending the the output structure
@@ -22,9 +24,7 @@ class ClassNameConflictHandler(ContainerHandlerInterface):
         depending the configuration and start renaming classes and
         dependencies."""
 
-        use_name = (
-            self.container.config.output.structure == StructureStyle.SINGLE_PACKAGE
-        )
+        use_name = self.container.config.output.structure in REQUIRE_UNIQUE_NAMES
         getter = operator.attrgetter("name" if use_name else "qname")
         groups = group_by(self.container, lambda x: text.alnum(getter(x)))
 

@@ -52,6 +52,19 @@ class ClassNameConflictHandlerTests(FactoryTestCase):
 
         mock_rename_classes.assert_called_once_with(classes, True)
 
+    @mock.patch.object(ClassNameConflictHandler, "rename_classes")
+    def test_run_with_clusters_structure(self, mock_rename_classes):
+        classes = [
+            ClassFactory.create(qname="{foo}a"),
+            ClassFactory.create(qname="{bar}a"),
+            ClassFactory.create(qname="a"),
+        ]
+        self.container.config.output.structure = StructureStyle.CLUSTERS
+        self.container.extend(classes)
+        self.processor.run()
+
+        mock_rename_classes.assert_called_once_with(classes, True)
+
     @mock.patch.object(ClassNameConflictHandler, "rename_class")
     def test_rename_classes(self, mock_rename_class):
         classes = [

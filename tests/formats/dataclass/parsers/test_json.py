@@ -102,6 +102,19 @@ class JsonParserTests(FactoryTestCase):
         self.assertIsInstance(book_list[0], BookForm)
         self.assertIsInstance(book_list[1], BookForm)
 
+    def test_parse_with_fail_on_converter_warnings(self):
+        json_str = '{"x": "foo"}'
+        self.assertEqual("foo", self.parser.from_string(json_str, TypeA).x)
+
+        self.parser.config.fail_on_converter_warnings = True
+        with self.assertRaises(ParserError) as cm:
+            self.parser.from_string(json_str, TypeA)
+
+        self.assertEqual(
+            "Failed to convert value `foo` to one of (<class 'int'>,)",
+            str(cm.exception),
+        )
+
     def test_verify_type(self):
         invalid_cases = [
             (

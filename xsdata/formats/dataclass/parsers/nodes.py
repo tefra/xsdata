@@ -461,7 +461,15 @@ class NodeParser(PushParser):
         """Parse the input stream or filename and return the resulting object
         tree."""
         handler = self.handler(clazz=clazz, parser=self)
-        result = handler.parse(source)
+
+        with warnings.catch_warnings():
+            if self.config.fail_on_converter_warnings:
+                warnings.filterwarnings("error", category=ConverterWarning)
+
+            try:
+                result = handler.parse(source)
+            except ConverterWarning as e:
+                raise ParserError(e)
 
         if result is not None:
             return result

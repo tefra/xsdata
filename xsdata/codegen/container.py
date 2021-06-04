@@ -17,10 +17,10 @@ from xsdata.codegen.handlers import AttributeOverridesHandler
 from xsdata.codegen.handlers import AttributeRestrictionsHandler
 from xsdata.codegen.handlers import AttributeSubstitutionHandler
 from xsdata.codegen.handlers import AttributeTypeHandler
-from xsdata.codegen.handlers import ClassBareInnerHandler
 from xsdata.codegen.handlers import ClassDesignateHandler
 from xsdata.codegen.handlers import ClassEnumerationHandler
 from xsdata.codegen.handlers import ClassExtensionHandler
+from xsdata.codegen.handlers import ClassInnersHandler
 from xsdata.codegen.handlers import ClassNameConflictHandler
 from xsdata.codegen.mixins import ContainerHandlerInterface
 from xsdata.codegen.mixins import ContainerInterface
@@ -61,7 +61,7 @@ class ClassContainer(ContainerInterface):
             AttributeDefaultValueHandler(self),
             AttributeRestrictionsHandler(),
             AttributeNameConflictHandler(),
-            ClassBareInnerHandler(),
+            ClassInnersHandler(),
         ]
 
         self.collection_processors: List[ContainerHandlerInterface] = [

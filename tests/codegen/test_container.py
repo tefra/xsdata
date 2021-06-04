@@ -59,7 +59,7 @@ class ClassContainerTests(FactoryTestCase):
                 "AttributeDefaultValueHandler",
                 "AttributeRestrictionsHandler",
                 "AttributeNameConflictHandler",
-                "ClassBareInnerHandler",
+                "ClassInnersHandler",
             ],
             [x.__class__.__name__ for x in container.post_processors],
         )
@@ -74,7 +74,7 @@ class ClassContainerTests(FactoryTestCase):
                 "AttributeDefaultValueHandler",
                 "AttributeRestrictionsHandler",
                 "AttributeNameConflictHandler",
-                "ClassBareInnerHandler",
+                "ClassInnersHandler",
             ],
             [x.__class__.__name__ for x in container.post_processors],
         )

@@ -21,6 +21,7 @@ from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.parsers.config import ParserConfig
+from xsdata.formats.dataclass.parsers.handlers import XmlEventHandler
 from xsdata.formats.dataclass.parsers.mixins import XmlHandler
 from xsdata.formats.dataclass.parsers.nodes import ElementNode
 from xsdata.formats.dataclass.parsers.nodes import NodeParser
@@ -611,6 +612,20 @@ class NodeParserTests(TestCase):
             parser.parse([], Books)
 
         self.assertEqual("Failed to create target class `Books`", str(cm.exception))
+
+    def test_parse_with_fail_on_converter_warnings(self):
+        parser = NodeParser(handler=XmlEventHandler)
+        xml = """<TypeA>foo</TypeA>"""
+        self.assertEqual("foo", parser.from_string(xml, TypeA).x)
+
+        parser.config.fail_on_converter_warnings = True
+        with self.assertRaises(ParserError) as cm:
+            parser.from_string(xml, TypeA)
+
+        self.assertEqual(
+            "Failed to convert value `foo` to one of (<class 'int'>,)",
+            str(cm.exception),
+        )
 
     def test_start(self):
         queue = []

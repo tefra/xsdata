@@ -1,16 +1,17 @@
-from xsdata.codegen.handlers import ClassBareInnerHandler
+from xsdata.codegen.handlers import ClassInnersHandler
 from xsdata.models.enums import DataType
+from xsdata.utils.testing import AttrFactory
 from xsdata.utils.testing import ClassFactory
 from xsdata.utils.testing import ExtensionFactory
 from xsdata.utils.testing import FactoryTestCase
 
 
-class ClassBareInnerHandlerTests(FactoryTestCase):
+class ClassInnersHandlerTests(FactoryTestCase):
     def setUp(self):
         super().setUp()
-        self.processor = ClassBareInnerHandler()
+        self.processor = ClassInnersHandler()
 
-    def test_process(self):
+    def test_remove_inner(self):
         target = ClassFactory.elements(3)
 
         inner_1 = ClassFactory.elements(2)
@@ -56,3 +57,17 @@ class ClassBareInnerHandlerTests(FactoryTestCase):
         self.assertFalse(target.attrs[2].types[0].forward)
         self.assertFalse(target.attrs[2].types[0].circular)
         self.assertFalse(target.attrs[2].types[0].native)
+
+    def test_rename_inner(self):
+        outer = ClassFactory.create(qname="{xsdata}foo")
+        inner = ClassFactory.elements(1, qname="{xsdata}foo")
+        outer.attrs.append(AttrFactory.reference(inner.qname, forward=True))
+        outer.inner.append(inner)
+
+        self.assertEqual("{xsdata}foo", outer.attrs[0].types[0].qname)
+        self.assertEqual("{xsdata}foo", outer.inner[0].qname)
+
+        self.processor.process(outer)
+
+        self.assertEqual("{xsdata}foo_Inner", outer.attrs[0].types[0].qname)
+        self.assertEqual("{xsdata}foo_Inner", outer.inner[0].qname)

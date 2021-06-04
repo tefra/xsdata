@@ -54,10 +54,17 @@ class JsonParser(AbstractParser):
         data = self.load_json(source)
         tp = self.verify_type(clazz, data)
 
-        if isinstance(data, list):
-            return [self.bind_dataclass(obj, tp) for obj in data]  # type: ignore
+        with warnings.catch_warnings():
+            if self.config.fail_on_converter_warnings:
+                warnings.filterwarnings("error", category=ConverterWarning)
 
-        return self.bind_dataclass(data, tp)
+            try:
+                if not isinstance(data, list):
+                    return self.bind_dataclass(data, tp)
+
+                return [self.bind_dataclass(obj, tp) for obj in data]  # type: ignore
+            except ConverterWarning as e:
+                raise ParserError(e)
 
     def load_json(self, source: Any) -> Union[Dict, List]:
         if not hasattr(source, "read"):

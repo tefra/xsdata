@@ -20,7 +20,7 @@ class ClassAnalyzer:
         # Run analyzer handlers
         container.process()
 
-        classes = container.class_list
+        classes = list(container)
         cls.validate_references(classes)
 
         return classes

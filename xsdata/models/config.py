@@ -28,11 +28,13 @@ class StructureStyle(Enum):
 
     :cvar FILENAMES: filenames
     :cvar NAMESPACES: namespaces
-    :cvar SINGLE_PACKAGE: package
+    :cvar CLUSTERS: clusters
+    :cvar SINGLE_PACKAGE: single-package
     """
 
     FILENAMES = "filenames"
     NAMESPACES = "namespaces"
+    CLUSTERS = "clusters"
     SINGLE_PACKAGE = "single-package"
 
 

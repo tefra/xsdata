@@ -3,8 +3,8 @@ from typing import Dict
 from typing import List
 from typing import Optional
 
-from xsdata.codegen.mixins import ContainerHandlerInterface
 from xsdata.codegen.mixins import ContainerInterface
+from xsdata.codegen.mixins import RelativeHandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
@@ -12,7 +12,7 @@ from xsdata.codegen.utils import ClassUtils
 from xsdata.utils import collections
 
 
-class AttributeSubstitutionHandler(ContainerHandlerInterface):
+class AttributeSubstitutionHandler(RelativeHandlerInterface):
     """Apply substitution attributes to the given class recursively."""
 
     __slots__ = ("substitutions",)
@@ -62,7 +62,7 @@ class AttributeSubstitutionHandler(ContainerHandlerInterface):
         group them by their fully qualified name."""
 
         self.substitutions = defaultdict(list)
-        for obj in self.container.iterate():
+        for obj in self.container:
             for qname in obj.substitutions:
                 attr = self.create_substitution(obj)
                 self.substitutions[qname].append(attr)

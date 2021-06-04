@@ -20,7 +20,7 @@ class ContainerInterface(abc.ABC):
         self.config = config
 
     @abc.abstractmethod
-    def iterate(self) -> Iterator[Class]:
+    def __iter__(self) -> Iterator[Class]:
         """Create an iterator for the class map values."""
 
     @abc.abstractmethod
@@ -55,11 +55,24 @@ class HandlerInterface(abc.ABC):
         """Process the given target class."""
 
 
-class ContainerHandlerInterface(HandlerInterface, metaclass=ABCMeta):
+class RelativeHandlerInterface(HandlerInterface, metaclass=ABCMeta):
     """Class handler interface with access to the complete classes
     container."""
 
-    __slots__ = ("container",)
+    __slots__ = "container"
 
     def __init__(self, container: ContainerInterface):
         self.container = container
+
+
+class ContainerHandlerInterface(abc.ABC):
+    """Class container."""
+
+    __slots__ = "container"
+
+    def __init__(self, container: ContainerInterface):
+        self.container = container
+
+    @abc.abstractmethod
+    def run(self):
+        """Run the process for the whole container."""

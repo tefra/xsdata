@@ -11,6 +11,7 @@ from typing import List
 from typing import Optional
 from typing import Type
 
+from xsdata.exceptions import CodeGenerationError
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.models.enums import DataType
@@ -203,11 +204,13 @@ class AttrType:
         """Shortcut for qname local name."""
         return namespaces.local_name(self.qname)
 
-    @property
-    def is_dependency(self) -> bool:
+    def is_dependency(self, allow_circular: bool) -> bool:
         """Return true if attribute is not a forward/circular references and
         it's not a native python time."""
-        return not (self.forward or self.native or self.circular)
+
+        return not (
+            self.forward or self.native or (not allow_circular and self.circular)
+        )
 
     @property
     def datatype(self) -> Optional[DataType]:
@@ -380,13 +383,14 @@ class Class:
 
     :param qname:
     :param tag:
-    :param module:
+    :param location:
     :param mixed:
     :param abstract:
     :param nillable:
     :param status:
     :param container:
     :param package:
+    :param module:
     :param namespace:
     :param help:
     :param meta_name:
@@ -401,13 +405,14 @@ class Class:
 
     qname: str
     tag: str
-    module: str
+    location: str
     mixed: bool = field(default=False)
     abstract: bool = field(default=False)
     nillable: bool = field(default=False)
     status: Status = field(default=Status.RAW)
     container: Optional[str] = field(default=None)
     package: Optional[str] = field(default=None)
+    module: Optional[str] = field(default=None)
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None)
     meta_name: Optional[str] = field(default=None)
@@ -488,10 +493,15 @@ class Class:
     @property
     def target_module(self) -> str:
         """Return the target module this class is assigned to."""
-        if self.package:
+        if self.package and self.module:
             return f"{self.package}.{self.module}"
 
-        return self.module
+        if self.module:
+            return self.module
+
+        raise CodeGenerationError(
+            f"Class `{self.name}` has not been assigned to a module yet!"
+        )
 
     def clone(self) -> "Class":
         """Return a deep cloned instance."""
@@ -500,7 +510,7 @@ class Class:
         attrs = [attr.clone() for attr in self.attrs]
         return replace(self, inner=inners, extensions=extensions, attrs=attrs)
 
-    def dependencies(self) -> Iterator[str]:
+    def dependencies(self, allow_circular: bool = False) -> Iterator[str]:
         """
         Return a set of dependencies for the given class.
 
@@ -520,11 +530,11 @@ class Class:
             types.update(tp for choice in attr.choices for tp in choice.types)
 
         for tp in types:
-            if tp.is_dependency:
+            if tp.is_dependency(allow_circular):
                 yield tp.qname
 
         for inner in self.inner:
-            yield from inner.dependencies()
+            yield from inner.dependencies(allow_circular)
 
 
 @dataclass

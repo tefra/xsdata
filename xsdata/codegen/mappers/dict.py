@@ -14,15 +14,15 @@ class DictMapper:
     """Map a dictionary to classes, extensions and attributes."""
 
     @classmethod
-    def map(cls, data: Dict, name: str) -> List[Class]:
+    def map(cls, data: Dict, name: str, location: str) -> List[Class]:
         """Convert a dictionary to a list of codegen classes."""
 
         target = cls.build_class(data, name)
-        return list(ClassUtils.flatten(target, name))
+        return list(ClassUtils.flatten(target, f"{location}/{name}"))
 
     @classmethod
     def build_class(cls, data: Dict, name: str) -> Class:
-        target = Class(qname=name, tag=Tag.ELEMENT, module="")
+        target = Class(qname=name, tag=Tag.ELEMENT, location="")
 
         for key, value in data.items():
             cls.build_class_attribute(target, key, value)

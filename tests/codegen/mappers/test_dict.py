@@ -24,11 +24,11 @@ class DictMapperTests(FactoryTestCase):
         mock_build_class.return_value = root_class
         mock_flatten.return_value = iter_flat_classes
 
-        actual = DictMapper.map(data, "root")
+        actual = DictMapper.map(data, "root", "tests")
 
         self.assertEqual(flat_classes, actual)
         mock_build_class.assert_called_once_with(data, "root")
-        mock_flatten.assert_called_once_with(root_class, "root")
+        mock_flatten.assert_called_once_with(root_class, "tests/root")
 
     def test_build_class(self):
         data = {"a": 1, "b": True}
@@ -36,7 +36,8 @@ class DictMapperTests(FactoryTestCase):
         expected = ClassFactory.create(
             tag=Tag.ELEMENT,
             qname="root",
-            module="",
+            location="",
+            module=None,
             ns_map={},
             attrs=[
                 AttrFactory.native(
@@ -88,7 +89,8 @@ class DictMapperTests(FactoryTestCase):
         expected_inner = ClassFactory.create(
             qname="a",
             tag=Tag.ELEMENT,
-            module="",
+            location="",
+            module=None,
             ns_map={},
             attrs=[
                 AttrFactory.native(DataType.SHORT, name="sub1"),

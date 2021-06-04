@@ -2,14 +2,12 @@ import io
 import json
 import os
 from collections import defaultdict
-from pathlib import Path
 from typing import Callable
 from typing import Dict
 from typing import List
 from typing import NamedTuple
 from typing import Optional
 from typing import Tuple
-from urllib.parse import urlparse
 from urllib.request import urlopen
 
 from xsdata.codegen.analyzer import ClassAnalyzer
@@ -28,8 +26,6 @@ from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.parsers import TreeParser
 from xsdata.logger import logger
 from xsdata.models.config import GeneratorConfig
-from xsdata.models.config import StructureStyle
-from xsdata.models.enums import COMMON_SCHEMA_DIR
 from xsdata.models.wsdl import Definitions
 from xsdata.models.xsd import Schema
 from xsdata.utils import collections
@@ -85,12 +81,12 @@ class SchemaTransformer:
     :param config: Generator configuration
     """
 
-    __slots__ = ("print", "config", "class_map", "processed", "preloaded")
+    __slots__ = ("print", "config", "classes", "processed", "preloaded")
 
     def __init__(self, print: bool, config: GeneratorConfig):
         self.print = print
         self.config = config
-        self.class_map: Dict[str, List[Class]] = {}
+        self.classes: List[Class] = []
         self.processed: List[str] = []
         self.preloaded: Dict = {}
 
@@ -136,48 +132,46 @@ class SchemaTransformer:
 
         classes = []
         parser = TreeParser()
+        location = os.path.dirname(uris[0]) if uris else ""
         for uri in uris:
             input_stream = self.load_resource(uri)
             if input_stream:
                 logger.info("Parsing document %s", os.path.basename(uri))
                 any_element: AnyElement = parser.from_bytes(input_stream)
-                classes.extend(ElementMapper.map(any_element))
+                classes.extend(ElementMapper.map(any_element, location))
 
-        dirname = os.path.dirname(uris[0]) if uris else ""
-        self.class_map[dirname] = ClassUtils.reduce(classes)
+        self.classes.extend(ClassUtils.reduce(classes))
 
     def process_json_documents(self, uris: List[str]):
         """Process a list of json resources."""
 
         classes = []
+        name = self.config.output.package.split(".")[-1]
+        dirname = os.path.dirname(uris[0]) if uris else ""
+
         for uri in uris:
             input_stream = self.load_resource(uri)
             if input_stream:
                 data = json.load(io.BytesIO(input_stream))
                 logger.info("Parsing document %s", os.path.basename(uri))
-                name = self.config.output.package.split(".")[-1]
-
                 if isinstance(data, dict):
                     data = [data]
 
                 for obj in data:
-                    classes.extend(DictMapper.map(obj, name))
+                    classes.extend(DictMapper.map(obj, name, dirname))
 
-        dirname = os.path.dirname(uris[0]) if uris else ""
-        self.class_map[dirname] = ClassUtils.reduce(classes)
+        self.classes.extend(ClassUtils.reduce(classes))
 
     def process_classes(self):
         """Process the generated classes and write or print the final
         output."""
-        classes = [cls for classes in self.class_map.values() for cls in classes]
-        class_num, inner_num = self.count_classes(classes)
+        class_num, inner_num = self.count_classes(self.classes)
         if class_num:
             logger.info(
                 "Analyzer input: %d main and %d inner classes", class_num, inner_num
             )
-            self.designate_classes()
 
-            classes = self.analyze_classes(classes)
+            classes = self.analyze_classes(self.classes)
             class_num, inner_num = self.count_classes(classes)
             logger.info(
                 "Analyzer output: %d main and %d inner classes", class_num, inner_num
@@ -198,17 +192,11 @@ class SchemaTransformer:
             if sub.location:
                 self.process_schema(sub.location, schema.target_namespace)
 
-        assert schema.location is not None
-
-        self.class_map[schema.location] = self.generate_classes(schema)
+        self.classes.extend(self.generate_classes(schema))
 
     def convert_definitions(self, definitions: Definitions):
         """Convert a definitions instance to codegen classes."""
-        assert definitions.location is not None
-
-        key = definitions.location
-        classes = DefinitionsMapper.map(definitions)
-        self.class_map.setdefault(key, []).extend(classes)
+        self.classes.extend(DefinitionsMapper.map(definitions))
 
     def generate_classes(self, schema: Schema) -> List[Class]:
         """Convert and return the given schema tree to classes."""
@@ -310,78 +298,3 @@ class SchemaTransformer:
             inner += sum(self.count_classes(cls.inner))
 
         return main, inner
-
-    def designate_classes(self):
-        structure_style = self.config.output.structure
-        if structure_style == StructureStyle.NAMESPACES:
-            self.designate_by_namespaces()
-        elif structure_style == StructureStyle.SINGLE_PACKAGE:
-            self.designate_by_package()
-        else:
-            self.designate_by_filenames()
-
-    def designate_by_filenames(self):
-        """Group uris by common path and auto assign package names to all
-        classes."""
-
-        def assign(classes: List[Class], package: str):
-            """Assign the given package to all the classes and their inners."""
-            for obj in classes:
-                obj.package = package
-                assign(obj.inner, package)
-
-        prev = ""
-        index = 0
-        groups = defaultdict(list)
-        output_package = self.config.output.package
-        common_schemas_dir = COMMON_SCHEMA_DIR.as_uri()
-        for key in sorted(self.class_map.keys()):
-            if key.startswith(common_schemas_dir):
-                groups[0].append(key)
-            else:
-                key_parsed = urlparse(key)
-                common_path = os.path.commonpath((prev, key))
-                if not common_path or common_path == key_parsed.scheme:
-                    index += 1
-
-                prev = key
-                groups[index].append(key)
-
-        for keys in groups.values():
-            common_path = (
-                os.path.dirname(keys[0]) if len(keys) == 1 else os.path.commonpath(keys)
-            )
-            for key in keys:
-                items = self.class_map[key]
-                suffix = ".".join(Path(key).parent.relative_to(common_path).parts)
-                package_name = (
-                    f"{output_package}.{suffix}" if suffix else output_package
-                )
-                assign(items, package_name)
-
-    def designate_by_namespaces(self):
-        def assign(items: List[Class], package: str):
-            for item in items:
-                item.package = package
-                item.module = item.target_namespace or ""
-
-                assign(item.inner, package)
-
-        for classes in self.class_map.values():
-            assign(classes, self.config.output.package)
-
-    def designate_by_package(self):
-
-        package_parts = self.config.output.package.split(".")
-        module = package_parts.pop()
-        package = ".".join(package_parts)
-
-        def assign(items: List[Class]):
-            for item in items:
-                item.package = package
-                item.module = module
-
-                assign(item.inner)
-
-        for classes in self.class_map.values():
-            assign(classes)

@@ -72,7 +72,7 @@ class AbstractGenerator(abc.ABC):
         modules = {}
         packages = {}
         for obj in classes:
-            if obj.package is None:
+            if obj.package is None or obj.module is None:
                 raise CodeGenerationError(
                     f"Class `{obj.name}` has not been assigned to a package"
                 )

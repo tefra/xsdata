@@ -31,8 +31,13 @@ class SchemaMapper:
     def map(cls, schema: Schema) -> List[Class]:
         """Map schema children elements to classes."""
 
+        assert schema.location is not None
+
+        location = schema.location
+        target_namespace = schema.target_namespace
+
         return [
-            cls.build_class(element, container, schema.module, schema.target_namespace)
+            cls.build_class(element, container, location, target_namespace)
             for container, element in cls.root_elements(schema)
         ]
 
@@ -57,7 +62,7 @@ class SchemaMapper:
         cls,
         obj: ElementBase,
         container: str,
-        module: str,
+        location: str,
         target_namespace: Optional[str],
     ) -> Class:
         """Build and return a class instance."""
@@ -71,7 +76,7 @@ class SchemaMapper:
             container=container,
             help=obj.display_help,
             ns_map=obj.ns_map,
-            module=module,
+            location=location,
             default=obj.default_value,
             fixed=obj.is_fixed,
             substitutions=cls.build_substitutions(obj, target_namespace),
@@ -244,9 +249,9 @@ class SchemaMapper:
 
         types = [cls.build_data_type(target, tp) for tp in obj.attr_types]
 
-        module = target.module
+        location = target.location
         namespace = target.target_namespace
-        for inner in cls.build_inner_classes(obj, module, namespace):
+        for inner in cls.build_inner_classes(obj, location, namespace):
             target.inner.append(inner)
             types.append(AttrType(qname=inner.qname, forward=True))
 
@@ -257,20 +262,20 @@ class SchemaMapper:
 
     @classmethod
     def build_inner_classes(
-        cls, obj: ElementBase, module: str, namespace: Optional[str]
+        cls, obj: ElementBase, location: str, namespace: Optional[str]
     ) -> Iterator[Class]:
         """Find and convert anonymous types to a class instances."""
         if isinstance(obj, SimpleType) and obj.is_enumeration:
-            yield cls.build_class(obj, obj.class_name, module, namespace)
+            yield cls.build_class(obj, obj.class_name, location, namespace)
         else:
             for child in obj.children():
                 if isinstance(child, ComplexType) or (
                     isinstance(child, SimpleType) and child.is_enumeration
                 ):
                     child.name = obj.real_name
-                    yield cls.build_class(child, obj.class_name, module, namespace)
+                    yield cls.build_class(child, obj.class_name, location, namespace)
                 else:
-                    yield from cls.build_inner_classes(child, module, namespace)
+                    yield from cls.build_inner_classes(child, location, namespace)
 
     @classmethod
     def is_class(cls, item: ElementBase) -> bool:

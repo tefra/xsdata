@@ -62,6 +62,16 @@ by the schema location they are defined. This works well for schemas that avoid 
 imports. If you get import errors you should try one of the alternative structure
 styles.
 
+**clusters**
+
+This style will identify the strongly connected classes and will group them together,
+creating as many modules as possible. The modules are named after the the main class
+of the group.
+
+.. code-block:: console
+
+    $ xsdata schema.xsd --package models --structure-style clusters
+
 
 **namespaces**
 

@@ -20,9 +20,9 @@ class DataclassGeneratorTests(FactoryTestCase):
     @mock.patch.object(DataclassGenerator, "render_module")
     def test_render(self, mock_render_module, mock_render_package):
         classes = [
-            ClassFactory.create(package="foo.bar"),
-            ClassFactory.create(package="bar.foo"),
-            ClassFactory.create(package="thug.life"),
+            ClassFactory.create(package="foo.bar", module="tests"),
+            ClassFactory.create(package="bar.foo", module="tests"),
+            ClassFactory.create(package="thug.life", module="tests"),
         ]
 
         mock_render_module.return_value = "module"
@@ -49,9 +49,9 @@ class DataclassGeneratorTests(FactoryTestCase):
 
     def test_render_package(self):
         classes = [
-            ClassFactory.create(qname="a", package="foo"),
-            ClassFactory.create(qname="b", package="foo"),
-            ClassFactory.create(qname="c", package="foo"),
+            ClassFactory.create(qname="a", package="foo", module="tests"),
+            ClassFactory.create(qname="b", package="foo", module="tests"),
+            ClassFactory.create(qname="c", package="foo", module="tests"),
             ClassFactory.create(qname="a", package="foo", module="bar"),
         ]
 

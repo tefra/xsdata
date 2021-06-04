@@ -30,7 +30,14 @@ class ClassContainerTests(FactoryTestCase):
         }
 
         self.assertEqual(2, len(container.data))
-        self.assertEqual(expected, container.data)
+        self.assertEqual(3, len(list(container)))
+        self.assertEqual(classes, list(container))
+
+        self.assertEqual(
+            ["ClassNameConflictHandler", "ClassDesignateHandler"],
+            [x.__class__.__name__ for x in container.collection_processors],
+        )
+
         self.assertEqual(
             [
                 "AttributeGroupHandler",
@@ -131,7 +138,7 @@ class ClassContainerTests(FactoryTestCase):
             classes[3],
         ]
         container.filter_classes()
-        self.assertEqual(expected, container.class_list)
+        self.assertEqual(expected, list(container))
 
     @mock.patch.object(Class, "should_generate", new_callable=mock.PropertyMock)
     def test_filter_classes_with_only_simple_types(self, mock_class_should_generate):
@@ -141,4 +148,4 @@ class ClassContainerTests(FactoryTestCase):
         container.extend(classes)
         container.filter_classes()
 
-        self.assertEqual(classes, container.class_list)
+        self.assertEqual(classes, list(container))

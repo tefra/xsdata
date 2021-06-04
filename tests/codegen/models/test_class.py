@@ -1,6 +1,7 @@
 import sys
 
 from xsdata.codegen.models import SIMPLE_TYPES
+from xsdata.exceptions import CodeGenerationError
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
@@ -22,7 +23,11 @@ class ClassTests(FactoryTestCase):
                         AttrTypeFactory.create(
                             qname=build_qname(Namespace.XS.uri, "annotated"),
                             forward=True,
-                        )
+                        ),
+                        AttrTypeFactory.create(
+                            qname="circular",
+                            circular=True,
+                        ),
                     ],
                     choices=[
                         AttrFactory.create(
@@ -59,7 +64,13 @@ class ClassTests(FactoryTestCase):
             inner=[
                 ClassFactory.create(
                     attrs=AttrFactory.list(
-                        2, types=AttrTypeFactory.list(1, qname="{xsdata}foo")
+                        2,
+                        types=[
+                            AttrTypeFactory.create(qname="{xsdata}foo"),
+                            AttrTypeFactory.create(
+                                qname="{xsdata}circular", circular=True
+                            ),
+                        ],
                     )
                 )
             ],
@@ -74,7 +85,10 @@ class ClassTests(FactoryTestCase):
             "{http://www.w3.org/2001/XMLSchema}foobar",
             "{xsdata}foo",
         ]
+
         self.assertCountEqual(expected, list(obj.dependencies()))
+        self.assertIn("circular", list(obj.dependencies(allow_circular=True)))
+        self.assertIn("{xsdata}circular", list(obj.dependencies(allow_circular=True)))
 
     def test_property_has_suffix_attr(self):
         obj = ClassFactory.create()
@@ -147,11 +161,17 @@ class ClassTests(FactoryTestCase):
 
     def test_property_target_module(self):
 
-        obj = ClassFactory.create()
-        self.assertEqual("tests", obj.target_module)
+        obj = ClassFactory.create(module=None, package=None)
+        with self.assertRaises(CodeGenerationError) as cm:
+            obj.target_module
 
-        obj.package = ""
-        self.assertEqual("tests", obj.target_module)
+        self.assertEqual(
+            f"Class `{obj.name}` has not been assigned to a module yet!",
+            str(cm.exception),
+        )
+
+        obj.module = "bar"
+        self.assertEqual("bar", obj.target_module)
 
         obj.package = "foo"
-        self.assertEqual("foo.tests", obj.target_module)
+        self.assertEqual("foo.bar", obj.target_module)

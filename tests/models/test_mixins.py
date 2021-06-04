@@ -202,19 +202,3 @@ class ElementBaseTests(TestCase):
 
         children = list(element.children(lambda x: int(x.id) % 2 == 0))
         self.assertEqual([two, four], children)
-
-
-class ModuleMixinTests(TestCase):
-    def test_property_module(self):
-        obj = Definitions()
-
-        with self.assertRaises(SchemaValueError) as cm:
-            obj.module
-
-        self.assertEqual("Definitions empty location.", str(cm.exception))
-
-        obj.location = "a/b/c/d/foo.services"
-        self.assertEqual("foo.services", obj.module)
-
-        obj.location = "a/b/c/d/foo.services.wsdl"
-        self.assertEqual("foo.services", obj.module)

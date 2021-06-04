@@ -172,8 +172,8 @@ class DefinitionsMapperTests(FactoryTestCase):
             qname=build_qname("xsdata", "Calc_Add"),
             status=Status.PROCESSED,
             tag=Tag.BINDING_OPERATION,
-            module="foo",
-            package=None,
+            location="foo.wsdl",
+            module=None,
             ns_map={"foo": "bar"},
             attrs=[
                 DefinitionsMapper.build_attr(
@@ -347,7 +347,7 @@ class DefinitionsMapperTests(FactoryTestCase):
             qname=build_qname("bar", name),
             meta_name="Envelope",
             tag=Tag.BINDING_MESSAGE,
-            module="foo",
+            location="foo.wsdl",
             ns_map={"foo": "bar"},
             namespace="xsdata",
         )
@@ -423,7 +423,7 @@ class DefinitionsMapperTests(FactoryTestCase):
             qname=build_qname("bar", name),
             meta_name="Envelope",
             tag=Tag.BINDING_MESSAGE,
-            module="foo",
+            location="foo.wsdl",
             ns_map={"foo": "bar"},
             namespace="xsdata",
         )
@@ -698,7 +698,7 @@ class DefinitionsMapperTests(FactoryTestCase):
             qname=build_qname("xsdata", "bar"),
             status=Status.PROCESSED,
             tag=Tag.ELEMENT,
-            module="foo",
+            location="foo.wsdl",
             ns_map=message.ns_map,
             attrs=attrs,
         )
@@ -706,14 +706,16 @@ class DefinitionsMapperTests(FactoryTestCase):
 
     def test_get_or_create_inner_class(self):
 
-        target = ClassFactory.create(module="foo", package=None, ns_map={"foo": "bar"})
+        target = ClassFactory.create(
+            location="foo", package=None, ns_map={"foo": "bar"}
+        )
 
         actual = DefinitionsMapper.build_inner_class(target, "body")
         expected = ClassFactory.create(
             qname="body",
             tag=Tag.BINDING_MESSAGE,
-            module=target.module,
-            package=None,
+            location=target.location,
+            module=None,
             ns_map=target.ns_map,
         )
         self.assertEqual(expected, actual)

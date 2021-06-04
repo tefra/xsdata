@@ -32,9 +32,9 @@ class AbstractGeneratorTests(FactoryTestCase):
     @mock.patch.object(NoneGenerator, "package_name", return_value="pck")
     def test_normalize_packages(self, *args):
         classes = [
-            ClassFactory.create(qname="{a}a", package="bar"),
-            ClassFactory.create(qname="{a}b", package="bar"),
-            ClassFactory.create(qname="b", package="bar"),
+            ClassFactory.create(qname="{a}a", package="bar", module="mod"),
+            ClassFactory.create(qname="{a}b", package="bar", module="mod"),
+            ClassFactory.create(qname="b", package="bar", module="mod"),
         ]
 
         self.generator.normalize_packages(classes)

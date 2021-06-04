@@ -25,11 +25,11 @@ class ElementMapperTests(FactoryTestCase):
         mock_build_class.return_value = root_class
         mock_flatten.return_value = iter_flat_classes
 
-        actual = ElementMapper.map(element)
+        actual = ElementMapper.map(element, "tests")
 
         self.assertEqual(flat_classes, actual)
         mock_build_class.assert_called_once_with(element, "xsdata")
-        mock_flatten.assert_called_once_with(root_class, "root")
+        mock_flatten.assert_called_once_with(root_class, "tests/root")
 
     def test_build_class_simple_type(self):
         element = AnyElement(
@@ -43,7 +43,8 @@ class ElementMapperTests(FactoryTestCase):
             tag=Tag.ELEMENT,
             qname="{target}root",
             namespace="xsdata",
-            module="",
+            location="",
+            module=None,
             ns_map={},
             attrs=[
                 AttrFactory.native(
@@ -87,7 +88,8 @@ class ElementMapperTests(FactoryTestCase):
             tag=Tag.ELEMENT,
             qname="{target}root",
             namespace="xsdata",
-            module="",
+            location="",
+            module=None,
             ns_map={},
             attrs=[
                 AttrFactory.native(
@@ -124,7 +126,8 @@ class ElementMapperTests(FactoryTestCase):
             tag=Tag.ELEMENT,
             qname="root",
             namespace="xsdata",
-            module="",
+            location="",
+            module=None,
             mixed=True,
             ns_map={},
             attrs=[

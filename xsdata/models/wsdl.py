@@ -14,7 +14,6 @@ from xsdata.models.mixins import array_any_element
 from xsdata.models.mixins import array_element
 from xsdata.models.mixins import attribute
 from xsdata.models.mixins import element
-from xsdata.models.mixins import ModuleMixin
 from xsdata.models.xsd import Schema
 from xsdata.utils import collections
 
@@ -187,7 +186,7 @@ class Service(WsdlElement):
 
 
 @dataclass
-class Definitions(ExtensibleElement, ModuleMixin):
+class Definitions(ExtensibleElement):
     """
     :param types:
     :param imports:

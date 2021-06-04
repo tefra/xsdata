@@ -22,7 +22,6 @@ from xsdata.models.mixins import array_element
 from xsdata.models.mixins import attribute
 from xsdata.models.mixins import element
 from xsdata.models.mixins import ElementBase
-from xsdata.models.mixins import ModuleMixin
 from xsdata.utils import text
 from xsdata.utils.collections import unique_sequence
 from xsdata.utils.namespaces import clean_uri
@@ -1242,7 +1241,7 @@ class Override(SchemaLocation):
 
 
 @dataclass
-class Schema(SchemaLocation, ModuleMixin):
+class Schema(SchemaLocation):
     """
     Model representation of a schema xs:schema element.
 

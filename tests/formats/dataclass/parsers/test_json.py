@@ -104,8 +104,6 @@ class JsonParserTests(FactoryTestCase):
 
     def test_parse_with_fail_on_converter_warnings(self):
         json_str = '{"x": "foo"}'
-        self.assertEqual("foo", self.parser.from_string(json_str, TypeA).x)
-
         self.parser.config.fail_on_converter_warnings = True
         with self.assertRaises(ParserError) as cm:
             self.parser.from_string(json_str, TypeA)

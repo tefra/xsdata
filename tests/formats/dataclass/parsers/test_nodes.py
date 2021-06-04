@@ -615,10 +615,9 @@ class NodeParserTests(TestCase):
 
     def test_parse_with_fail_on_converter_warnings(self):
         parser = NodeParser(handler=XmlEventHandler)
-        xml = """<TypeA>foo</TypeA>"""
-        self.assertEqual("foo", parser.from_string(xml, TypeA).x)
-
         parser.config.fail_on_converter_warnings = True
+
+        xml = """<TypeA>foo</TypeA>"""
         with self.assertRaises(ParserError) as cm:
             parser.from_string(xml, TypeA)
 

@@ -5,6 +5,7 @@ from unittest import TestCase
 
 from pkg_resources import get_distribution
 
+from xsdata.exceptions import ParserError
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.config import GeneratorOutput
 
@@ -99,3 +100,17 @@ class GeneratorConfigTests(TestCase):
             "</Config>\n"
         )
         self.assertEqual(expected, file_path.read_text())
+
+    def test_read_with_wrong_value(self):
+        existing = (
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            f'<Config xmlns="http://pypi.org/project/xsdata" version="21.7">\n'
+            '  <Output maxLineLength="79">\n'
+            "    <Structure>unknown</Structure>\n"
+            "  </Output>\n"
+            "</Config>\n"
+        )
+        file_path = Path(tempfile.mktemp())
+        file_path.write_text(existing, encoding="utf-8")
+        with self.assertRaises(ParserError):
+            GeneratorConfig.read(file_path)

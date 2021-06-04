@@ -281,7 +281,10 @@ class GeneratorConfig:
             element_name_generator=text.pascal_case,
             attribute_name_generator=text.camel_case,
         )
-        config = ParserConfig(fail_on_unknown_properties=False)
+        config = ParserConfig(
+            fail_on_unknown_properties=False,
+            fail_on_converter_warnings=True,
+        )
         parser = XmlParser(context=ctx, config=config)
         return parser.from_path(path, cls)
 

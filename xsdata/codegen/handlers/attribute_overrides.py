@@ -58,7 +58,7 @@ class AttributeOverridesHandler(RelativeHandlerInterface):
             attr.default == source_attr.default
             and attr.fixed == source_attr.fixed
             and attr.mixed == source_attr.mixed
-            and attr.restrictions == source_attr.restrictions
+            and attr.restrictions.is_compatible(source_attr.restrictions)
         ):
             ClassUtils.remove_attribute(target, attr)
 

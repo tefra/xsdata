@@ -7,6 +7,8 @@
         This is the root type documentation. """Lorem ipsum""" dolor sit amet, consectetur adipiscing elit. Morbi dapibus.
 
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec imperdiet lacus sed sagittis scelerisque. Ut sodales metus: "sit", "amet", "lectus"
+        My\Ipsum
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:complexType>
@@ -16,6 +18,7 @@
             <xsd:documentation>
               This is an inner type """field""" documentation.
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam nec.
+              My\Ipsum
             </xsd:documentation>
           </xsd:annotation>
           <xsd:complexType>
@@ -30,6 +33,7 @@
                   <xsd:documentation>
                     This is an inner type '''field''' documentation.
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus efficitur.
+                    My\Ipsum
                   </xsd:documentation>
                 </xsd:annotation>
               </xsd:element>
@@ -55,6 +59,7 @@
                 <xsd:annotation>
                   <xsd:documentation>
                     Lorem ipsum dolor
+                    My\Ipsum
                   </xsd:documentation>
                 </xsd:annotation>
               </xsd:enumeration>
@@ -75,14 +80,14 @@
   </xsd:element>
   <xsd:element name="DoubleQuotesSummary">
     <xsd:annotation>
-      <xsd:documentation>Dont trip on quotes: "A", "B", "C", "D"</xsd:documentation>
+      <xsd:documentation>Dont trip on quotes: "A", "B", "C", "D" My\Ipsum</xsd:documentation>
     </xsd:annotation>
   </xsd:element>
     <xsd:element name="DoubleQuotesDescription">
     <xsd:annotation>
       <xsd:documentation>Let's trip.
 
-        Dont trip on quotes: "A", "B", "C", "D"</xsd:documentation>
+        Dont trip on quotes: "A", "B", "C", "D" My\Ipsum</xsd:documentation>
     </xsd:annotation>
   </xsd:element>
   <xsd:simpleType name="RootEnum">
@@ -97,7 +102,7 @@
       <xsd:enumeration value="B">
         <xsd:annotation>
           <xsd:documentation>
-            Lorem ipsum dolor """sit""" amet, consectetur adipiscing elit. Morbi dapibus.
+            Lorem ipsum dolor """sit""" amet, consectetur adipiscing elit. Morbi dapibus. My\Ipsum
           </xsd:documentation>
         </xsd:annotation>
       </xsd:enumeration>

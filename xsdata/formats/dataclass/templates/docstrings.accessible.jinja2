@@ -1,1 +1,1 @@
-{{ '"""{}"""'.format(obj.help | text_strip | replace('"""', "'''")) }}
+{{ '"""{}"""'.format(obj.help | clean_docstring) }}

@@ -3,8 +3,7 @@ import warnings
 from pathlib import Path
 from unittest import TestCase
 
-from pkg_resources import get_distribution
-
+from xsdata import __version__
 from xsdata.exceptions import ParserError
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.config import GeneratorOutput
@@ -25,14 +24,13 @@ class GeneratorConfigTests(TestCase):
 
     def test_create(self):
         file_path = Path(tempfile.mktemp())
-        version = get_distribution("xsdata").version
         obj = GeneratorConfig.create()
         with file_path.open("w") as fp:
             obj.write(fp, obj)
 
         expected = (
             '<?xml version="1.0" encoding="UTF-8"?>\n'
-            f'<Config xmlns="http://pypi.org/project/xsdata" version="{version}">\n'
+            f'<Config xmlns="http://pypi.org/project/xsdata" version="{__version__}">\n'
             '  <Output maxLineLength="79">\n'
             "    <Package>generated</Package>\n"
             "    <Format>dataclasses</Format>\n"
@@ -72,7 +70,6 @@ class GeneratorConfigTests(TestCase):
             "  <Aliases/>\n"
             "</Config>\n"
         )
-        version = get_distribution("xsdata").version
         file_path = Path(tempfile.mktemp())
         file_path.write_text(existing, encoding="utf-8")
         config = GeneratorConfig.read(file_path)
@@ -81,7 +78,7 @@ class GeneratorConfigTests(TestCase):
 
         expected = (
             '<?xml version="1.0" encoding="UTF-8"?>\n'
-            f'<Config xmlns="http://pypi.org/project/xsdata" version="{version}">\n'
+            f'<Config xmlns="http://pypi.org/project/xsdata" version="{__version__}">\n'
             '  <Output maxLineLength="79">\n'
             "    <Package>foo.bar</Package>\n"
             "    <Format>dataclasses</Format>\n"

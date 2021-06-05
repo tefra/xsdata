@@ -7,8 +7,8 @@ from typing import Iterator
 import click
 import click_log
 from click_default_group import DefaultGroup
-from pkg_resources import get_distribution
 
+from xsdata import __version__
 from xsdata.codegen.transformer import SchemaTransformer
 from xsdata.codegen.writer import CodeWriter
 from xsdata.logger import logger
@@ -27,7 +27,7 @@ click_log.basic_config(logger)
 
 
 @click.group(cls=DefaultGroup, default="generate", default_if_no_args=False)
-@click.version_option(get_distribution("xsdata").version)
+@click.version_option(__version__)
 @click_log.simple_verbosity_option(logger)
 def cli():
     """xsdata command line interface."""

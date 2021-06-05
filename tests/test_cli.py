@@ -32,7 +32,7 @@ class CliTests(TestCase):
         self.assertIsNone(result.exception)
         self.assertFalse(mock_init.call_args[1]["print"])
         self.assertEqual("foo", config.output.package)
-        self.assertEqual("dataclasses", config.output.format)
+        self.assertEqual("dataclasses", config.output.format.value)
         self.assertEqual(StructureStyle.FILENAMES, config.output.structure)
         self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
 
@@ -60,7 +60,7 @@ class CliTests(TestCase):
         self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
         self.assertFalse(mock_init.call_args[1]["print"])
         self.assertEqual("foo", config.output.package)
-        self.assertEqual("dataclasses", config.output.format)
+        self.assertEqual("dataclasses", config.output.format.value)
         self.assertEqual(StructureStyle.NAMESPACES, config.output.structure)
 
     @mock.patch.object(SchemaTransformer, "process")
@@ -77,7 +77,7 @@ class CliTests(TestCase):
         self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
         self.assertFalse(mock_init.call_args[1]["print"])
         self.assertEqual("foo", config.output.package)
-        self.assertEqual("dataclasses", config.output.format)
+        self.assertEqual("dataclasses", config.output.format.value)
         self.assertEqual(StructureStyle.SINGLE_PACKAGE, config.output.structure)
 
     @mock.patch.object(SchemaTransformer, "process")
@@ -112,7 +112,7 @@ class CliTests(TestCase):
         self.assertIsNone(result.exception)
         self.assertFalse(mock_init.call_args[1]["print"])
         self.assertEqual("foo.bar", config.output.package)
-        self.assertEqual("dataclasses", config.output.format)
+        self.assertEqual("dataclasses", config.output.format.value)
         self.assertEqual(StructureStyle.NAMESPACES, config.output.structure)
         self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
         file_path.unlink()

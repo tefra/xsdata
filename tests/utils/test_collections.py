@@ -11,12 +11,6 @@ class CollectionsTests(TestCase):
         self.assertEqual(-1, collections.find([0, 1], 2))
         self.assertEqual(1, collections.find([0, 1], 1))
 
-    def test_map_key(self):
-        dictionary = {"a": "b"}
-
-        self.assertIsNone(collections.map_key(dictionary, "x"))
-        self.assertEqual("a", collections.map_key(dictionary, "b"))
-
     def test_prepend(self):
         target = [1, 2, 3]
         prepend_values = [4, 5, 6]

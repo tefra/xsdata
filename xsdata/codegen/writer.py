@@ -49,12 +49,12 @@ class CodeWriter:
 
     @classmethod
     def from_config(cls, config: GeneratorConfig) -> "CodeWriter":
-        if config.output.format not in cls.generators:
+        if config.output.format.value not in cls.generators:
             raise CodeGenerationError(
-                f"Unknown output format: '{config.output.format}'"
+                f"Unknown output format: '{config.output.format.value}'"
             )
 
-        generator_class = cls.generators[config.output.format]
+        generator_class = cls.generators[config.output.format.value]
         return cls(generator=generator_class(config))
 
     @classmethod

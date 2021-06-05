@@ -210,6 +210,10 @@ class AttrType:
     circular: bool = field(default=False)
 
     @property
+    def datatype(self) -> Optional[DataType]:
+        return DataType.from_qname(self.qname) if self.native else None
+
+    @property
     def name(self) -> str:
         """Shortcut for qname local name."""
         return namespaces.local_name(self.qname)
@@ -221,10 +225,6 @@ class AttrType:
         return not (
             self.forward or self.native or (not allow_circular and self.circular)
         )
-
-    @property
-    def datatype(self) -> Optional[DataType]:
-        return DataType.from_qname(self.qname) if self.native else None
 
     def clone(self) -> "AttrType":
         """Return a deep cloned instance."""
@@ -464,6 +464,12 @@ class Class:
         """Return whether this instance is derived from an non abstract
         xs:element."""
         return self.tag == Tag.ELEMENT
+
+    @property
+    def is_group(self) -> bool:
+        """Return whether this attribute is derived from an xs:group or
+        xs:attributeGroup."""
+        return self.tag in (Tag.ATTRIBUTE_GROUP, Tag.GROUP)
 
     @property
     def is_enumeration(self) -> bool:

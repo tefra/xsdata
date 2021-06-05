@@ -11,10 +11,10 @@ from typing import Sequence
 
 def unique_sequence(items: Iterable, key: Optional[str] = None) -> List:
     """
-    Return a new list with the unique values from the sequence.
+    Return a new list with the unique values from an iterable.
 
     Optionally you can also provide a lambda to generate the unique key
-    of each item in the sequence.
+    of each item in the iterable object.
     """
     seen = set()
 
@@ -37,15 +37,20 @@ def remove(items: Iterable, predicate: Callable) -> List:
 
 
 def group_by(items: Iterable, key: Callable) -> Dict[Any, List]:
-    """Group the items of a sequence by the result of the callable."""
+    """Group the items of an iterable object by the result of the callable."""
     result = defaultdict(list)
     for item in items:
         result[key(item)].append(item)
     return result
 
 
+def index_by(items: Iterable, key: Callable) -> Dict[Any, Any]:
+    """Index the items of an iterable object by the result of the callable."""
+    return {key(item): item for item in items}
+
+
 def apply(items: Iterable, func: Callable):
-    """Apply the given function to each item of the sequence."""
+    """Apply the given function to each item of the iterable object."""
     for item in items:
         func(item)
 
@@ -62,15 +67,6 @@ def find(items: Sequence, value: Any) -> int:
 def first(items: Iterator) -> Any:
     """Return the first item of the iterator."""
     return next(items, None)
-
-
-def map_key(dictionary: Dict, search: Any) -> Any:
-    """Find and return they key for given search value."""
-    for key, value in dictionary.items():
-        if value == search:
-            return key
-
-    return None
 
 
 def prepend(target: List, *args: Any):

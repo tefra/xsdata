@@ -14,6 +14,7 @@ from xsdata.codegen.writer import CodeWriter
 from xsdata.logger import logger
 from xsdata.models.config import DocstringStyle
 from xsdata.models.config import GeneratorConfig
+from xsdata.models.config import OutputFormat
 from xsdata.models.config import StructureStyle
 from xsdata.utils.downloader import Downloader
 from xsdata.utils.hooks import load_entry_points
@@ -179,7 +180,7 @@ def generate(**kwargs: Any):
             config.output.package = kwargs["package"]
     else:
         config = GeneratorConfig()
-        config.output.format = kwargs["output"]
+        config.output.format = OutputFormat(value=kwargs["output"])
         config.output.package = kwargs["package"]
         config.output.compound_fields = kwargs["compound_fields"]
         config.output.docstring_style = DocstringStyle(kwargs["docstring_style"])

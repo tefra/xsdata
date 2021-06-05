@@ -33,7 +33,7 @@ class GeneratorConfigTests(TestCase):
             f'<Config xmlns="http://pypi.org/project/xsdata" version="{__version__}">\n'
             '  <Output maxLineLength="79">\n'
             "    <Package>generated</Package>\n"
-            "    <Format>dataclasses</Format>\n"
+            '    <Format relativeImports="false">dataclasses</Format>\n'
             "    <Structure>filenames</Structure>\n"
             "    <DocstringStyle>reStructuredText</DocstringStyle>\n"
             "    <CompoundFields>false</CompoundFields>\n"
@@ -81,7 +81,7 @@ class GeneratorConfigTests(TestCase):
             f'<Config xmlns="http://pypi.org/project/xsdata" version="{__version__}">\n'
             '  <Output maxLineLength="79">\n'
             "    <Package>foo.bar</Package>\n"
-            "    <Format>dataclasses</Format>\n"
+            '    <Format relativeImports="false">dataclasses</Format>\n'
             "    <Structure>filenames</Structure>\n"
             "    <DocstringStyle>reStructuredText</DocstringStyle>\n"
             "    <CompoundFields>false</CompoundFields>\n"

@@ -14,7 +14,6 @@ from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import NamespaceType
-from xsdata.utils import collections
 from xsdata.utils import text
 from xsdata.utils.constants import return_true
 
@@ -168,7 +167,11 @@ class ElementBase:
     @property
     def xs_prefix(self) -> Optional[str]:
         """Return the xml schema uri prefix."""
-        return collections.map_key(self.ns_map, Namespace.XS.uri)
+        for prefix, uri in self.ns_map.items():
+            if uri == Namespace.XS.uri:
+                return prefix
+
+        return None
 
     def get_restrictions(self) -> Dict[str, Any]:
         """Return the restrictions dictionary of this element."""

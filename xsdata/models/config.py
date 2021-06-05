@@ -1,5 +1,6 @@
 import warnings
 from dataclasses import dataclass
+from dataclasses import field
 from enum import Enum
 from pathlib import Path
 from typing import Any
@@ -124,6 +125,20 @@ class DocstringStyle(Enum):
 
 
 @dataclass
+class OutputFormat:
+    value: str = field(default="dataclasses")
+    relative_imports: bool = attribute(default=False)
+
+    def __post_init__(self):
+        if self.value == "pydata":
+            warnings.warn(
+                "Output format 'pydata' renamed to 'dataclasses'",
+                DeprecationWarning,
+            )
+            self.value = "dataclasses"
+
+
+@dataclass
 class GeneratorOutput:
     """
     Main generator output options.
@@ -139,18 +154,10 @@ class GeneratorOutput:
 
     max_line_length: int = attribute(default=79)
     package: str = element(default="generated")
-    format: str = element(default="dataclasses")
+    format: OutputFormat = element(default_factory=OutputFormat)
     structure: StructureStyle = element(default=StructureStyle.FILENAMES)
     docstring_style: DocstringStyle = element(default=DocstringStyle.RST)
     compound_fields: bool = element(default=False)
-
-    def __post_init__(self):
-        if self.format == "pydata":
-            warnings.warn(
-                "Output format 'pydata' renamed to 'dataclasses'",
-                DeprecationWarning,
-            )
-            self.format = "dataclasses"
 
 
 @dataclass

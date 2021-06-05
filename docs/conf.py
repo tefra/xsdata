@@ -10,9 +10,9 @@
 #
 import os
 import sys
+from importlib import metadata
 
 import sphinx_material
-from pkg_resources import get_distribution
 
 sys.path.insert(0, os.path.abspath(".."))
 
@@ -23,7 +23,7 @@ copyright = "2020, Christodoulos Tsoulloftas"
 author = "Christodoulos Tsoulloftas"
 
 # The full version, including alpha/beta/rc tags
-version = release = get_distribution("xsdata").version
+version = release = metadata.version("xsdata")
 
 # -- General configuration ---------------------------------------------------
 

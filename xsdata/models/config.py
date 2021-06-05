@@ -8,8 +8,7 @@ from typing import Dict
 from typing import List
 from typing import TextIO
 
-from pkg_resources import get_distribution
-
+from xsdata import __version__
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers import XmlParser
 from xsdata.formats.dataclass.parsers.config import ParserConfig
@@ -256,7 +255,7 @@ class GeneratorConfig:
         name = "Config"
         namespace = "http://pypi.org/project/xsdata"
 
-    version: str = attribute(init=False, default=get_distribution("xsdata").version)
+    version: str = attribute(init=False, default=__version__)
     output: GeneratorOutput = element(default_factory=GeneratorOutput)
     conventions: GeneratorConventions = element(default_factory=GeneratorConventions)
     aliases: GeneratorAliases = element(default_factory=GeneratorAliases)

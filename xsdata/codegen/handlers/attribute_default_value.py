@@ -1,3 +1,4 @@
+from operator import attrgetter
 from typing import Optional
 
 from xsdata.codegen.mixins import RelativeHandlerInterface
@@ -85,6 +86,5 @@ class AttributeDefaultValueHandler(RelativeHandlerInterface):
         if attr_type.native:
             return None
 
-        return self.container.find(
-            attr_type.qname, condition=lambda x: x.is_enumeration
-        )
+        is_enumeration = attrgetter("is_enumeration")
+        return self.container.find(attr_type.qname, condition=is_enumeration)

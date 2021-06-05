@@ -77,11 +77,11 @@ class ClassNameConflictHandlerTests(FactoryTestCase):
 
         mock_rename_class.assert_has_calls(
             [
-                mock.call(classes[0], False),
                 mock.call(classes[1], False),
+                mock.call(classes[0], False),
                 mock.call(classes[2], False),
-                mock.call(classes[0], True),
                 mock.call(classes[1], True),
+                mock.call(classes[0], True),
                 mock.call(classes[2], True),
             ]
         )

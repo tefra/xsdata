@@ -40,7 +40,7 @@ class ClassNameConflictHandler(ContainerHandlerInterface):
         the list.
         """
         total_elements = sum(x.is_element for x in classes)
-        for target in classes:
+        for target in sorted(classes, key=operator.attrgetter("name")):
             if not target.is_element or total_elements > 1:
                 self.rename_class(target, use_name)
 

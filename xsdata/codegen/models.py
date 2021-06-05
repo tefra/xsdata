@@ -61,8 +61,8 @@ class Restrictions:
 
     required: Optional[bool] = field(default=None)
     prohibited: Optional[bool] = field(default=None)
-    min_occurs: Optional[int] = field(default=None, compare=False)
-    max_occurs: Optional[int] = field(default=None, compare=False)
+    min_occurs: Optional[int] = field(default=None)
+    max_occurs: Optional[int] = field(default=None)
     min_exclusive: Optional[str] = field(default=None)
     min_inclusive: Optional[str] = field(default=None)
     min_length: Optional[int] = field(default=None)
@@ -76,10 +76,10 @@ class Restrictions:
     pattern: Optional[str] = field(default=None)
     explicit_timezone: Optional[str] = field(default=None)
     nillable: Optional[bool] = field(default=None)
-    sequential: Optional[bool] = field(default=None, compare=False)
+    sequential: Optional[bool] = field(default=None)
     tokens: Optional[bool] = field(default=None)
     format: Optional[str] = field(default=None)
-    choice: Optional[str] = field(default=None, compare=False)
+    choice: Optional[str] = field(default=None)
 
     @property
     def is_list(self) -> bool:
@@ -94,6 +94,16 @@ class Restrictions:
     @property
     def is_prohibited(self) -> bool:
         return self.prohibited or self.max_occurs == 0
+
+    def is_compatible(self, other: "Restrictions") -> bool:
+        def bool_eq(a: Optional[bool], b: Optional[bool]) -> bool:
+            return bool(a) is bool(b)
+
+        return (
+            bool_eq(self.required, other.required)
+            and bool_eq(self.nillable, other.nillable)
+            and bool_eq(self.tokens, other.tokens)
+        )
 
     def merge(self, source: "Restrictions"):
         """Update properties from another instance."""

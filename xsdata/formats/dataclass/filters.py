@@ -106,7 +106,7 @@ class Filters:
                 "format_metadata": self.format_metadata,
                 "type_name": self.type_name,
                 "text_wrap": self.text_wrap,
-                "text_strip": self.text_strip,
+                "clean_docstring": self.clean_docstring,
             }
         )
 
@@ -119,7 +119,7 @@ class Filters:
         is_enum = obj.is_enumeration
         for attr in obj.attrs:
             name = attr.name
-            docstring = (attr.help or "").strip()
+            docstring = self.clean_docstring(attr.help)
             if is_enum:
                 yield self.constant_name(name, obj.name), docstring
             else:
@@ -218,7 +218,7 @@ class Filters:
         }
 
         if self.docstring_style == DocstringStyle.ACCESSIBLE and attr.help:
-            metadata["doc"] = attr.help.replace('"""', "'''")
+            metadata["doc"] = self.clean_docstring(attr.help, False)
 
         return self.filter_metadata(metadata)
 
@@ -259,7 +259,7 @@ class Filters:
             metadata.update(restrictions)
 
             if self.docstring_style == DocstringStyle.ACCESSIBLE and choice.help:
-                metadata["doc"] = choice.help.replace('"""', "'''")
+                metadata["doc"] = self.clean_docstring(choice.help, False)
 
             result.append(self.filter_metadata(metadata))
 
@@ -366,12 +366,28 @@ class Filters:
         )
 
     @classmethod
-    def text_strip(cls, string: Optional[str]) -> str:
-        """Remove all whitespace from every line of the string."""
+    def clean_docstring(cls, string: Optional[str], escape: bool = True) -> str:
+        """
+        Prepare string for docstring generation.
+
+        - Strip whitespace from each line
+        - Replace triple double quotes with single quotes
+        - Escape backslashes
+
+        :param string: input value
+        :param escape: skip backslashes escape, if string is going to
+            pass through formatting.
+        """
         if not string:
             return ""
 
-        return "\n".join(map(str.strip, string.splitlines()))
+        def _clean(txt: str) -> str:
+            if escape:
+                txt = txt.replace("\\", "\\\\")
+
+            return txt.replace('"""', "'''").strip()
+
+        return "\n".join(_clean(line) for line in string.splitlines() if line.strip())
 
     def format_docstring(self, doc_string: str, level: int) -> str:
         """Format doc strings."""

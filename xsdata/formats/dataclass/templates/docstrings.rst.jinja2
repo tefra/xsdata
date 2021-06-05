@@ -1,9 +1,9 @@
 {% set offset = (level + 1) * 4 + 7 -%}
 {% set is_enum = obj.is_enumeration -%}
 {% set prefix = "cvar" if is_enum else "ivar" -%}
-{{ '"""{}"""'.format(obj.help | text_strip | replace('"""', "'''")) }}
+{{ '"""{}"""'.format(obj.help | clean_docstring) }}
 {% if obj.has_help_attr %}
 {%- for var_name, var_doc in obj | class_params %}
-{{ ":{} {}: {}".format(prefix, var_name, var_doc.replace('"""', "'''")) | text_wrap(offset) }}
+{{ ":{} {}: {}".format(prefix, var_name, var_doc) | text_wrap(offset) }}
 {%- endfor %}
 {%- endif %}

@@ -20,9 +20,8 @@ def test_books_schema():
             str(schema),
             "--package",
             package,
-            "--ns-struct",
-            "--docstring-style",
-            "Google",
+            "--structure-style=namespaces",
+            "--docstring-style=Google",
         ],
         catch_exceptions=False,
     )

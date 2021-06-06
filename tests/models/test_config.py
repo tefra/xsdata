@@ -1,12 +1,10 @@
 import tempfile
-import warnings
 from pathlib import Path
 from unittest import TestCase
 
 from xsdata import __version__
 from xsdata.exceptions import ParserError
 from xsdata.models.config import GeneratorConfig
-from xsdata.models.config import GeneratorOutput
 
 
 class GeneratorConfigTests(TestCase):

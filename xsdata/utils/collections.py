@@ -44,11 +44,6 @@ def group_by(items: Iterable, key: Callable) -> Dict[Any, List]:
     return result
 
 
-def index_by(items: Iterable, key: Callable) -> Dict[Any, Any]:
-    """Index the items of an iterable object by the result of the callable."""
-    return {key(item): item for item in items}
-
-
 def apply(items: Iterable, func: Callable):
     """Apply the given function to each item of the iterable object."""
     for item in items:

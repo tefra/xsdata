@@ -1,4 +1,3 @@
-import warnings
 from dataclasses import dataclass
 from dataclasses import field
 from enum import Enum
@@ -126,16 +125,15 @@ class DocstringStyle(Enum):
 
 @dataclass
 class OutputFormat:
+    """
+    Output format options.
+
+    :param value: Name of the format
+    :param relative_imports: Enable relative imports
+    """
+
     value: str = field(default="dataclasses")
     relative_imports: bool = attribute(default=False)
-
-    def __post_init__(self):
-        if self.value == "pydata":
-            warnings.warn(
-                "Output format 'pydata' renamed to 'dataclasses'",
-                DeprecationWarning,
-            )
-            self.value = "dataclasses"
 
 
 @dataclass

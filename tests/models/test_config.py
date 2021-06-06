@@ -13,15 +13,6 @@ class GeneratorConfigTests(TestCase):
     def setUp(self) -> None:
         self.maxDiff = None
 
-    def test_deprecation_warning(self):
-        with warnings.catch_warnings(record=True) as w:
-            output = GeneratorOutput(format="pydata")
-
-        self.assertEqual(
-            "Output format 'pydata' renamed to 'dataclasses'", str(w[-1].message)
-        )
-        self.assertEqual("dataclasses", output.format)
-
     def test_create(self):
         file_path = Path(tempfile.mktemp())
         obj = GeneratorConfig.create()

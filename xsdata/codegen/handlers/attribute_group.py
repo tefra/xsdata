@@ -1,9 +1,10 @@
+from operator import attrgetter
+
 from xsdata.codegen.mixins import RelativeHandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Class
 from xsdata.codegen.utils import ClassUtils
 from xsdata.exceptions import AnalyzerValueError
-from xsdata.models.enums import Tag
 
 
 class AttributeGroupHandler(RelativeHandlerInterface):
@@ -36,9 +37,7 @@ class AttributeGroupHandler(RelativeHandlerInterface):
         :raises AnalyzerValueError: if source class is not found.
         """
         qname = attr.types[0].qname  # group attributes have one type only.
-        source = self.container.find(
-            qname, condition=lambda x: x.tag in (Tag.ATTRIBUTE_GROUP, Tag.GROUP)
-        )
+        source = self.container.find(qname, condition=attrgetter("is_group"))
 
         if not source:
             raise AnalyzerValueError(f"Group attribute not found: `{qname}`")

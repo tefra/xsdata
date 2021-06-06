@@ -14,6 +14,7 @@ from xsdata.codegen.writer import CodeWriter
 from xsdata.logger import logger
 from xsdata.models.config import DocstringStyle
 from xsdata.models.config import GeneratorConfig
+from xsdata.models.config import OutputFormat
 from xsdata.models.config import StructureStyle
 from xsdata.utils.downloader import Downloader
 from xsdata.utils.hooks import load_entry_points
@@ -87,11 +88,6 @@ def download(source: str, output: str):
     help=(
         "Specify the target package to be created inside the current working directory "
         "Default: generated"
-        "\n\n"
-        "The generated module structure relies on the common input source path"
-        "\n\n"
-        "Use the --ns-struct option for a more flat structure and to avoid circular "
-        "import errors."
     ),
     default="generated",
 )
@@ -114,17 +110,6 @@ def download(source: str, output: str):
         "Default: reStructuredText"
     ),
     default="reStructuredText",
-)
-@click.option(
-    "-ns",
-    "--ns-struct",
-    is_flag=True,
-    default=False,
-    help=(
-        "Use namespaces to group classes in modules. "
-        "Useful against circular import errors. "
-        "Deprecated use '--structure-style namespaces'"
-    ),
 )
 @click.option(
     "-ss",
@@ -155,6 +140,13 @@ def download(source: str, output: str):
     ),
 )
 @click.option(
+    "-ri",
+    "--relative-imports",
+    is_flag=True,
+    default=False,
+    help="Enable relative imports",
+)
+@click.option(
     "-pp",
     "--print",
     is_flag=True,
@@ -179,18 +171,18 @@ def generate(**kwargs: Any):
             config.output.package = kwargs["package"]
     else:
         config = GeneratorConfig()
-        config.output.format = kwargs["output"]
+        config.output.format = OutputFormat(
+            value=kwargs["output"], relative_imports=kwargs["relative_imports"]
+        )
         config.output.package = kwargs["package"]
         config.output.compound_fields = kwargs["compound_fields"]
         config.output.docstring_style = DocstringStyle(kwargs["docstring_style"])
 
-    if kwargs["ns_struct"]:
-        config.output.structure = StructureStyle.NAMESPACES
-        logger.warning(
-            "--ns-struct is deprecated switch to '--structure-style namespaces'"
-        )
-    elif kwargs["structure_style"] != StructureStyle.FILENAMES.value:
+    if kwargs["structure_style"] != StructureStyle.FILENAMES.value:
         config.output.structure = StructureStyle(kwargs["structure_style"])
+
+    if kwargs["relative_imports"]:
+        config.output.format.relative_imports = True
 
     uris = resolve_source(kwargs["source"])
     transformer = SchemaTransformer(config=config, print=kwargs["print"])

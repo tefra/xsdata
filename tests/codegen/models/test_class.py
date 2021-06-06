@@ -137,6 +137,11 @@ class ClassTests(FactoryTestCase):
         obj.extensions.append(ExtensionFactory.create())
         self.assertFalse(obj.is_simple_type)
 
+    def test_property_is_group(self):
+        self.assertTrue(ClassFactory.create(tag=Tag.GROUP).is_group)
+        self.assertTrue(ClassFactory.create(tag=Tag.ATTRIBUTE_GROUP).is_group)
+        self.assertFalse(ClassFactory.create(tag=Tag.ELEMENT).is_group)
+
     def test_property_should_generate(self):
         obj = ClassFactory.create(tag=Tag.ELEMENT)
         self.assertTrue(obj.should_generate)

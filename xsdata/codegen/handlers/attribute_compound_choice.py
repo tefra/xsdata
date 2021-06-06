@@ -1,3 +1,4 @@
+from operator import attrgetter
 from typing import List
 
 from xsdata.codegen.mixins import HandlerInterface
@@ -17,7 +18,7 @@ class AttributeCompoundChoiceHandler(HandlerInterface):
     __slots__ = ()
 
     def process(self, target: Class):
-        groups = group_by(target.attrs, lambda x: x.restrictions.choice)
+        groups = group_by(target.attrs, attrgetter("restrictions.choice"))
         for choice, attrs in groups.items():
             if choice and len(attrs) > 1 and any(attr.is_list for attr in attrs):
                 self.group_fields(target, attrs)

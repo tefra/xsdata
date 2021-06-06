@@ -44,7 +44,13 @@ class DataclassGeneratorTests(FactoryTestCase):
             (cwd.joinpath("thug/life/tests.py"), "thug.life.tests", "module"),
         ]
         self.assertEqual(expected, actual)
-        mock_render_package.assert_has_calls([mock.call([x]) for x in classes])
+        mock_render_package.assert_has_calls(
+            [
+                mock.call([classes[0]], "foo.bar"),
+                mock.call([classes[1]], "bar.foo"),
+                mock.call([classes[2]], "thug.life"),
+            ]
+        )
         mock_render_module.assert_has_calls([mock.call(mock.ANY, [x]) for x in classes])
 
     def test_render_package(self):
@@ -57,7 +63,7 @@ class DataclassGeneratorTests(FactoryTestCase):
 
         random.shuffle(classes)
 
-        actual = self.generator.render_package(classes)
+        actual = self.generator.render_package(classes, "foo.tests")
         expected = "\n".join(
             [
                 "from foo.bar import A as BarA",

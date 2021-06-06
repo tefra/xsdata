@@ -32,7 +32,8 @@ class CliTests(TestCase):
         self.assertIsNone(result.exception)
         self.assertFalse(mock_init.call_args[1]["print"])
         self.assertEqual("foo", config.output.package)
-        self.assertEqual("dataclasses", config.output.format)
+        self.assertEqual("dataclasses", config.output.format.value)
+        self.assertFalse(config.output.format.relative_imports)
         self.assertEqual(StructureStyle.FILENAMES, config.output.structure)
         self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
 
@@ -49,22 +50,6 @@ class CliTests(TestCase):
 
     @mock.patch.object(SchemaTransformer, "process")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
-    def test_generate_with_ns_struct_mode(self, mock_init, mock_process):
-        source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
-        result = self.runner.invoke(
-            cli, [str(source), "--package", "foo", "--ns-struct"]
-        )
-        config = mock_init.call_args[1]["config"]
-
-        self.assertIsNone(result.exception)
-        self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
-        self.assertFalse(mock_init.call_args[1]["print"])
-        self.assertEqual("foo", config.output.package)
-        self.assertEqual("dataclasses", config.output.format)
-        self.assertEqual(StructureStyle.NAMESPACES, config.output.structure)
-
-    @mock.patch.object(SchemaTransformer, "process")
-    @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
     def test_generate_with_structure_style_mode(self, mock_init, mock_process):
         source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
         result = self.runner.invoke(
@@ -77,7 +62,7 @@ class CliTests(TestCase):
         self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
         self.assertFalse(mock_init.call_args[1]["print"])
         self.assertEqual("foo", config.output.package)
-        self.assertEqual("dataclasses", config.output.format)
+        self.assertEqual("dataclasses", config.output.format.value)
         self.assertEqual(StructureStyle.SINGLE_PACKAGE, config.output.structure)
 
     @mock.patch.object(SchemaTransformer, "process")
@@ -112,7 +97,7 @@ class CliTests(TestCase):
         self.assertIsNone(result.exception)
         self.assertFalse(mock_init.call_args[1]["print"])
         self.assertEqual("foo.bar", config.output.package)
-        self.assertEqual("dataclasses", config.output.format)
+        self.assertEqual("dataclasses", config.output.format.value)
         self.assertEqual(StructureStyle.NAMESPACES, config.output.structure)
         self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
         file_path.unlink()
@@ -132,17 +117,17 @@ class CliTests(TestCase):
             cli,
             [
                 str(source),
-                "--config",
-                str(file_path),
-                "--package",
-                "foo",
-                "--ns-struct",
+                f"--config={file_path}",
+                "--package=foo",
+                "--structure-style=namespaces",
+                "--relative-imports",
             ],
         )
         config = mock_init.call_args[1]["config"]
 
         self.assertIsNone(result.exception)
         self.assertEqual("foo", config.output.package)
+        self.assertTrue(config.output.format.relative_imports)
         self.assertEqual(StructureStyle.NAMESPACES, config.output.structure)
         file_path.unlink()
 

@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 from tests.fixtures.datatypes import Telephone
 from xsdata.codegen.models import Restrictions
 from xsdata.formats.dataclass.filters import Filters
@@ -27,7 +29,7 @@ class FiltersTests(FactoryTestCase):
     def setUp(self) -> None:
         super().setUp()
         config = GeneratorConfig()
-        self.filters = Filters.from_config(config)
+        self.filters = Filters(config)
 
     def test_class_name(self):
         self.filters.class_aliases["boom"] = "Bang"
@@ -595,7 +597,27 @@ class FiltersTests(FactoryTestCase):
         self.assertEqual(expected, self.filters.format_metadata(data))
         self.assertEqual('""', self.filters.format_metadata(""))
 
-    def test_from_config(self):
+    def test_import_module(self):
+        case = namedtuple("Case", ["module", "from_module", "result"])
+        cases = [
+            case("foo.bar", "foo", ".bar"),
+            case("bar.foo", "foo", "bar.foo"),
+            case("a.b.e.f", "a.b.c.d", "..e.f"),
+            case("a.b.c.f", "a.b.c.d", ".f"),
+            case("a.b.c.f.e", "a.b", ".c.f.e"),
+            case("a.b.c.f", "", "a.b.c.f"),
+        ]
+
+        transform = self.filters.import_module
+        self.filters.relative_imports = False
+        for case in cases:
+            self.assertEqual(case.module, transform(case.module, case.from_module))
+
+        self.filters.relative_imports = True
+        for case in cases:
+            self.assertEqual(case.result, transform(case.module, case.from_module))
+
+    def test__init(self):
         config = GeneratorConfig()
         config.conventions.package_name.safe_prefix = "safe_package"
         config.conventions.package_name.case = NameCase.MIXED
@@ -611,7 +633,7 @@ class FiltersTests(FactoryTestCase):
         config.aliases.package_name.append(GeneratorAlias("g", "h"))
         config.aliases.module_name.append(GeneratorAlias("i", "j"))
 
-        filters = Filters.from_config(config)
+        filters = Filters(config)
 
         self.assertEqual("safe_class", filters.class_safe_prefix)
         self.assertEqual("safe_field", filters.field_safe_prefix)

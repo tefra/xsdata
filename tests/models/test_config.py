@@ -1,26 +1,15 @@
 import tempfile
-import warnings
 from pathlib import Path
 from unittest import TestCase
 
 from xsdata import __version__
 from xsdata.exceptions import ParserError
 from xsdata.models.config import GeneratorConfig
-from xsdata.models.config import GeneratorOutput
 
 
 class GeneratorConfigTests(TestCase):
     def setUp(self) -> None:
         self.maxDiff = None
-
-    def test_deprecation_warning(self):
-        with warnings.catch_warnings(record=True) as w:
-            output = GeneratorOutput(format="pydata")
-
-        self.assertEqual(
-            "Output format 'pydata' renamed to 'dataclasses'", str(w[-1].message)
-        )
-        self.assertEqual("dataclasses", output.format)
 
     def test_create(self):
         file_path = Path(tempfile.mktemp())
@@ -33,7 +22,7 @@ class GeneratorConfigTests(TestCase):
             f'<Config xmlns="http://pypi.org/project/xsdata" version="{__version__}">\n'
             '  <Output maxLineLength="79">\n'
             "    <Package>generated</Package>\n"
-            "    <Format>dataclasses</Format>\n"
+            '    <Format relativeImports="false">dataclasses</Format>\n'
             "    <Structure>filenames</Structure>\n"
             "    <DocstringStyle>reStructuredText</DocstringStyle>\n"
             "    <CompoundFields>false</CompoundFields>\n"
@@ -81,7 +70,7 @@ class GeneratorConfigTests(TestCase):
             f'<Config xmlns="http://pypi.org/project/xsdata" version="{__version__}">\n'
             '  <Output maxLineLength="79">\n'
             "    <Package>foo.bar</Package>\n"
-            "    <Format>dataclasses</Format>\n"
+            '    <Format relativeImports="false">dataclasses</Format>\n'
             "    <Structure>filenames</Structure>\n"
             "    <DocstringStyle>reStructuredText</DocstringStyle>\n"
             "    <CompoundFields>false</CompoundFields>\n"

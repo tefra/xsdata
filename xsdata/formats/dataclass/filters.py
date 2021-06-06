@@ -28,6 +28,10 @@ from xsdata.utils.namespaces import clean_uri
 from xsdata.utils.namespaces import local_name
 
 
+def index_aliases(aliases: List[GeneratorAlias]) -> Dict:
+    return {alias.source: alias.target for alias in aliases}
+
+
 class Filters:
 
     __slots__ = (
@@ -47,47 +51,27 @@ class Filters:
         "module_safe_prefix",
         "docstring_style",
         "max_line_length",
+        "relative_imports",
     )
 
-    def __init__(
-        self,
-        class_aliases: Dict,
-        field_aliases: Dict,
-        package_aliases: Dict,
-        module_aliases: Dict,
-        class_case: Callable,
-        field_case: Callable,
-        constant_case: Callable,
-        package_case: Callable,
-        module_case: Callable,
-        class_safe_prefix: str,
-        field_safe_prefix: str,
-        constant_safe_prefix: str,
-        package_safe_prefix: str,
-        module_safe_prefix: str,
-        docstring_style: DocstringStyle,
-        max_line_length: int = 79,
-    ):
-
-        self.class_aliases = class_aliases
-        self.field_aliases = field_aliases
-        self.package_aliases = package_aliases
-        self.module_aliases = module_aliases
-
-        self.class_case = class_case
-        self.field_case = field_case
-        self.constant_case = constant_case
-        self.package_case = package_case
-        self.module_case = module_case
-
-        self.class_safe_prefix = class_safe_prefix
-        self.field_safe_prefix = field_safe_prefix
-        self.constant_safe_prefix = constant_safe_prefix
-        self.package_safe_prefix = package_safe_prefix
-        self.module_safe_prefix = module_safe_prefix
-
-        self.docstring_style = docstring_style
-        self.max_line_length = max_line_length
+    def __init__(self, config: GeneratorConfig):
+        self.class_aliases: Dict = index_aliases(config.aliases.class_name)
+        self.field_aliases: Dict = index_aliases(config.aliases.field_name)
+        self.package_aliases: Dict = index_aliases(config.aliases.package_name)
+        self.module_aliases: Dict = index_aliases(config.aliases.module_name)
+        self.class_case: Callable = config.conventions.class_name.case
+        self.field_case: Callable = config.conventions.field_name.case
+        self.constant_case: Callable = config.conventions.constant_name.case
+        self.package_case: Callable = config.conventions.package_name.case
+        self.module_case: Callable = config.conventions.module_name.case
+        self.class_safe_prefix: str = config.conventions.class_name.safe_prefix
+        self.field_safe_prefix: str = config.conventions.field_name.safe_prefix
+        self.constant_safe_prefix: str = config.conventions.constant_name.safe_prefix
+        self.package_safe_prefix: str = config.conventions.package_name.safe_prefix
+        self.module_safe_prefix: str = config.conventions.module_name.safe_prefix
+        self.docstring_style: DocstringStyle = config.output.docstring_style
+        self.max_line_length: int = config.output.max_line_length
+        self.relative_imports: bool = config.output.format.relative_imports
 
     def register(self, env: Environment):
         env.filters.update(
@@ -107,6 +91,8 @@ class Filters:
                 "type_name": self.type_name,
                 "text_wrap": self.text_wrap,
                 "clean_docstring": self.clean_docstring,
+                "import_module": self.import_module,
+                "import_class": self.import_class,
             }
         )
 
@@ -191,6 +177,30 @@ class Filters:
             return datatype.type.__name__
 
         return self.class_name(attr_type.alias or attr_type.name)
+
+    def import_module(self, module: str, from_module: str) -> str:
+        """Convert import module to relative path if config is enabled."""
+        if self.relative_imports:
+            mp = module.split(".")
+            fp = from_module.split(".")
+            index = 0
+
+            # Find common parts index
+            while len(mp) > index and len(fp) > index and mp[index] == fp[index]:
+                index += 1
+
+            if index > 0:
+                # Replace common parts with dots
+                return f"{'.' * max(1, len(fp) - index)}{'.'.join(mp[index:])}"
+
+        return module
+
+    def import_class(self, name: str, alias: Optional[str]) -> str:
+        """Convert import class name with alias support."""
+        if alias:
+            return f"{self.class_name(name)} as {self.class_name(alias)}"
+
+        return self.class_name(name)
 
     def field_metadata(
         self, attr: Attr, parent_namespace: Optional[str], parents: List[str]
@@ -600,27 +610,3 @@ class Filters:
                 result.append(f"from {library} import {', '.join(names)}")
 
         return "\n".join(result)
-
-    @classmethod
-    def from_config(cls, config: GeneratorConfig) -> "Filters":
-        def index_aliases(aliases: List[GeneratorAlias]) -> Dict:
-            return {alias.source: alias.target for alias in aliases}
-
-        return cls(
-            class_aliases=index_aliases(config.aliases.class_name),
-            field_aliases=index_aliases(config.aliases.field_name),
-            package_aliases=index_aliases(config.aliases.package_name),
-            module_aliases=index_aliases(config.aliases.module_name),
-            class_case=config.conventions.class_name.case,
-            field_case=config.conventions.field_name.case,
-            constant_case=config.conventions.constant_name.case,
-            package_case=config.conventions.package_name.case,
-            module_case=config.conventions.module_name.case,
-            class_safe_prefix=config.conventions.class_name.safe_prefix,
-            field_safe_prefix=config.conventions.field_name.safe_prefix,
-            constant_safe_prefix=config.conventions.constant_name.safe_prefix,
-            package_safe_prefix=config.conventions.package_name.safe_prefix,
-            module_safe_prefix=config.conventions.module_name.safe_prefix,
-            docstring_style=config.output.docstring_style,
-            max_line_length=config.output.max_line_length,
-        )

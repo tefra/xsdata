@@ -173,7 +173,7 @@ class ElementBaseTests(TestCase):
         element = ElementBase()
         self.assertIsNone(element.xs_prefix)
 
-        element.ns_map["foo"] = Namespace.XS.uri
+        element.ns_map = {"a": "a", "foo": Namespace.XS.uri}
         self.assertEqual("foo", element.xs_prefix)
 
     def test_children(self):

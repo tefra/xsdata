@@ -85,13 +85,13 @@ class XmlValTests(TestCase):
         meta = self.context.build(ChoiceType)
         var = meta.choices[0]
 
-        self.assertIsNone(var.find_value_choice(["1.1", "1.2"]))
-        self.assertEqual(var.elements["int2"], var.find_value_choice(None))
-        self.assertEqual(var.elements["qname"], var.find_value_choice("foo"))
-        self.assertEqual(var.elements["int"], var.find_value_choice(1))
-        self.assertEqual(var.elements["tokens"], var.find_value_choice([1, 2]))
-        self.assertEqual(var.elements["a"], var.find_value_choice(TypeA(1)))
-        self.assertEqual(var.elements["b"], var.find_value_choice(TypeB(1, "b")))
+        self.assertIsNone(var.find_value_choice(["1.1", "1.2"], False))
+        self.assertEqual(var.elements["int2"], var.find_value_choice(None, False))
+        self.assertEqual(var.elements["qname"], var.find_value_choice("foo", False))
+        self.assertEqual(var.elements["int"], var.find_value_choice(1, False))
+        self.assertEqual(var.elements["tokens"], var.find_value_choice([1, 2], False))
+        self.assertEqual(var.elements["a"], var.find_value_choice(TypeA(1), True))
+        self.assertEqual(var.elements["b"], var.find_value_choice(TypeB(1, "b"), True))
 
     def test_match_namespace(self):
         var = XmlVarFactory.create(xml_type=XmlType.WILDCARD, name="foo")

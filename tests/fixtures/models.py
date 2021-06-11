@@ -24,6 +24,7 @@ class TypeC:
     x: int
     y: str
     z: float
+    fixed: str = field(init=False, default="ignored")
 
 
 @dataclass
@@ -44,6 +45,11 @@ class ExtendedType:
     a: Optional[TypeA] = field(default=None)
     any: Optional[object] = field(default=None)
     wildcard: Optional[object] = field(default=None, metadata={"type": "Wildcard"})
+
+
+@dataclass
+class ExtendedListType:
+    wildcard: List[object] = field(default_factory=list, metadata={"type": "Wildcard"})
 
 
 @dataclass
@@ -71,7 +77,9 @@ class UnionType:
 
 @dataclass
 class AttrsType:
-    attrs: Dict[str, str] = field(metadata={"type": "Attributes"})
+    index: int = field(metadata={"type": "Attribute"})
+    attrs: Dict[str, str] = field(metadata={"type": "Attributes", "namespace": "##any"})
+    fixed: str = field(init=False, default="ignored", metadata={"type": "Attribute"})
 
 
 @dataclass

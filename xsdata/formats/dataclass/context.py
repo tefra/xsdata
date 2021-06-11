@@ -1,6 +1,5 @@
 import sys
 from collections import defaultdict
-from dataclasses import is_dataclass
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -11,6 +10,8 @@ from typing import Type
 
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.bindings import T
+from xsdata.formats.dataclass.compat import cross_compat
+from xsdata.formats.dataclass.compat import CrossCompat
 from xsdata.formats.dataclass.models.builders import XmlMetaBuilder
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.models.enums import DataType
@@ -28,6 +29,7 @@ class XmlContext:
     __slots__ = (
         "element_name_generator",
         "attribute_name_generator",
+        "compat",
         "cache",
         "xsi_cache",
         "sys_modules",
@@ -37,10 +39,13 @@ class XmlContext:
         self,
         element_name_generator: Callable = return_input,
         attribute_name_generator: Callable = return_input,
+        compat: CrossCompat = cross_compat,
     ):
 
         self.element_name_generator = element_name_generator
         self.attribute_name_generator = attribute_name_generator
+        self.compat = compat
+
         self.cache: Dict[Type, XmlMeta] = {}
         self.xsi_cache: Dict[str, List[Type]] = defaultdict(list)
         self.sys_modules = 0
@@ -77,7 +82,7 @@ class XmlContext:
         self.xsi_cache.clear()
 
         for clazz in self.get_subclasses(object):
-            if is_dataclass(clazz):
+            if self.compat.is_model(clazz):
                 source_qname = XmlMetaBuilder.build_source_qname(
                     clazz, self.element_name_generator
                 )
@@ -155,12 +160,12 @@ class XmlContext:
         """
 
         if clazz not in self.cache:
-            self.cache[clazz] = XmlMetaBuilder.build(
-                clazz,
-                parent_ns,
-                self.element_name_generator,
-                self.attribute_name_generator,
+            builder = XmlMetaBuilder(
+                compat=self.compat,
+                element_name_generator=self.element_name_generator,
+                attribute_name_generator=self.attribute_name_generator,
             )
+            self.cache[clazz] = builder.build(clazz, parent_ns)
         return self.cache[clazz]
 
     def build_recursive(self, clazz: Type, parent_ns: Optional[str] = None):
@@ -171,7 +176,7 @@ class XmlContext:
             for var in meta.get_all_vars():
                 types = var.element_types if var.elements else var.types
                 for tp in types:
-                    if is_dataclass(tp):
+                    if self.compat.is_model(tp):
                         self.build_recursive(tp, meta.namespace)
 
     def local_names_match(self, names: Set[str], clazz: Type) -> bool:

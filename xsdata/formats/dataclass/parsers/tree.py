@@ -44,6 +44,7 @@ class TreeParser(NodeParser):
                 xml_type=XmlType.WILDCARD,
                 index=0,
                 types=(object,),
+                clazz=None,
                 init=True,
                 mixed=False,
                 tokens=False,
@@ -59,5 +60,11 @@ class TreeParser(NodeParser):
                 wildcards=(),
             )
 
-            child = WildcardNode(var=var, attrs=attrs, ns_map=ns_map, position=0)
+            child = WildcardNode(
+                var=var,
+                attrs=attrs,
+                ns_map=ns_map,
+                position=0,
+                factory=self.context.compat.any_element,
+            )
         queue.append(child)

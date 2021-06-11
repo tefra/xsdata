@@ -3,6 +3,7 @@ import copy
 import importlib
 import random
 import unittest
+from dataclasses import is_dataclass
 from typing import Any
 from typing import Dict
 from typing import List
@@ -24,6 +25,7 @@ from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
+from xsdata.utils.collections import first
 from xsdata.utils.namespaces import build_qname
 
 T = TypeVar("T")
@@ -339,6 +341,7 @@ class XmlVarFactory(Factory):
         qname: Optional[str] = None,
         index: int = 0,
         types: Optional[Sequence[Type]] = None,
+        clazz: Optional[Type] = None,
         init: bool = True,
         mixed: bool = False,
         tokens: bool = False,
@@ -370,11 +373,15 @@ class XmlVarFactory(Factory):
         if wildcards is None:
             wildcards = []
 
+        if clazz is None:
+            clazz = first(tp for tp in types if is_dataclass(tp))
+
         return XmlVar(
             index=index,
             name=name,
             qname=qname,
             types=types,
+            clazz=clazz,
             init=init,
             mixed=mixed,
             tokens=tokens,

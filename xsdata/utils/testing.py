@@ -373,15 +373,12 @@ class XmlVarFactory(Factory):
         if wildcards is None:
             wildcards = []
 
-        if clazz is None:
-            clazz = first(tp for tp in types if is_dataclass(tp))
-
         return XmlVar(
             index=index,
             name=name,
             qname=qname,
             types=types,
-            clazz=clazz,
+            clazz=clazz or first(tp for tp in types if is_dataclass(tp)),
             init=init,
             mixed=mixed,
             tokens=tokens,

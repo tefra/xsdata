@@ -6,11 +6,11 @@ from typing import List
 from typing import Optional
 from typing import Type
 
+from xsdata.formats.dataclass.parsers.bases import NodeParser
+from xsdata.formats.dataclass.parsers.bases import Parsed
 from xsdata.formats.dataclass.parsers.handlers import default_handler
 from xsdata.formats.dataclass.parsers.mixins import XmlHandler
 from xsdata.formats.dataclass.parsers.mixins import XmlNode
-from xsdata.formats.dataclass.parsers.nodes import NodeParser
-from xsdata.formats.dataclass.parsers.nodes import Parsed
 from xsdata.models.enums import EventType
 from xsdata.utils.namespaces import local_name
 from xsdata.utils.text import snake_case

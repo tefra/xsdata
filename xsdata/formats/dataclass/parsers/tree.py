@@ -7,12 +7,12 @@ from typing import Type
 
 from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.formats.dataclass.models.elements import XmlVar
+from xsdata.formats.dataclass.parsers.bases import NodeParser
+from xsdata.formats.dataclass.parsers.bases import Parsed
 from xsdata.formats.dataclass.parsers.handlers import default_handler
 from xsdata.formats.dataclass.parsers.mixins import XmlHandler
 from xsdata.formats.dataclass.parsers.mixins import XmlNode
-from xsdata.formats.dataclass.parsers.nodes import NodeParser
-from xsdata.formats.dataclass.parsers.nodes import Parsed
-from xsdata.formats.dataclass.parsers.nodes import WildcardNode
+from xsdata.formats.dataclass.parsers.nodes.wildcard import WildcardNode
 
 
 @dataclass

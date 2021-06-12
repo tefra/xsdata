@@ -65,6 +65,6 @@ class TreeParser(NodeParser):
                 attrs=attrs,
                 ns_map=ns_map,
                 position=0,
-                factory=self.context.compat.any_element,
+                factory=self.context.class_type.any_element,
             )
         queue.append(child)

@@ -77,7 +77,7 @@ class JsonParser(AbstractParser):
                 list_type = True
                 args = get_args(clazz)
 
-                if len(args) != 1 or not self.context.compat.is_model(args[0]):
+                if len(args) != 1 or not self.context.class_type.is_model(args[0]):
                     raise TypeError()
 
                 clazz = args[0]
@@ -109,7 +109,7 @@ class JsonParser(AbstractParser):
     def bind_dataclass(self, data: Dict, clazz: Type[T]) -> T:
         """Recursively build the given model from the input dict data."""
 
-        if set(data.keys()) == self.context.compat.derived_keys:
+        if set(data.keys()) == self.context.class_type.derived_keys:
             return self.bind_derived_dataclass(data, clazz)
 
         meta = self.context.build(clazz)
@@ -136,7 +136,7 @@ class JsonParser(AbstractParser):
         xsi_type = data["type"]
         params = data["value"]
 
-        generic = self.context.compat.derived_element
+        generic = self.context.class_type.derived_element
 
         if clazz is generic:
             real_clazz: Optional[Type[T]] = None
@@ -163,12 +163,12 @@ class JsonParser(AbstractParser):
         max_score = -1.0
         for clazz in classes:
 
-            if not self.context.compat.is_model(clazz):
+            if not self.context.class_type.is_model(clazz):
                 continue
 
             if self.context.local_names_match(keys, clazz):
                 candidate = self.bind_optional_dataclass(data, clazz)
-                score = self.context.compat.score_object(candidate)
+                score = self.context.class_type.score_object(candidate)
                 if score > max_score:
                     max_score = score
                     obj = candidate
@@ -209,11 +209,11 @@ class JsonParser(AbstractParser):
             return self.bind_text(meta, var, value)
 
         keys = value.keys()
-        if keys == self.context.compat.any_keys:
+        if keys == self.context.class_type.any_keys:
             # Bind data to AnyElement dataclass
-            return self.bind_dataclass(value, self.context.compat.any_element)
+            return self.bind_dataclass(value, self.context.class_type.any_element)
 
-        if keys == self.context.compat.derived_keys:
+        if keys == self.context.class_type.derived_keys:
             # Bind data to AnyElement dataclass
             return self.bind_derived_value(meta, var, value)
 
@@ -225,7 +225,7 @@ class JsonParser(AbstractParser):
 
         if var.elements:
             # Compound field we need to match the value to one of the choice elements
-            check_subclass = self.context.compat.is_model(type(value))
+            check_subclass = self.context.class_type.is_model(type(value))
             choice = var.find_value_choice(value, check_subclass)
             if choice:
                 return self.bind_text(meta, choice, value)
@@ -290,7 +290,7 @@ class JsonParser(AbstractParser):
         else:
             value = self.bind_best_dataclass(params, meta.element_types)
 
-        generic = self.context.compat.derived_element
+        generic = self.context.class_type.derived_element
         return generic(qname=qname, value=value, type=xsi_type)
 
     @classmethod

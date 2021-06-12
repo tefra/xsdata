@@ -74,7 +74,7 @@ class XmlSerializer(AbstractSerializer):
     def write_object(self, obj: Any):
         """Produce an events stream from a dataclass or a derived element."""
         qname = xsi_type = None
-        if isinstance(obj, self.context.compat.derived_element):
+        if isinstance(obj, self.context.class_type.derived_element):
             meta = self.context.build(obj.value.__class__)
             xsi_type = QName(meta.source_qname)
             qname = obj.qname
@@ -176,11 +176,11 @@ class XmlSerializer(AbstractSerializer):
         The object can be a dataclass or a generic object or any other
         simple type.
         """
-        if isinstance(value, self.context.compat.any_element):
+        if isinstance(value, self.context.class_type.any_element):
             yield from self.write_wildcard(value, var, namespace)
-        elif isinstance(value, self.context.compat.derived_element):
+        elif isinstance(value, self.context.class_type.derived_element):
             yield from self.write_derived_element(value, namespace)
-        elif self.context.compat.is_model(type(value)):
+        elif self.context.class_type.is_model(type(value)):
             yield from self.write_xsi_type(value, var, namespace)
         elif var.is_element:
             yield from self.write_element(value, var, namespace)
@@ -188,7 +188,7 @@ class XmlSerializer(AbstractSerializer):
             yield from self.write_data(value, var, namespace)
 
     def write_derived_element(self, value: Any, namespace: NoneStr) -> Generator:
-        if self.context.compat.is_model(type(value.value)):
+        if self.context.class_type.is_model(type(value.value)):
             xsi_type = None
             if value.type:
                 meta = self.context.build(value.value.__class__)
@@ -255,20 +255,20 @@ class XmlSerializer(AbstractSerializer):
         The value can be anything as long as we can match the qualified
         name or its type to a choice.
         """
-        if isinstance(value, self.context.compat.derived_element):
+        if isinstance(value, self.context.class_type.derived_element):
             choice = var.find_choice(value.qname)
             value = value.value
 
-            if self.context.compat.is_model(type(value)):
+            if self.context.class_type.is_model(type(value)):
                 func = self.write_xsi_type
             else:
                 func = self.write_element
 
-        elif isinstance(value, self.context.compat.any_element) and value.qname:
+        elif isinstance(value, self.context.class_type.any_element) and value.qname:
             choice = var.find_choice(value.qname)
             func = self.write_any_type
         else:
-            check_subclass = self.context.compat.is_model(type(value))
+            check_subclass = self.context.class_type.is_model(type(value))
             choice = var.find_value_choice(value, check_subclass)
             func = self.write_value
 

@@ -16,7 +16,7 @@ from typing import Type
 
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.converter import converter
-from xsdata.formats.dataclass.compat import CrossCompat
+from xsdata.formats.dataclass.compat import ClassType
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.formats.dataclass.models.elements import XmlVar
@@ -29,23 +29,23 @@ from xsdata.utils.namespaces import build_qname
 
 
 class XmlMetaBuilder:
-    __slots__ = ("compat", "element_name_generator", "attribute_name_generator")
+    __slots__ = ("class_type", "element_name_generator", "attribute_name_generator")
 
     def __init__(
         self,
-        compat: CrossCompat,
+        class_type: ClassType,
         element_name_generator: Callable,
         attribute_name_generator: Callable,
     ):
 
-        self.compat = compat
+        self.class_type = class_type
         self.element_name_generator = element_name_generator
         self.attribute_name_generator = attribute_name_generator
 
     def build(self, clazz: Type, parent_ns: Optional[str]) -> XmlMeta:
         """Build the binding metadata for a dataclass and its fields."""
 
-        if not self.compat.is_model(clazz):
+        if not self.class_type.is_model(clazz):
             raise XmlContextError(f"Type '{clazz}' is not a dataclass.")
 
         # Fetch the dataclass meta settings and make sure we don't inherit
@@ -115,21 +115,21 @@ class XmlMetaBuilder:
         type_hints = get_type_hints(clazz)
         globalns = sys.modules[clazz.__module__].__dict__
         builder = XmlVarBuilder(
-            compat=self.compat,
+            class_type=self.class_type,
             parent_ns=parent_ns,
             default_xml_type=self.default_xml_type(clazz),
             element_name_generator=element_name_generator,
             attribute_name_generator=attribute_name_generator,
         )
 
-        for index, _field in enumerate(self.compat.get_fields(clazz)):
+        for index, _field in enumerate(self.class_type.get_fields(clazz)):
             var = builder.build(
                 index,
                 _field.name,
                 type_hints[_field.name],
                 _field.metadata,
                 _field.init,
-                self.compat.default_value(_field),
+                self.class_type.default_value(_field),
                 globalns,
             )
             if var is not None:
@@ -153,7 +153,7 @@ class XmlMetaBuilder:
         """Return the default xml type for the fields of the given dataclass
         with an undefined type."""
         counters: Dict[str, int] = defaultdict(int)
-        for var in self.compat.get_fields(clazz):
+        for var in self.class_type.get_fields(clazz):
             xml_type = var.metadata.get("type")
             counters[xml_type or "undefined"] += 1
 
@@ -171,8 +171,8 @@ class XmlMetaBuilder:
 class XmlVarBuilder:
 
     __slots__ = (
-        "compat",
         "parent_ns",
+        "class_type",
         "default_xml_type",
         "element_name_generator",
         "attribute_name_generator",
@@ -180,14 +180,14 @@ class XmlVarBuilder:
 
     def __init__(
         self,
-        compat: CrossCompat,
+        class_type: ClassType,
         parent_ns: Optional[str],
         default_xml_type: str,
         element_name_generator: Callable = return_input,
         attribute_name_generator: Callable = return_input,
     ):
-        self.compat = compat
         self.parent_ns = parent_ns
+        self.class_type = class_type
         self.default_xml_type = default_xml_type
         self.element_name_generator = element_name_generator
         self.attribute_name_generator = attribute_name_generator
@@ -226,7 +226,7 @@ class XmlVarBuilder:
         local_name = self.build_local_name(xml_type, local_name, name)
         element_list = self.is_element_list(origin, sub_origin, tokens)
         any_type = self.is_any_type(types, xml_type)
-        clazz = first(tp for tp in types if self.compat.is_model(tp))
+        clazz = first(tp for tp in types if self.class_type.is_model(tp))
         namespaces = self.resolve_namespaces(xml_type, namespace)
         default_namespace = self.default_namespace(namespaces)
         qname = build_qname(default_namespace, local_name)
@@ -448,7 +448,7 @@ class XmlVarBuilder:
         # Validate all types are registered in the converter.
         for tp in types:
             if (
-                not self.compat.is_model(tp)
+                not self.class_type.is_model(tp)
                 and tp not in converter.registry
                 and not issubclass(tp, Enum)
             ):

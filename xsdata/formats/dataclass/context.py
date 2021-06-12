@@ -10,8 +10,7 @@ from typing import Type
 
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.bindings import T
-from xsdata.formats.dataclass.compat import cross_compat
-from xsdata.formats.dataclass.compat import CrossCompat
+from xsdata.formats.dataclass.compat import class_types
 from xsdata.formats.dataclass.models.builders import XmlMetaBuilder
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.models.enums import DataType
@@ -29,7 +28,7 @@ class XmlContext:
     __slots__ = (
         "element_name_generator",
         "attribute_name_generator",
-        "compat",
+        "class_type",
         "cache",
         "xsi_cache",
         "sys_modules",
@@ -39,12 +38,12 @@ class XmlContext:
         self,
         element_name_generator: Callable = return_input,
         attribute_name_generator: Callable = return_input,
-        compat: CrossCompat = cross_compat,
+        class_type: str = "dataclasses",
     ):
 
         self.element_name_generator = element_name_generator
         self.attribute_name_generator = attribute_name_generator
-        self.compat = compat
+        self.class_type = class_types.get_type(class_type)
 
         self.cache: Dict[Type, XmlMeta] = {}
         self.xsi_cache: Dict[str, List[Type]] = defaultdict(list)
@@ -82,7 +81,7 @@ class XmlContext:
         self.xsi_cache.clear()
 
         for clazz in self.get_subclasses(object):
-            if self.compat.is_model(clazz):
+            if self.class_type.is_model(clazz):
                 source_qname = XmlMetaBuilder.build_source_qname(
                     clazz, self.element_name_generator
                 )
@@ -161,7 +160,7 @@ class XmlContext:
 
         if clazz not in self.cache:
             builder = XmlMetaBuilder(
-                compat=self.compat,
+                class_type=self.class_type,
                 element_name_generator=self.element_name_generator,
                 attribute_name_generator=self.attribute_name_generator,
             )
@@ -176,7 +175,7 @@ class XmlContext:
             for var in meta.get_all_vars():
                 types = var.element_types if var.elements else var.types
                 for tp in types:
-                    if self.compat.is_model(tp):
+                    if self.class_type.is_model(tp):
                         self.build_recursive(tp, meta.namespace)
 
     def local_names_match(self, names: Set[str], clazz: Type) -> bool:

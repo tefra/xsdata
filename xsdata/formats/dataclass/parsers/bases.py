@@ -104,7 +104,7 @@ class NodeParser(PushParser):
             if xsi_type is None or meta.qname == qname:
                 derived_factory = None
             else:
-                derived_factory = self.context.compat.derived_element
+                derived_factory = self.context.class_type.derived_element
 
             from xsdata.formats.dataclass.parsers.nodes import ElementNode
 

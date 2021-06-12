@@ -200,7 +200,7 @@ class ElementNode(XmlNode):
         elif var.name in params:
             previous = params[var.name]
             if previous.qname:
-                factory = self.context.compat.any_element
+                factory = self.context.class_type.any_element
                 params[var.name] = factory(children=[previous])
 
             params[var.name].children.append(value)
@@ -223,10 +223,10 @@ class ElementNode(XmlNode):
         """Prepare parsed value before binding to a wildcard field."""
 
         if qname:
-            any_factory = self.context.compat.any_element
-            derived_factory = self.context.compat.derived_element
+            any_factory = self.context.class_type.any_element
+            derived_factory = self.context.class_type.derived_element
 
-            if not self.context.compat.is_model(value):
+            if not self.context.class_type.is_model(value):
 
                 value = any_factory(qname=qname, text=converter.serialize(value))
             elif not isinstance(value, (any_factory, derived_factory)):
@@ -280,7 +280,7 @@ class ElementNode(XmlNode):
                 items.append(tail)
         else:
             previous = params.get(var.name, None)
-            factory = self.context.compat.any_element
+            factory = self.context.class_type.any_element
             generic = factory(
                 text=txt,
                 tail=tail,
@@ -323,7 +323,7 @@ class ElementNode(XmlNode):
             )
 
         xsi_type = ParserUtils.xsi_type(attrs, ns_map)
-        derived_factory = self.context.compat.derived_element
+        derived_factory = self.context.class_type.derived_element
 
         if var.clazz:
             return self.build_element_node(
@@ -368,7 +368,7 @@ class ElementNode(XmlNode):
             attrs=attrs,
             ns_map=ns_map,
             position=position,
-            factory=self.context.compat.any_element,
+            factory=self.context.class_type.any_element,
         )
 
     def build_element_node(

@@ -18,7 +18,7 @@ from tests.fixtures.books import BookForm
 from tests.fixtures.models import TypeB
 from tests.fixtures.series import Country
 from xsdata.exceptions import XmlContextError
-from xsdata.formats.dataclass.compat import cross_compat
+from xsdata.formats.dataclass.compat import class_types
 from xsdata.formats.dataclass.models.builders import XmlMetaBuilder
 from xsdata.formats.dataclass.models.builders import XmlVarBuilder
 from xsdata.formats.dataclass.models.elements import XmlType
@@ -36,7 +36,7 @@ class XmlMetaBuilderTests(FactoryTestCase):
     def setUp(self):
         super().setUp()
         self.builder = XmlMetaBuilder(
-            compat=cross_compat,
+            class_type=class_types.get_type("dataclasses"),
             element_name_generator=return_input,
             attribute_name_generator=return_input,
         )
@@ -211,7 +211,7 @@ class XmlMetaBuilderTests(FactoryTestCase):
 class XmlVarBuilderTests(TestCase):
     def setUp(self) -> None:
         self.builder = XmlVarBuilder(
-            compat=cross_compat,
+            class_type=class_types.get_type("dataclasses"),
             parent_ns=None,
             default_xml_type=XmlType.ELEMENT,
             element_name_generator=return_input,

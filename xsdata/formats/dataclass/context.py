@@ -49,6 +49,11 @@ class XmlContext:
         self.xsi_cache: Dict[str, List[Type]] = defaultdict(list)
         self.sys_modules = 0
 
+    def reset(self):
+        self.cache.clear()
+        self.xsi_cache.clear()
+        self.sys_modules = 0
+
     def fetch(
         self,
         clazz: Type,

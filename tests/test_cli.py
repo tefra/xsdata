@@ -10,6 +10,8 @@ from tests import fixtures_dir
 from xsdata.cli import cli
 from xsdata.cli import resolve_source
 from xsdata.codegen.transformer import SchemaTransformer
+from xsdata.codegen.writer import CodeWriter
+from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.logger import logger
 from xsdata.models.config import DocstringStyle
 from xsdata.models.config import GeneratorConfig
@@ -17,10 +19,21 @@ from xsdata.models.config import StructureStyle
 from xsdata.utils.downloader import Downloader
 
 
+CodeWriter.register_generator("testing", DataclassGenerator)
+
+
 class CliTests(TestCase):
     def setUp(self):
         self.runner = CliRunner()
         super().setUp()
+
+    @classmethod
+    def setUpClass(cls):
+        CodeWriter.register_generator("testing", DataclassGenerator)
+
+    @classmethod
+    def tearDownClass(cls):
+        CodeWriter.unregister_generator("testing")
 
     @mock.patch.object(SchemaTransformer, "process")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
@@ -113,19 +126,21 @@ class CliTests(TestCase):
             config.write(fp, config)
 
         source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
+
         result = self.runner.invoke(
             cli,
             [
                 str(source),
                 f"--config={file_path}",
+                "--output=testing",
                 "--package=foo",
                 "--structure-style=namespaces",
                 "--relative-imports",
             ],
         )
+        self.assertIsNone(result.exception, msg=result.output)
         config = mock_init.call_args[1]["config"]
 
-        self.assertIsNone(result.exception)
         self.assertEqual("foo", config.output.package)
         self.assertTrue(config.output.format.relative_imports)
         self.assertEqual(StructureStyle.NAMESPACES, config.output.structure)

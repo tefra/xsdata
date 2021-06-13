@@ -10,6 +10,7 @@ from typing import Type
 
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
+from xsdata.utils.hooks import load_entry_points
 
 
 class ClassType(abc.ABC):
@@ -117,3 +118,5 @@ class Dataclasses(ClassType):
 
 class_types = ClassTypes()
 class_types.register("dataclasses", Dataclasses())
+
+load_entry_points("xsdata.plugins.class_types")

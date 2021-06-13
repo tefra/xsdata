@@ -23,6 +23,7 @@ class XmlContext:
 
     :param element_name_generator: Default element name generator
     :param attribute_name_generator: Default attribute name generator
+    :param class_type: Default class type `dataclasses`
     """
 
     __slots__ = (

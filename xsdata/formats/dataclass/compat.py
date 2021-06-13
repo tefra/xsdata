@@ -20,36 +20,38 @@ class ClassType(abc.ABC):
     @property
     @abc.abstractmethod
     def any_element(self) -> Type:
-        pass
+        """Return the any type used to bind wildcard element nodes."""
 
     @property
     @abc.abstractmethod
     def derived_element(self) -> Type:
-        pass
+        """Return the derived type used to bind ambiguous element nodes."""
 
     @property
     def any_keys(self) -> Set[str]:
+        """Return the field names of the any type."""
         return {field.name for field in self.get_fields(self.any_element)}
 
     @property
     def derived_keys(self) -> Set[str]:
+        """Return the field names of the derived type."""
         return {field.name for field in self.get_fields(self.derived_element)}
 
     @abc.abstractmethod
-    def is_model(self, obj: Type) -> bool:
-        pass
+    def is_model(self, obj: Any) -> bool:
+        """Return whether the given type is binding model."""
 
     @abc.abstractmethod
-    def get_fields(self, obj: Type) -> Tuple[Any, ...]:
-        pass
+    def get_fields(self, obj: Any) -> Tuple[Any, ...]:
+        """Return the models fields in the correct mro ordering."""
 
     @abc.abstractmethod
     def default_value(self, field: Any) -> Any:
-        pass
+        """Return the default value or factory of the given model field."""
 
     def score_object(self, obj: Any) -> float:
         """
-        Score a dataclass instance by the field values types.
+        Score a binding model instance by its field values types.
 
         Weights:
             1. None: 0
@@ -100,10 +102,10 @@ class Dataclasses(ClassType):
     def derived_element(self) -> Type:
         return DerivedElement
 
-    def is_model(self, obj: Type) -> bool:
+    def is_model(self, obj: Any) -> bool:
         return is_dataclass(obj)
 
-    def get_fields(self, obj: Type) -> Tuple[Any, ...]:
+    def get_fields(self, obj: Any) -> Tuple[Any, ...]:
         return fields(obj)
 
     def default_value(self, field: Any) -> Any:

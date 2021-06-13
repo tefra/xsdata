@@ -180,7 +180,7 @@ class XmlSerializer(AbstractSerializer):
             yield from self.write_wildcard(value, var, namespace)
         elif isinstance(value, self.context.class_type.derived_element):
             yield from self.write_derived_element(value, namespace)
-        elif self.context.class_type.is_model(type(value)):
+        elif self.context.class_type.is_model(value):
             yield from self.write_xsi_type(value, var, namespace)
         elif var.is_element:
             yield from self.write_element(value, var, namespace)
@@ -188,7 +188,7 @@ class XmlSerializer(AbstractSerializer):
             yield from self.write_data(value, var, namespace)
 
     def write_derived_element(self, value: Any, namespace: NoneStr) -> Generator:
-        if self.context.class_type.is_model(type(value.value)):
+        if self.context.class_type.is_model(value.value):
             xsi_type = None
             if value.type:
                 meta = self.context.build(value.value.__class__)
@@ -259,7 +259,7 @@ class XmlSerializer(AbstractSerializer):
             choice = var.find_choice(value.qname)
             value = value.value
 
-            if self.context.class_type.is_model(type(value)):
+            if self.context.class_type.is_model(value):
                 func = self.write_xsi_type
             else:
                 func = self.write_element
@@ -268,7 +268,7 @@ class XmlSerializer(AbstractSerializer):
             choice = var.find_choice(value.qname)
             func = self.write_any_type
         else:
-            check_subclass = self.context.class_type.is_model(type(value))
+            check_subclass = self.context.class_type.is_model(value)
             choice = var.find_value_choice(value, check_subclass)
             func = self.write_value
 

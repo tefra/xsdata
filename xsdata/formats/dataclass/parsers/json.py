@@ -225,7 +225,7 @@ class JsonParser(AbstractParser):
 
         if var.elements:
             # Compound field we need to match the value to one of the choice elements
-            check_subclass = self.context.class_type.is_model(type(value))
+            check_subclass = self.context.class_type.is_model(value)
             choice = var.find_value_choice(value, check_subclass)
             if choice:
                 return self.bind_text(meta, choice, value)

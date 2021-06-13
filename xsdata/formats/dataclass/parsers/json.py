@@ -2,8 +2,6 @@ import json
 import warnings
 from dataclasses import dataclass
 from dataclasses import field
-from dataclasses import fields
-from dataclasses import is_dataclass
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -21,16 +19,11 @@ from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
-from xsdata.formats.dataclass.models.generics import AnyElement
-from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.formats.dataclass.typing import get_args
 from xsdata.formats.dataclass.typing import get_origin
 from xsdata.utils.constants import EMPTY_MAP
-
-ANY_KEYS = {f.name for f in fields(AnyElement)}
-DERIVED_KEYS = {f.name for f in fields(DerivedElement)}
 
 
 @dataclass
@@ -84,7 +77,7 @@ class JsonParser(AbstractParser):
                 list_type = True
                 args = get_args(clazz)
 
-                if len(args) != 1 or not is_dataclass(args[0]):
+                if len(args) != 1 or not self.context.class_type.is_model(args[0]):
                     raise TypeError()
 
                 clazz = args[0]
@@ -116,7 +109,7 @@ class JsonParser(AbstractParser):
     def bind_dataclass(self, data: Dict, clazz: Type[T]) -> T:
         """Recursively build the given model from the input dict data."""
 
-        if set(data.keys()) == DERIVED_KEYS:
+        if set(data.keys()) == self.context.class_type.derived_keys:
             return self.bind_derived_dataclass(data, clazz)
 
         meta = self.context.build(clazz)
@@ -143,7 +136,9 @@ class JsonParser(AbstractParser):
         xsi_type = data["type"]
         params = data["value"]
 
-        if clazz is DerivedElement:
+        generic = self.context.class_type.derived_element
+
+        if clazz is generic:
             real_clazz: Optional[Type[T]] = None
             if xsi_type:
                 real_clazz = self.context.find_type(xsi_type)
@@ -158,7 +153,7 @@ class JsonParser(AbstractParser):
         else:
             value = self.bind_dataclass(params, clazz)
 
-        return DerivedElement(qname=qname, type=xsi_type, value=value)
+        return generic(qname=qname, type=xsi_type, value=value)
 
     def bind_best_dataclass(self, data: Dict, classes: Iterable[Type[T]]) -> T:
         """Attempt to bind the given data to one possible models, if more than
@@ -167,9 +162,13 @@ class JsonParser(AbstractParser):
         keys = set(data.keys())
         max_score = -1.0
         for clazz in classes:
-            if is_dataclass(clazz) and self.context.local_names_match(keys, clazz):
+
+            if not self.context.class_type.is_model(clazz):
+                continue
+
+            if self.context.local_names_match(keys, clazz):
                 candidate = self.bind_optional_dataclass(data, clazz)
-                score = ParserUtils.score_object(candidate)
+                score = self.context.class_type.score_object(candidate)
                 if score > max_score:
                     max_score = score
                     obj = candidate
@@ -210,11 +209,11 @@ class JsonParser(AbstractParser):
             return self.bind_text(meta, var, value)
 
         keys = value.keys()
-        if keys == ANY_KEYS:
+        if keys == self.context.class_type.any_keys:
             # Bind data to AnyElement dataclass
-            return self.bind_dataclass(value, AnyElement)
+            return self.bind_dataclass(value, self.context.class_type.any_element)
 
-        if keys == DERIVED_KEYS:
+        if keys == self.context.class_type.derived_keys:
             # Bind data to AnyElement dataclass
             return self.bind_derived_value(meta, var, value)
 
@@ -226,7 +225,8 @@ class JsonParser(AbstractParser):
 
         if var.elements:
             # Compound field we need to match the value to one of the choice elements
-            choice = var.find_value_choice(value)
+            check_subclass = self.context.class_type.is_model(value)
+            choice = var.find_value_choice(value, check_subclass)
             if choice:
                 return self.bind_text(meta, choice, value)
 
@@ -257,11 +257,10 @@ class JsonParser(AbstractParser):
             # xs:anyType element, check all meta classes
             return self.bind_best_dataclass(data, meta.element_types)
         else:
+            assert var.clazz is not None
             return self.bind_dataclass(data, var.clazz)
 
-    def bind_derived_value(
-        self, meta: XmlMeta, var: XmlVar, data: Dict
-    ) -> DerivedElement:
+    def bind_derived_value(self, meta: XmlMeta, var: XmlVar, data: Dict) -> T:
         """Bind derived element entry point."""
 
         qname = data["qname"]
@@ -291,7 +290,8 @@ class JsonParser(AbstractParser):
         else:
             value = self.bind_best_dataclass(params, meta.element_types)
 
-        return DerivedElement(qname=qname, value=value, type=xsi_type)
+        generic = self.context.class_type.derived_element
+        return generic(qname=qname, value=value, type=xsi_type)
 
     @classmethod
     def find_var(

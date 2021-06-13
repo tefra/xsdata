@@ -224,7 +224,7 @@ class JsonParserTests(FactoryTestCase):
         )
 
     def test_bind_attributes(self):
-        data = {"attrs": {"a": 1, "b": 2}}
+        data = {"attrs": {"a": 1, "b": 2}, "index": 1}
 
         actual = self.parser.bind_dataclass(data, AttrsType)
         self.assertEqual(data["attrs"], actual.attrs)

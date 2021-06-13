@@ -1,7 +1,6 @@
 import itertools
 import operator
 import sys
-from dataclasses import is_dataclass
 from typing import Any
 from typing import Dict
 from typing import Iterator
@@ -15,7 +14,6 @@ from typing import Type
 
 from xsdata.formats.converter import converter
 from xsdata.models.enums import NamespaceType
-from xsdata.utils import collections
 from xsdata.utils.namespaces import local_name
 from xsdata.utils.namespaces import target_uri
 
@@ -80,6 +78,7 @@ class XmlVar(MetaMixin):
         "name",
         "qname",
         "types",
+        "clazz",
         "init",
         "mixed",
         "tokens",
@@ -101,7 +100,6 @@ class XmlVar(MetaMixin):
         "is_attribute",
         "is_attributes",
         "namespace_matches",
-        "clazz",
         "is_clazz_union",
         "local_name",
     )
@@ -112,6 +110,7 @@ class XmlVar(MetaMixin):
         name: str,
         qname: str,
         types: Sequence[Type],
+        clazz: Optional[Type],
         init: bool,
         mixed: bool,
         tokens: bool,
@@ -132,6 +131,7 @@ class XmlVar(MetaMixin):
         self.name = name
         self.qname = qname
         self.types = types
+        self.clazz = clazz
         self.init = init
         self.mixed = mixed
         self.tokens = tokens
@@ -148,7 +148,6 @@ class XmlVar(MetaMixin):
 
         self.namespace_matches: Optional[Dict[str, bool]] = None
 
-        self.clazz = collections.first(tp for tp in types if is_dataclass(tp))
         self.is_clazz_union = self.clazz and len(types) > 1
         self.local_name = local_name(qname)
 
@@ -181,7 +180,7 @@ class XmlVar(MetaMixin):
         match = self.elements.get(qname)
         return match or find_by_namespace(self.wildcards, qname)
 
-    def find_value_choice(self, value: Any) -> Optional["XmlVar"]:
+    def find_value_choice(self, value: Any, check_subclass: bool) -> Optional["XmlVar"]:
         """Match and return a choice field that matches the given value
         type."""
 
@@ -192,7 +191,6 @@ class XmlVar(MetaMixin):
         else:
             tp = type(value)
             tokens = False
-            check_subclass = is_dataclass(value)
 
         return self.find_type_choice(value, tp, tokens, check_subclass)
 

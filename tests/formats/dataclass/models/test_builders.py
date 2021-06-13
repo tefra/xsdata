@@ -18,6 +18,7 @@ from tests.fixtures.books import BookForm
 from tests.fixtures.models import TypeB
 from tests.fixtures.series import Country
 from xsdata.exceptions import XmlContextError
+from xsdata.formats.dataclass.compat import class_types
 from xsdata.formats.dataclass.models.builders import XmlMetaBuilder
 from xsdata.formats.dataclass.models.builders import XmlVarBuilder
 from xsdata.formats.dataclass.models.elements import XmlType
@@ -32,6 +33,14 @@ from xsdata.utils.testing import XmlVarFactory
 
 
 class XmlMetaBuilderTests(FactoryTestCase):
+    def setUp(self):
+        super().setUp()
+        self.builder = XmlMetaBuilder(
+            class_type=class_types.get_type("dataclasses"),
+            element_name_generator=return_input,
+            attribute_name_generator=return_input,
+        )
+
     @mock.patch.object(XmlMetaBuilder, "build_vars")
     def test_build(self, mock_build_vars):
         var = XmlVarFactory.create(
@@ -39,7 +48,7 @@ class XmlMetaBuilderTests(FactoryTestCase):
         )
         mock_build_vars.return_value = [var]
 
-        result = XmlMetaBuilder.build(Artist, None, return_input, return_input)
+        result = self.builder.build(Artist, None)
         expected = XmlMetaFactory.create(
             clazz=Artist,
             qname="{http://musicbrainz.org/ns/mmd-2.0#}artist",
@@ -53,9 +62,7 @@ class XmlMetaBuilderTests(FactoryTestCase):
 
     @mock.patch.object(XmlMetaBuilder, "build_vars", return_value=[])
     def test_build_with_parent_namespace(self, mock_build_vars):
-        result = XmlMetaBuilder.build(
-            Country, "http://xsdata", return_input, return_input
-        )
+        result = self.builder.build(Country, "http://xsdata")
 
         self.assertEqual(build_qname("http://xsdata", "country"), result.qname)
         mock_build_vars.assert_called_once_with(
@@ -64,7 +71,8 @@ class XmlMetaBuilderTests(FactoryTestCase):
 
     @mock.patch.object(XmlMetaBuilder, "build_vars", return_value=[])
     def test_build_with_no_meta_name_and_name_generator(self, *args):
-        result = XmlMetaBuilder.build(BookForm, None, text.snake_case, return_input)
+        self.builder.element_name_generator = text.snake_case
+        result = self.builder.build(BookForm, None)
 
         self.assertEqual("book_form", result.qname)
 
@@ -83,20 +91,20 @@ class XmlMetaBuilderTests(FactoryTestCase):
             class Meta:
                 name = "thug"
 
-        result = XmlMetaBuilder.build(Foo, None, return_input, return_input)
+        result = self.builder.build(Foo, None)
         self.assertEqual("Foo", result.qname)
 
-        result = XmlMetaBuilder.build(Thug, None, return_input, return_input)
+        result = self.builder.build(Thug, None)
         self.assertEqual("thug", result.qname)
 
     def test_build_with_no_dataclass_raises_exception(self, *args):
         with self.assertRaises(XmlContextError) as cm:
-            XmlMetaBuilder.build(int, None, return_input, return_input)
+            self.builder.build(int, None)
 
         self.assertEqual(f"Type '{int}' is not a dataclass.", str(cm.exception))
 
     def test_build_vars(self):
-        result = XmlMetaBuilder.build_vars(BookForm, None, text.pascal_case, str.upper)
+        result = self.builder.build_vars(BookForm, None, text.pascal_case, str.upper)
         self.assertIsInstance(result, Iterator)
 
         expected = [
@@ -162,7 +170,7 @@ class XmlMetaBuilderTests(FactoryTestCase):
             self.assertIsNone(var.clazz)
 
     def test_build_vars_with_ignore_types(self):
-        result = XmlMetaBuilder.build_vars(TypeB, None, return_input, return_input)
+        result = self.builder.build_vars(TypeB, None, return_input, return_input)
         self.assertIsInstance(result, Iterator)
 
         actual = list(result)
@@ -170,20 +178,20 @@ class XmlMetaBuilderTests(FactoryTestCase):
 
     def test_default_xml_type(self):
         cls = make_dataclass("a", [("x", int)])
-        self.assertEqual(XmlType.TEXT, XmlMetaBuilder.default_xml_type(cls))
+        self.assertEqual(XmlType.TEXT, self.builder.default_xml_type(cls))
 
         cls = make_dataclass("b", [("x", int), ("y", int)])
-        self.assertEqual(XmlType.ELEMENT, XmlMetaBuilder.default_xml_type(cls))
+        self.assertEqual(XmlType.ELEMENT, self.builder.default_xml_type(cls))
 
         cls = make_dataclass(
             "c", [("x", int), ("y", int, field(metadata=dict(type="Text")))]
         )
-        self.assertEqual(XmlType.ELEMENT, XmlMetaBuilder.default_xml_type(cls))
+        self.assertEqual(XmlType.ELEMENT, self.builder.default_xml_type(cls))
 
         cls = make_dataclass(
             "d", [("x", int), ("y", int, field(metadata=dict(type="Element")))]
         )
-        self.assertEqual(XmlType.TEXT, XmlMetaBuilder.default_xml_type(cls))
+        self.assertEqual(XmlType.TEXT, self.builder.default_xml_type(cls))
 
         with self.assertRaises(XmlContextError) as cm:
             cls = make_dataclass(
@@ -193,7 +201,7 @@ class XmlMetaBuilderTests(FactoryTestCase):
                     ("y", int, field(metadata=dict(type="Text"))),
                 ],
             )
-            XmlMetaBuilder.default_xml_type(cls)
+            self.builder.default_xml_type(cls)
 
         self.assertEqual(
             "Dataclass `e` includes more than one text node!", str(cm.exception)
@@ -203,8 +211,9 @@ class XmlMetaBuilderTests(FactoryTestCase):
 class XmlVarBuilderTests(TestCase):
     def setUp(self) -> None:
         self.builder = XmlVarBuilder(
-            default_xml_type=XmlType.ELEMENT,
+            class_type=class_types.get_type("dataclasses"),
             parent_ns=None,
+            default_xml_type=XmlType.ELEMENT,
             element_name_generator=return_input,
             attribute_name_generator=return_input,
         )
@@ -215,10 +224,9 @@ class XmlVarBuilderTests(TestCase):
         globalns = sys.modules[CompoundFieldExample.__module__].__dict__
         type_hints = get_type_hints(CompoundFieldExample)
         class_field = fields(CompoundFieldExample)[0]
+        self.builder.parent_ns = "bar"
 
-        builder = XmlVarBuilder(XmlType.ELEMENT, "bar", return_input, return_input)
-
-        actual = builder.build(
+        actual = self.builder.build(
             66,
             "compound",
             type_hints["compound"],

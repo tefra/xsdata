@@ -1,7 +1,6 @@
 import json
 from dataclasses import dataclass
 from dataclasses import field
-from dataclasses import is_dataclass
 from enum import Enum
 from io import StringIO
 from typing import Any
@@ -59,7 +58,7 @@ class JsonSerializer(AbstractSerializer):
         self.dump_factory(self.convert(obj), out, indent=self.indent)
 
     def convert(self, obj: Any, var: Optional[XmlVar] = None) -> Any:
-        if var is None or is_dataclass(obj):
+        if var is None or self.context.class_type.is_model(obj):
 
             if isinstance(obj, list):
                 return [self.convert(o) for o in obj]

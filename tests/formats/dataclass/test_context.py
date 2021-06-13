@@ -18,6 +18,7 @@ from xsdata.utils.testing import XmlMetaFactory
 class XmlContextTests(FactoryTestCase):
     def setUp(self):
         self.ctx = XmlContext()
+        self.ctx.reset()
         super().setUp()
 
     @mock.patch.object(XmlContext, "find_subclass")

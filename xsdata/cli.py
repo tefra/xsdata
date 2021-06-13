@@ -181,6 +181,9 @@ def generate(**kwargs: Any):
     if kwargs["structure_style"] != StructureStyle.FILENAMES.value:
         config.output.structure = StructureStyle(kwargs["structure_style"])
 
+    if kwargs["output"] != "dataclasses":
+        config.output.format.value = kwargs["output"]
+
     if kwargs["relative_imports"]:
         config.output.format.relative_imports = True
 

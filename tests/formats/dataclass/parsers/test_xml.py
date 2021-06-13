@@ -33,7 +33,7 @@ class UserXmlParserTests(FactoryTestCase):
         objects = []
         queue = []
         var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo", types=(bool,))
-        queue.append(PrimitiveNode(var, {}))
+        queue.append(PrimitiveNode(var, {}, None))
 
         result = self.parser.end(queue, objects, "enabled", "true", None)
         self.assertTrue(result)

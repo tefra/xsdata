@@ -7,9 +7,9 @@ from tests.fixtures.books.fixtures import books
 from tests.fixtures.books.fixtures import events
 from tests.fixtures.books.fixtures import events_default_ns
 from xsdata.exceptions import XmlHandlerError
+from xsdata.formats.dataclass.parsers.bases import RecordParser
 from xsdata.formats.dataclass.parsers.handlers import XmlEventHandler
 from xsdata.formats.dataclass.parsers.handlers import XmlSaxHandler
-from xsdata.formats.dataclass.parsers.nodes import RecordParser
 
 
 class XmlEventHandlerTests(TestCase):

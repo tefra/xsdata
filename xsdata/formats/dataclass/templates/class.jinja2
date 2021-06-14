@@ -7,14 +7,15 @@
 {% set class_name =  obj.name|class_name -%}
 {% set local_name =  obj.meta_name or obj.name -%}
 {% set local_name = None if class_name == local_name or parents|length != 1 else local_name -%}
-{% set base_classes = obj.extensions|map(attribute='type')|map('type_name')|join(', ') %}
+{% set base_classes = obj.extensions|map(attribute='type')|map('type_name')|join(', ') -%}
+{% set target_namespace = obj.target_namespace if level == 0 and module_namespace != obj.target_namespace else None %}
 
 @dataclass
 class {{ class_name }}{{"({})".format(base_classes) if base_classes }}:
 {%- if help %}
 {{ help|indent(4, first=True) }}
 {%- endif -%}
-{%- if local_name or obj.is_nillable or obj.namespace is not none %}
+{%- if local_name or obj.is_nillable or obj.namespace is not none or target_namespace %}
     class Meta:
         {%- if local_name %}
         name = "{{ local_name }}"
@@ -24,6 +25,9 @@ class {{ class_name }}{{"({})".format(base_classes) if base_classes }}:
         {%- endif -%}
         {%- if obj.namespace is not none %}
         namespace = "{{ obj.namespace }}"
+        {%- endif %}
+        {%- if target_namespace and target_namespace != obj.namespace %}
+        target_namespace = "{{ target_namespace }}"
         {%- endif %}
 {% elif obj.attrs|length == 0 and not help %}
     pass

@@ -404,7 +404,7 @@ class XmlMetaFactory(Factory):
         cls,
         clazz: Type,
         qname: Optional[str] = None,
-        source_qname: Optional[str] = None,
+        target_qname: Optional[str] = None,
         nillable: bool = False,
         text: Optional[XmlVar] = None,
         choices: Optional[Sequence[XmlVar]] = None,
@@ -418,8 +418,8 @@ class XmlMetaFactory(Factory):
         if qname is None:
             qname = clazz.__name__
 
-        if source_qname is None:
-            source_qname = qname
+        if target_qname is None:
+            target_qname = qname
 
         if choices is None:
             choices = []
@@ -439,7 +439,7 @@ class XmlMetaFactory(Factory):
         return XmlMeta(
             clazz=clazz,
             qname=qname,
-            source_qname=source_qname,
+            target_qname=target_qname,
             nillable=nillable,
             text=text,
             choices=choices,

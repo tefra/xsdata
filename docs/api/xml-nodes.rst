@@ -12,7 +12,6 @@ for models and their fields.
     :template: dataclass.rst
     :nosignatures:
 
-    XmlNode
     ElementNode
     WildcardNode
     UnionNode

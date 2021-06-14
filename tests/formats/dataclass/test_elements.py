@@ -143,7 +143,7 @@ class XmlMetaTests(TestCase):
             "XmlMeta("
             "clazz=<class 'tests.fixtures.models.TypeA'>, "
             "qname='a', "
-            "source_qname='a', "
+            "target_qname='a', "
             "nillable=False, "
             "text=None, "
             "choices=[], "

@@ -2,6 +2,7 @@ import re
 from pathlib import Path
 from typing import Iterator
 from typing import List
+from typing import Optional
 
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
@@ -92,20 +93,27 @@ class DataclassGenerator(AbstractGenerator):
     ) -> str:
         """Render the source code for the target module of the given class
         list."""
+
+        if len({x.target_namespace for x in classes}) == 1:
+            module_namespace = classes[0].target_namespace
+        else:
+            module_namespace = None
+
         resolver.process(classes)
         imports = resolver.sorted_imports()
-        output = self.render_classes(resolver.sorted_classes())
-        namespace = classes[0].target_namespace
+        output = self.render_classes(resolver.sorted_classes(), module_namespace)
         module = classes[0].target_module
 
         return self.env.get_template("module.jinja2").render(
             output=output,
             module=module,
             imports=imports,
-            namespace=namespace,
+            namespace=module_namespace,
         )
 
-    def render_classes(self, classes: List[Class]) -> str:
+    def render_classes(
+        self, classes: List[Class], module_namespace: Optional[str]
+    ) -> str:
         """Render the source code of the classes."""
         load = self.env.get_template
         config = self.config
@@ -123,7 +131,9 @@ class DataclassGenerator(AbstractGenerator):
             return (
                 load(template)
                 .render(
-                    obj=obj, docstring_style=config.output.docstring_style.name.lower()
+                    obj=obj,
+                    module_namespace=module_namespace,
+                    docstring_style=config.output.docstring_style.name.lower(),
                 )
                 .strip()
             )

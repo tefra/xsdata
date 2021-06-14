@@ -265,7 +265,7 @@ class XmlMeta(MetaMixin):
 
     :param clazz: The dataclass type
     :param qname: The namespace qualified name.
-    :param source_qname: The source namespace qualified name.
+    :param target_qname: The target namespace qualified name.
     :param nillable: Specifies whether an explicit empty value can be assigned.
     :param mixed_content: Has a wildcard with mixed flag enabled
     :param text: Text var
@@ -279,7 +279,7 @@ class XmlMeta(MetaMixin):
     __slots__ = (
         "clazz",
         "qname",
-        "source_qname",
+        "target_qname",
         "nillable",
         "text",
         "choices",
@@ -296,7 +296,7 @@ class XmlMeta(MetaMixin):
         self,
         clazz: Type,
         qname: str,
-        source_qname: str,
+        target_qname: str,
         nillable: bool,
         text: Optional[XmlVar],
         choices: Sequence[XmlVar],
@@ -309,7 +309,7 @@ class XmlMeta(MetaMixin):
         self.clazz = clazz
         self.qname = qname
         self.namespace = target_uri(qname)
-        self.source_qname = source_qname
+        self.target_qname = target_qname
         self.nillable = nillable
         self.text = text
         self.choices = choices

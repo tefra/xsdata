@@ -76,7 +76,7 @@ class XmlSerializer(AbstractSerializer):
         qname = xsi_type = None
         if isinstance(obj, self.context.class_type.derived_element):
             meta = self.context.build(obj.value.__class__)
-            xsi_type = QName(meta.source_qname)
+            xsi_type = QName(meta.target_qname)
             qname = obj.qname
             obj = obj.value
 
@@ -192,7 +192,7 @@ class XmlSerializer(AbstractSerializer):
             xsi_type = None
             if value.type:
                 meta = self.context.build(value.value.__class__)
-                xsi_type = QName(meta.source_qname)
+                xsi_type = QName(meta.target_qname)
 
             yield from self.write_dataclass(
                 value.value, namespace, qname=value.qname, xsi_type=xsi_type
@@ -233,7 +233,7 @@ class XmlSerializer(AbstractSerializer):
         clazz = var.clazz
         if clazz is None or self.context.is_derived(value, clazz):
             meta = self.context.fetch(value.__class__, namespace)
-            return QName(meta.source_qname)
+            return QName(meta.target_qname)
 
         raise SerializerError(
             f"{value.__class__.__name__} is not derived from {clazz.__name__}"

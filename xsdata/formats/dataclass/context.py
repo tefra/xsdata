@@ -73,7 +73,7 @@ class XmlContext:
         """
         meta = self.build(clazz, parent_ns)
         subclass = None
-        if xsi_type and meta.source_qname != xsi_type:
+        if xsi_type and meta.target_qname != xsi_type:
             subclass = self.find_subclass(clazz, xsi_type)
 
         return self.build(subclass, parent_ns) if subclass else meta
@@ -86,12 +86,11 @@ class XmlContext:
 
         self.xsi_cache.clear()
 
+        name_generator = self.element_name_generator
         for clazz in self.get_subclasses(object):
             if self.class_type.is_model(clazz):
-                source_qname = XmlMetaBuilder.build_source_qname(
-                    clazz, self.element_name_generator
-                )
-                self.xsi_cache[source_qname].append(clazz)
+                qname = XmlMetaBuilder.build_target_qname(clazz, name_generator)
+                self.xsi_cache[qname].append(clazz)
 
         self.sys_modules = len(sys.modules)
 

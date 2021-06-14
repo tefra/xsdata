@@ -39,7 +39,7 @@ class XmlContextTests(FactoryTestCase):
         meta = XmlMetaFactory.create(
             clazz=Artist,
             qname="Artist",
-            source_qname="Artist",
+            target_qname="Artist",
             nillable=False,
         )
 

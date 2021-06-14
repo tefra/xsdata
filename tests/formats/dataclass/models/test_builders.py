@@ -103,6 +103,21 @@ class XmlMetaBuilderTests(FactoryTestCase):
 
         self.assertEqual(f"Type '{int}' is not a dataclass.", str(cm.exception))
 
+    def test_target_namespace(self):
+        class Meta:
+            namespace = "bar"
+            target_namespace = "foo"
+
+        self.assertEqual("foo", self.builder.target_namespace(None, Meta))
+
+        del Meta.target_namespace
+        self.assertEqual("bar", self.builder.target_namespace(None, Meta))
+
+        class Module:
+            __NAMESPACE__ = "gl"
+
+        self.assertEqual("gl", self.builder.target_namespace(Module, Meta))
+
     def test_build_vars(self):
         result = self.builder.build_vars(BookForm, None, text.pascal_case, str.upper)
         self.assertIsInstance(result, Iterator)

@@ -147,6 +147,51 @@ class DataclassGeneratorTests(FactoryTestCase):
 
         self.assertEqual(expected, actual)
 
+    def test_render_module_with_mixed_target_namespaces(self):
+        classes = [
+            ClassFactory.elements(1, qname="{foo}bar"),
+            ClassFactory.elements(1, qname="{bar}foo"),
+        ]
+        resolver = DependenciesResolver({})
+
+        actual = self.generator.render_module(resolver, classes)
+        expected = (
+            "from dataclasses import dataclass, field\n"
+            "from typing import Optional\n"
+            "\n"
+            "\n"
+            "@dataclass\n"
+            "class Foo:\n"
+            "    class Meta:\n"
+            '        name = "foo"\n'
+            '        target_namespace = "bar"\n'
+            "\n"
+            "    attr_c: Optional[str] = field(\n"
+            "        default=None,\n"
+            "        metadata={\n"
+            '            "name": "attr_C",\n'
+            '            "type": "Element",\n'
+            "        }\n"
+            "    )\n"
+            "\n"
+            "\n"
+            "@dataclass\n"
+            "class Bar:\n"
+            "    class Meta:\n"
+            '        name = "bar"\n'
+            '        target_namespace = "foo"\n'
+            "\n"
+            "    attr_b: Optional[str] = field(\n"
+            "        default=None,\n"
+            "        metadata={\n"
+            '            "name": "attr_B",\n'
+            '            "type": "Element",\n'
+            "        }\n"
+            "    )\n"
+        )
+
+        self.assertEqual(expected, actual)
+
     def test_module_name(self):
         self.assertEqual("foo_bar", self.generator.module_name("fooBar"))
         self.assertEqual("foo_bar_wtf", self.generator.module_name("fooBar.wtf"))

@@ -104,6 +104,10 @@ procedures.
    * - namespace
      - str
      - The element xml namespace.
+   * - target_namespace
+     - str
+     - Specify the element target namespace for auto type locator, if module namespace
+       is not available or the type is not qualified.
    * - element_name_generator
      - Callable
      - Element name generator

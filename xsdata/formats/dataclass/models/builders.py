@@ -29,7 +29,7 @@ from xsdata.utils.namespaces import build_qname
 
 
 class XmlMetaBuilder:
-    __slots__ = ("class_type", "element_name_generator", "attribute_name_generator")
+    __slots__ = "class_type", "element_name_generator", "attribute_name_generator"
 
     def __init__(
         self,
@@ -62,7 +62,8 @@ class XmlMetaBuilder:
         nillable = getattr(meta, "nillable", False)
         namespace = getattr(meta, "namespace", parent_ns)
         module = sys.modules[clazz.__module__]
-        source_namespace = getattr(module, "__NAMESPACE__", None)
+        target_namespace = self.target_namespace(module, meta)
+
         class_vars = self.build_vars(
             clazz,
             namespace,
@@ -94,7 +95,7 @@ class XmlMetaBuilder:
         return XmlMeta(
             clazz=clazz,
             qname=build_qname(namespace, local_name),
-            source_qname=build_qname(source_namespace, local_name),
+            target_qname=build_qname(target_namespace, local_name),
             nillable=nillable,
             text=text,
             attributes=attributes,
@@ -136,7 +137,7 @@ class XmlMetaBuilder:
                 yield var
 
     @classmethod
-    def build_source_qname(cls, clazz: Type, element_name_generator: Callable) -> str:
+    def build_target_qname(cls, clazz: Type, element_name_generator: Callable) -> str:
         """Build the source qualified name of a model based on the module
         namespace."""
         meta = clazz.Meta if "Meta" in clazz.__dict__ else None
@@ -146,8 +147,21 @@ class XmlMetaBuilder:
         )
         local_name = local_name or element_name_generator(clazz.__name__)
         module = sys.modules[clazz.__module__]
-        source_namespace = getattr(module, "__NAMESPACE__", None)
-        return build_qname(source_namespace, local_name)
+        target_namespace = cls.target_namespace(module, meta)
+        return build_qname(target_namespace, local_name)
+
+    @classmethod
+    def target_namespace(cls, module: Any, meta: Any) -> Optional[str]:
+        """The target namespace this class metadata was defined in."""
+        namespace = getattr(meta, "target_namespace", None)
+        if namespace is not None:
+            return namespace
+
+        namespace = getattr(module, "__NAMESPACE__", None)
+        if namespace is not None:
+            return namespace
+
+        return getattr(meta, "namespace", None)
 
     def default_xml_type(self, clazz: Type) -> str:
         """Return the default xml type for the fields of the given dataclass

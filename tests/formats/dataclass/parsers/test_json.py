@@ -7,6 +7,8 @@ from tests import fixtures_dir
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
 from tests.fixtures.models import AttrsType
+from tests.fixtures.models import BaseC
+from tests.fixtures.models import BaseType
 from tests.fixtures.models import ChoiceType
 from tests.fixtures.models import ExtendedType
 from tests.fixtures.models import TypeA
@@ -222,6 +224,12 @@ class JsonParserTests(FactoryTestCase):
             "to any of the ['TypeA', 'TypeB', 'TypeC', 'TypeD']",
             str(cm.exception),
         )
+
+    def test_bind_dataclass_subclasses(self):
+        data = {"element": {"x": "1", "y": "foo", "z": "1.0"}}
+        actual = self.parser.bind_dataclass(data, BaseType)
+
+        self.assertIsInstance(actual.element, BaseC)
 
     def test_bind_attributes(self):
         data = {"attrs": {"a": 1, "b": 2}, "index": 1}

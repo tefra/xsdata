@@ -8,21 +8,13 @@ on:
 
 jobs:
   tests:
-    name: ${{ matrix.name }}
+    name: Python ${{ matrix.python }} - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}-latest
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - {name: PyPy 3.6, python: pypy-3.6, os: ubuntu}
-          - {name: PyPy 3.7, python: pypy-3.7, os: ubuntu}
-          - {name: Python 3.6, python: 3.6, os: ubuntu}
-          - {name: Python 3.7, python: 3.7, os: ubuntu}
-          - {name: Python 3.8, python: 3.8, os: ubuntu}
-          - {name: Python 3.9, python: 3.9, os: ubuntu}
-          - {name: Python 3.10, python: 3.10.0-beta - 3.10, os: ubuntu}
-          - {name: Windows py37, python: 3.7, os: windows}
-          - {name: MacOS py37, python: 3.7, os: macos}
+        python: [ "3.6", "3.7", "3.8", "3.9", "3.10.0-beta - 3.10", "pypy-3.6", "pypy-3.7" ]
+        os: [ "ubuntu", "windows", "macos" ]
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python }}
@@ -50,8 +42,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: [3.7, 3.8, 3.9]
-        mode: [xsd, json, xml]
+        python: [ "3.7", "3.8", "3.9" ]
+        mode: [ "xsd", "json", "xml" ]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/checkout@v2
@@ -78,7 +70,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: 3.7
+          python-version: 3.9
       - name: Install dependencies
         run: |
           python -m pip install tox
@@ -107,6 +99,6 @@ jobs:
     name: Pre-commit Hooks
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
-    - uses: pre-commit/action@v2.0.2
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - uses: pre-commit/action@v2.0.2

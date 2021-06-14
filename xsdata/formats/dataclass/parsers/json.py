@@ -258,6 +258,13 @@ class JsonParser(AbstractParser):
             return self.bind_best_dataclass(data, meta.element_types)
         else:
             assert var.clazz is not None
+
+            subclasses = set(self.context.get_subclasses(var.clazz))
+            if subclasses:
+                # field annotation is an abstract/base type
+                subclasses.add(var.clazz)
+                return self.bind_best_dataclass(data, subclasses)
+
             return self.bind_dataclass(data, var.clazz)
 
     def bind_derived_value(self, meta: XmlMeta, var: XmlVar, data: Dict) -> T:

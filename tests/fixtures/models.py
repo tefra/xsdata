@@ -41,6 +41,21 @@ class TypeDuplicate:
 
 
 @dataclass
+class BaseA:
+    x: str
+
+
+@dataclass
+class BaseB(BaseA):
+    y: str
+
+
+@dataclass
+class BaseC(BaseB):
+    z: str
+
+
+@dataclass
 class ExtendedType:
     a: Optional[TypeA] = field(default=None)
     any: Optional[object] = field(default=None)
@@ -73,6 +88,11 @@ class ChoiceType:
 @dataclass
 class UnionType:
     element: Union[TypeA, TypeB, TypeC, TypeD]
+
+
+@dataclass
+class BaseType:
+    element: BaseA
 
 
 @dataclass

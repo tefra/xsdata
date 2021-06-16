@@ -17,7 +17,7 @@ def get_origin(tp: Any) -> Any:
     if tp is Dict:
         return Dict
 
-    if tp in (List, Union):
+    if tp in (Tuple, List, Union):
         raise TypeError()
 
     if isinstance(tp, TypeVar):
@@ -27,6 +27,9 @@ def get_origin(tp: Any) -> Any:
     if origin:
         if origin in (list, List):
             return List
+
+        if origin in (tuple, Tuple):
+            return Tuple
 
         if origin in (dict, Dict):
             return Dict
@@ -53,21 +56,19 @@ def evaluate(tp: Any, globalns: Any = None, localns: Any = None) -> Tuple[Type, 
 
 def _evaluate(tp: Any) -> Iterator[Type]:
     origin = get_origin(tp)
-    if origin is List:
-        yield from _evaluate_list(tp)
-    elif origin is Dict:
-        yield from _evaluate_mapping(tp)
-    elif origin is Union:
-        yield from _evaluate_union(tp)
-    elif origin is Type:
-        args = get_args(tp)
-        if not args or isinstance(args[0], TypeVar):
-            raise TypeError()
-        yield from _evaluate(args[0])
-    elif origin is TypeVar:
-        yield from _evaluate_typevar(tp)
+
+    func = __evaluations__.get(origin)
+    if func:
+        yield from func(tp)
     else:
         yield tp
+
+
+def _evaluate_type(tp: Any) -> Iterator[Type]:
+    args = get_args(tp)
+    if not args or isinstance(args[0], TypeVar):
+        raise TypeError()
+    yield from _evaluate(args[0])
 
 
 def _evaluate_mapping(tp: Any) -> Iterator[Type]:
@@ -102,12 +103,26 @@ def _evaluate_list(tp: Any) -> Iterator[Type]:
 
         if origin is None:
             yield arg
-        elif origin is Union:
-            yield from _evaluate_union(arg)
-        elif origin is List:
-            yield from _evaluate_list(arg)
-        elif origin is TypeVar:
-            yield from _evaluate_typevar(arg)
+        elif origin in (Union, List, Tuple, TypeVar):
+            yield from __evaluations__[origin](arg)
+        else:
+            raise TypeError()
+
+
+def _evaluate_tuple(tp: Any) -> Iterator[Type]:
+    yield tuple
+
+    args = get_args(tp)
+    for arg in args:
+
+        if arg is Ellipsis:
+            continue
+
+        origin = get_origin(arg)
+        if origin is None:
+            yield arg
+        elif origin in (Union, List, Tuple, TypeVar):
+            yield from __evaluations__[origin](arg)
         else:
             raise TypeError()
 
@@ -136,3 +151,13 @@ def _evaluate_typevar(tp: TypeVar):
             yield from _evaluate(arg)
     else:
         raise TypeError()
+
+
+__evaluations__ = {
+    Tuple: _evaluate_tuple,
+    List: _evaluate_list,
+    Dict: _evaluate_mapping,
+    Union: _evaluate_union,
+    Type: _evaluate_type,
+    TypeVar: _evaluate_typevar,
+}

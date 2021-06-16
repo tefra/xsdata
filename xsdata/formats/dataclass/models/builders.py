@@ -223,6 +223,7 @@ class XmlVarBuilder:
         init: bool,
         default_value: Any,
         globalns: Any,
+        factory: Optional[Callable] = None,
     ) -> Optional[XmlVar]:
         """Build the binding metadata for a dataclass field."""
         xml_type = metadata.get("type", self.default_xml_type)
@@ -246,7 +247,14 @@ class XmlVarBuilder:
             )
 
         local_name = self.build_local_name(xml_type, local_name, name)
-        element_list = self.is_element_list(origin, sub_origin, tokens)
+
+        if tokens and sub_origin is None:
+            sub_origin = origin
+            origin = None
+
+        if origin is None:
+            origin = factory
+
         any_type = self.is_any_type(types, xml_type)
         clazz = first(tp for tp in types if self.class_type.is_model(tp))
         namespaces = self.resolve_namespaces(xml_type, namespace)
@@ -255,7 +263,7 @@ class XmlVarBuilder:
 
         elements = {}
         wildcards = []
-        for choice in self.build_choices(name, choices, globalns):
+        for choice in self.build_choices(name, choices, origin, globalns):
             if choice.is_element:
                 elements[choice.qname] = choice
             else:  # choice.is_wildcard:
@@ -268,12 +276,12 @@ class XmlVarBuilder:
             init=init,
             mixed=mixed,
             format=format_str,
-            tokens=tokens,
             clazz=clazz,
             any_type=any_type,
             nillable=nillable,
             sequential=sequential,
-            list_element=element_list,
+            factory=origin,
+            tokens_factory=sub_origin,
             default=default_value,
             types=types,
             elements=elements,
@@ -284,7 +292,7 @@ class XmlVarBuilder:
         )
 
     def build_choices(
-        self, name: str, choices: List[Dict], globalns: Any
+        self, name: str, choices: List[Dict], factory: Callable, globalns: Any
     ) -> Iterator[XmlVar]:
         """Build the binding metadata for a compound dataclass field."""
         existing_types: Set[type] = set()
@@ -302,13 +310,18 @@ class XmlVarBuilder:
                 metadata["type"] = XmlType.ELEMENT
 
             var = self.build(
-                index, name, type_hint, metadata, True, default_value, globalns
+                index,
+                name,
+                type_hint,
+                metadata,
+                True,
+                default_value,
+                globalns,
+                factory,
             )
 
             # It's impossible for choice elements to be ignorable, read above!
             assert var is not None
-
-            var.list_element = True
 
             if var.any_type or any(True for tp in var.types if tp in existing_types):
                 var.derived = True
@@ -391,8 +404,8 @@ class XmlVarBuilder:
         If the field is derived from xs:NMTOKENS both origins have to be
         lists.
         """
-        if origin is list:
-            return not is_tokens or sub_origin is list
+        if origin in (list, tuple):
+            return not is_tokens or sub_origin in (list, tuple)
 
         return False
 
@@ -422,7 +435,7 @@ class XmlVarBuilder:
             origin = None
             sub_origin = None
 
-            while types[0] in (list, dict):
+            while types[0] in (tuple, list, dict):
                 if origin is None:
                     origin = types[0]
                 elif sub_origin is None:
@@ -455,7 +468,7 @@ class XmlVarBuilder:
             # Attributes need origin dict, no sub origin and tokens
             if origin is not dict or sub_origin or tokens:
                 return False
-        elif origin is dict or tokens and origin is not list:
+        elif origin is dict or tokens and origin not in (list, tuple):
             # Origin dict is only supported by Attributes
             # xs:NMTOKENS need origin list
             return False

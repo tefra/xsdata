@@ -5,6 +5,7 @@ import random
 import unittest
 from dataclasses import is_dataclass
 from typing import Any
+from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -344,7 +345,8 @@ class XmlVarFactory(Factory):
         clazz: Optional[Type] = None,
         init: bool = True,
         mixed: bool = False,
-        tokens: bool = False,
+        factory: Optional[Callable] = None,
+        tokens_factory: Optional[Callable] = None,
         format: Optional[str] = None,
         derived: bool = False,
         any_type: bool = False,
@@ -381,7 +383,8 @@ class XmlVarFactory(Factory):
             clazz=clazz or first(tp for tp in types if is_dataclass(tp)),
             init=init,
             mixed=mixed,
-            tokens=tokens,
+            factory=factory,
+            tokens_factory=tokens_factory,
             format=format,
             derived=derived,
             any_type=any_type,

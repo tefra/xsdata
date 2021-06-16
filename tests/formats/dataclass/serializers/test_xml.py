@@ -119,7 +119,9 @@ class XmlSerializerTests(TestCase):
         self.assertEqual(expected, list(result))
 
     def test_write_tokens(self):
-        var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, qname="a", tokens=True)
+        var = XmlVarFactory.create(
+            xml_type=XmlType.ELEMENT, qname="a", tokens_factory=list
+        )
 
         result = self.serializer.write_value([], var, "xsdata")
         self.assertIsInstance(result, Generator)
@@ -438,7 +440,7 @@ class XmlSerializerTests(TestCase):
                     qname="b",
                     name="b",
                     types=(int,),
-                    tokens=True,
+                    tokens_factory=list,
                 ),
             },
         )
@@ -475,9 +477,7 @@ class XmlSerializerTests(TestCase):
         self.assertEqual(msg, str(cm.exception))
 
     def test_write_value_with_list_value(self):
-        var = XmlVarFactory.create(
-            xml_type=XmlType.ELEMENT, qname="a", list_element=True
-        )
+        var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, qname="a", factory=list)
         value = [True, False]
         expected = [
             (XmlWriterEvent.START, "a"),

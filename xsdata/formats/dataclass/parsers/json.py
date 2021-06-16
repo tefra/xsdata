@@ -117,14 +117,17 @@ class JsonParser(AbstractParser):
 
         params = {}
         for key, value in data.items():
-            is_list = isinstance(value, list)
+            is_list = isinstance(value, (list, tuple))
             var = self.find_var(xml_vars, key, is_list)
 
             if var is None and self.config.fail_on_unknown_properties:
                 raise ParserError(f"Unknown property {clazz.__qualname__}.{key}")
 
             if var and var.init:
-                params[var.name] = self.bind_value(meta, var, value)
+                if var.factory:
+                    params[var.name] = var.factory(self.bind_value(meta, var, value))
+                else:
+                    params[var.name] = self.bind_value(meta, var, value)
 
         try:
             return clazz(**params)  # type: ignore
@@ -202,7 +205,8 @@ class JsonParser(AbstractParser):
 
         # Repeating element, recursively bind the values
         if not recursive and var.list_element and isinstance(value, list):
-            return [self.bind_value(meta, var, val, True) for val in value]
+            assert var.factory is not None
+            return var.factory(self.bind_value(meta, var, val, True) for val in value)
 
         # If not dict this is an text or tokens value.
         if not isinstance(value, dict):
@@ -241,7 +245,12 @@ class JsonParser(AbstractParser):
 
         # Convert value according to the field types
         return ParserUtils.parse_value(
-            value, var.types, var.default, EMPTY_MAP, var.tokens, var.format
+            value=value,
+            types=var.types,
+            default=var.default,
+            ns_map=EMPTY_MAP,
+            tokens_factory=var.tokens_factory,
+            format=var.format,
         )
 
     def bind_complex_type(self, meta: XmlMeta, var: XmlVar, data: Dict) -> Any:

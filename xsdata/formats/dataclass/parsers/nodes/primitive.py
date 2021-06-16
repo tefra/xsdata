@@ -28,12 +28,12 @@ class PrimitiveNode(XmlNode):
         self, qname: str, text: Optional[str], tail: Optional[str], objects: List
     ) -> bool:
         obj = ParserUtils.parse_value(
-            text,
-            self.var.types,
-            self.var.default,
-            self.ns_map,
-            self.var.tokens,
-            self.var.format,
+            value=text,
+            types=self.var.types,
+            default=self.var.default,
+            ns_map=self.ns_map,
+            tokens_factory=self.var.tokens_factory,
+            format=self.var.format,
         )
 
         if obj is None and not self.var.nillable:

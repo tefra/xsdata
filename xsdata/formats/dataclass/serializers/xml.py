@@ -5,6 +5,7 @@ from io import StringIO
 from typing import Any
 from typing import Dict
 from typing import Generator
+from typing import Iterable
 from typing import List
 from typing import Optional
 from typing import TextIO
@@ -141,12 +142,14 @@ class XmlSerializer(AbstractSerializer):
             yield from self.write_tokens(value, var, namespace)
         elif var.is_elements:
             yield from self.write_elements(value, var, namespace)
-        elif var.list_element and isinstance(value, list):
+        elif var.list_element and isinstance(value, (list, tuple)):
             yield from self.write_list(value, var, namespace)
         else:
             yield from self.write_any_type(value, var, namespace)
 
-    def write_list(self, values: List, var: XmlVar, namespace: NoneStr) -> Generator:
+    def write_list(
+        self, values: Iterable, var: XmlVar, namespace: NoneStr
+    ) -> Generator:
         """Produce an events stream for the given list of values."""
         for value in values:
             yield from self.write_value(value, var, namespace)
@@ -155,7 +158,7 @@ class XmlSerializer(AbstractSerializer):
         """Produce an events stream for the given tokens list or list of tokens
         lists."""
         if value or var.nillable:
-            if value and isinstance(value[0], list):
+            if value and isinstance(value[0], (list, tuple)):
                 for val in value:
                     yield from self.write_element(val, var, namespace)
             else:
@@ -241,7 +244,7 @@ class XmlSerializer(AbstractSerializer):
 
     def write_elements(self, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
         """Produce an events stream from compound elements field."""
-        if isinstance(value, list):
+        if isinstance(value, (list, tuple)):
             for choice in value:
                 yield from self.write_choice(choice, var, namespace)
         else:
@@ -350,7 +353,7 @@ class XmlSerializer(AbstractSerializer):
         for var in meta.get_attribute_vars():
             if var.is_attribute:
                 value = getattr(obj, var.name)
-                if value is None or isinstance(value, list) and not value:
+                if value is None or isinstance(value, (list, tuple)) and not value:
                     continue
 
                 yield var.qname, cls.encode(value, var)

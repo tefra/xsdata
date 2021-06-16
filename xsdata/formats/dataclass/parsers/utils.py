@@ -1,5 +1,8 @@
+from collections import UserList
 from typing import Any
+from typing import Callable
 from typing import Dict
+from typing import Iterable
 from typing import Optional
 from typing import Sequence
 from typing import Type
@@ -10,6 +13,15 @@ from xsdata.models.enums import QNames
 from xsdata.utils import constants
 from xsdata.utils import text
 from xsdata.utils.namespaces import build_qname
+
+
+class PendingCollection(UserList):
+    def __init__(self, initlist: Optional[Iterable], factory: Optional[Callable]):
+        super().__init__(initlist)
+        self.factory = factory or list
+
+    def evaluate(self) -> Iterable:
+        return self.factory(self.data)
 
 
 class ParserUtils:
@@ -35,26 +47,26 @@ class ParserUtils:
         types: Sequence[Type],
         default: Any = None,
         ns_map: Optional[Dict] = None,
-        tokens: bool = False,
-        _format: Optional[str] = None,
+        tokens_factory: Callable = None,
+        format: Optional[str] = None,
     ) -> Any:
         """Convert xml string values to s python primitive type."""
 
         if value is None:
 
             if callable(default):
-                return default() if tokens else None
+                return default() if tokens_factory else None
 
             return default
 
-        if tokens:
-            value = value if isinstance(value, list) else value.split()
-            return [
-                converter.deserialize(val, types, ns_map=ns_map, format=_format)
+        if tokens_factory:
+            value = value if isinstance(value, (list, tuple)) else value.split()
+            return tokens_factory(
+                converter.deserialize(val, types, ns_map=ns_map, format=format)
                 for val in value
-            ]
+            )
 
-        return converter.deserialize(value, types, ns_map=ns_map, format=_format)
+        return converter.deserialize(value, types, ns_map=ns_map, format=format)
 
     @classmethod
     def normalize_content(cls, value: Optional[str]) -> Optional[str]:

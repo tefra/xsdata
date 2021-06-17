@@ -30,11 +30,8 @@ context instance.
     from tests.fixtures.primer import PurchaseOrder, Usaddress
 
 
-Parsing XML
-===========
-
-From xml filename
-------------------
+Parse from xml filename
+=======================
 
 .. doctest::
 
@@ -50,8 +47,8 @@ From xml filename
     Usaddress(name='Robert Smith', street='8 Oak Avenue', city='Old Town', state='PA', zip=Decimal('95819'), country='US')
 
 
-From xml file object
---------------------
+Parse from xml file object
+==========================
 
 .. doctest::
 
@@ -62,8 +59,8 @@ From xml file object
     '8 Oak Avenue'
 
 
-From xml stream
----------------
+Parse from xml stream
+=====================
 
 .. doctest::
 
@@ -73,8 +70,8 @@ From xml stream
     '8 Oak Avenue'
 
 
-From xml string
----------------
+Parse from xml string
+=====================
 
 .. doctest::
 
@@ -83,8 +80,8 @@ From xml string
     '8 Oak Avenue'
 
 
-From xml bytes
---------------
+Parse from xml bytes
+====================
 
 .. doctest::
 
@@ -93,8 +90,8 @@ From xml bytes
     '8 Oak Avenue'
 
 
-From xml path
--------------
+Parse from xml Path
+===================
 
 .. doctest::
 
@@ -103,8 +100,27 @@ From xml path
     '8 Oak Avenue'
 
 
-Unknown xml target type
------------------------
+Parse from lxml Element or Tree
+===============================
+
+The :class:`~xsdata.formats.dataclass.parsers.handlers.LxmlEventHandler`, which is
+the default one when lxml is installed, can also be used to bind data directly
+from an Element or Tree.
+
+.. doctest::
+
+    >>> import lxml
+    >>> from xsdata.formats.dataclass.parsers.handlers import LxmlEventHandler
+    ...
+    >>> parser = XmlParser(handler=LxmlEventHandler)
+    >>> tree = lxml.etree.parse(str(xml_path))
+    >>> bill_to = parser.parse(tree.find('.//billTo'), Usaddress)
+    >>> bill_to
+    Usaddress(name='Robert Smith', street='8 Oak Avenue', city='Old Town', state='PA', zip=Decimal('95819'), country='US')
+
+
+Parse with unknown xml target type
+==================================
 
 It's optimal to provide the target model but completely optional. The parser can scan
 all the imported modules to find a matching dataclass.
@@ -115,7 +131,10 @@ all the imported modules to find a matching dataclass.
 
 
 Parser Config
--------------
+=============
+
+The configuration allows to enable/disable various features and failures.
+
 
     >>> from xsdata.formats.dataclass.parsers.config import ParserConfig
     ...
@@ -132,8 +151,8 @@ Parser Config
 API :ref:`Reference <ParserConfig>`.
 
 
-Alternative handlers
---------------------
+Parse xml with alternative handlers
+===================================
 
 XmlHandlers read the xml source and push build events to create the target class.
 xsData ships with multiple handlers based on lxml and native python that vary in
@@ -163,12 +182,8 @@ performance and features.
 Read :ref:`more... <XML Handlers>`
 
 
-Serializing XML
-===============
-
-
-Render xml string
------------------
+Serialize xml to string
+=======================
 
 .. doctest::
 
@@ -207,8 +222,8 @@ Render xml string
     <BLANKLINE>
 
 
-Set custom prefixes
---------------------
+Serialize xml with custom namespace prefixes
+============================================
 
 .. doctest::
 
@@ -227,8 +242,8 @@ Set custom prefixes
     <BLANKLINE>
 
 
-Set a default namespace
------------------------
+Serialize xml with default namespace
+====================================
 
 .. doctest::
 
@@ -247,8 +262,8 @@ Set a default namespace
     <BLANKLINE>
 
 
-Write to xml stream
--------------------
+Serialize xml to stream
+=======================
 
 .. doctest::
 
@@ -274,40 +289,8 @@ Write to xml stream
     >>> path.unlink()
 
 
-Serializer Config
------------------
-
-.. doctest::
-
-    >>> from xsdata.formats.dataclass.serializers.config import SerializerConfig
-    ...
-    >>> serializer = XmlSerializer(config=SerializerConfig(
-    ...     pretty_print=True,
-    ...     encoding="UTF-8",
-    ...     xml_version="1.1",
-    ...     xml_declaration=False,
-    ...     schema_location="urn books.xsd",
-    ...     no_namespace_schema_location=None,
-    ... ))
-    >>> print(serializer.render(books))
-    <ns0:books xmlns:ns0="urn:books" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn books.xsd">
-      <book id="bk001" lang="en">
-        <author>Hightower, Kim</author>
-        <title>The First Book</title>
-        <genre>Fiction</genre>
-        <price>44.95</price>
-        <pub_date>2000-10-01</pub_date>
-        <review>An amazing story of nothing.</review>
-      </book>
-    </ns0:books>
-    <BLANKLINE>
-
-
-Read :ref:`more... <SerializerConfig>`
-
-
-Alternative Writers
--------------------
+Serialize xml with alternative writers
+======================================
 
 xsData ships with multiple writers based on lxml and native python that may vary
 in performance in some cases. The output of all them is consistent with a few
@@ -339,3 +322,35 @@ exceptions when handling mixed content with ``pretty_print=True``.
     <BLANKLINE>
 
 Read :ref:`more... <XML Writers>`
+
+
+Serializer Config
+=================
+
+.. doctest::
+
+    >>> from xsdata.formats.dataclass.serializers.config import SerializerConfig
+    ...
+    >>> serializer = XmlSerializer(config=SerializerConfig(
+    ...     pretty_print=True,
+    ...     encoding="UTF-8",
+    ...     xml_version="1.1",
+    ...     xml_declaration=False,
+    ...     schema_location="urn books.xsd",
+    ...     no_namespace_schema_location=None,
+    ... ))
+    >>> print(serializer.render(books))
+    <ns0:books xmlns:ns0="urn:books" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn books.xsd">
+      <book id="bk001" lang="en">
+        <author>Hightower, Kim</author>
+        <title>The First Book</title>
+        <genre>Fiction</genre>
+        <price>44.95</price>
+        <pub_date>2000-10-01</pub_date>
+        <review>An amazing story of nothing.</review>
+      </book>
+    </ns0:books>
+    <BLANKLINE>
+
+
+Read :ref:`more... <SerializerConfig>`

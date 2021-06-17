@@ -30,12 +30,8 @@ context instance.
     from tests.fixtures.books.books import Books
 
 
-Parsing JSON
-============
-
-
-From json filename
-------------------
+Parse from json filename
+========================
 
 .. doctest::
 
@@ -52,8 +48,8 @@ From json filename
     BookForm(author='Hightower, Kim', title='The First Book', genre='Fiction', price=44.95, pub_date=XmlDate(2000, 10, 1), review='An amazing story of nothing.', id='bk001', lang='en')
 
 
-From json file object
----------------------
+Parse from json file object
+===========================
 
 .. doctest::
 
@@ -64,8 +60,8 @@ From json file object
     BookForm(author='Hightower, Kim', title='The First Book', genre='Fiction', price=44.95, pub_date=XmlDate(2000, 10, 1), review='An amazing story of nothing.', id='bk001', lang='en')
 
 
-From json stream
-----------------
+Parse from json stream
+======================
 
 .. doctest::
 
@@ -75,8 +71,8 @@ From json stream
     BookForm(author='Hightower, Kim', title='The First Book', genre='Fiction', price=44.95, pub_date=XmlDate(2000, 10, 1), review='An amazing story of nothing.', id='bk001', lang='en')
 
 
-From json string
-----------------
+Parse from json string
+======================
 
 .. doctest::
 
@@ -85,8 +81,8 @@ From json string
     BookForm(author='Hightower, Kim', title='The First Book', genre='Fiction', price=44.95, pub_date=XmlDate(2000, 10, 1), review='An amazing story of nothing.', id='bk001', lang='en')
 
 
-From json bytes
----------------
+Parse from json bytes
+=====================
 
 .. doctest::
 
@@ -95,8 +91,8 @@ From json bytes
     BookForm(author='Hightower, Kim', title='The First Book', genre='Fiction', price=44.95, pub_date=XmlDate(2000, 10, 1), review='An amazing story of nothing.', id='bk001', lang='en')
 
 
-From json path
---------------
+Parse from json Path
+====================
 
 .. doctest::
 
@@ -105,8 +101,12 @@ From json path
     BookForm(author='Hightower, Kim', title='The First Book', genre='Fiction', price=44.95, pub_date=XmlDate(2000, 10, 1), review='An amazing story of nothing.', id='bk001', lang='en')
 
 
-Ignore unknown properties
--------------------------
+Parse json with unknown properties
+==================================
+
+By default the parser will fail on unknown properties, but you can disable these
+errors through configuration.
+
 
 .. doctest::
 
@@ -127,8 +127,8 @@ Ignore unknown properties
 API :ref:`Reference <ParserConfig>`.
 
 
-Unknown json target type
-------------------------
+Parse with unknown json target type
+===================================
 
 It's optimal to provide the target model but completely optional. The parser can scan
 all the imported modules to find a matching dataclass.
@@ -156,8 +156,8 @@ all the imported modules to find a matching dataclass.
     if the configuration option is disabled!
 
 
-List of Objects
----------------
+Parser list of objects
+======================
 
 Specify the target binding type to ``List[ModelName]``
 
@@ -191,8 +191,8 @@ Specify the target binding type to ``List[ModelName]``
     'Nagata, Suanne'
 
 
-Custom json load factory
-------------------------
+Parser with custom json load factory
+====================================
 
 The default factory is python's builtin :func:`python:json.load` but you can use any
 other implementation as long as it's has a compatible signature.
@@ -204,12 +204,8 @@ other implementation as long as it's has a compatible signature.
     parser = JsonParser(load_factory=ujson.load)
 
 
-Serializing JSON
-================
-
-
-Render json string
-------------------
+Serialize json to string
+========================
 
 .. doctest::
 
@@ -264,9 +260,8 @@ Render json string
     }
 
 
-
-Write to json stream
---------------------
+Serialize json to stream
+=========================
 
 .. doctest::
 
@@ -304,8 +299,8 @@ Write to json stream
     >>> path.unlink()
 
 
-Custom Dict factory
--------------------
+Serialize with custom dict factory
+==================================
 
 By using a custom dict factory you can change the output behaviour, like filter out
 ``None`` values.
@@ -341,8 +336,8 @@ or conveniently
     {"author": "Nagata, Suanne", "title": "Becoming Somebody", "price": 33.95, "pub_date": "2001-01-10", "review": "A masterpiece of the fine art of gossiping.", "id": "bk002", "lang": "en"}
 
 
-Custom json dump factory
-------------------------
+Serialize with custom json dump factory
+=======================================
 
 The default factory is python's builtin :func:`python:json.dump` but you can use any
 other implementation as long as it's has a compatible signature.

@@ -1,7 +1,10 @@
 from unittest import mock
 from unittest.case import TestCase
 
+from lxml import etree
+
 from tests import fixtures_dir
+from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
 from tests.fixtures.books.fixtures import books
 from tests.fixtures.books.fixtures import events
@@ -27,6 +30,17 @@ class LxmlEventHandlerTests(TestCase):
         self.assertEqual(books, self.parser.from_path(path, Books))
         self.assertEqual({None: "urn:books"}, self.parser.ns_map)
         self.assertEqual(events_default_ns, self.parser.events)
+
+    def test_parse_with_element_or_tree(self):
+        path = fixtures_dir.joinpath("books/books.xml")
+        tree = etree.parse(str(path))
+
+        result = self.parser.parse(tree, Books)
+        self.assertEqual(books, result)
+
+        tree = etree.parse(str(path))
+        result = self.parser.parse(tree.find(".//book"), BookForm)
+        self.assertEqual(books.book[0], result)
 
     def test_parse_with_xinclude(self):
         path = fixtures_dir.joinpath("books/books-xinclude.xml")

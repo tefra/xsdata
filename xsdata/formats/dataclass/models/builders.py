@@ -114,7 +114,6 @@ class XmlMetaBuilder:
     ):
         """Build the binding metadata for the given dataclass fields."""
         type_hints = get_type_hints(clazz)
-        globalns = sys.modules[clazz.__module__].__dict__
         builder = XmlVarBuilder(
             class_type=self.class_type,
             parent_ns=parent_ns,
@@ -123,18 +122,27 @@ class XmlMetaBuilder:
             attribute_name_generator=attribute_name_generator,
         )
 
-        for index, _field in enumerate(self.class_type.get_fields(clazz)):
+        for index, field in enumerate(self.class_type.get_fields(clazz)):
             var = builder.build(
                 index,
-                _field.name,
-                type_hints[_field.name],
-                _field.metadata,
-                _field.init,
-                self.class_type.default_value(_field),
-                globalns,
+                field.name,
+                type_hints[field.name],
+                field.metadata,
+                field.init,
+                self.class_type.default_value(field),
+                self.find_globalns(clazz, field.name),
             )
             if var is not None:
                 yield var
+
+    @classmethod
+    def find_globalns(cls, clazz: Type, name: str) -> Optional[Dict]:
+        for base in clazz.__mro__:
+            ann = base.__dict__.get("__annotations__")
+            if ann and name in ann:
+                return sys.modules[base.__module__].__dict__
+
+        return None
 
     @classmethod
     def build_target_qname(cls, clazz: Type, element_name_generator: Callable) -> str:

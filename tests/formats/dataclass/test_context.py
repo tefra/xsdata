@@ -6,8 +6,10 @@ from tests.fixtures.artists import Artist
 from tests.fixtures.artists import BeginArea
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import BooksForm
+from tests.fixtures.models import BaseType
 from tests.fixtures.models import ChoiceType
 from tests.fixtures.models import TypeA
+from tests.fixtures.models import TypeC
 from tests.fixtures.models import UnionType
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.models.enums import DataType
@@ -107,10 +109,10 @@ class XmlContextTests(FactoryTestCase):
 
     def test_build_recursive(self):
         self.ctx.build_recursive(ChoiceType)
-        self.assertEqual(3, len(self.ctx.cache))
+        self.assertEqual(6, len(self.ctx.cache))
 
-        self.ctx.build_recursive(TypeA)
-        self.assertEqual(3, len(self.ctx.cache))
+        self.ctx.build_recursive(BaseType)
+        self.assertEqual(8, len(self.ctx.cache))
 
         self.ctx.build_recursive(UnionType)
-        self.assertEqual(6, len(self.ctx.cache))
+        self.assertEqual(8, len(self.ctx.cache))

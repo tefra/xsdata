@@ -3,8 +3,11 @@ from dataclasses import field
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Type
 from typing import Union
 from xml.etree.ElementTree import QName
+
+from xsdata.utils.constants import return_true
 
 
 @dataclass
@@ -79,7 +82,13 @@ class ChoiceType:
                 {"name": "int2", "type": int, "nillable": True},
                 {"name": "float", "type": float},
                 {"name": "qname", "type": QName},
-                {"name": "tokens", "type": List[int], "tokens": True},
+                {"name": "tokens", "type": List[int], "tokens": True, "default_factory": return_true},
+                {"name": "union", "type": Type["UnionType"], "namespace": "foo"},
+                {"name": "p", "type": float, "fixed": True, "default": 1.1},
+                {"wildcard": True,
+                "type": object,
+                "namespace": "http://www.w3.org/1999/xhtml",
+                },
             ),
         }
     )

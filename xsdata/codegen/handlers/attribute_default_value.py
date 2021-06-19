@@ -25,6 +25,9 @@ class AttributeDefaultValueHandler(RelativeHandlerInterface):
         for attr in target.attrs:
             self.process_attribute(target, attr)
 
+            for choice in attr.choices:
+                self.process_attribute(target, choice)
+
     def process_attribute(self, target: Class, attr: Attr):
 
         if attr.is_enumeration:

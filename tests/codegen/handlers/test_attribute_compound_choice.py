@@ -1,11 +1,14 @@
 from unittest import mock
 
+from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import AttributeCompoundChoiceHandler
 from xsdata.codegen.models import Restrictions
+from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import DataType
 from xsdata.utils.testing import AttrFactory
 from xsdata.utils.testing import AttrTypeFactory
 from xsdata.utils.testing import ClassFactory
+from xsdata.utils.testing import ExtensionFactory
 from xsdata.utils.testing import FactoryTestCase
 
 
@@ -13,7 +16,8 @@ class AttributeCompoundChoiceHandlerTests(FactoryTestCase):
     def setUp(self):
         super().setUp()
 
-        self.processor = AttributeCompoundChoiceHandler()
+        self.container = ClassContainer(config=GeneratorConfig())
+        self.processor = AttributeCompoundChoiceHandler(container=self.container)
 
     @mock.patch.object(AttributeCompoundChoiceHandler, "group_fields")
     def test_process(self, mock_group_fields):
@@ -87,29 +91,27 @@ class AttributeCompoundChoiceHandlerTests(FactoryTestCase):
         self.assertEqual(1, len(target.attrs))
         self.assertEqual(expected_res, target.attrs[0].restrictions)
 
-    def test_group_fields_limit_name(self):
-        target = ClassFactory.create(attrs=AttrFactory.list(3))
-        for attr in target.attrs:
-            attr.restrictions.choice = "1"
-
-        self.processor.group_fields(target, list(target.attrs))
-
-        self.assertEqual(1, len(target.attrs))
-        self.assertEqual("attr_B_Or_attr_C_Or_attr_D", target.attrs[0].name)
-
-        target = ClassFactory.create(attrs=AttrFactory.list(4))
-        for attr in target.attrs:
-            attr.restrictions.choice = "1"
-
-        self.processor.group_fields(target, list(target.attrs))
-        self.assertEqual("choice", target.attrs[0].name)
-
+    def test_choose_name(self):
         target = ClassFactory.create()
-        attr = AttrFactory.element(restrictions=Restrictions(choice="1"))
-        target.attrs.append(attr)
-        target.attrs.append(attr.clone())
-        self.processor.group_fields(target, list(target.attrs))
-        self.assertEqual("choice", target.attrs[0].name)
+
+        actual = self.processor.choose_name(target, ["a", "b", "c"])
+        self.assertEqual("a_Or_b_Or_c", actual)
+
+        actual = self.processor.choose_name(target, ["a", "b", "c", "d"])
+        self.assertEqual("choice", actual)
+
+        target.attrs.append(AttrFactory.create(name="choice"))
+        actual = self.processor.choose_name(target, ["a", "b", "c", "d"])
+        self.assertEqual("choice_1", actual)
+
+        base = ClassFactory.create()
+        base.attrs.append(AttrFactory.create(name="Choice!"))
+        target.extensions.append(ExtensionFactory.reference(base.qname))
+        self.container.extend((target, base))
+
+        target.attrs.clear()
+        actual = self.processor.choose_name(target, ["a", "b", "c", "d"])
+        self.assertEqual("choice_1", actual)
 
     def test_build_attr_choice(self):
         attr = AttrFactory.create(

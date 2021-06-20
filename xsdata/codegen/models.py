@@ -19,6 +19,7 @@ from xsdata.models.enums import QNames
 from xsdata.models.enums import Tag
 from xsdata.models.mixins import ElementBase
 from xsdata.utils import namespaces
+from xsdata.utils import text
 
 xml_type_map = {
     Tag.ANY: XmlType.WILDCARD,
@@ -342,6 +343,10 @@ class Attr:
                 result.add(datatype.type)
 
         return list(result)
+
+    @property
+    def slug(self) -> str:
+        return text.alnum(self.name)
 
     @property
     def xml_type(self) -> Optional[str]:

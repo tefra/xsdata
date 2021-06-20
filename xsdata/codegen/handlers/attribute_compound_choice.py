@@ -1,17 +1,18 @@
 from operator import attrgetter
 from typing import List
 
-from xsdata.codegen.mixins import HandlerInterface
+from xsdata.codegen.mixins import RelativeHandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Restrictions
+from xsdata.codegen.utils import ClassUtils
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
 from xsdata.utils.collections import group_by
 
 
-class AttributeCompoundChoiceHandler(HandlerInterface):
+class AttributeCompoundChoiceHandler(RelativeHandlerInterface):
     """Group attributes that belong in the same choice and replace them by
     compound fields."""
 
@@ -23,13 +24,13 @@ class AttributeCompoundChoiceHandler(HandlerInterface):
             if choice and len(attrs) > 1 and any(attr.is_list for attr in attrs):
                 self.group_fields(target, attrs)
 
-    @classmethod
-    def group_fields(cls, target: Class, attrs: List[Attr]):
+    def group_fields(self, target: Class, attrs: List[Attr]):
         """Group attributes into a new compound field."""
 
         pos = target.attrs.index(attrs[0])
         choice = attrs[0].restrictions.choice
         sum_occurs = choice and choice.startswith("effective_")
+
         names = []
         choices = []
         min_occurs = []
@@ -39,12 +40,9 @@ class AttributeCompoundChoiceHandler(HandlerInterface):
             names.append(attr.local_name)
             min_occurs.append(attr.restrictions.min_occurs or 0)
             max_occurs.append(attr.restrictions.max_occurs or 0)
-            choices.append(cls.build_attr_choice(attr))
+            choices.append(self.build_attr_choice(attr))
 
-        if len(names) > 3 or len(names) != len(set(names)):
-            name = "choice"
-        else:
-            name = "_Or_".join(names)
+        name = self.choose_name(target, names)
 
         target.attrs.insert(
             pos,
@@ -60,6 +58,18 @@ class AttributeCompoundChoiceHandler(HandlerInterface):
                 choices=choices,
             ),
         )
+
+    def choose_name(self, target: Class, names: List[str]) -> str:
+        slug_getter = attrgetter("slug")
+        reserved = set(map(slug_getter, self.base_attrs(target)))
+        reserved.update(map(slug_getter, target.attrs))
+
+        if len(names) > 3 or len(names) != len(set(names)):
+            name = "choice"
+        else:
+            name = "_Or_".join(names)
+
+        return ClassUtils.unique_name(name, reserved)
 
     @classmethod
     def build_attr_choice(cls, attr: Attr) -> Attr:

@@ -70,7 +70,7 @@ class ClassContainer(ContainerInterface):
         ]
 
         if self.config.output.compound_fields:
-            self.post_processors.insert(0, AttributeCompoundChoiceHandler())
+            self.post_processors.insert(0, AttributeCompoundChoiceHandler(self))
 
     def __iter__(self) -> Iterator[Class]:
         """Create an iterator for the class map values."""

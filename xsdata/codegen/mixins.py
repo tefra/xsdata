@@ -5,6 +5,7 @@ from typing import Iterator
 from typing import List
 from typing import Optional
 
+from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Class
 from xsdata.models.config import GeneratorConfig
 from xsdata.utils.constants import return_true
@@ -63,6 +64,18 @@ class RelativeHandlerInterface(HandlerInterface, metaclass=ABCMeta):
 
     def __init__(self, container: ContainerInterface):
         self.container = container
+
+    def base_attrs(self, target: Class) -> List[Attr]:
+        attrs: List[Attr] = []
+        for extension in target.extensions:
+            base = self.container.find(extension.type.qname)
+
+            assert base is not None
+
+            attrs.extend(base.attrs)
+            attrs.extend(self.base_attrs(base))
+
+        return attrs
 
 
 class ContainerHandlerInterface(abc.ABC):

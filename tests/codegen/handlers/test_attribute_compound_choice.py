@@ -122,8 +122,6 @@ class AttributeCompoundChoiceHandlerTests(FactoryTestCase):
         )
         attr.local_name = "aaa"
         attr.restrictions = Restrictions(
-            required=True,
-            prohibited=None,
             min_occurs=1,
             max_occurs=1,
             min_exclusive="1.1",

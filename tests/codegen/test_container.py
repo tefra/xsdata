@@ -54,7 +54,6 @@ class ClassContainerTests(FactoryTestCase):
             ],
             20: [
                 "AttributeEffectiveChoiceHandler",
-                "AttributeRestrictionsHandler",
                 "AttributeDefaultValueHandler",
             ],
             30: [

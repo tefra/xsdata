@@ -260,6 +260,20 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self.processor.copy_attribute_properties(source, target, attr, attr.types[0])
         self.assertTrue(attr.restrictions.nillable)
 
+    def test_copy_attribute_properties_to_attribute_target(self):
+        source = ClassFactory.elements(1, nillable=True)
+        target = ClassFactory.create(attrs=AttrFactory.list(1, tag=Tag.ATTRIBUTE))
+        attr = target.attrs[0]
+        attr.restrictions.min_occurs = 1
+        attr.restrictions.max_occurs = 1
+
+        source.attrs[0].restrictions.min_occurs = 0
+        source.attrs[0].restrictions.max_occurs = 1
+
+        self.assertFalse(attr.is_optional)
+        self.processor.copy_attribute_properties(source, target, attr, attr.types[0])
+        self.assertFalse(attr.is_optional)
+
     @mock.patch.object(AttributeTypeHandler, "is_circular_dependency")
     def test_set_circular_flag(self, mock_is_circular_dependency):
         source = ClassFactory.create()

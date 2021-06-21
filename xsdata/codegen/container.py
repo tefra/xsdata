@@ -14,7 +14,6 @@ from xsdata.codegen.handlers import AttributeMergeHandler
 from xsdata.codegen.handlers import AttributeMixedContentHandler
 from xsdata.codegen.handlers import AttributeNameConflictHandler
 from xsdata.codegen.handlers import AttributeOverridesHandler
-from xsdata.codegen.handlers import AttributeRestrictionsHandler
 from xsdata.codegen.handlers import AttributeSubstitutionHandler
 from xsdata.codegen.handlers import AttributeTypeHandler
 from xsdata.codegen.handlers import ClassDesignateHandler
@@ -63,7 +62,6 @@ class ClassContainer(ContainerInterface):
             ],
             Steps.SANITIZE: [
                 AttributeEffectiveChoiceHandler(),
-                AttributeRestrictionsHandler(),
                 AttributeDefaultValueHandler(self),
             ],
             Steps.RESOLVE: [

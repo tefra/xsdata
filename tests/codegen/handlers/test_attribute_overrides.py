@@ -78,14 +78,16 @@ class AttributeOverridesHandlerTests(FactoryTestCase):
         self.processor.validate_override(target, attr_a, attr_b)
         self.assertEqual(1, len(target.attrs))
 
-        # restrictions except choice, min/max occurs don't match
+        # Restrictions don't match
         attr_b.fixed = attr_a.fixed
-        attr_a.restrictions.required = not attr_b.restrictions.required
+        attr_a.restrictions.tokens = not attr_b.restrictions.tokens
+        attr_a.restrictions.nillable = not attr_b.restrictions.nillable
         self.processor.validate_override(target, attr_a, attr_b)
         self.assertEqual(1, len(target.attrs))
 
         # Restrictions are compatible again
-        attr_a.restrictions.required = attr_b.restrictions.required
+        attr_a.restrictions.tokens = attr_b.restrictions.tokens
+        attr_a.restrictions.nillable = attr_b.restrictions.nillable
         self.processor.validate_override(target, attr_a, attr_b)
         self.assertEqual(0, len(target.attrs))
 

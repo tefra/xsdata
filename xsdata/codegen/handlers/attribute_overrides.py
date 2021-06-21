@@ -2,6 +2,7 @@ import sys
 from operator import attrgetter
 from typing import Dict
 from typing import List
+from typing import Optional
 
 from xsdata.codegen.mixins import RelativeHandlerInterface
 from xsdata.codegen.models import Attr
@@ -47,12 +48,17 @@ class AttributeOverridesHandler(RelativeHandlerInterface):
 
         if (
             attr.default == source_attr.default
-            and attr.fixed == source_attr.fixed
-            and attr.mixed == source_attr.mixed
-            and attr.restrictions.is_compatible(source_attr.restrictions)
+            and bool_eq(attr.fixed, source_attr.fixed)
+            and bool_eq(attr.mixed, source_attr.mixed)
+            and bool_eq(attr.restrictions.tokens, source_attr.restrictions.tokens)
+            and bool_eq(attr.restrictions.nillable, source_attr.restrictions.nillable)
         ):
             ClassUtils.remove_attribute(target, attr)
 
     @classmethod
     def resolve_conflict(cls, attr: Attr, source_attr: Attr):
         ClassUtils.rename_attribute_by_preference(attr, source_attr)
+
+
+def bool_eq(a: Optional[bool], b: Optional[bool]) -> bool:
+    return bool(a) is bool(b)

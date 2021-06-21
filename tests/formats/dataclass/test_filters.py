@@ -267,9 +267,27 @@ class FiltersTests(FactoryTestCase):
         attr.restrictions.min_occurs = 1
         attr.restrictions.max_occurs = 2
         attr.restrictions.max_inclusive = "2"
-        attr.restrictions.required = False
 
         expected = {"min_occurs": 1, "max_occurs": 2, "max_inclusive": 2}
+        self.assertEqual(expected, self.filters.field_metadata(attr, None, []))
+
+        attr.restrictions.min_occurs = 1
+        attr.restrictions.max_occurs = 1
+        expected = {"required": True, "max_inclusive": 2}
+        self.assertEqual(expected, self.filters.field_metadata(attr, None, []))
+
+        attr.restrictions.nillable = True
+        expected = {"nillable": True, "max_inclusive": 2}
+        self.assertEqual(expected, self.filters.field_metadata(attr, None, []))
+
+        attr.default = "foo"
+        attr.restrictions.nillable = False
+        expected = {"max_inclusive": 2}
+        self.assertEqual(expected, self.filters.field_metadata(attr, None, []))
+
+        attr.default = None
+        attr.restrictions.tokens = True
+        expected = {"max_inclusive": 2, "tokens": True}
         self.assertEqual(expected, self.filters.field_metadata(attr, None, []))
 
     def test_field_metadata_mixed(self):

@@ -33,7 +33,7 @@ class AttributeDefaultValueHandler(RelativeHandlerInterface):
         if attr.is_enumeration:
             return
 
-        if attr.is_optional or attr.is_xsi_type:
+        if attr.is_optional or attr.is_xsi_type or attr.is_list:
             attr.fixed = False
             attr.default = None
 

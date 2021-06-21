@@ -63,6 +63,14 @@ class AttributeDefaultValueHandlerTests(FactoryTestCase):
         self.assertFalse(attr.fixed)
         self.assertIsNone(attr.default)
 
+    def test_process_attribute_with_list_field(self):
+        target = ClassFactory.create()
+        attr = AttrFactory.create(fixed=True, default=2)
+        attr.restrictions.max_occurs = 5
+        self.processor.process_attribute(target, attr)
+        self.assertFalse(attr.fixed)
+        self.assertIsNone(attr.default)
+
     def test_process_attribute_with_xsi_type(self):
         target = ClassFactory.create()
         attr = AttrFactory.create(

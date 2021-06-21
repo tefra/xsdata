@@ -7,8 +7,6 @@ from xsdata.codegen.models import Restrictions
 class RestrictionsTests(TestCase):
     def setUp(self) -> None:
         self.restrictions = Restrictions(
-            required=True,
-            prohibited=None,
             min_occurs=1,
             max_occurs=1,
             min_exclusive="1.1",
@@ -38,7 +36,6 @@ class RestrictionsTests(TestCase):
 
     def test_property_is_prohibited(self):
         self.assertFalse(Restrictions().is_prohibited)
-        self.assertTrue(Restrictions(prohibited=True).is_prohibited)
         self.assertTrue(Restrictions(max_occurs=0).is_prohibited)
 
     def test_merge(self):
@@ -71,17 +68,20 @@ class RestrictionsTests(TestCase):
             "max_exclusive": "1",
             "max_inclusive": "1.1",
             "max_length": 10,
-            "max_occurs": 1,
             "min_exclusive": "1.1",
             "min_inclusive": "1",
             "min_length": 1,
-            "min_occurs": 1,
             "nillable": True,
             "pattern": "[A-Z]",
-            "required": True,
             "total_digits": 333,
             "white_space": "collapse",
         }
+        self.assertEqual(expected, self.restrictions.asdict())
+
+        self.restrictions.nillable = None
+
+        del expected["nillable"]
+        expected["required"] = True
         self.assertEqual(expected, self.restrictions.asdict())
 
     def test_asdict_with_types(self):
@@ -92,14 +92,11 @@ class RestrictionsTests(TestCase):
             "max_exclusive": 1.0,  # str -> float
             "max_inclusive": 1.1,  # str -> float
             "max_length": 10,
-            "max_occurs": 1,
             "min_exclusive": 1.1,  # str -> float
             "min_inclusive": 1.0,  # str -> float
             "min_length": 1,
-            "min_occurs": 1,
             "nillable": True,
             "pattern": "[A-Z]",
-            "required": True,
             "total_digits": 333,
             "white_space": "collapse",
         }
@@ -121,24 +118,3 @@ class RestrictionsTests(TestCase):
 
         self.assertEqual(clone, restrictions)
         self.assertIsNot(clone, restrictions)
-
-    def test_is_compatible(self):
-        clone = self.restrictions.clone()
-        self.assertTrue(self.restrictions.is_compatible(clone))
-
-        clone.max_length = 10
-        self.assertTrue(self.restrictions.is_compatible(clone))
-
-        clone.required = not self.restrictions.required
-        clone.nillable = not self.restrictions.nillable
-        clone.tokens = not self.restrictions.tokens
-        self.assertFalse(self.restrictions.is_compatible(clone))
-
-        clone.required = not clone.required
-        self.assertFalse(self.restrictions.is_compatible(clone))
-
-        clone.nillable = not clone.nillable
-        self.assertFalse(self.restrictions.is_compatible(clone))
-
-        clone.tokens = not clone.tokens
-        self.assertTrue(self.restrictions.is_compatible(clone))

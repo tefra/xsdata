@@ -9,10 +9,8 @@ class AttributeRestrictionsHandler(HandlerInterface):
     __slots__ = ()
 
     def process(self, target: Class):
-
-        for index, attr in enumerate(target.attrs):
+        for attr in target.attrs:
             self.reset_occurrences(attr)
-            self.reset_sequential(target, index)
 
     @classmethod
     def reset_occurrences(cls, attr: Attr):
@@ -47,24 +45,3 @@ class AttributeRestrictionsHandler(HandlerInterface):
 
         if attr.default or attr.fixed or attr.restrictions.nillable:
             restrictions.required = None
-
-    @classmethod
-    def reset_sequential(cls, target: Class, index: int):
-        """Reset the attribute at the given index if it has no siblings with
-        the sequential restriction."""
-
-        attr = target.attrs[index]
-        before = target.attrs[index - 1] if index - 1 >= 0 else None
-        after = target.attrs[index + 1] if index + 1 < len(target.attrs) else None
-
-        if not attr.is_list:
-            attr.restrictions.sequential = False
-
-        if (
-            not attr.restrictions.sequential
-            or (before and before.restrictions.sequential)
-            or (after and after.restrictions.sequential and after.is_list)
-        ):
-            return
-
-        attr.restrictions.sequential = False

@@ -2,6 +2,7 @@ from unittest import mock
 
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import AttributeCompoundChoiceHandler
+from xsdata.codegen.models import Class
 from xsdata.codegen.models import Restrictions
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import DataType
@@ -16,7 +17,9 @@ class AttributeCompoundChoiceHandlerTests(FactoryTestCase):
     def setUp(self):
         super().setUp()
 
-        self.container = ClassContainer(config=GeneratorConfig())
+        self.config = GeneratorConfig()
+        self.config.output.compound_fields = True
+        self.container = ClassContainer(config=self.config)
         self.processor = AttributeCompoundChoiceHandler(container=self.container)
 
     @mock.patch.object(AttributeCompoundChoiceHandler, "group_fields")
@@ -154,3 +157,39 @@ class AttributeCompoundChoiceHandlerTests(FactoryTestCase):
         self.assertEqual(expected_res, actual.restrictions)
         self.assertEqual(attr.help, actual.help)
         self.assertFalse(actual.fixed)
+
+    def test_reset_sequential(self):
+        def len_sequential(target: Class):
+            return len([attr for attr in target.attrs if attr.restrictions.sequential])
+
+        restrictions = Restrictions(max_occurs=2, sequential=True)
+        target = ClassFactory.create(
+            attrs=[
+                AttrFactory.create(restrictions=restrictions.clone()),
+                AttrFactory.create(restrictions=restrictions.clone()),
+            ]
+        )
+
+        attrs_clone = [attr.clone() for attr in target.attrs]
+
+        self.processor.compound_fields = False
+        self.processor.reset_sequential(target, 0)
+        self.assertEqual(2, len_sequential(target))
+
+        target.attrs[0].restrictions.sequential = False
+        self.processor.reset_sequential(target, 0)
+        self.assertEqual(1, len_sequential(target))
+
+        self.processor.reset_sequential(target, 1)
+        self.assertEqual(0, len_sequential(target))
+
+        target.attrs = attrs_clone
+        target.attrs[1].restrictions.sequential = False
+        self.processor.reset_sequential(target, 0)
+        self.assertEqual(0, len_sequential(target))
+
+        target.attrs[0].restrictions.sequential = True
+        target.attrs[0].restrictions.max_occurs = 0
+        target.attrs[1].restrictions.sequential = True
+        self.processor.reset_sequential(target, 0)
+        self.assertEqual(1, len_sequential(target))

@@ -116,7 +116,7 @@ class DefinitionsMapper:
 
         yield Class(
             qname=build_qname(definitions.target_namespace, name),
-            status=Status.PROCESSED,
+            status=Status.FLATTENED,
             tag=type(binding_operation).__name__,
             location=definitions.location,
             ns_map=binding_operation.ns_map,
@@ -250,7 +250,7 @@ class DefinitionsMapper:
 
         return Class(
             qname=build_qname(definitions.target_namespace, message_name),
-            status=Status.PROCESSED,
+            status=Status.FLATTENED,
             tag=Tag.ELEMENT,
             location=definitions.location,
             ns_map=ns_map,

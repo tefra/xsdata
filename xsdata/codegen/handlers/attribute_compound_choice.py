@@ -1,6 +1,7 @@
 from operator import attrgetter
 from typing import List
 
+from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.mixins import RelativeHandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
@@ -16,13 +17,22 @@ class AttributeCompoundChoiceHandler(RelativeHandlerInterface):
     """Group attributes that belong in the same choice and replace them by
     compound fields."""
 
-    __slots__ = ()
+    __slots__ = "compound_fields"
+
+    def __init__(self, container: ContainerInterface):
+        super().__init__(container)
+
+        self.compound_fields = container.config.output.compound_fields
 
     def process(self, target: Class):
-        groups = group_by(target.attrs, attrgetter("restrictions.choice"))
-        for choice, attrs in groups.items():
-            if choice and len(attrs) > 1 and any(attr.is_list for attr in attrs):
-                self.group_fields(target, attrs)
+        if self.compound_fields:
+            groups = group_by(target.attrs, attrgetter("restrictions.choice"))
+            for choice, attrs in groups.items():
+                if choice and len(attrs) > 1 and any(attr.is_list for attr in attrs):
+                    self.group_fields(target, attrs)
+
+        for index in range(len(target.attrs)):
+            self.reset_sequential(target, index)
 
     def group_fields(self, target: Class, attrs: List[Attr]):
         """Group attributes into a new compound field."""
@@ -93,3 +103,24 @@ class AttributeCompoundChoiceHandler(RelativeHandlerInterface):
             help=attr.help,
             restrictions=restrictions,
         )
+
+    @classmethod
+    def reset_sequential(cls, target: Class, index: int):
+        """Reset the attribute at the given index if it has no siblings with
+        the sequential restriction."""
+
+        attr = target.attrs[index]
+        before = target.attrs[index - 1] if index - 1 >= 0 else None
+        after = target.attrs[index + 1] if index + 1 < len(target.attrs) else None
+
+        if not attr.is_list:
+            attr.restrictions.sequential = False
+
+        if (
+            not attr.restrictions.sequential
+            or (before and before.restrictions.sequential)
+            or (after and after.restrictions.sequential and after.is_list)
+        ):
+            return
+
+        attr.restrictions.sequential = False

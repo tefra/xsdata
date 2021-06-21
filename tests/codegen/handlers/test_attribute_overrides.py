@@ -23,15 +23,15 @@ class AttributeOverridesHandlerTests(FactoryTestCase):
     @mock.patch.object(AttributeOverridesHandler, "validate_override")
     def test_process(self, mock_validate_override, mock_resolve_conflict):
         class_a = ClassFactory.create(
-            status=Status.PROCESSING,
+            status=Status.FLATTENING,
             attrs=[
                 AttrFactory.create(name="el", tag=Tag.ELEMENT),
                 AttrFactory.create(name="at", tag=Tag.ATTRIBUTE),
             ],
         )
 
-        class_b = ClassFactory.elements(2, status=Status.PROCESSED)
-        class_c = ClassFactory.create(status=Status.PROCESSED)
+        class_b = ClassFactory.elements(2, status=Status.FLATTENED)
+        class_c = ClassFactory.create(status=Status.FLATTENED)
 
         class_b.extensions.append(ExtensionFactory.reference(class_c.qname))
         class_a.extensions.append(ExtensionFactory.reference(class_b.qname))

@@ -150,7 +150,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
                 AttrFactory.create(tag=Tag.RESTRICTION),
             ],
             extensions=ExtensionFactory.list(2),
-            status=Status.PROCESSED,
+            status=Status.FLATTENED,
         )
         target = ClassFactory.enumeration(1)
         target.attrs[0].default = "Yes"

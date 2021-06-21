@@ -1,9 +1,7 @@
 from xsdata.codegen.handlers import AttributeRestrictionsHandler
-from xsdata.codegen.models import Class
 from xsdata.codegen.models import Restrictions
 from xsdata.models.enums import Tag
 from xsdata.utils.testing import AttrFactory
-from xsdata.utils.testing import ClassFactory
 from xsdata.utils.testing import FactoryTestCase
 
 
@@ -75,38 +73,3 @@ class AttributeRestrictionsHandlerTests(FactoryTestCase):
         attr.restrictions.nillable = True
         self.processor.reset_occurrences(attr)
         self.assertIsNone(attr.restrictions.required)
-
-    def test_reset_sequential(self):
-        def len_sequential(target: Class):
-            return len([attr for attr in target.attrs if attr.restrictions.sequential])
-
-        restrictions = Restrictions(max_occurs=2, sequential=True)
-        target = ClassFactory.create(
-            attrs=[
-                AttrFactory.create(restrictions=restrictions.clone()),
-                AttrFactory.create(restrictions=restrictions.clone()),
-            ]
-        )
-
-        attrs_clone = [attr.clone() for attr in target.attrs]
-
-        self.processor.reset_sequential(target, 0)
-        self.assertEqual(2, len_sequential(target))
-
-        target.attrs[0].restrictions.sequential = False
-        self.processor.reset_sequential(target, 0)
-        self.assertEqual(1, len_sequential(target))
-
-        self.processor.reset_sequential(target, 1)
-        self.assertEqual(0, len_sequential(target))
-
-        target.attrs = attrs_clone
-        target.attrs[1].restrictions.sequential = False
-        self.processor.reset_sequential(target, 0)
-        self.assertEqual(0, len_sequential(target))
-
-        target.attrs[0].restrictions.sequential = True
-        target.attrs[0].restrictions.max_occurs = 0
-        target.attrs[1].restrictions.sequential = True
-        self.processor.reset_sequential(target, 0)
-        self.assertEqual(1, len_sequential(target))

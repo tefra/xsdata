@@ -171,7 +171,7 @@ class AttributeTypeHandler(RelativeHandlerInterface):
         """Check if any source dependencies recursively match the target
         class."""
 
-        if source is target or source.status == Status.PROCESSING:
+        if source is target or source.status == Status.FLATTENING:
             return True
 
         for qname in self.cached_dependencies(source):

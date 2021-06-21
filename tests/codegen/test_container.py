@@ -1,10 +1,12 @@
 from unittest import mock
 
 from xsdata.codegen.container import ClassContainer
+from xsdata.codegen.container import Steps
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Status
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import Tag
+from xsdata.utils.testing import AttrFactory
 from xsdata.utils.testing import ClassFactory
 from xsdata.utils.testing import FactoryTestCase
 
@@ -21,7 +23,8 @@ class ClassContainerTests(FactoryTestCase):
             ClassFactory.create(qname="{xsdata}foo", tag=Tag.COMPLEX_TYPE),
             ClassFactory.create(qname="{xsdata}foobar", tag=Tag.COMPLEX_TYPE),
         ]
-        container = ClassContainer(config=GeneratorConfig())
+        config = GeneratorConfig()
+        container = ClassContainer(config)
         container.extend(classes)
 
         expected = {
@@ -33,13 +36,13 @@ class ClassContainerTests(FactoryTestCase):
         self.assertEqual(3, len(list(container)))
         self.assertEqual(classes, list(container))
 
-        self.assertEqual(
-            ["ClassNameConflictHandler", "ClassDesignateHandler"],
-            [x.__class__.__name__ for x in container.collection_processors],
-        )
+        actual = {
+            step: [processor.__class__.__name__ for processor in processors]
+            for step, processors in container.processors.items()
+        }
 
-        self.assertEqual(
-            [
+        expected = {
+            10: [
                 "AttributeGroupHandler",
                 "ClassExtensionHandler",
                 "ClassEnumerationHandler",
@@ -48,46 +51,30 @@ class ClassContainerTests(FactoryTestCase):
                 "AttributeMergeHandler",
                 "AttributeMixedContentHandler",
                 "AttributeDefaultValidateHandler",
-                "AttributeOverridesHandler",
+            ],
+            20: [
                 "AttributeEffectiveChoiceHandler",
-            ],
-            [x.__class__.__name__ for x in container.pre_processors],
-        )
-
-        self.assertEqual(
-            [
-                "AttributeDefaultValueHandler",
                 "AttributeRestrictionsHandler",
-                "AttributeNameConflictHandler",
-                "ClassInnersHandler",
-            ],
-            [x.__class__.__name__ for x in container.post_processors],
-        )
-
-        config = GeneratorConfig()
-        config.output.compound_fields = True
-        container = ClassContainer(config=config)
-
-        self.assertEqual(
-            [
-                "AttributeCompoundChoiceHandler",
                 "AttributeDefaultValueHandler",
-                "AttributeRestrictionsHandler",
-                "AttributeNameConflictHandler",
-                "ClassInnersHandler",
             ],
-            [x.__class__.__name__ for x in container.post_processors],
-        )
+            30: [
+                "AttributeOverridesHandler",
+                "AttributeNameConflictHandler",
+            ],
+            40: ["ClassInnersHandler", "AttributeCompoundChoiceHandler"],
+        }
 
-    @mock.patch.object(ClassContainer, "pre_process_class")
-    def test_find(self, mock_pre_process_class):
-        def pre_process_class(x: Class):
-            x.status = Status.PROCESSED
+        self.assertEqual(expected, actual)
+
+    @mock.patch.object(ClassContainer, "process_class")
+    def test_find(self, mock_process_class):
+        def process_class(x: Class, step: int):
+            x.status = Status.FLATTENED
 
         class_a = ClassFactory.create(qname="a")
-        class_b = ClassFactory.create(qname="b", status=Status.PROCESSED)
-        class_c = ClassFactory.enumeration(2, qname="b", status=Status.PROCESSING)
-        mock_pre_process_class.side_effect = pre_process_class
+        class_b = ClassFactory.create(qname="b", status=Status.FLATTENED)
+        class_c = ClassFactory.enumeration(2, qname="b", status=Status.FLATTENING)
+        mock_process_class.side_effect = process_class
         self.container.extend([class_a, class_b, class_c])
 
         self.assertIsNone(self.container.find("nope"))
@@ -96,34 +83,47 @@ class ClassContainerTests(FactoryTestCase):
         self.assertEqual(
             class_c, self.container.find(class_b.qname, lambda x: x.is_enumeration)
         )
-        mock_pre_process_class.assert_called_once_with(class_a)
+        mock_process_class.assert_called_once_with(class_a, Steps.FLATTEN)
 
-    @mock.patch.object(ClassContainer, "pre_process_class")
-    def test_find_inner(self, mock_pre_process_class):
+    @mock.patch.object(ClassContainer, "process_class")
+    def test_find_inner(self, mock_process_class):
         obj = ClassFactory.create()
         first = ClassFactory.create(qname="{a}a")
-        second = ClassFactory.create(qname="{a}b", status=Status.PROCESSED)
+        second = ClassFactory.create(qname="{a}b", status=Status.FLATTENED)
         obj.inner.extend((first, second))
 
-        def pre_process_class(x: Class):
-            x.status = Status.PROCESSED
+        def process_class(x: Class, step: int):
+            x.status = Status.FLATTENED
 
-        mock_pre_process_class.side_effect = pre_process_class
+        mock_process_class.side_effect = process_class
 
         self.assertEqual(first, self.container.find_inner(obj, "{a}a"))
         self.assertEqual(second, self.container.find_inner(obj, "{a}b"))
-        mock_pre_process_class.assert_called_once_with(first)
+        mock_process_class.assert_called_once_with(first, Steps.FLATTEN)
 
-    def test_pre_process_class(self):
+    def test_process_class(self):
         target = ClassFactory.create(
             inner=[ClassFactory.elements(2), ClassFactory.elements(1)]
         )
         self.container.add(target)
 
         self.container.process()
-        self.assertEqual(Status.PROCESSED, target.status)
-        self.assertEqual(Status.PROCESSED, target.inner[0].status)
-        self.assertEqual(Status.PROCESSED, target.inner[1].status)
+        self.assertEqual(Status.FINALIZED, target.status)
+        self.assertEqual(Status.FINALIZED, target.inner[0].status)
+        self.assertEqual(Status.FINALIZED, target.inner[1].status)
+
+    def test_process_classes(self):
+        target = ClassFactory.create(
+            attrs=[AttrFactory.reference("enumeration")],
+            inner=[ClassFactory.enumeration(2, qname="enumeration")],
+        )
+
+        self.container.add(target)
+        self.container.process_classes(Steps.FLATTEN)
+        self.assertEqual(2, len(list(self.container)))
+
+        for obj in self.container:
+            self.assertEqual(Status.FLATTENED, obj.status)
 
     @mock.patch.object(Class, "should_generate", new_callable=mock.PropertyMock)
     def test_filter_classes(self, mock_class_should_generate):

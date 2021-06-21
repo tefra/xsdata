@@ -182,7 +182,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self, mock_copy_attribute_properties, mock_update_restrictions
     ):
         attr = AttrFactory.create(types=[AttrTypeFactory.create(qname="{bar}a")])
-        inner = ClassFactory.simple_type(qname="{bar}a", status=Status.PROCESSED)
+        inner = ClassFactory.simple_type(qname="{bar}a", status=Status.FLATTENED)
         target = ClassFactory.create(inner=[inner])
 
         self.processor.process_inner_type(target, attr, attr.types[0])
@@ -199,7 +199,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self, mock_copy_attribute_properties, mock_update_restrictions
     ):
         target = ClassFactory.create()
-        inner = ClassFactory.elements(2, qname="a", status=Status.PROCESSED)
+        inner = ClassFactory.elements(2, qname="a", status=Status.FLATTENED)
         attr = AttrFactory.create(types=[AttrTypeFactory.create(qname="a")])
 
         target.inner.append(inner)
@@ -281,7 +281,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         source = ClassFactory.create()
         target = ClassFactory.create()
         another = ClassFactory.create()
-        processing = ClassFactory.create(status=Status.PROCESSING)
+        processing = ClassFactory.create(status=Status.FLATTENING)
 
         find_classes = {"a": another, "b": target}
 

@@ -385,9 +385,14 @@ class Extension:
 
 class Status(IntEnum):
     RAW = 0
-    PROCESSING = 1
-    PROCESSED = 2
-    SANITIZED = 3
+    FLATTENING = 10
+    FLATTENED = 11
+    SANITIZING = 20
+    SANITIZED = 21
+    RESOLVING = 30
+    RESOLVED = 31
+    FINALIZING = 40
+    FINALIZED = 41
 
 
 @dataclass

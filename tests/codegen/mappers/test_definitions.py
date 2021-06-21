@@ -170,7 +170,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         other = ClassFactory.create()
         service = ClassFactory.create(
             qname=build_qname("xsdata", "Calc_Add"),
-            status=Status.PROCESSED,
+            status=Status.FLATTENED,
             tag=Tag.BINDING_OPERATION,
             location="foo.wsdl",
             module=None,
@@ -696,7 +696,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         actual = DefinitionsMapper.build_message_class(definitions, port_type_message)
         expected = Class(
             qname=build_qname("xsdata", "bar"),
-            status=Status.PROCESSED,
+            status=Status.FLATTENED,
             tag=Tag.ELEMENT,
             location="foo.wsdl",
             ns_map=message.ns_map,

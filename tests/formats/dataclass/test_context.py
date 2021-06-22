@@ -84,12 +84,12 @@ class XmlContextTests(FactoryTestCase):
         a = make_dataclass("A", fields=[])
         b = make_dataclass("B", fields=[], bases=(a,))
         c = make_dataclass("C", fields=[], bases=(a,))
-        other = make_dataclass("Other", fields=[])
+        other = make_dataclass("Other", fields=[])  # Included in the locals
 
         self.assertEqual(b, self.ctx.find_subclass(a, "B"))
         self.assertEqual(b, self.ctx.find_subclass(c, "B"))
-        self.assertEqual(a, self.ctx.find_subclass(b, "A"))
-        self.assertEqual(a, self.ctx.find_subclass(c, "A"))
+        self.assertIsNone(self.ctx.find_subclass(b, "A"))
+        self.assertIsNone(self.ctx.find_subclass(c, "A"))
         self.assertIsNone(self.ctx.find_subclass(c, "Unknown"))
         self.assertIsNone(self.ctx.find_subclass(c, "Other"))
 

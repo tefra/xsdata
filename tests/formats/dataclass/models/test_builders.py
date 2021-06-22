@@ -8,15 +8,19 @@ from typing import Dict
 from typing import get_type_hints
 from typing import Iterator
 from typing import List
-from typing import Type
 from typing import Union
 from unittest import mock
 from unittest import TestCase
+from xml.etree.ElementTree import QName
 
 from tests.fixtures.artists import Artist
 from tests.fixtures.books import BookForm
+from tests.fixtures.models import ChoiceType
+from tests.fixtures.models import TypeA
 from tests.fixtures.models import TypeB
+from tests.fixtures.models import UnionType
 from tests.fixtures.series import Country
+from tests.fixtures.submodels import ChoiceTypeChild
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.compat import class_types
 from xsdata.formats.dataclass.models.builders import XmlMetaBuilder
@@ -102,6 +106,12 @@ class XmlMetaBuilderTests(FactoryTestCase):
             self.builder.build(int, None)
 
         self.assertEqual(f"Type '{int}' is not a dataclass.", str(cm.exception))
+
+    def test_build_locates_globalns_per_field(self):
+        actual = self.builder.build(ChoiceTypeChild, None)
+        self.assertEqual(1, len(actual.choices))
+        self.assertEqual(9, len(actual.choices[0].elements))
+        self.assertIsNone(self.builder.find_globalns(object, "foo"))
 
     def test_target_namespace(self):
         class Meta:
@@ -234,17 +244,18 @@ class XmlVarBuilderTests(TestCase):
         )
 
         super().setUp()
+        self.maxDiff = None
 
     def test_build_with_choice_field(self):
-        globalns = sys.modules[CompoundFieldExample.__module__].__dict__
-        type_hints = get_type_hints(CompoundFieldExample)
-        class_field = fields(CompoundFieldExample)[0]
+        globalns = sys.modules[ChoiceType.__module__].__dict__
+        type_hints = get_type_hints(ChoiceType)
+        class_field = fields(ChoiceType)[0]
         self.builder.parent_ns = "bar"
 
         actual = self.builder.build(
             66,
-            "compound",
-            type_hints["compound"],
+            "choice",
+            type_hints["choice"],
             class_field.metadata,
             True,
             list,
@@ -252,96 +263,110 @@ class XmlVarBuilderTests(TestCase):
         )
         expected = XmlVarFactory.create(
             index=67,
-            xml_type=XmlType.ELEMENTS,
-            name="compound",
-            qname="compound",
+            name="choice",
+            types=(object,),
             list_element=True,
             any_type=True,
             default=list,
+            xml_type=XmlType.ELEMENTS,
             elements={
-                "{foo}node": XmlVarFactory.create(
+                "{bar}a": XmlVarFactory.create(
                     index=1,
-                    xml_type=XmlType.ELEMENT,
-                    name="compound",
-                    qname="{foo}node",
+                    name="choice",
+                    qname="{bar}a",
+                    types=(TypeA,),
+                    clazz=TypeA,
                     list_element=True,
-                    types=(CompoundFieldExample,),
-                    namespaces=("foo",),
-                    derived=False,
-                ),
-                "{bar}x": XmlVarFactory.create(
-                    index=2,
-                    xml_type=XmlType.ELEMENT,
-                    name="compound",
-                    qname="{bar}x",
-                    tokens=True,
-                    list_element=True,
-                    types=(str,),
                     namespaces=("bar",),
-                    derived=False,
-                    default=return_true,
-                    format="Nope",
                 ),
-                "{bar}y": XmlVarFactory.create(
+                "{bar}b": XmlVarFactory.create(
+                    index=2,
+                    name="choice",
+                    qname="{bar}b",
+                    types=(TypeB,),
+                    clazz=TypeB,
+                    list_element=True,
+                    namespaces=("bar",),
+                ),
+                "{bar}int": XmlVarFactory.create(
                     index=3,
-                    xml_type=XmlType.ELEMENT,
-                    name="compound",
-                    qname="{bar}y",
+                    name="choice",
+                    qname="{bar}int",
+                    types=(int,),
+                    list_element=True,
+                    namespaces=("bar",),
+                ),
+                "{bar}int2": XmlVarFactory.create(
+                    index=4,
+                    name="choice",
+                    qname="{bar}int2",
+                    types=(int,),
+                    derived=True,
                     nillable=True,
                     list_element=True,
-                    types=(int,),
                     namespaces=("bar",),
-                    derived=False,
                 ),
-                "{bar}z": XmlVarFactory.create(
-                    index=4,
-                    xml_type=XmlType.ELEMENT,
-                    name="compound",
-                    qname="{bar}z",
-                    nillable=False,
-                    list_element=True,
-                    types=(int,),
-                    namespaces=("bar",),
-                    derived=True,
-                ),
-                "{bar}o": XmlVarFactory.create(
+                "{bar}float": XmlVarFactory.create(
                     index=5,
-                    xml_type=XmlType.ELEMENT,
-                    name="compound",
-                    qname="{bar}o",
-                    nillable=False,
-                    list_element=True,
-                    types=(object,),
-                    namespaces=("bar",),
-                    derived=True,
-                    any_type=True,
-                ),
-                "{bar}p": XmlVarFactory.create(
-                    index=6,
-                    xml_type=XmlType.ELEMENT,
-                    name="compound",
-                    qname="{bar}p",
+                    name="choice",
+                    qname="{bar}float",
                     types=(float,),
                     list_element=True,
                     namespaces=("bar",),
+                ),
+                "{bar}qname": XmlVarFactory.create(
+                    index=6,
+                    name="choice",
+                    qname="{bar}qname",
+                    types=(QName,),
+                    list_element=True,
+                    namespaces=("bar",),
+                ),
+                "{bar}tokens": XmlVarFactory.create(
+                    index=7,
+                    name="choice",
+                    qname="{bar}tokens",
+                    types=(int,),
+                    tokens=True,
+                    derived=True,
+                    list_element=True,
+                    default=return_true,
+                    namespaces=("bar",),
+                ),
+                "{foo}union": XmlVarFactory.create(
+                    index=8,
+                    name="choice",
+                    qname="{foo}union",
+                    types=(UnionType,),
+                    clazz=UnionType,
+                    list_element=True,
+                    namespaces=("foo",),
+                ),
+                "{bar}p": XmlVarFactory.create(
+                    index=9,
+                    name="choice",
+                    qname="{bar}p",
+                    types=(float,),
+                    derived=True,
+                    list_element=True,
                     default=1.1,
+                    namespaces=("bar",),
                 ),
             },
             wildcards=[
                 XmlVarFactory.create(
-                    index=7,
+                    index=10,
+                    name="choice",
                     xml_type=XmlType.WILDCARD,
-                    name="compound",
                     qname="{http://www.w3.org/1999/xhtml}any",
                     types=(object,),
-                    namespaces=("http://www.w3.org/1999/xhtml",),
-                    derived=True,
-                    any_type=False,
                     list_element=True,
-                )
+                    default=None,
+                    namespaces=("http://www.w3.org/1999/xhtml",),
+                ),
             ],
-            types=(object,),
         )
+
         self.assertEqual(expected, actual)
 
     def test_build_validates_result(self):
@@ -455,37 +480,3 @@ class XmlVarBuilderTests(TestCase):
                 XmlType.TEXT, None, None, (int, uuid.UUID), False, False
             )
         )
-
-
-@dataclass
-class CompoundFieldExample:
-
-    compound: List[object] = field(
-        default_factory=list,
-        metadata={
-            "type": "Elements",
-            "choices": (
-                {
-                    "name": "node",
-                    "type": Type["CompoundFieldExample"],
-                    "namespace": "foo",
-                },
-                {
-                    "name": "x",
-                    "type": List[str],
-                    "tokens": True,
-                    "default_factory": return_true,
-                    "format": "Nope",
-                },
-                {"name": "y", "type": List[int], "nillable": True},
-                {"name": "z", "type": List[int]},
-                {"name": "o", "type": object},
-                {"name": "p", "type": float, "fixed": True, "default": 1.1},
-                {
-                    "wildcard": True,
-                    "type": object,
-                    "namespace": "http://www.w3.org/1999/xhtml",
-                },
-            ),
-        },
-    )

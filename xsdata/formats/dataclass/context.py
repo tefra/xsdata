@@ -148,6 +148,13 @@ class XmlContext:
 
         types: List[Type] = self.find_types(qname)
         for tp in types:
+
+            # Why would an xml node with have an xsi:type that points
+            # to parent class is beyond me but it happens, let's protect
+            # against that scenario <node xsi:type="nodeAbstract" />
+            if issubclass(clazz, tp):
+                continue
+
             for tp_mro in tp.__mro__:
                 if tp_mro is not object and tp_mro in clazz.__mro__:
                     return tp

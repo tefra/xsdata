@@ -284,7 +284,7 @@ class SchemaMapperTests(FactoryTestCase):
         mock_default_value.return_value = "default"
         mock_is_fixed.return_value = True
         mock_element_namespace.return_value = "http://something/common"
-        mock_get_restrictions.return_value = {"required": True}
+        mock_get_restrictions.return_value = {"min_occurs": 1, "max_occurs": 1}
 
         attribute = Attribute(default="false")
         attribute.index = 66
@@ -300,7 +300,7 @@ class SchemaMapperTests(FactoryTestCase):
             default=mock_default_value.return_value,
             fixed=mock_is_fixed.return_value,
             index=66,
-            restrictions=Restrictions(required=True),
+            restrictions=Restrictions(min_occurs=1, max_occurs=1),
         )
         self.assertEqual(expected, item.attrs[0])
         self.assertEqual({"bar": "foo", "foo": "bar"}, item.ns_map)
@@ -309,7 +309,7 @@ class SchemaMapperTests(FactoryTestCase):
 
     def test_build_class_attribute_skip_prohibited(self):
         item = ClassFactory.create(ns_map={"bar": "foo"})
-        attribute = Attribute(default="false", use=UseType.PROHIBITED)
+        attribute = Attribute(use=UseType.PROHIBITED)
         SchemaMapper.build_class_attribute(item, attribute, Restrictions())
         self.assertEqual(0, len(item.attrs))
 

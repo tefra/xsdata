@@ -19,6 +19,7 @@ from xsdata.models.enums import QNames
 from xsdata.models.enums import Tag
 from xsdata.models.mixins import ElementBase
 from xsdata.utils import namespaces
+from xsdata.utils import text
 
 xml_type_map = {
     Tag.ANY: XmlType.WILDCARD,
@@ -36,8 +37,6 @@ class Restrictions:
     """
     Model representation of a dataclass field validation and type metadata.
 
-    :param required:
-    :param prohibited:
     :param min_occurs:
     :param max_occurs:
     :param min_exclusive:
@@ -59,8 +58,6 @@ class Restrictions:
     :param choice:
     """
 
-    required: Optional[bool] = field(default=None)
-    prohibited: Optional[bool] = field(default=None)
     min_occurs: Optional[int] = field(default=None)
     max_occurs: Optional[int] = field(default=None)
     min_exclusive: Optional[str] = field(default=None)
@@ -93,17 +90,7 @@ class Restrictions:
 
     @property
     def is_prohibited(self) -> bool:
-        return self.prohibited or self.max_occurs == 0
-
-    def is_compatible(self, other: "Restrictions") -> bool:
-        def bool_eq(a: Optional[bool], b: Optional[bool]) -> bool:
-            return bool(a) is bool(b)
-
-        return (
-            bool_eq(self.required, other.required)
-            and bool_eq(self.nillable, other.nillable)
-            and bool_eq(self.tokens, other.tokens)
-        )
+        return self.max_occurs == 0
 
     def merge(self, source: "Restrictions"):
         """Update properties from another instance."""
@@ -133,8 +120,6 @@ class Restrictions:
 
     def update(self, source: "Restrictions"):
         keys = (
-            "required",
-            "prohibited",
             "min_exclusive",
             "min_inclusive",
             "min_length",
@@ -165,14 +150,19 @@ class Restrictions:
         result = {}
         sorted_types = converter.sort_types(types) if types else []
 
+        if self.is_list:
+            if self.min_occurs is not None and self.min_occurs > 0:
+                result["min_occurs"] = self.min_occurs
+            if self.max_occurs is not None and self.max_occurs < sys.maxsize:
+                result["max_occurs"] = self.max_occurs
+        elif self.min_occurs == self.max_occurs == 1 and not self.nillable:
+            result["required"] = True
+
         for key, value in asdict(self).items():
-            if value is None or key == "choice":
+            if value is None or key in ("choice", "min_occurs", "max_occurs"):
                 continue
-            elif key == "max_occurs" and value >= sys.maxsize:
-                continue
-            elif key == "min_occurs" and value == 0:
-                continue
-            elif key.endswith("clusive") and types:
+
+            if key.endswith("clusive") and types:
                 value = converter.deserialize(value, sorted_types)
 
             result[key] = value
@@ -344,6 +334,10 @@ class Attr:
         return list(result)
 
     @property
+    def slug(self) -> str:
+        return text.alnum(self.name)
+
+    @property
     def xml_type(self) -> Optional[str]:
         """Return the xml node type this attribute is mapped to."""
         return xml_type_map.get(self.tag)
@@ -380,9 +374,14 @@ class Extension:
 
 class Status(IntEnum):
     RAW = 0
-    PROCESSING = 1
-    PROCESSED = 2
-    SANITIZED = 3
+    FLATTENING = 10
+    FLATTENED = 11
+    SANITIZING = 20
+    SANITIZED = 21
+    RESOLVING = 30
+    RESOLVED = 31
+    FINALIZING = 40
+    FINALIZED = 41
 
 
 @dataclass

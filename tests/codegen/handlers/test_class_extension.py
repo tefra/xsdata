@@ -150,7 +150,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
                 AttrFactory.create(tag=Tag.RESTRICTION),
             ],
             extensions=ExtensionFactory.list(2),
-            status=Status.PROCESSED,
+            status=Status.FLATTENED,
         )
         target = ClassFactory.enumeration(1)
         target.attrs[0].default = "Yes"
@@ -431,7 +431,9 @@ class ClassExtensionHandlerTests(FactoryTestCase):
 
     def test_add_default_attribute(self):
         xs_string = AttrTypeFactory.native(DataType.STRING)
-        extension = ExtensionFactory.create(xs_string, Restrictions(required=True))
+        extension = ExtensionFactory.create(
+            xs_string, Restrictions(min_occurs=1, max_occurs=1)
+        )
         item = ClassFactory.elements(1, extensions=[extension])
 
         ClassExtensionHandler.add_default_attribute(item, extension)
@@ -449,9 +451,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         ClassExtensionHandler.add_default_attribute(item, extension)
 
         expected.types.append(xs_int)
-        expected_restrictions = Restrictions(
-            tokens=True, required=True, min_occurs=1, max_occurs=1
-        )
+        expected_restrictions = Restrictions(tokens=True, min_occurs=1, max_occurs=1)
 
         self.assertEqual(2, len(item.attrs))
         self.assertEqual(0, len(item.extensions))
@@ -461,7 +461,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
     def test_add_default_attribute_with_any_type(self):
         extension = ExtensionFactory.create(
             AttrTypeFactory.native(DataType.ANY_TYPE),
-            Restrictions(min_occurs=1, max_occurs=1, required=True),
+            Restrictions(min_occurs=1, max_occurs=1),
         )
         item = ClassFactory.create(extensions=[extension])
 
@@ -472,7 +472,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
             types=[extension.type.clone()],
             tag=Tag.ANY,
             namespace="##any",
-            restrictions=Restrictions(min_occurs=1, max_occurs=1, required=True),
+            restrictions=Restrictions(min_occurs=1, max_occurs=1),
         )
 
         self.assertEqual(1, len(item.attrs))

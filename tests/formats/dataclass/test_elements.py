@@ -43,7 +43,9 @@ class XmlValTests(TestCase):
     def test_property_element_types(self):
         meta = self.context.build(ChoiceType)
         var = meta.choices[0]
-        self.assertEqual({TypeA, TypeB, int, float, QName}, var.element_types)
+        self.assertEqual(
+            {TypeA, TypeB, int, float, QName, UnionType}, var.element_types
+        )
 
     def test_find_choice(self):
         var = XmlVarFactory.create(

@@ -64,3 +64,8 @@ class ClassInnersHandler(HandlerInterface):
             for attr_type in attr.types:
                 if attr_type.forward and attr_type.qname == qname:
                     yield attr_type
+
+            for choice in attr.choices:
+                for choice_type in choice.types:
+                    if choice_type.forward and choice_type.qname == qname:
+                        yield choice_type

@@ -182,7 +182,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self, mock_copy_attribute_properties, mock_update_restrictions
     ):
         attr = AttrFactory.create(types=[AttrTypeFactory.create(qname="{bar}a")])
-        inner = ClassFactory.simple_type(qname="{bar}a", status=Status.PROCESSED)
+        inner = ClassFactory.simple_type(qname="{bar}a", status=Status.FLATTENED)
         target = ClassFactory.create(inner=[inner])
 
         self.processor.process_inner_type(target, attr, attr.types[0])
@@ -199,7 +199,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self, mock_copy_attribute_properties, mock_update_restrictions
     ):
         target = ClassFactory.create()
-        inner = ClassFactory.elements(2, qname="a", status=Status.PROCESSED)
+        inner = ClassFactory.elements(2, qname="a", status=Status.FLATTENED)
         attr = AttrFactory.create(types=[AttrTypeFactory.create(qname="a")])
 
         target.inner.append(inner)
@@ -260,6 +260,20 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self.processor.copy_attribute_properties(source, target, attr, attr.types[0])
         self.assertTrue(attr.restrictions.nillable)
 
+    def test_copy_attribute_properties_to_attribute_target(self):
+        source = ClassFactory.elements(1, nillable=True)
+        target = ClassFactory.create(attrs=AttrFactory.list(1, tag=Tag.ATTRIBUTE))
+        attr = target.attrs[0]
+        attr.restrictions.min_occurs = 1
+        attr.restrictions.max_occurs = 1
+
+        source.attrs[0].restrictions.min_occurs = 0
+        source.attrs[0].restrictions.max_occurs = 1
+
+        self.assertFalse(attr.is_optional)
+        self.processor.copy_attribute_properties(source, target, attr, attr.types[0])
+        self.assertFalse(attr.is_optional)
+
     @mock.patch.object(AttributeTypeHandler, "is_circular_dependency")
     def test_set_circular_flag(self, mock_is_circular_dependency):
         source = ClassFactory.create()
@@ -281,7 +295,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         source = ClassFactory.create()
         target = ClassFactory.create()
         another = ClassFactory.create()
-        processing = ClassFactory.create(status=Status.PROCESSING)
+        processing = ClassFactory.create(status=Status.FLATTENING)
 
         find_classes = {"a": another, "b": target}
 

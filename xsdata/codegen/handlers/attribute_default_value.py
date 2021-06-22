@@ -25,12 +25,15 @@ class AttributeDefaultValueHandler(RelativeHandlerInterface):
         for attr in target.attrs:
             self.process_attribute(target, attr)
 
+            for choice in attr.choices:
+                self.process_attribute(target, choice)
+
     def process_attribute(self, target: Class, attr: Attr):
 
         if attr.is_enumeration:
             return
 
-        if attr.is_optional or attr.is_xsi_type:
+        if attr.is_optional or attr.is_xsi_type or attr.is_list:
             attr.fixed = False
             attr.default = None
 

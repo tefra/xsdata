@@ -83,7 +83,7 @@ class AttributeGroupHandlerTests(FactoryTestCase):
         target = ClassFactory.create(qname="bar", tag=Tag.GROUP)
         target.attrs.append(group_attr)
 
-        target.status = Status.PROCESSING
+        target.status = Status.FLATTENING
         self.processor.container.add(target)
 
         self.processor.process_attribute(target, group_attr)

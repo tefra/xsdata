@@ -7,7 +7,6 @@ from .attribute_merge import AttributeMergeHandler
 from .attribute_mixed_content import AttributeMixedContentHandler
 from .attribute_name_conflict import AttributeNameConflictHandler
 from .attribute_overrides import AttributeOverridesHandler
-from .attribute_restrictions import AttributeRestrictionsHandler
 from .attribute_substitution import AttributeSubstitutionHandler
 from .attribute_type import AttributeTypeHandler
 from .class_designate import ClassDesignateHandler
@@ -26,7 +25,6 @@ __all__ = [
     "AttributeMixedContentHandler",
     "AttributeNameConflictHandler",
     "AttributeOverridesHandler",
-    "AttributeRestrictionsHandler",
     "AttributeSubstitutionHandler",
     "AttributeTypeHandler",
     "ClassDesignateHandler",

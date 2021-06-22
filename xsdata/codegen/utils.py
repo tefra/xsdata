@@ -1,7 +1,9 @@
 import sys
+from operator import attrgetter
 from typing import Iterator
 from typing import List
 from typing import Optional
+from typing import Set
 
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
@@ -239,12 +241,19 @@ class ClassUtils:
     def rename_attributes_by_index(cls, attrs: List[Attr], rename: List[Attr]):
         """Append the next available index number to all the rename attributes
         names."""
+        slug_getter = attrgetter("slug")
         for index in range(1, len(rename)):
-            num = 1
+            reserved = set(map(slug_getter, attrs))
             name = rename[index].name
+            rename[index].name = cls.unique_name(name, reserved)
 
-            reserved = {text.alnum(attr.name) for attr in attrs}
-            while text.alnum(f"{name}_{num}") in reserved:
-                num += 1
+    @classmethod
+    def unique_name(cls, name: str, reserved: Set[str]) -> str:
+        if text.alnum(name) in reserved:
+            index = 1
+            while text.alnum(f"{name}_{index}") in reserved:
+                index += 1
 
-            rename[index].name = f"{name}_{num}"
+            return f"{name}_{index}"
+
+        return name

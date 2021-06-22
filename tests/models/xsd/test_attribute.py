@@ -41,14 +41,21 @@ class AttributeTests(TestCase):
 
     def test_get_restrictions(self):
         obj = Attribute()
-        self.assertEqual({}, obj.get_restrictions())
+        self.assertEqual({"max_occurs": 1, "min_occurs": 0}, obj.get_restrictions())
 
+        obj.default = "foo"
+        self.assertEqual({"max_occurs": 1, "min_occurs": 1}, obj.get_restrictions())
+        obj.default = None
+        obj.fixed = "foo"
+        self.assertEqual({"max_occurs": 1, "min_occurs": 1}, obj.get_restrictions())
+
+        obj.fixed = None
         obj.use = UseType.REQUIRED
-        expected = {"required": True}
+        expected = {"max_occurs": 1, "min_occurs": 1}
         self.assertEqual(expected, obj.get_restrictions())
 
         obj.use = UseType.PROHIBITED
-        expected = {"prohibited": True}
+        expected = {"max_occurs": 0, "min_occurs": 0}
         self.assertEqual(expected, obj.get_restrictions())
 
         obj.simple_type = SimpleType(restriction=Restriction(length=Length(value=1)))

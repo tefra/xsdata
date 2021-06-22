@@ -156,11 +156,17 @@ class AttributeTypeHandler(RelativeHandlerInterface):
 
         restrictions = source_attr.restrictions.clone()
         restrictions.merge(attr.restrictions)
-        attr.restrictions = restrictions
-        attr.help = attr.help or source_attr.help
+
+        if attr.is_attribute:
+            # Attributes maintain their occurrences no matter what!
+            restrictions.min_occurs = attr.restrictions.min_occurs
+            restrictions.max_occurs = attr.restrictions.max_occurs
 
         if source.nillable:
             restrictions.nillable = True
+
+        attr.restrictions = restrictions
+        attr.help = attr.help or source_attr.help
 
     def set_circular_flag(self, source: Class, target: Class, attr_type: AttrType):
         """Update circular reference flag."""
@@ -171,7 +177,7 @@ class AttributeTypeHandler(RelativeHandlerInterface):
         """Check if any source dependencies recursively match the target
         class."""
 
-        if source is target or source.status == Status.PROCESSING:
+        if source is target or source.status == Status.FLATTENING:
             return True
 
         for qname in self.cached_dependencies(source):

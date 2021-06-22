@@ -3,6 +3,7 @@ from unittest import mock
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import AttributeDefaultValueHandler
 from xsdata.models.config import GeneratorConfig
+from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.utils.testing import AttrFactory
 from xsdata.utils.testing import AttrTypeFactory
@@ -26,10 +27,46 @@ class AttributeDefaultValueHandlerTests(FactoryTestCase):
         self.processor.process_attribute(target, attr)
         self.assertTrue(attr.fixed)
 
+    @mock.patch.object(AttributeDefaultValueHandler, "process_attribute")
+    def test_process_with_attr_choices(self, mock_process_attribute):
+        choice = AttrFactory.create(
+            name="attr_B_Or_attr_C",
+            tag="Choice",
+            index=0,
+            types=[AttrTypeFactory.native(DataType.ANY_TYPE)],
+            choices=[
+                AttrFactory.reference("one"),
+                AttrFactory.reference("two"),
+                AttrFactory.reference("three"),
+            ],
+        )
+        target = ClassFactory.create()
+        target.attrs.append(choice)
+
+        self.processor.process(target)
+
+        self.assertEqual(4, mock_process_attribute.call_count)
+        mock_process_attribute.assert_has_calls(
+            [
+                mock.call(target, target.attrs[0]),
+                mock.call(target, target.attrs[0].choices[0]),
+                mock.call(target, target.attrs[0].choices[1]),
+                mock.call(target, target.attrs[0].choices[2]),
+            ]
+        )
+
     def test_process_attribute_with_optional_field(self):
         target = ClassFactory.create()
         attr = AttrFactory.create(fixed=True, default=2)
         attr.restrictions.min_occurs = 0
+        self.processor.process_attribute(target, attr)
+        self.assertFalse(attr.fixed)
+        self.assertIsNone(attr.default)
+
+    def test_process_attribute_with_list_field(self):
+        target = ClassFactory.create()
+        attr = AttrFactory.create(fixed=True, default=2)
+        attr.restrictions.max_occurs = 5
         self.processor.process_attribute(target, attr)
         self.assertFalse(attr.fixed)
         self.assertIsNone(attr.default)

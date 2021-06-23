@@ -190,6 +190,7 @@ class AttrType:
     :param native:
     :param forward:
     :param circular:
+    :param substituted:
     """
 
     qname: str
@@ -198,6 +199,7 @@ class AttrType:
     native: bool = field(default=False)
     forward: bool = field(default=False)
     circular: bool = field(default=False)
+    substituted: bool = field(default=False, compare=False)
 
     @property
     def datatype(self) -> Optional[DataType]:

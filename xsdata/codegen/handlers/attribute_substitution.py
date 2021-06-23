@@ -15,7 +15,7 @@ from xsdata.utils import collections
 class AttributeSubstitutionHandler(RelativeHandlerInterface):
     """Apply substitution attributes to the given class recursively."""
 
-    __slots__ = ("substitutions",)
+    __slots__ = "substitutions"
 
     def __init__(self, container: ContainerInterface):
         super().__init__(container)
@@ -43,11 +43,17 @@ class AttributeSubstitutionHandler(RelativeHandlerInterface):
 
         The cloned attributes are placed below the attribute the are
         supposed to substitute.
+
+        Guard against multiple substitutions in case of xs:groups.
         """
         index = target.attrs.index(attr)
         assert self.substitutions is not None
 
         for attr_type in attr.types:
+            if attr_type.substituted:
+                continue
+
+            attr_type.substituted = True
             for substitution in self.substitutions.get(attr_type.qname, []):
                 clone = ClassUtils.clone_attribute(substitution, attr.restrictions)
 

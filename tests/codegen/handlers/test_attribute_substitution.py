@@ -58,6 +58,10 @@ class AttributeSubstitutionHandlerTests(FactoryTestCase):
 
         self.assertEqual(4, len(target.attrs))
 
+        # Guard against multiple runs in case of xs:groups
+        self.processor.process_attribute(target, first_attr)
+        self.assertEqual(4, len(target.attrs))
+
         self.assertEqual(reference_attrs[0], target.attrs[0])
         self.assertIsNot(reference_attrs[0], target.attrs[0])
         self.assertEqual(reference_attrs[1], target.attrs[3])

@@ -252,6 +252,7 @@ class XmlVarBuilderTests(TestCase):
         class_field = fields(ChoiceType)[0]
         self.builder.parent_ns = "bar"
 
+        self.maxDiff = None
         actual = self.builder.build(
             66,
             "choice",
@@ -327,7 +328,7 @@ class XmlVarBuilderTests(TestCase):
                     name="choice",
                     qname="{bar}tokens",
                     types=(int,),
-                    tokens=True,
+                    tokens_factory=list,
                     derived=True,
                     factory=list,
                     default=return_true,

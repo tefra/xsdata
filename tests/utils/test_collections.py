@@ -1,6 +1,4 @@
-import itertools
-from typing import Generator
-from typing import Hashable
+from collections import namedtuple
 from unittest import TestCase
 
 from xsdata.utils import collections
@@ -24,3 +22,11 @@ class CollectionsTests(TestCase):
         self.assertEqual([2, 2, 3], collections.remove([1, 2, 2, 3], lambda x: x == 1))
 
         self.assertEqual([3], collections.remove([1, 2, 2, 3], lambda x: x < 3))
+
+    def test_is_array(self):
+        fixture = namedtuple("fixture", ["a", "b"])
+
+        self.assertFalse(collections.is_array(1))
+        self.assertFalse(collections.is_array(fixture(1, 2)))
+        self.assertTrue(collections.is_array([]))
+        self.assertTrue(collections.is_array(tuple()))

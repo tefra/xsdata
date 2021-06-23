@@ -9,6 +9,13 @@ from typing import Optional
 from typing import Sequence
 
 
+def is_array(value: Any) -> bool:
+    if isinstance(value, (list, tuple)):
+        return not hasattr(value, "_fields")
+
+    return False
+
+
 def unique_sequence(items: Iterable, key: Optional[str] = None) -> List:
     """
     Return a new list with the unique values from an iterable.

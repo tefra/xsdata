@@ -10,6 +10,7 @@ from typing import Type
 from xsdata.formats.converter import converter
 from xsdata.formats.converter import QNameConverter
 from xsdata.models.enums import QNames
+from xsdata.utils import collections
 from xsdata.utils import constants
 from xsdata.utils import text
 from xsdata.utils.namespaces import build_qname
@@ -60,7 +61,7 @@ class ParserUtils:
             return default
 
         if tokens_factory:
-            value = value if isinstance(value, (list, tuple)) else value.split()
+            value = value if collections.is_array(value) else value.split()
             return tokens_factory(
                 converter.deserialize(val, types, ns_map=ns_map, format=format)
                 for val in value

@@ -23,6 +23,7 @@ from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.formats.dataclass.typing import get_args
 from xsdata.formats.dataclass.typing import get_origin
+from xsdata.utils import collections
 from xsdata.utils.constants import EMPTY_MAP
 
 
@@ -117,17 +118,14 @@ class JsonParser(AbstractParser):
 
         params = {}
         for key, value in data.items():
-            is_list = isinstance(value, (list, tuple))
-            var = self.find_var(xml_vars, key, is_list)
+            is_array = collections.is_array(value)
+            var = self.find_var(xml_vars, key, is_array)
 
             if var is None and self.config.fail_on_unknown_properties:
                 raise ParserError(f"Unknown property {clazz.__qualname__}.{key}")
 
             if var and var.init:
-                if var.factory:
-                    params[var.name] = var.factory(self.bind_value(meta, var, value))
-                else:
-                    params[var.name] = self.bind_value(meta, var, value)
+                params[var.name] = self.bind_value(meta, var, value)
 
         try:
             return clazz(**params)  # type: ignore

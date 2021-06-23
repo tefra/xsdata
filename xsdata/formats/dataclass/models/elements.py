@@ -15,6 +15,7 @@ from typing import Type
 
 from xsdata.formats.converter import converter
 from xsdata.models.enums import NamespaceType
+from xsdata.utils import collections
 from xsdata.utils.namespaces import local_name
 from xsdata.utils.namespaces import target_uri
 
@@ -190,7 +191,7 @@ class XmlVar(MetaMixin):
         """Match and return a choice field that matches the given value
         type."""
 
-        if isinstance(value, list):
+        if collections.is_array(value):
             tp = type(None) if not value else type(value[0])
             tokens = True
             check_subclass = False

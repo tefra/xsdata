@@ -24,6 +24,7 @@ from xsdata.formats.dataclass.serializers.mixins import XmlWriterEvent
 from xsdata.formats.dataclass.serializers.writers import default_writer
 from xsdata.models.enums import DataType
 from xsdata.models.enums import QNames
+from xsdata.utils import collections
 from xsdata.utils import namespaces
 from xsdata.utils.constants import EMPTY_MAP
 from xsdata.utils.namespaces import split_qname
@@ -142,7 +143,7 @@ class XmlSerializer(AbstractSerializer):
             yield from self.write_tokens(value, var, namespace)
         elif var.is_elements:
             yield from self.write_elements(value, var, namespace)
-        elif var.list_element and isinstance(value, (list, tuple)):
+        elif var.list_element and collections.is_array(value):
             yield from self.write_list(value, var, namespace)
         else:
             yield from self.write_any_type(value, var, namespace)
@@ -158,7 +159,7 @@ class XmlSerializer(AbstractSerializer):
         """Produce an events stream for the given tokens list or list of tokens
         lists."""
         if value or var.nillable:
-            if value and isinstance(value[0], (list, tuple)):
+            if value and collections.is_array(value[0]):
                 for val in value:
                     yield from self.write_element(val, var, namespace)
             else:
@@ -244,7 +245,7 @@ class XmlSerializer(AbstractSerializer):
 
     def write_elements(self, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
         """Produce an events stream from compound elements field."""
-        if isinstance(value, (list, tuple)):
+        if collections.is_array(value):
             for choice in value:
                 yield from self.write_choice(choice, var, namespace)
         else:
@@ -353,7 +354,7 @@ class XmlSerializer(AbstractSerializer):
         for var in meta.get_attribute_vars():
             if var.is_attribute:
                 value = getattr(obj, var.name)
-                if value is None or isinstance(value, (list, tuple)) and not value:
+                if value is None or collections.is_array(value) and not value:
                     continue
 
                 yield var.qname, cls.encode(value, var)

@@ -46,7 +46,7 @@ class CliTests(TestCase):
         self.assertFalse(mock_init.call_args[1]["print"])
         self.assertEqual("foo", config.output.package)
         self.assertEqual("dataclasses", config.output.format.value)
-        self.assertFalse(config.output.format.relative_imports)
+        self.assertFalse(config.output.relative_imports)
         self.assertEqual(StructureStyle.FILENAMES, config.output.structure)
         self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
 
@@ -142,7 +142,7 @@ class CliTests(TestCase):
         config = mock_init.call_args[1]["config"]
 
         self.assertEqual("foo", config.output.package)
-        self.assertTrue(config.output.format.relative_imports)
+        self.assertTrue(config.output.relative_imports)
         self.assertEqual(StructureStyle.NAMESPACES, config.output.structure)
         file_path.unlink()
 

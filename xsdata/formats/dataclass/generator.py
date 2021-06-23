@@ -116,27 +116,21 @@ class DataclassGenerator(AbstractGenerator):
     ) -> str:
         """Render the source code of the classes."""
         load = self.env.get_template
-        config = self.config
 
         def render_class(obj: Class) -> str:
             """Render class or enumeration."""
 
             if obj.is_enumeration:
-                template = "enum.jinja2"
+                template = load("enum.jinja2")
             elif obj.is_service:
-                template = "service.jinja2"
+                template = load("service.jinja2")
             else:
-                template = "class.jinja2"
+                template = load("class.jinja2")
 
-            return (
-                load(template)
-                .render(
-                    obj=obj,
-                    module_namespace=module_namespace,
-                    docstring_style=config.output.docstring_style.name.lower(),
-                )
-                .strip()
-            )
+            return template.render(
+                obj=obj,
+                module_namespace=module_namespace,
+            ).strip()
 
         return "\n\n\n".join(map(render_class, classes)) + "\n"
 

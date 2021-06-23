@@ -397,19 +397,6 @@ class XmlVarBuilder:
         return None
 
     @classmethod
-    def is_element_list(cls, origin: Any, sub_origin: Any, is_tokens: bool) -> bool:
-        """
-        Return whether the field is a list element.
-
-        If the field is derived from xs:NMTOKENS both origins have to be
-        lists.
-        """
-        if origin in (list, tuple):
-            return not is_tokens or sub_origin in (list, tuple)
-
-        return False
-
-    @classmethod
     def is_any_type(cls, types: Sequence[Type], xml_type: str) -> bool:
         """Return whether the given xml type supports derived values."""
         if xml_type in (XmlType.ELEMENT, XmlType.ELEMENTS):

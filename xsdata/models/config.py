@@ -129,11 +129,11 @@ class OutputFormat:
     Output format options.
 
     :param value: Name of the format
-    :param relative_imports: Enable relative imports
+    :param frozen: Enable relative imports
     """
 
     value: str = field(default="dataclasses")
-    relative_imports: bool = attribute(default=False)
+    frozen: bool = attribute(default=False)
 
 
 @dataclass
@@ -146,6 +146,7 @@ class GeneratorOutput:
     :param format: Code generator output format name
     :param structure: Select an output structure
     :param docstring_style: Select a docstring style
+    :param relative_imports: Enable relative imports
     :param compound_fields: Use compound fields for repeating choices.
         Enable if elements ordering matters for your case.
     """
@@ -155,6 +156,7 @@ class GeneratorOutput:
     format: OutputFormat = element(default_factory=OutputFormat)
     structure: StructureStyle = element(default=StructureStyle.FILENAMES)
     docstring_style: DocstringStyle = element(default=DocstringStyle.RST)
+    relative_imports: bool = element(default=False)
     compound_fields: bool = element(default=False)
 
 

@@ -126,6 +126,13 @@ class FiltersTests(FactoryTestCase):
 
         self.assertEqual(expected, self.filters.field_default_value(attr))
 
+        expected = """lambda: (
+            1,
+            "bar",
+        )"""
+        self.filters.format.frozen = True
+        self.assertEqual(expected, self.filters.field_default_value(attr))
+
         attr.tag = Tag.ENUMERATION
         expected = """(
             1,
@@ -205,10 +212,13 @@ class FiltersTests(FactoryTestCase):
         attr = AttrFactory.any_attribute()
         self.assertEqual("dict", self.filters.field_default_value(attr))
 
-    def test_field_default_value_with_type_list(self):
+    def test_field_default_value_with_array_type(self):
         attr = AttrFactory.create(types=[type_bool])
         attr.restrictions.max_occurs = 2
         self.assertEqual("list", self.filters.field_default_value(attr))
+
+        self.filters.format.frozen = True
+        self.assertEqual("tuple", self.filters.field_default_value(attr))
 
     def test_field_default_value_with_multiple_types(self):
         attr = AttrFactory.create(types=[type_bool, type_int, type_float], default="2")
@@ -386,13 +396,19 @@ class FiltersTests(FactoryTestCase):
             self.filters.field_type(attr, ["Parent", "Inner"]),
         )
 
-    def test_field_type_with_list_type(self):
+    def test_field_type_with_array_type(self):
         attr = AttrFactory.create(
             types=AttrTypeFactory.list(1, qname="foo_bar", forward=True)
         )
         attr.restrictions.max_occurs = 2
         self.assertEqual(
             'List["A.Parent.FooBar"]',
+            self.filters.field_type(attr, ["A", "Parent"]),
+        )
+
+        self.filters.format.frozen = True
+        self.assertEqual(
+            'Tuple["A.Parent.FooBar", ...]',
             self.filters.field_type(attr, ["A", "Parent"]),
         )
 
@@ -405,6 +421,10 @@ class FiltersTests(FactoryTestCase):
 
         attr.restrictions.max_occurs = 2
         self.assertEqual("List[List[FooBar]]", self.filters.field_type(attr, []))
+
+        attr.restrictions.max_occurs = 1
+        self.filters.format.frozen = True
+        self.assertEqual("Tuple[FooBar, ...]", self.filters.field_type(attr, []))
 
     def test_field_type_with_alias(self):
         attr = AttrFactory.create(
@@ -482,6 +502,10 @@ class FiltersTests(FactoryTestCase):
         actual = self.filters.choice_type(choice, ["a", "b"])
         self.assertEqual("Type[List[Union[str, bool]]]", actual)
 
+        self.filters.format.frozen = True
+        actual = self.filters.choice_type(choice, ["a", "b"])
+        self.assertEqual("Type[Tuple[Union[str, bool], ...]]", actual)
+
     def test_default_imports_with_decimal(self):
         expected = "from decimal import Decimal"
 
@@ -542,6 +566,10 @@ class FiltersTests(FactoryTestCase):
 
         output = ": List["
         expected = "from typing import List"
+        self.assertIn(expected, self.filters.default_imports(output))
+
+        output = ": Tuple["
+        expected = "from typing import Tuple"
         self.assertIn(expected, self.filters.default_imports(output))
 
         output = "Optional[ "
@@ -635,6 +663,16 @@ class FiltersTests(FactoryTestCase):
         for case in cases:
             self.assertEqual(case.result, transform(case.module, case.from_module))
 
+    def test_build_class_annotation(self):
+        config = GeneratorConfig()
+
+        actual = self.filters.build_class_annotation(config.output.format)
+        self.assertEqual("@dataclass", actual)
+
+        config.output.format.frozen = True
+        actual = self.filters.build_class_annotation(config.output.format)
+        self.assertEqual("@dataclass(frozen=True)", actual)
+
     def test__init(self):
         config = GeneratorConfig()
         config.conventions.package_name.safe_prefix = "safe_package"
@@ -652,6 +690,8 @@ class FiltersTests(FactoryTestCase):
         config.aliases.module_name.append(GeneratorAlias("i", "j"))
 
         filters = Filters(config)
+
+        self.assertFalse(filters.relative_imports)
 
         self.assertEqual("safe_class", filters.class_safe_prefix)
         self.assertEqual("safe_field", filters.field_safe_prefix)

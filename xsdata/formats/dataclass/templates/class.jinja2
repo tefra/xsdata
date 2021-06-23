@@ -1,6 +1,6 @@
 {% set level = level|default(0) -%}
 {% set help | format_docstring(level + 1) %}
-    {%- include "docstrings." + docstring_style + ".jinja2" -%}
+    {%- include "docstrings." + docstring_name + ".jinja2" -%}
 {% endset -%}
 {% set parent_namespace = obj.namespace if obj.namespace is not none else parent_namespace|default(None) -%}
 {% set parents = parents|default([obj.name]) -%}
@@ -10,7 +10,7 @@
 {% set base_classes = obj.extensions|map(attribute='type')|map('type_name')|join(', ') -%}
 {% set target_namespace = obj.target_namespace if level == 0 and module_namespace != obj.target_namespace else None %}
 
-@dataclass
+{{ class_annotation }}
 class {{ class_name }}{{"({})".format(base_classes) if base_classes }}:
 {%- if help %}
 {{ help|indent(4, first=True) }}

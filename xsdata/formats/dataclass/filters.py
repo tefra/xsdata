@@ -22,8 +22,9 @@ from xsdata.formats.dataclass import utils
 from xsdata.models.config import DocstringStyle
 from xsdata.models.config import GeneratorAlias
 from xsdata.models.config import GeneratorConfig
+from xsdata.models.config import OutputFormat
+from xsdata.utils import collections
 from xsdata.utils import text
-from xsdata.utils.collections import unique_sequence
 from xsdata.utils.namespaces import clean_uri
 from xsdata.utils.namespaces import local_name
 
@@ -52,6 +53,7 @@ class Filters:
         "docstring_style",
         "max_line_length",
         "relative_imports",
+        "format",
     )
 
     def __init__(self, config: GeneratorConfig):
@@ -71,9 +73,16 @@ class Filters:
         self.module_safe_prefix: str = config.conventions.module_name.safe_prefix
         self.docstring_style: DocstringStyle = config.output.docstring_style
         self.max_line_length: int = config.output.max_line_length
-        self.relative_imports: bool = config.output.format.relative_imports
+        self.relative_imports: bool = config.output.relative_imports
+        self.format = config.output.format
 
     def register(self, env: Environment):
+        env.globals.update(
+            {
+                "docstring_name": self.docstring_style.name.lower(),
+                "class_annotation": self.build_class_annotation(self.format),
+            }
+        )
         env.filters.update(
             {
                 "field_name": self.field_name,
@@ -95,6 +104,14 @@ class Filters:
                 "import_class": self.import_class,
             }
         )
+
+    @classmethod
+    def build_class_annotation(cls, format: OutputFormat) -> str:
+        args = []
+        if format.frozen:
+            args.append("frozen=True")
+
+        return f"@dataclass({','.join(args)})" if args else "@dataclass"
 
     def class_name(self, name: str) -> str:
         """Convert the given string to a class name according to the selected
@@ -293,7 +310,7 @@ class Filters:
         if isinstance(data, dict):
             return self.format_dict(data, indent)
 
-        if isinstance(data, (list, tuple)) and not hasattr(data, "_fields"):
+        if collections.is_array(data):
             return self.format_iterable(data, indent)
 
         if isinstance(data, str):
@@ -436,7 +453,7 @@ class Filters:
     def field_default_value(self, attr: Attr, ns_map: Optional[Dict] = None) -> Any:
         """Generate the field default value/factory for the given attribute."""
         if attr.is_list or (attr.is_tokens and not attr.default):
-            return "list"
+            return "tuple" if self.format.frozen else "list"
         if attr.is_dict:
             return "dict"
         if attr.default is None:
@@ -480,10 +497,11 @@ class Filters:
         assert isinstance(attr.default, str)
 
         fmt = attr.restrictions.format
-        tokens = [
+        factory = tuple if self.format.frozen else list
+        tokens = factory(
             converter.deserialize(val, types, ns_map=ns_map, format=fmt)
             for val in attr.default.split()
-        ]
+        )
 
         if attr.is_enumeration:
             return self.format_metadata(tuple(tokens), indent=8)
@@ -493,7 +511,7 @@ class Filters:
     def field_type(self, attr: Attr, parents: List[str]) -> str:
         """Generate type hints for the given attribute."""
 
-        type_names = unique_sequence(
+        type_names = collections.unique_sequence(
             self.field_type_name(x, parents) for x in attr.types
         )
 
@@ -502,10 +520,14 @@ class Filters:
             result = f"Union[{result}]"
 
         if attr.is_tokens:
-            result = f"List[{result}]"
+            result = (
+                f"Tuple[{result}, ...]" if self.format.frozen else f"List[{result}]"
+            )
 
         if attr.is_list:
-            result = f"List[{result}]"
+            result = (
+                f"Tuple[{result}, ...]" if self.format.frozen else f"List[{result}]"
+            )
         elif attr.is_dict:
             result = "Dict[str, str]"
         elif attr.default is None and not attr.is_factory:
@@ -524,7 +546,7 @@ class Filters:
         compound field that might be a list, that's why list restriction
         is also ignored.
         """
-        type_names = unique_sequence(
+        type_names = collections.unique_sequence(
             self.field_type_name(x, parents) for x in choice.types
         )
 
@@ -533,7 +555,9 @@ class Filters:
             result = f"Union[{result}]"
 
         if choice.is_tokens:
-            result = f"List[{result}]"
+            result = (
+                f"Tuple[{result}, ...]" if self.format.frozen else f"List[{result}]"
+            )
 
         return f"Type[{result}]"
 
@@ -590,6 +614,7 @@ class Filters:
                 "Dict": [": Dict"],
                 "List": [": List["],
                 "Optional": ["Optional["],
+                "Tuple": ["Tuple["],
                 "Type": ["Type["],
                 "Union": ["Union["],
             },

@@ -157,7 +157,7 @@ class TypingTests(TestCase):
             (tuple, tuple, bool, str), evaluate(Tuple[Tuple[Union[bool, str]]])
         )
 
-        unsupported_cases = [List, List[Dict[str, str]]]
+        unsupported_cases = [Tuple, Tuple[Dict[str, str]]]
         for case in unsupported_cases:
             with self.assertRaises(TypeError, msg=case):
                 evaluate(case)

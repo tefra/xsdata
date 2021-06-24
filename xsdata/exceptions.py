@@ -2,6 +2,10 @@ class CodeGenerationError(TypeError):
     """Unexpected state during code generation related errors."""
 
 
+class GeneratorConfigError(CodeGenerationError):
+    """Unexpected state during generator config related errors."""
+
+
 class ConverterError(ValueError):
     """Converting values between document/python types related errors."""
 

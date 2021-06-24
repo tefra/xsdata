@@ -9,6 +9,7 @@ from typing import List
 from typing import TextIO
 
 from xsdata import __version__
+from xsdata.exceptions import GeneratorConfigError
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers import XmlParser
 from xsdata.formats.dataclass.parsers.config import ParserConfig
@@ -129,11 +130,23 @@ class OutputFormat:
     Output format options.
 
     :param value: Name of the format
-    :param frozen: Enable relative imports
+    :param repr: Generate repr methods
+    :param eq: Generate equal method
+    :param order: Generate rich comparison methods
+    :param unsafe_hash: Forcefully generate hash method without frozen
+    :param frozen: Enable read only properties with immutable containers
     """
 
     value: str = field(default="dataclasses")
+    repr: bool = attribute(default=True)
+    eq: bool = attribute(default=True)
+    order: bool = attribute(default=False)
+    unsafe_hash: bool = attribute(default=False)
     frozen: bool = attribute(default=False)
+
+    def __post_init__(self):
+        if self.order and not self.eq:
+            raise GeneratorConfigError("eq must be true if order is true")
 
 
 @dataclass

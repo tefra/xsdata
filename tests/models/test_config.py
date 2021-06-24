@@ -3,8 +3,10 @@ from pathlib import Path
 from unittest import TestCase
 
 from xsdata import __version__
+from xsdata.exceptions import GeneratorConfigError
 from xsdata.exceptions import ParserError
 from xsdata.models.config import GeneratorConfig
+from xsdata.models.config import OutputFormat
 
 
 class GeneratorConfigTests(TestCase):
@@ -22,7 +24,8 @@ class GeneratorConfigTests(TestCase):
             f'<Config xmlns="http://pypi.org/project/xsdata" version="{__version__}">\n'
             '  <Output maxLineLength="79">\n'
             "    <Package>generated</Package>\n"
-            '    <Format frozen="false">dataclasses</Format>\n'
+            '    <Format repr="true" eq="true" order="false" '
+            'unsafeHash="false" frozen="false">dataclasses</Format>\n'
             "    <Structure>filenames</Structure>\n"
             "    <DocstringStyle>reStructuredText</DocstringStyle>\n"
             "    <RelativeImports>false</RelativeImports>\n"
@@ -71,7 +74,8 @@ class GeneratorConfigTests(TestCase):
             f'<Config xmlns="http://pypi.org/project/xsdata" version="{__version__}">\n'
             '  <Output maxLineLength="79">\n'
             "    <Package>foo.bar</Package>\n"
-            '    <Format frozen="false">dataclasses</Format>\n'
+            '    <Format repr="true" eq="true" order="false" unsafeHash="false" '
+            'frozen="false">dataclasses</Format>\n'
             "    <Structure>filenames</Structure>\n"
             "    <DocstringStyle>reStructuredText</DocstringStyle>\n"
             "    <RelativeImports>false</RelativeImports>\n"
@@ -102,3 +106,10 @@ class GeneratorConfigTests(TestCase):
         file_path.write_text(existing, encoding="utf-8")
         with self.assertRaises(ParserError):
             GeneratorConfig.read(file_path)
+
+    def test_format_with_invalid_state(self):
+
+        with self.assertRaises(GeneratorConfigError) as cm:
+            OutputFormat(eq=False, order=True)
+
+        self.assertEqual("eq must be true if order is true", str(cm.exception))

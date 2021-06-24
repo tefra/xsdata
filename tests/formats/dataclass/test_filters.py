@@ -665,13 +665,26 @@ class FiltersTests(FactoryTestCase):
 
     def test_build_class_annotation(self):
         config = GeneratorConfig()
+        format = config.output.format
 
-        actual = self.filters.build_class_annotation(config.output.format)
+        actual = self.filters.build_class_annotation(format)
         self.assertEqual("@dataclass", actual)
 
-        config.output.format.frozen = True
-        actual = self.filters.build_class_annotation(config.output.format)
+        format.frozen = True
+        actual = self.filters.build_class_annotation(format)
         self.assertEqual("@dataclass(frozen=True)", actual)
+
+        format.repr = False
+        format.eq = False
+        format.order = True
+        format.unsafe_hash = True
+        actual = self.filters.build_class_annotation(format)
+        expected = (
+            "@dataclass(repr=False, eq=False, order=True,"
+            " unsafe_hash=True, frozen=True)"
+        )
+
+        self.assertEqual(expected, actual)
 
     def test__init(self):
         config = GeneratorConfig()

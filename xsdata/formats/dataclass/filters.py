@@ -108,10 +108,19 @@ class Filters:
     @classmethod
     def build_class_annotation(cls, format: OutputFormat) -> str:
         args = []
+
+        if not format.repr:
+            args.append("repr=False")
+        if not format.eq:
+            args.append("eq=False")
+        if format.order:
+            args.append("order=True")
+        if format.unsafe_hash:
+            args.append("unsafe_hash=True")
         if format.frozen:
             args.append("frozen=True")
 
-        return f"@dataclass({','.join(args)})" if args else "@dataclass"
+        return f"@dataclass({', '.join(args)})" if args else "@dataclass"
 
     def class_name(self, name: str) -> str:
         """Convert the given string to a class name according to the selected

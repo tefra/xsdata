@@ -315,6 +315,8 @@ class Attribute(AnnotationBase):
     def bases(self) -> Iterator[str]:
         if self.type:
             yield self.type
+        elif not self.has_children:
+            yield DataType.STRING.prefixed(self.xs_prefix)
 
     @property
     def is_attribute(self) -> bool:

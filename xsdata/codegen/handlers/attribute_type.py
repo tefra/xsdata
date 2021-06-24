@@ -110,15 +110,15 @@ class AttributeTypeHandler(RelativeHandlerInterface):
         Process an attributes type that depends on any global type.
 
         Strategies:
-            1. Reset absent or dummy attribute types with a warning
+            1. Reset absent types with a warning
             2. Copy attribute properties from a simple type
             3. Copy format restriction from an enumeration
             4. Set circular flag for the rest
         """
 
         source = self.find_dependency(attr_type, attr.tag)
-        if not source or (not source.attrs and not source.extensions):
-            logger.warning("Reset dummy type: %s", attr_type.name)
+        if not source:
+            logger.warning("Reset absent type: %s", attr_type.name)
             use_str = not source or not source.is_complex
             self.reset_attribute_type(attr_type, use_str)
         elif source.is_simple_type:
@@ -167,6 +167,8 @@ class AttributeTypeHandler(RelativeHandlerInterface):
 
         attr.restrictions = restrictions
         attr.help = attr.help or source_attr.help
+        attr.fixed = attr.fixed or source_attr.fixed
+        attr.default = attr.default or source_attr.default
 
     def set_circular_flag(self, source: Class, target: Class, attr_type: AttrType):
         """Update circular reference flag."""

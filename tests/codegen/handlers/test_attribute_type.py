@@ -119,19 +119,6 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self.processor.process_dependency_type(target, attr, attr_type)
         mock_reset_attribute_type.assert_called_once_with(attr_type, True)
 
-    @mock.patch.object(AttributeTypeHandler, "reset_attribute_type")
-    @mock.patch.object(AttributeTypeHandler, "find_dependency")
-    def test_process_dependency_type_with_dummy_type(
-        self, mock_find_dependency, mock_reset_attribute_type
-    ):
-        mock_find_dependency.return_value = ClassFactory.create(tag=Tag.ELEMENT)
-        target = ClassFactory.create()
-        attr = AttrFactory.create()
-        attr_type = attr.types[0]
-
-        self.processor.process_dependency_type(target, attr, attr_type)
-        mock_reset_attribute_type.assert_called_once_with(attr_type, False)
-
     @mock.patch.object(AttributeTypeHandler, "copy_attribute_properties")
     @mock.patch.object(AttributeTypeHandler, "find_dependency")
     def test_process_dependency_type_with_simple_type(
@@ -260,7 +247,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self.processor.copy_attribute_properties(source, target, attr, attr.types[0])
         self.assertTrue(attr.restrictions.nillable)
 
-    def test_copy_attribute_properties_to_attribute_target(self):
+    def test_copy_attribute_properties_to_attribute_target_preserve_occurrences(self):
         source = ClassFactory.elements(1, nillable=True)
         target = ClassFactory.create(attrs=AttrFactory.list(1, tag=Tag.ATTRIBUTE))
         attr = target.attrs[0]
@@ -273,6 +260,24 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self.assertFalse(attr.is_optional)
         self.processor.copy_attribute_properties(source, target, attr, attr.types[0])
         self.assertFalse(attr.is_optional)
+
+    def test_copy_attribute_properties_set_default_value_if_none(self):
+        target = ClassFactory.create(attrs=AttrFactory.list(1, tag=Tag.ATTRIBUTE))
+        attr = target.attrs[0]
+
+        source = ClassFactory.elements(1)
+        source.attrs[0].default = "foo"
+        source.attrs[0].fixed = True
+
+        self.processor.copy_attribute_properties(source, target, attr, attr.types[0])
+        self.assertEqual("foo", attr.default)
+        self.assertTrue("foo", attr.fixed)
+
+        source.attrs[0].default = "bar"
+        source.attrs[0].fixed = False
+        self.processor.copy_attribute_properties(source, target, attr, attr.types[0])
+        self.assertEqual("foo", attr.default)
+        self.assertTrue("foo", attr.fixed)
 
     @mock.patch.object(AttributeTypeHandler, "is_circular_dependency")
     def test_set_circular_flag(self, mock_is_circular_dependency):

@@ -1,6 +1,7 @@
 from unittest import TestCase
 
 from xsdata.exceptions import SchemaValueError
+from xsdata.models.enums import Namespace
 from xsdata.models.enums import UseType
 from xsdata.models.xsd import Attribute
 from xsdata.models.xsd import Length
@@ -64,7 +65,12 @@ class AttributeTests(TestCase):
 
     def test_property_bases(self):
         obj = Attribute()
+        obj.ns_map["xs"] = Namespace.XS.uri
+        self.assertEqual(["xs:string"], list(obj.bases))
+
+        obj.simple_type = SimpleType()
         self.assertEqual([], list(obj.bases))
 
         obj.type = "foo"
+        obj.simple_type = None
         self.assertEqual(["foo"], list(obj.bases))

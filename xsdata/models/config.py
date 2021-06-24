@@ -9,6 +9,7 @@ from typing import List
 from typing import TextIO
 
 from xsdata import __version__
+from xsdata.exceptions import GeneratorConfigError
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers import XmlParser
 from xsdata.formats.dataclass.parsers.config import ParserConfig
@@ -129,11 +130,23 @@ class OutputFormat:
     Output format options.
 
     :param value: Name of the format
-    :param relative_imports: Enable relative imports
+    :param repr: Generate repr methods
+    :param eq: Generate equal method
+    :param order: Generate rich comparison methods
+    :param unsafe_hash: Generate hash method when frozen is false
+    :param frozen: Enable read only properties with immutable containers
     """
 
     value: str = field(default="dataclasses")
-    relative_imports: bool = attribute(default=False)
+    repr: bool = attribute(default=True)
+    eq: bool = attribute(default=True)
+    order: bool = attribute(default=False)
+    unsafe_hash: bool = attribute(default=False)
+    frozen: bool = attribute(default=False)
+
+    def __post_init__(self):
+        if self.order and not self.eq:
+            raise GeneratorConfigError("eq must be true if order is true")
 
 
 @dataclass
@@ -146,6 +159,7 @@ class GeneratorOutput:
     :param format: Code generator output format name
     :param structure: Select an output structure
     :param docstring_style: Select a docstring style
+    :param relative_imports: Enable relative imports
     :param compound_fields: Use compound fields for repeating choices.
         Enable if elements ordering matters for your case.
     """
@@ -155,6 +169,7 @@ class GeneratorOutput:
     format: OutputFormat = element(default_factory=OutputFormat)
     structure: StructureStyle = element(default=StructureStyle.FILENAMES)
     docstring_style: DocstringStyle = element(default=DocstringStyle.RST)
+    relative_imports: bool = element(default=False)
     compound_fields: bool = element(default=False)
 
 

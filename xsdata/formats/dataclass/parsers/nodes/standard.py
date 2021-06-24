@@ -38,12 +38,10 @@ class StandardNode(XmlNode):
         self, qname: str, text: Optional[str], tail: Optional[str], objects: List
     ) -> bool:
         obj = ParserUtils.parse_value(
-            text,
-            [self.datatype.type],
-            None,
-            self.ns_map,
-            False,
-            self.datatype.format,
+            value=text,
+            types=[self.datatype.type],
+            ns_map=self.ns_map,
+            format=self.datatype.format,
         )
 
         if obj is None and not self.nillable:

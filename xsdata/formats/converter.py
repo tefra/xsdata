@@ -31,6 +31,7 @@ from xsdata.models.datatype import XmlDuration
 from xsdata.models.datatype import XmlHexBinary
 from xsdata.models.datatype import XmlPeriod
 from xsdata.models.datatype import XmlTime
+from xsdata.utils import collections
 from xsdata.utils import namespaces
 from xsdata.utils import text
 
@@ -398,7 +399,7 @@ class EnumConverter(Converter):
         if data_type is None or not isinstance(data_type, EnumMeta):
             raise ConverterError(f"'{data_type}' is not an enum")
 
-        if isinstance(value, (list, tuple)) and not hasattr(value, "_fields"):
+        if collections.is_array(value):
             values = value
         elif isinstance(value, str):
             value = value.strip()

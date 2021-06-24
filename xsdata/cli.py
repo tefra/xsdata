@@ -171,10 +171,9 @@ def generate(**kwargs: Any):
             config.output.package = kwargs["package"]
     else:
         config = GeneratorConfig()
-        config.output.format = OutputFormat(
-            value=kwargs["output"], relative_imports=kwargs["relative_imports"]
-        )
+        config.output.format = OutputFormat(value=kwargs["output"])
         config.output.package = kwargs["package"]
+        config.output.relative_imports = kwargs["relative_imports"]
         config.output.compound_fields = kwargs["compound_fields"]
         config.output.docstring_style = DocstringStyle(kwargs["docstring_style"])
 
@@ -185,7 +184,7 @@ def generate(**kwargs: Any):
         config.output.format.value = kwargs["output"]
 
     if kwargs["relative_imports"]:
-        config.output.format.relative_imports = True
+        config.output.relative_imports = True
 
     uris = resolve_source(kwargs["source"])
     transformer = SchemaTransformer(config=config, print=kwargs["print"])

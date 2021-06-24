@@ -124,7 +124,7 @@ Simply follow the Python lib
 
 .. warning::
 
-    Currently only List, Dict and Union annotations are supported.
+    Currently only List, Tuple, Dict and Union annotations are supported.
     Everything else will raise an exception as unsupported.
 
 

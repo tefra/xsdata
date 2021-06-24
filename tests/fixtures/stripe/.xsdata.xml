@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config xmlns="http://pypi.org/project/xsdata" version="21.6">
   <Output maxLineLength="79">
-    <Package>generated</Package>
-    <Format repr="true" eq="true" order="false" unsafeHash="false" frozen="false">dataclasses</Format>
-    <Structure>filenames</Structure>
+    <Package>tests.fixtures.stripe.models.balance</Package>
+    <Format repr="true" eq="true" order="true" unsafeHash="false" frozen="true">dataclasses</Format>
+    <Structure>single-package</Structure>
     <DocstringStyle>reStructuredText</DocstringStyle>
-    <RelativeImports>false</RelativeImports>
+    <RelativeImports>true</RelativeImports>
     <CompoundFields>false</CompoundFields>
   </Output>
   <Conventions>
@@ -16,10 +16,5 @@
     <PackageName case="snakeCase" safePrefix="pkg"/>
   </Conventions>
   <Aliases>
-    <ClassName source="fooType" target="Foo"/>
-    <ClassName source="ABCSomething" target="ABCSomething"/>
-    <FieldName source="ChangeofGauge" target="change_of_gauge"/>
-    <PackageName source="http://www.w3.org/1999/xhtml" target="xtml"/>
-    <ModuleName source="2010.1" target="2020a"/>
   </Aliases>
 </Config>

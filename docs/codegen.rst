@@ -23,6 +23,7 @@ Generate Code
 
     - :ref:`Compound fields <Type: Elements>`
     - :ref:`Docstring styles`
+    - :ref:`Dataclasses Features`
 
 
 .. code-block:: console
@@ -96,8 +97,9 @@ altogether.
 
 .. warning::
 
-    Auto :ref:`locating types <Unknown xml target type>` during parsing might not work since
-    all classes are bundled together under the same module namespace.
+    Auto :ref:`locating types <Parse with unknown xml target type>` during parsing
+    might not work since all classes are bundled together under the same module
+    namespace.
 
 
 Initialize Config

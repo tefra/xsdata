@@ -14,6 +14,7 @@ from xsdata.formats.dataclass.parsers import nodes
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.mixins import XmlNode
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
+from xsdata.formats.dataclass.parsers.utils import PendingCollection
 from xsdata.logger import logger
 from xsdata.models.enums import DataType
 
@@ -86,6 +87,10 @@ class ElementNode(XmlNode):
         if not bind_text and wild_var:
             self.bind_wild_content(params, wild_var, text, tail)
 
+        for key in params.keys():
+            if isinstance(params[key], PendingCollection):
+                params[key] = params[key].evaluate()
+
         obj = self.meta.clazz(**params)
         if self.derived_factory:
             obj = self.derived_factory(qname=qname, value=obj, type=self.xsi_type)
@@ -119,12 +124,12 @@ class ElementNode(XmlNode):
     def bind_attr(self, params: Dict, var: XmlVar, value: Any):
         if var.init:
             params[var.name] = ParserUtils.parse_value(
-                value,
-                var.types,
-                var.default,
-                self.ns_map,
-                var.tokens,
-                var.format,
+                value=value,
+                types=var.types,
+                default=var.default,
+                ns_map=self.ns_map,
+                tokens_factory=var.tokens_factory,
+                format=var.format,
             )
 
     def bind_any_attr(self, params: Dict, var: XmlVar, qname: str, value: Any):
@@ -169,7 +174,7 @@ class ElementNode(XmlNode):
             if var.list_element:
                 items = params.get(var.name)
                 if items is None:
-                    params[var.name] = [value]
+                    params[var.name] = PendingCollection([value], var.factory)
                 else:
                     items.append(value)
             elif var.name not in params:
@@ -194,7 +199,7 @@ class ElementNode(XmlNode):
         if var.list_element:
             items = params.get(var.name)
             if items is None:
-                params[var.name] = [value]
+                params[var.name] = PendingCollection([value], var.factory)
             else:
                 items.append(value)
         elif var.name in params:
@@ -246,7 +251,12 @@ class ElementNode(XmlNode):
             var = self.meta.text
             if var and var.init:
                 params[var.name] = ParserUtils.parse_value(
-                    txt, var.types, var.default, self.ns_map, var.tokens, var.format
+                    value=txt,
+                    types=var.types,
+                    default=var.default,
+                    ns_map=self.ns_map,
+                    tokens_factory=var.tokens_factory,
+                    format=var.format,
                 )
                 return True
 
@@ -272,7 +282,7 @@ class ElementNode(XmlNode):
         if var.list_element:
             items = params.get(var.name)
             if items is None:
-                params[var.name] = items = []
+                params[var.name] = items = PendingCollection(None, var.factory)
 
             if txt:
                 items.insert(0, txt)

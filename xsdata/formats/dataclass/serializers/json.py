@@ -14,6 +14,7 @@ from xsdata.formats.bindings import AbstractSerializer
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlVar
+from xsdata.utils import collections
 
 
 def filter_none(x: Tuple) -> Dict:
@@ -60,7 +61,7 @@ class JsonSerializer(AbstractSerializer):
     def convert(self, obj: Any, var: Optional[XmlVar] = None) -> Any:
         if var is None or self.context.class_type.is_model(obj):
 
-            if isinstance(obj, list):
+            if collections.is_array(obj):
                 return [self.convert(o) for o in obj]
 
             return self.dict_factory(
@@ -70,10 +71,7 @@ class JsonSerializer(AbstractSerializer):
                 ]
             )
 
-        if isinstance(obj, tuple) and hasattr(obj, "_fields"):
-            return converter.serialize(obj, format=var.format)
-
-        if isinstance(obj, (list, tuple)):
+        if collections.is_array(obj):
             return type(obj)(self.convert(v, var) for v in obj)
 
         if isinstance(obj, (dict, int, float, str, bool)):

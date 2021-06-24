@@ -17,7 +17,6 @@ class PhoneConverter(Converter):
 
         raise ConverterError()
 
-
     def serialize(self, value: Telephone, **kwargs: Any) -> str:
         return "-".join(map(str, value))
 

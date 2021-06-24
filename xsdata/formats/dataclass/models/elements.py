@@ -2,6 +2,7 @@ import itertools
 import operator
 import sys
 from typing import Any
+from typing import Callable
 from typing import Dict
 from typing import Iterator
 from typing import List
@@ -14,6 +15,7 @@ from typing import Type
 
 from xsdata.formats.converter import converter
 from xsdata.models.enums import NamespaceType
+from xsdata.utils import collections
 from xsdata.utils.namespaces import local_name
 from xsdata.utils.namespaces import target_uri
 
@@ -81,18 +83,20 @@ class XmlVar(MetaMixin):
         "clazz",
         "init",
         "mixed",
-        "tokens",
+        "factory",
+        "tokens_factory",
         "format",
         "derived",
         "any_type",
         "nillable",
         "sequential",
-        "list_element",
         "default",
         "namespaces",
         "elements",
         "wildcards",
         # Calculated
+        "tokens",
+        "list_element",
         "is_text",
         "is_element",
         "is_elements",
@@ -113,13 +117,13 @@ class XmlVar(MetaMixin):
         clazz: Optional[Type],
         init: bool,
         mixed: bool,
-        tokens: bool,
+        factory: Optional[Callable],
+        tokens_factory: Optional[Callable],
         format: Optional[str],
         derived: bool,
         any_type: bool,
         nillable: bool,
         sequential: bool,
-        list_element: bool,
         default: Any,
         xml_type: str,
         namespaces: Sequence[str],
@@ -134,17 +138,20 @@ class XmlVar(MetaMixin):
         self.clazz = clazz
         self.init = init
         self.mixed = mixed
-        self.tokens = tokens
+        self.tokens = tokens_factory is not None
         self.format = format
         self.derived = derived
         self.any_type = any_type
         self.nillable = nillable
         self.sequential = sequential
-        self.list_element = list_element
+        self.list_element = factory in (list, tuple)
         self.default = default
         self.namespaces = namespaces
         self.elements = elements
         self.wildcards = wildcards
+
+        self.factory = factory
+        self.tokens_factory = tokens_factory
 
         self.namespace_matches: Optional[Dict[str, bool]] = None
 
@@ -184,7 +191,7 @@ class XmlVar(MetaMixin):
         """Match and return a choice field that matches the given value
         type."""
 
-        if isinstance(value, list):
+        if collections.is_array(value):
             tp = type(None) if not value else type(value[0])
             tokens = True
             check_subclass = False

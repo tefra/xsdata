@@ -252,6 +252,7 @@ class XmlVarBuilderTests(TestCase):
         class_field = fields(ChoiceType)[0]
         self.builder.parent_ns = "bar"
 
+        self.maxDiff = None
         actual = self.builder.build(
             66,
             "choice",
@@ -265,7 +266,7 @@ class XmlVarBuilderTests(TestCase):
             index=67,
             name="choice",
             types=(object,),
-            list_element=True,
+            factory=list,
             any_type=True,
             default=list,
             xml_type=XmlType.ELEMENTS,
@@ -276,7 +277,7 @@ class XmlVarBuilderTests(TestCase):
                     qname="{bar}a",
                     types=(TypeA,),
                     clazz=TypeA,
-                    list_element=True,
+                    factory=list,
                     namespaces=("bar",),
                 ),
                 "{bar}b": XmlVarFactory.create(
@@ -285,7 +286,7 @@ class XmlVarBuilderTests(TestCase):
                     qname="{bar}b",
                     types=(TypeB,),
                     clazz=TypeB,
-                    list_element=True,
+                    factory=list,
                     namespaces=("bar",),
                 ),
                 "{bar}int": XmlVarFactory.create(
@@ -293,7 +294,7 @@ class XmlVarBuilderTests(TestCase):
                     name="choice",
                     qname="{bar}int",
                     types=(int,),
-                    list_element=True,
+                    factory=list,
                     namespaces=("bar",),
                 ),
                 "{bar}int2": XmlVarFactory.create(
@@ -303,7 +304,7 @@ class XmlVarBuilderTests(TestCase):
                     types=(int,),
                     derived=True,
                     nillable=True,
-                    list_element=True,
+                    factory=list,
                     namespaces=("bar",),
                 ),
                 "{bar}float": XmlVarFactory.create(
@@ -311,7 +312,7 @@ class XmlVarBuilderTests(TestCase):
                     name="choice",
                     qname="{bar}float",
                     types=(float,),
-                    list_element=True,
+                    factory=list,
                     namespaces=("bar",),
                 ),
                 "{bar}qname": XmlVarFactory.create(
@@ -319,7 +320,7 @@ class XmlVarBuilderTests(TestCase):
                     name="choice",
                     qname="{bar}qname",
                     types=(QName,),
-                    list_element=True,
+                    factory=list,
                     namespaces=("bar",),
                 ),
                 "{bar}tokens": XmlVarFactory.create(
@@ -327,9 +328,9 @@ class XmlVarBuilderTests(TestCase):
                     name="choice",
                     qname="{bar}tokens",
                     types=(int,),
-                    tokens=True,
+                    tokens_factory=list,
                     derived=True,
-                    list_element=True,
+                    factory=list,
                     default=return_true,
                     namespaces=("bar",),
                 ),
@@ -339,7 +340,7 @@ class XmlVarBuilderTests(TestCase):
                     qname="{foo}union",
                     types=(UnionType,),
                     clazz=UnionType,
-                    list_element=True,
+                    factory=list,
                     namespaces=("foo",),
                 ),
                 "{bar}p": XmlVarFactory.create(
@@ -348,7 +349,7 @@ class XmlVarBuilderTests(TestCase):
                     qname="{bar}p",
                     types=(float,),
                     derived=True,
-                    list_element=True,
+                    factory=list,
                     default=1.1,
                     namespaces=("bar",),
                 ),
@@ -360,7 +361,7 @@ class XmlVarBuilderTests(TestCase):
                     xml_type=XmlType.WILDCARD,
                     qname="{http://www.w3.org/1999/xhtml}any",
                     types=(object,),
-                    list_element=True,
+                    factory=list,
                     default=None,
                     namespaces=("http://www.w3.org/1999/xhtml",),
                 ),

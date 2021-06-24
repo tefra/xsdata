@@ -14,23 +14,28 @@ os.chdir(root)
 
 
 def test_json_documents():
-    filepath = fixtures_dir.joinpath("series")
+
+    filepath = fixtures_dir.joinpath("stripe")
     package = "tests.fixtures.series"
     runner = CliRunner()
     result = runner.invoke(
-        cli, [str(filepath.joinpath("samples")), "--package", package]
+        cli,
+        [
+            str(filepath.joinpath("samples")),
+            f"--config={str(filepath.joinpath('.xsdata.xml'))}",
+        ],
     )
 
     if result.exception:
         raise result.exception
 
-    clazz = load_class(result.output, "Series")
+    clazz = load_class(result.output, "Balance")
 
     parser = JsonParser()
     serializer = JsonSerializer(indent=4)
 
-    for i in range(1, 3):
-        ori = filepath.joinpath(f"samples/show{i}.json").read_text()
+    for sample in filepath.joinpath("samples").glob("*.json"):
+        ori = sample.read_text()
         obj = parser.from_string(ori, clazz)
         actual = serializer.render(obj)
 

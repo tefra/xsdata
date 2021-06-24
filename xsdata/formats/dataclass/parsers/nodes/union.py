@@ -104,6 +104,8 @@ class UnionNode(XmlNode):
         try:
             with warnings.catch_warnings():
                 warnings.filterwarnings("error", category=ConverterWarning)
-                return ParserUtils.parse_value(value, types, ns_map=self.ns_map)
+                return ParserUtils.parse_value(
+                    value=value, types=types, ns_map=self.ns_map
+                )
         except Exception:
             return None

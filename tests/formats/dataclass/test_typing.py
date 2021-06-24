@@ -33,6 +33,14 @@ class TypingTests(TestCase):
         with self.assertRaises(TypeError):
             get_origin(List)
 
+    def test_get_origin_tuple(self):
+        self.assertEqual(Tuple, get_origin(Tuple[int]))
+        self.assertEqual(Tuple, get_origin(Tuple[Union[int, str]]))
+        self.assertEqual(Tuple, get_origin(Tuple[int, ...]))
+
+        with self.assertRaises(TypeError):
+            get_origin(Tuple)
+
     def test_get_origin_dict(self):
         self.assertEqual(Dict, get_origin(Dict))
         self.assertEqual(Dict, get_origin(Dict[int, str]))
@@ -81,6 +89,10 @@ class TypingTests(TestCase):
     def test_get_args(self):
         self.assertEqual((), get_args(int))
         self.assertEqual((int,), get_args(List[int]))
+        self.assertEqual((int, Ellipsis), get_args(Tuple[int, ...]))
+        self.assertEqual((int,), get_args(Tuple[int]))
+        self.assertEqual((int, str, float), get_args(Tuple[int, str, float]))
+        self.assertEqual((Union[str, int],), get_args(Tuple[Union[str, int]]))
         self.assertEqual((List[int], type(None)), get_args(Optional[List[int]]))
         self.assertEqual((int, str), get_args(Union[int, str]))
         self.assertEqual((int, type(None)), get_args(Optional[int]))
@@ -122,11 +134,30 @@ class TypingTests(TestCase):
         self.assertEqual((list, int), evaluate(List[int]))
         self.assertEqual((list, float, str), evaluate(List[Union[float, str]]))
         self.assertEqual((list, int), evaluate(List[Optional[int]]))
+        self.assertEqual((list, tuple, int), evaluate(List[Tuple[int]]))
         self.assertEqual(
             (list, list, bool, str), evaluate(List[List[Union[bool, str]]])
         )
 
         unsupported_cases = [List, List[Dict[str, str]]]
+        for case in unsupported_cases:
+            with self.assertRaises(TypeError, msg=case):
+                evaluate(case)
+
+    def test_evaluate_tuple(self):
+        A = TypeVar("A", int, str)
+
+        self.assertEqual((tuple, int, str), evaluate(Tuple[A]))
+        self.assertEqual((tuple, int), evaluate(Tuple[int]))
+        self.assertEqual((tuple, int), evaluate(Tuple[int, ...]))
+        self.assertEqual((tuple, list, int), evaluate(Tuple[List[int], ...]))
+        self.assertEqual((tuple, float, str), evaluate(Tuple[Union[float, str]]))
+        self.assertEqual((tuple, int), evaluate(Tuple[Optional[int]]))
+        self.assertEqual(
+            (tuple, tuple, bool, str), evaluate(Tuple[Tuple[Union[bool, str]]])
+        )
+
+        unsupported_cases = [Tuple, Tuple[Dict[str, str]]]
         for case in unsupported_cases:
             with self.assertRaises(TypeError, msg=case):
                 evaluate(case)

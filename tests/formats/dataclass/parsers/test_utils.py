@@ -33,20 +33,20 @@ class ParserUtilsTests(FactoryTestCase):
         mock_deserialize.assert_called_once_with("1", [int], ns_map=None, format=None)
 
     def test_parse_value_with_tokens_true(self):
-        actual = ParserUtils.parse_value(" 1 2 3", [int], list, None, True)
+        actual = ParserUtils.parse_value(" 1 2 3", [int], list, None, list)
         self.assertEqual([1, 2, 3], actual)
 
-        actual = ParserUtils.parse_value(["1", "2", "3"], [int], list, None, True)
-        self.assertEqual([1, 2, 3], actual)
+        actual = ParserUtils.parse_value(["1", "2", "3"], [int], list, None, tuple)
+        self.assertEqual((1, 2, 3), actual)
 
-        actual = ParserUtils.parse_value(None, [int], lambda: [1, 2, 3], None, True)
+        actual = ParserUtils.parse_value(None, [int], lambda: [1, 2, 3], None, list)
         self.assertEqual([1, 2, 3], actual)
 
     @mock.patch.object(ConverterFactory, "deserialize", return_value=2)
     def test_parse_value_with_ns_map(self, mock_to_python):
         ns_map = dict(a=1)
-        ParserUtils.parse_value(" 1 2 3", [int], list, ns_map, True)
-        ParserUtils.parse_value(" 1 2 3", [str], None, ns_map, False)
+        ParserUtils.parse_value(" 1 2 3", [int], list, ns_map, list)
+        ParserUtils.parse_value(" 1 2 3", [str], None, ns_map)
 
         self.assertEqual(4, mock_to_python.call_count)
         mock_to_python.assert_has_calls(
@@ -60,7 +60,7 @@ class ParserUtilsTests(FactoryTestCase):
 
     @mock.patch.object(ConverterFactory, "deserialize", return_value=2)
     def test_parse_value_with_format(self, mock_to_python):
-        ParserUtils.parse_value(" 1 2 3", [str], list, _format="Nope")
+        ParserUtils.parse_value(" 1 2 3", [str], list, format="Nope")
         self.assertEqual(1, mock_to_python.call_count)
         mock_to_python.assert_called_once_with(
             " 1 2 3", [str], ns_map=None, format="Nope"

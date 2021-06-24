@@ -24,7 +24,12 @@ class PrimitiveNodeTests(TestCase):
         self.assertEqual(("foo", 13), objects[-1])
 
         mock_parse_value.assert_called_once_with(
-            "13", var.types, var.default, ns_map, var.tokens, var.format
+            value="13",
+            types=var.types,
+            default=var.default,
+            ns_map=ns_map,
+            tokens_factory=var.tokens_factory,
+            format=var.format,
         )
 
     def test_bind_derived_mode(self):

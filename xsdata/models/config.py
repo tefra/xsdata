@@ -133,7 +133,7 @@ class OutputFormat:
     :param repr: Generate repr methods
     :param eq: Generate equal method
     :param order: Generate rich comparison methods
-    :param unsafe_hash: Forcefully generate hash method without frozen
+    :param unsafe_hash: Generate hash method when frozen is false
     :param frozen: Enable read only properties with immutable containers
     """
 

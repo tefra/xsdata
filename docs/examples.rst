@@ -12,6 +12,7 @@ Code Generation
     examples/xml-modeling
     examples/json-modeling
     examples/compound-fields
+    examples/dataclasses-features
 
 
 Advance Topics

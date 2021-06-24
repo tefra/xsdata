@@ -1,0 +1,158 @@
+{
+  "object": "balance",
+  "available": [
+    {
+      "amount": 2685,
+      "currency": "nok",
+      "source_types": {
+        "bank_account": 0,
+        "card": 2685
+      }
+    },
+    {
+      "amount": 218420,
+      "currency": "nzd",
+      "source_types": {
+        "bank_account": 0,
+        "card": 218420
+      }
+    },
+    {
+      "amount": 779902,
+      "currency": "czk",
+      "source_types": {
+        "bank_account": 0,
+        "card": 779902
+      }
+    },
+    {
+      "amount": -1854,
+      "currency": "aud",
+      "source_types": {
+        "bank_account": 0,
+        "card": -1854
+      }
+    },
+    {
+      "amount": 278067892166,
+      "currency": "usd",
+      "source_types": {
+        "bank_account": 280201532,
+        "card": 277786138508
+      }
+    },
+    {
+      "amount": -54204,
+      "currency": "eur",
+      "source_types": {
+        "bank_account": 0,
+        "card": -54204
+      }
+    },
+    {
+      "amount": 2213741,
+      "currency": "cad",
+      "source_types": {
+        "bank_account": 0,
+        "card": 2213741
+      }
+    },
+    {
+      "amount": 7259805,
+      "currency": "gbp",
+      "source_types": {
+        "bank_account": 0,
+        "card": 7259805
+      }
+    },
+    {
+      "amount": -40320,
+      "currency": "jpy",
+      "source_types": {
+        "bank_account": 0,
+        "card": -40320
+      }
+    },
+    {
+      "amount": 12000,
+      "currency": "brl",
+      "source_types": {
+        "bank_account": 0,
+        "card": 12000
+      }
+    },
+    {
+      "amount": -412,
+      "currency": "sek",
+      "source_types": {
+        "bank_account": 0,
+        "card": -412
+      }
+    }
+  ],
+  "connect_reserved": [
+    {
+      "amount": 0,
+      "currency": "nok"
+    },
+    {
+      "amount": 0,
+      "currency": "nzd"
+    },
+    {
+      "amount": 0,
+      "currency": "czk"
+    },
+    {
+      "amount": 0,
+      "currency": "aud"
+    },
+    {
+      "amount": 55880,
+      "currency": "usd"
+    },
+    {
+      "amount": 54584,
+      "currency": "eur"
+    },
+    {
+      "amount": 0,
+      "currency": "cad"
+    },
+    {
+      "amount": 0,
+      "currency": "gbp"
+    },
+    {
+      "amount": 0,
+      "currency": "jpy"
+    },
+    {
+      "amount": 0,
+      "currency": "brl"
+    },
+    {
+      "amount": 0,
+      "currency": "sek"
+    }
+  ],
+  "livemode": false,
+  "pending": [
+    {
+      "amount": 835408472,
+      "currency": "usd",
+      "source_types": {
+        "bank_account": 0,
+        "card": 835408472
+      }
+    },
+    {
+      "amount": -22251,
+      "currency": "eur",
+      "source_types": {
+        "bank_account": 0,
+        "card": -22251
+      }
+    }
+  ]
+}

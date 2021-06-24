@@ -15,6 +15,7 @@ stop_words = [
     "false",
     "none",
     "yield",
+    "object",
     "break",
     "for",
     "not",

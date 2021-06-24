@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config xmlns="http://pypi.org/project/xsdata" version="21.6">
+  <Output maxLineLength="79">
+    <Package>tests.fixtures.stripe.models.balance</Package>
+    <Format repr="true" eq="true" order="true" unsafeHash="false" frozen="true">dataclasses</Format>
+    <Structure>single-package</Structure>
+    <DocstringStyle>reStructuredText</DocstringStyle>
+    <RelativeImports>true</RelativeImports>
+    <CompoundFields>false</CompoundFields>
+  </Output>
+  <Conventions>
+    <ClassName case="pascalCase" safePrefix="type"/>
+    <FieldName case="snakeCase" safePrefix="value"/>
+    <ConstantName case="screamingSnakeCase" safePrefix="value"/>
+    <ModuleName case="snakeCase" safePrefix="mod"/>
+    <PackageName case="snakeCase" safePrefix="pkg"/>
+  </Conventions>
+  <Aliases>
+  </Aliases>
+</Config>

@@ -18,6 +18,7 @@ like naming conventions and aliases.
     GeneratorConfig
     GeneratorOutput
 
+    OutputFormat
     GeneratorConventions
     GeneratorAliases
     StructureStyle

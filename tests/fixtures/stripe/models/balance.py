@@ -95,10 +95,9 @@ class Balance:
     class Meta:
         name = "balance"
 
-    object_value: Optional[str] = field(
+    object_type: Optional[str] = field(
         default=None,
         metadata={
-            "name": "object",
             "type": "Element",
         }
     )

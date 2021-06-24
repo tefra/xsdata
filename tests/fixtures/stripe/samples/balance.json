@@ -1,5 +1,5 @@
 {
-  "object": "balance",
+  "object_type": "balance",
   "available": [
     {
       "amount": 2685,

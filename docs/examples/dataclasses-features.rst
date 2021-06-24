@@ -19,7 +19,7 @@ almost all of them.
 
     .. literalinclude:: /../tests/fixtures/stripe/models/balance.py
        :language: python
-       :lines: 93-128
+       :lines: 93-127
 
 .. tab:: Frozen Bindings
 

@@ -16,6 +16,7 @@ from xml.etree.ElementTree import QName
 from tests.fixtures.artists import Artist
 from tests.fixtures.books import BookForm
 from tests.fixtures.models import ChoiceType
+from tests.fixtures.models import Parent
 from tests.fixtures.models import TypeA
 from tests.fixtures.models import TypeB
 from tests.fixtures.models import UnionType
@@ -112,6 +113,10 @@ class XmlMetaBuilderTests(FactoryTestCase):
         self.assertEqual(1, len(actual.choices))
         self.assertEqual(9, len(actual.choices[0].elements))
         self.assertIsNone(self.builder.find_globalns(object, "foo"))
+
+    def test_build_inner_type_has_no_target_qname(self):
+        actual = self.builder.build(Parent.Inner, None)
+        self.assertIsNone(actual.target_qname)
 
     def test_target_namespace(self):
         class Meta:

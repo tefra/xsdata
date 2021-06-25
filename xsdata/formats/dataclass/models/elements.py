@@ -303,7 +303,7 @@ class XmlMeta(MetaMixin):
         self,
         clazz: Type,
         qname: str,
-        target_qname: str,
+        target_qname: Optional[str],
         nillable: bool,
         text: Optional[XmlVar],
         choices: Sequence[XmlVar],

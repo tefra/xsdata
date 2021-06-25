@@ -147,3 +147,10 @@ class Paragraph:
         default_factory=list,
         metadata=dict(type="Wildcard", namespace="##any", mixed=True),
     )
+
+
+@dataclass
+class Parent:
+    @dataclass
+    class Inner:
+        pass

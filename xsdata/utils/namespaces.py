@@ -77,6 +77,12 @@ def clean_uri(namespace: str) -> str:
     return "_".join(x for x in namespace.split(".") if x not in __uri_ignore__)
 
 
+def real_xsi_type(qname: str, target_qname: Optional[str]) -> Optional[str]:
+    """Determine if the given target qualified name should be used to define a
+    derived type."""
+    return target_qname if target_qname != qname else None
+
+
 @functools.lru_cache(maxsize=50)
 def build_qname(tag_or_uri: Optional[str], tag: Optional[str] = None) -> str:
     """Create namespace qualified strings."""

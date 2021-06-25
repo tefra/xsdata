@@ -228,11 +228,15 @@ class ElementNodeTests(FactoryTestCase):
 
         fixture = make_dataclass("Fixture", [("content", str)])
         actual = self.node.prepare_generic_value("a", fixture("foo"))
-        expected = DerivedElement(qname="a", value=fixture("foo"))
+        expected = DerivedElement(qname="a", value=fixture("foo"), type="Fixture")
         self.assertEqual(expected, actual)
 
         actual = self.node.prepare_generic_value("a", expected)
         self.assertIs(expected, actual)
+
+        actual = self.node.prepare_generic_value("Fixture", fixture("foo"))
+        expected = DerivedElement(qname="Fixture", value=fixture("foo"))
+        self.assertEqual(expected, actual)
 
     def test_child(self):
         var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, qname="a", types=(TypeC,))

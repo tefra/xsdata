@@ -78,9 +78,9 @@ class XmlSerializer(AbstractSerializer):
         qname = xsi_type = None
         if isinstance(obj, self.context.class_type.derived_element):
             meta = self.context.build(obj.value.__class__)
-            xsi_type = QName(meta.target_qname)
             qname = obj.qname
             obj = obj.value
+            xsi_type = namespaces.real_xsi_type(qname, meta.target_qname)
 
         yield from self.write_dataclass(obj, qname=qname, xsi_type=xsi_type)
 
@@ -90,7 +90,7 @@ class XmlSerializer(AbstractSerializer):
         namespace: NoneStr = None,
         qname: NoneStr = None,
         nillable: bool = False,
-        xsi_type: Optional[QName] = None,
+        xsi_type: Optional[str] = None,
     ) -> Generator:
         """
         Produce an events stream from a dataclass.
@@ -193,13 +193,12 @@ class XmlSerializer(AbstractSerializer):
 
     def write_derived_element(self, value: Any, namespace: NoneStr) -> Generator:
         if self.context.class_type.is_model(value.value):
-            xsi_type = None
-            if value.type:
-                meta = self.context.build(value.value.__class__)
-                xsi_type = QName(meta.target_qname)
+            meta = self.context.fetch(value.value.__class__)
+            qname = value.qname
+            xsi_type = namespaces.real_xsi_type(qname, meta.target_qname)
 
             yield from self.write_dataclass(
-                value.value, namespace, qname=value.qname, xsi_type=xsi_type
+                value.value, namespace, qname=qname, xsi_type=xsi_type
             )
         else:
             datatype = DataType.from_value(value.value)
@@ -229,7 +228,7 @@ class XmlSerializer(AbstractSerializer):
         if value.tail:
             yield XmlWriterEvent.DATA, value.tail
 
-    def xsi_type(self, var: XmlVar, value: Any, namespace: NoneStr) -> Optional[QName]:
+    def xsi_type(self, var: XmlVar, value: Any, namespace: NoneStr) -> Optional[str]:
         """Get xsi:type if the given value is a derived instance."""
         if not value or value.__class__ in var.types:
             return None
@@ -237,7 +236,7 @@ class XmlSerializer(AbstractSerializer):
         clazz = var.clazz
         if clazz is None or self.context.is_derived(value, clazz):
             meta = self.context.fetch(value.__class__, namespace)
-            return QName(meta.target_qname)
+            return meta.target_qname
 
         raise SerializerError(
             f"{value.__class__.__name__} is not derived from {clazz.__name__}"
@@ -343,7 +342,7 @@ class XmlSerializer(AbstractSerializer):
 
     @classmethod
     def next_attribute(
-        cls, obj: Any, meta: XmlMeta, xsi_nil: bool, xsi_type: Optional[QName]
+        cls, obj: Any, meta: XmlMeta, xsi_nil: bool, xsi_type: Optional[str]
     ) -> Generator:
         """
         Return the attribute variables with their object values.
@@ -362,7 +361,7 @@ class XmlSerializer(AbstractSerializer):
                 yield from getattr(obj, var.name, EMPTY_MAP).items()
 
         if xsi_type:
-            yield QNames.XSI_TYPE, xsi_type
+            yield QNames.XSI_TYPE, QName(xsi_type)
 
         if xsi_nil:
             yield QNames.XSI_NIL, "true"

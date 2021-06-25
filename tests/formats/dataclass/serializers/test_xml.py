@@ -40,6 +40,17 @@ class XmlSerializerTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
+        obj = DerivedElement(qname="{urn:books}BookForm", value=book)
+        result = self.serializer.write_object(obj)
+        expected = [
+            (XmlWriterEvent.START, "{urn:books}BookForm"),
+            (XmlWriterEvent.ATTR, "id", "123"),
+            (XmlWriterEvent.ATTR, "lang", "en"),
+            (XmlWriterEvent.END, "{urn:books}BookForm"),
+        ]
+        self.assertIsInstance(result, Generator)
+        self.assertEqual(expected, list(result))
+
     def test_write_dataclass(self):
         book = BookForm(id="123", title="Misterioso: A Crime Novel", price=19.5)
         result = self.serializer.write_object(book)
@@ -103,6 +114,7 @@ class XmlSerializerTests(TestCase):
             (XmlWriterEvent.START, "ebook"),
             (XmlWriterEvent.ATTR, "id", "123"),
             (XmlWriterEvent.ATTR, "lang", "en"),
+            ("attr", QNames.XSI_TYPE, "{urn:books}BookForm"),
             (XmlWriterEvent.END, "ebook"),
             (XmlWriterEvent.DATA, "tail"),
         ]

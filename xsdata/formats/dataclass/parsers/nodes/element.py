@@ -17,6 +17,7 @@ from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.formats.dataclass.parsers.utils import PendingCollection
 from xsdata.logger import logger
 from xsdata.models.enums import DataType
+from xsdata.utils import namespaces
 
 
 class ElementNode(XmlNode):
@@ -232,10 +233,11 @@ class ElementNode(XmlNode):
             derived_factory = self.context.class_type.derived_element
 
             if not self.context.class_type.is_model(value):
-
                 value = any_factory(qname=qname, text=converter.serialize(value))
             elif not isinstance(value, (any_factory, derived_factory)):
-                value = derived_factory(qname=qname, value=value)
+                meta = self.context.fetch(type(value))
+                xsi_type = namespaces.real_xsi_type(qname, meta.target_qname)
+                value = derived_factory(qname=qname, value=value, type=xsi_type)
 
         return value
 

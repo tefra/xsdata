@@ -62,7 +62,13 @@ class XmlMetaBuilder:
         nillable = getattr(meta, "nillable", False)
         namespace = getattr(meta, "namespace", parent_ns)
         module = sys.modules[clazz.__module__]
-        target_namespace = self.target_namespace(module, meta)
+        qname = build_qname(namespace, local_name)
+
+        if self.is_inner_class(clazz):
+            target_qname = None
+        else:
+            target_namespace = self.target_namespace(module, meta)
+            target_qname = build_qname(target_namespace, local_name)
 
         class_vars = self.build_vars(
             clazz,
@@ -94,8 +100,8 @@ class XmlMetaBuilder:
 
         return XmlMeta(
             clazz=clazz,
-            qname=build_qname(namespace, local_name),
-            target_qname=build_qname(target_namespace, local_name),
+            qname=qname,
+            target_qname=target_qname,
             nillable=nillable,
             text=text,
             attributes=attributes,
@@ -143,6 +149,11 @@ class XmlMetaBuilder:
                 return sys.modules[base.__module__].__dict__
 
         return None
+
+    @classmethod
+    def is_inner_class(cls, clazz: Type) -> bool:
+        """Return whether the given type is nested inside another type."""
+        return "." in clazz.__qualname__
 
     @classmethod
     def build_target_qname(cls, clazz: Type, element_name_generator: Callable) -> str:

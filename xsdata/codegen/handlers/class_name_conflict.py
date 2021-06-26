@@ -1,9 +1,10 @@
-import operator
 from typing import List
 
 from xsdata.codegen.mixins import ContainerHandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Class
+from xsdata.codegen.models import get_name
+from xsdata.codegen.models import get_qname
 from xsdata.models.config import StructureStyle
 from xsdata.utils import text
 from xsdata.utils.collections import group_by
@@ -25,7 +26,7 @@ class ClassNameConflictHandler(ContainerHandlerInterface):
         dependencies."""
 
         use_name = self.container.config.output.structure in REQUIRE_UNIQUE_NAMES
-        getter = operator.attrgetter("name" if use_name else "qname")
+        getter = get_name if use_name else get_qname
         groups = group_by(self.container, lambda x: text.alnum(getter(x)))
 
         for classes in groups.values():
@@ -40,7 +41,7 @@ class ClassNameConflictHandler(ContainerHandlerInterface):
         the list.
         """
         total_elements = sum(x.is_element for x in classes)
-        for target in sorted(classes, key=operator.attrgetter("name")):
+        for target in sorted(classes, key=get_name):
             if not target.is_element or total_elements > 1:
                 self.rename_class(target, use_name)
 

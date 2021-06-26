@@ -1,4 +1,3 @@
-from operator import attrgetter
 from typing import List
 
 from xsdata.codegen.mixins import ContainerInterface
@@ -6,6 +5,8 @@ from xsdata.codegen.mixins import RelativeHandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
+from xsdata.codegen.models import get_restriction_choice
+from xsdata.codegen.models import get_slug
 from xsdata.codegen.models import Restrictions
 from xsdata.codegen.utils import ClassUtils
 from xsdata.models.enums import DataType
@@ -26,7 +27,7 @@ class AttributeCompoundChoiceHandler(RelativeHandlerInterface):
 
     def process(self, target: Class):
         if self.compound_fields:
-            groups = group_by(target.attrs, attrgetter("restrictions.choice"))
+            groups = group_by(target.attrs, get_restriction_choice)
             for choice, attrs in groups.items():
                 if choice and len(attrs) > 1 and any(attr.is_list for attr in attrs):
                     self.group_fields(target, attrs)
@@ -70,9 +71,8 @@ class AttributeCompoundChoiceHandler(RelativeHandlerInterface):
         )
 
     def choose_name(self, target: Class, names: List[str]) -> str:
-        slug_getter = attrgetter("slug")
-        reserved = set(map(slug_getter, self.base_attrs(target)))
-        reserved.update(map(slug_getter, target.attrs))
+        reserved = set(map(get_slug, self.base_attrs(target)))
+        reserved.update(map(get_slug, target.attrs))
 
         if len(names) > 3 or len(names) != len(set(names)):
             name = "choice"

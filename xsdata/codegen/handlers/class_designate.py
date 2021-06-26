@@ -1,6 +1,5 @@
 import os
 from collections import defaultdict
-from operator import attrgetter
 from pathlib import Path
 from typing import Iterable
 from typing import List
@@ -10,6 +9,8 @@ from toposort import toposort_flatten
 
 from xsdata.codegen.mixins import ContainerHandlerInterface
 from xsdata.codegen.models import Class
+from xsdata.codegen.models import get_location
+from xsdata.codegen.models import get_target_namespace
 from xsdata.models.config import StructureStyle
 from xsdata.models.enums import COMMON_SCHEMA_DIR
 from xsdata.utils import collections
@@ -38,7 +39,7 @@ class ClassDesignateHandler(ContainerHandlerInterface):
         """Group uris by common path and auto assign package names to all
         classes."""
         package = self.container.config.output.package
-        class_map = collections.group_by(self.container, key=attrgetter("location"))
+        class_map = collections.group_by(self.container, key=get_location)
         groups = self.group_common_paths(class_map.keys())
 
         for keys in groups:
@@ -57,8 +58,7 @@ class ClassDesignateHandler(ContainerHandlerInterface):
     def group_by_namespace(self):
         """Group classes by their target namespace."""
         package = self.container.config.output.package
-        namespace_getter = attrgetter("target_namespace")
-        groups = collections.group_by(self.container, key=namespace_getter)
+        groups = collections.group_by(self.container, key=get_target_namespace)
         for namespace, classes in groups.items():
             self.assign(classes, package, namespace or "")
 

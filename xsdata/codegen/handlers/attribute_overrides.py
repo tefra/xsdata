@@ -1,5 +1,4 @@
 import sys
-from operator import attrgetter
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -7,6 +6,7 @@ from typing import Optional
 from xsdata.codegen.mixins import RelativeHandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Class
+from xsdata.codegen.models import get_slug
 from xsdata.codegen.utils import ClassUtils
 from xsdata.utils import collections
 
@@ -38,7 +38,7 @@ class AttributeOverridesHandler(RelativeHandlerInterface):
 
     def base_attrs_map(self, target: Class) -> Dict[str, List[Attr]]:
         base_attrs = self.base_attrs(target)
-        return collections.group_by(base_attrs, key=attrgetter("slug"))
+        return collections.group_by(base_attrs, key=get_slug)
 
     @classmethod
     def validate_override(cls, target: Class, attr: Attr, source_attr: Attr):

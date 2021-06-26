@@ -1,4 +1,3 @@
-from operator import attrgetter
 from typing import Callable
 from typing import Dict
 from typing import Iterator
@@ -23,6 +22,8 @@ from xsdata.codegen.handlers import ClassInnersHandler
 from xsdata.codegen.handlers import ClassNameConflictHandler
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.models import Class
+from xsdata.codegen.models import get_qname
+from xsdata.codegen.models import should_generate
 from xsdata.codegen.models import Status
 from xsdata.codegen.utils import ClassUtils
 from xsdata.models.config import GeneratorConfig
@@ -151,9 +152,9 @@ class ClassContainer(ContainerInterface):
         filter classes that should be generated, otherwise leave the container
         as it is."""
 
-        candidates = list(filter(attrgetter("should_generate"), self))
+        candidates = list(filter(should_generate, self))
         if candidates:
-            self.data = group_by(candidates, attrgetter("qname"))
+            self.data = group_by(candidates, key=get_qname)
 
     def add(self, item: Class):
         """Add class item to the container."""

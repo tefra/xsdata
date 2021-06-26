@@ -1,3 +1,4 @@
+import operator
 import sys
 from dataclasses import asdict
 from dataclasses import dataclass
@@ -567,3 +568,15 @@ class Import:
     name: str
     source: str
     alias: Optional[str] = field(default=None)
+
+
+# Getters used all over the codegen process
+get_location = operator.attrgetter("location")
+get_name = operator.attrgetter("name")
+get_qname = operator.attrgetter("qname")
+get_restriction_choice = operator.attrgetter("restrictions.choice")
+get_slug = operator.attrgetter("slug")
+get_target_namespace = operator.attrgetter("target_namespace")
+is_enumeration = operator.attrgetter("is_enumeration")
+is_group = operator.attrgetter("is_group")
+should_generate = operator.attrgetter("should_generate")

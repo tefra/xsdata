@@ -1,5 +1,4 @@
 import sys
-from operator import attrgetter
 from typing import Iterator
 from typing import List
 from typing import Optional
@@ -9,6 +8,7 @@ from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Extension
+from xsdata.codegen.models import get_slug
 from xsdata.codegen.models import Restrictions
 from xsdata.exceptions import CodeGenerationError
 from xsdata.utils import collections
@@ -241,9 +241,8 @@ class ClassUtils:
     def rename_attributes_by_index(cls, attrs: List[Attr], rename: List[Attr]):
         """Append the next available index number to all the rename attributes
         names."""
-        slug_getter = attrgetter("slug")
         for index in range(1, len(rename)):
-            reserved = set(map(slug_getter, attrs))
+            reserved = set(map(get_slug, attrs))
             name = rename[index].name
             rename[index].name = cls.unique_name(name, reserved)
 

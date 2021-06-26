@@ -1,4 +1,3 @@
-import operator
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Dict
@@ -7,6 +6,7 @@ from typing import List
 from typing import Optional
 from typing import TypeVar
 
+from xsdata.codegen.models import get_name
 from xsdata.exceptions import DefinitionsValueError
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.models.enums import Namespace
@@ -160,8 +160,7 @@ class Binding(ExtensibleElement):
     operations: List[BindingOperation] = array_element(name="operation")
 
     def unique_operations(self) -> Iterator[BindingOperation]:
-        name_attr = operator.attrgetter("name")
-        grouped_operations = collections.group_by(self.operations, key=name_attr)
+        grouped_operations = collections.group_by(self.operations, key=get_name)
 
         for operations in grouped_operations.values():
             yield operations[-1]

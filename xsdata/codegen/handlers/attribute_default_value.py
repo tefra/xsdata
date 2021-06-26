@@ -1,10 +1,10 @@
-from operator import attrgetter
 from typing import Optional
 
 from xsdata.codegen.mixins import RelativeHandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
+from xsdata.codegen.models import is_enumeration
 from xsdata.logger import logger
 
 
@@ -89,5 +89,4 @@ class AttributeDefaultValueHandler(RelativeHandlerInterface):
         if attr_type.native:
             return None
 
-        is_enumeration = attrgetter("is_enumeration")
         return self.container.find(attr_type.qname, condition=is_enumeration)

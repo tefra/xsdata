@@ -27,7 +27,6 @@ from xsdata.models.enums import QNames
 from xsdata.utils import collections
 from xsdata.utils import namespaces
 from xsdata.utils.constants import EMPTY_MAP
-from xsdata.utils.namespaces import split_qname
 
 NoneStr = Optional[str]
 
@@ -102,7 +101,7 @@ class XmlSerializer(AbstractSerializer):
         meta = self.context.build(obj.__class__, namespace)
         qname = qname or meta.qname
         nillable = nillable or meta.nillable
-        namespace, tag = split_qname(qname)
+        namespace, tag = namespaces.split_qname(qname)
 
         yield XmlWriterEvent.START, qname
 
@@ -211,7 +210,7 @@ class XmlSerializer(AbstractSerializer):
     def write_wildcard(self, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
         """Produce an element events stream for the given generic object."""
         if value.qname:
-            namespace, tag = split_qname(value.qname)
+            namespace, tag = namespaces.split_qname(value.qname)
             yield XmlWriterEvent.START, value.qname
 
         for key, val in value.attributes.items():

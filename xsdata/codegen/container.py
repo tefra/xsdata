@@ -28,7 +28,6 @@ from xsdata.codegen.models import Status
 from xsdata.codegen.utils import ClassUtils
 from xsdata.models.config import GeneratorConfig
 from xsdata.utils import collections
-from xsdata.utils.collections import group_by
 from xsdata.utils.constants import return_true
 
 
@@ -154,7 +153,7 @@ class ClassContainer(ContainerInterface):
 
         candidates = list(filter(should_generate, self))
         if candidates:
-            self.data = group_by(candidates, key=get_qname)
+            self.data = collections.group_by(candidates, key=get_qname)
 
     def add(self, item: Class):
         """Add class item to the container."""

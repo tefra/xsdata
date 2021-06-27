@@ -6,10 +6,9 @@ from xsdata.codegen.models import Class
 from xsdata.codegen.models import get_name
 from xsdata.codegen.models import get_qname
 from xsdata.models.config import StructureStyle
+from xsdata.utils import collections
+from xsdata.utils import namespaces
 from xsdata.utils import text
-from xsdata.utils.collections import group_by
-from xsdata.utils.namespaces import build_qname
-from xsdata.utils.namespaces import split_qname
 
 REQUIRE_UNIQUE_NAMES = (StructureStyle.SINGLE_PACKAGE, StructureStyle.CLUSTERS)
 
@@ -27,7 +26,7 @@ class ClassNameConflictHandler(ContainerHandlerInterface):
 
         use_name = self.container.config.output.structure in REQUIRE_UNIQUE_NAMES
         getter = get_name if use_name else get_qname
-        groups = group_by(self.container, lambda x: text.alnum(getter(x)))
+        groups = collections.group_by(self.container, lambda x: text.alnum(getter(x)))
 
         for classes in groups.values():
             if len(classes) > 1:
@@ -51,7 +50,7 @@ class ClassNameConflictHandler(ContainerHandlerInterface):
         that depend on the target class."""
 
         qname = target.qname
-        namespace, name = split_qname(target.qname)
+        namespace, name = namespaces.split_qname(target.qname)
         target.qname = self.next_qname(namespace, name, use_name)
         target.meta_name = name
         self.container.reset(target, qname)
@@ -72,7 +71,7 @@ class ClassNameConflictHandler(ContainerHandlerInterface):
         while True:
             index += 1
             new_name = f"{name}_{index}"
-            qname = build_qname(namespace, new_name)
+            qname = namespaces.build_qname(namespace, new_name)
             cmp = text.alnum(new_name if use_name else qname)
 
             if cmp not in reserved:

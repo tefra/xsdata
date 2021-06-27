@@ -118,7 +118,7 @@ class Schedule:
 
 
 @dataclass
-class SelfType:
+class Self:
     class Meta:
         name = "self"
 
@@ -135,7 +135,7 @@ class Links:
     class Meta:
         name = "_links"
 
-    self_value: Optional[SelfType] = field(
+    self_value: Optional[Self] = field(
         default=None,
         metadata={
             "name": "self",

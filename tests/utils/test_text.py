@@ -1,8 +1,10 @@
+import string
 from unittest import TestCase
 
 from xsdata.utils.text import alnum
 from xsdata.utils.text import camel_case
 from xsdata.utils.text import capitalize
+from xsdata.utils.text import classify
 from xsdata.utils.text import kebab_case
 from xsdata.utils.text import mixed_case
 from xsdata.utils.text import mixed_pascal_case
@@ -12,6 +14,7 @@ from xsdata.utils.text import pascal_case
 from xsdata.utils.text import screaming_snake_case
 from xsdata.utils.text import snake_case
 from xsdata.utils.text import split_words
+from xsdata.utils.text import StringType
 
 
 class TextTests(TestCase):
@@ -131,10 +134,24 @@ class TextTests(TestCase):
         self.assertEqual(["user"], split_words("__user"))
         self.assertEqual(["TMessage", "DB"], split_words("TMessageDB"))
         self.assertEqual(["GLOBAL", "REF"], split_words("GLOBAL-REF"))
+        self.assertEqual(["book"], split_words("βιβλιο-book"))
 
     def test_alnum(self):
         self.assertEqual("foo1", alnum("foo 1"))
         self.assertEqual("foo1", alnum(" foo_1 "))
         self.assertEqual("foo1", alnum("\tfoo*1"))
         self.assertEqual("foo1", alnum(" foo*1"))
-        self.assertEqual("βιβλίο1", alnum(" βιβλίο*1"))
+        self.assertEqual("1", alnum(" βιβλίο*1"))
+
+    def test_classify(self):
+        for ltr in string.ascii_uppercase:
+            self.assertEqual(StringType.UPPER, classify(ltr))
+
+        for ltr in string.ascii_lowercase:
+            self.assertEqual(StringType.LOWER, classify(ltr))
+
+        for ltr in string.digits:
+            self.assertEqual(StringType.NUMERIC, classify(ltr))
+
+        for ltr in "~!@#$%^&*()_+β":
+            self.assertEqual(StringType.OTHER, classify(ltr))

@@ -49,8 +49,8 @@ RootB.NO.__doc__ = "Lorem ipsum dolor\nMy\\Ipsum"
 
 
 class RootD(Enum):
-    TRUE_VALUE = "true"
-    FALSE_VALUE = "false"
+    TRUE = "true"
+    FALSE = "false"
 
 
 @dataclass

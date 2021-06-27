@@ -1,4 +1,5 @@
 import math
+import re
 import textwrap
 from typing import Any
 from typing import Callable
@@ -18,15 +19,13 @@ from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.formats.converter import converter
-from xsdata.formats.dataclass import utils
 from xsdata.models.config import DocstringStyle
 from xsdata.models.config import GeneratorAlias
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.config import OutputFormat
 from xsdata.utils import collections
+from xsdata.utils import namespaces
 from xsdata.utils import text
-from xsdata.utils.namespaces import clean_uri
-from xsdata.utils.namespaces import local_name
 
 
 def index_aliases(aliases: List[GeneratorAlias]) -> Dict:
@@ -122,11 +121,6 @@ class Filters:
 
         return f"@dataclass({', '.join(args)})" if args else "@dataclass"
 
-    def class_name(self, name: str) -> str:
-        """Convert the given string to a class name according to the selected
-        conventions or use an existing alias."""
-        return self.class_aliases.get(name) or self._class_name(name)
-
     def class_params(self, obj: Class):
         is_enum = obj.is_enumeration
         for attr in obj.attrs:
@@ -137,8 +131,14 @@ class Filters:
             else:
                 yield self.field_name(name, obj.name), docstring
 
-    def _class_name(self, name: str) -> str:
-        return self.class_case(utils.safe_snake(name, self.class_safe_prefix))
+    def class_name(self, name: str) -> str:
+        """Convert the given string to a class name according to the selected
+        conventions or use an existing alias."""
+        alias = self.class_aliases.get(name)
+        if alias:
+            return alias
+
+        return self.safe_name(name, self.class_safe_prefix, self.class_case)
 
     def field_name(self, name: str, class_name: str) -> str:
         """
@@ -151,8 +151,9 @@ class Filters:
         if alias:
             return alias
 
-        safe_name = utils.safe_snake(name, self.field_safe_prefix)
-        return self.field_case(safe_name, class_name=class_name)
+        return self.safe_name(
+            name, self.field_safe_prefix, self.field_case, class_name=class_name
+        )
 
     def constant_name(self, name: str, class_name: str) -> str:
         """
@@ -165,36 +166,37 @@ class Filters:
         if alias:
             return alias
 
-        safe_name = utils.safe_snake(name, self.constant_safe_prefix)
-        return self.constant_case(safe_name, class_name=class_name)
+        return self.safe_name(
+            name, self.constant_safe_prefix, self.constant_case, class_name=class_name
+        )
 
     def module_name(self, name: str) -> str:
         """Convert the given string to a module name according to the selected
         conventions or use an existing alias."""
-        return self.module_aliases.get(name) or self._module_name(name)
+        alias = self.module_aliases.get(name)
+        if alias:
+            return alias
 
-    def _module_name(self, name: str) -> str:
-        return self.module_case(
-            utils.safe_snake(clean_uri(name), self.module_safe_prefix)
+        return self.safe_name(
+            namespaces.clean_uri(name), self.module_safe_prefix, self.module_case
         )
 
     def package_name(self, name: str) -> str:
         """Convert the given string to a package name according to the selected
         conventions or use an existing alias."""
 
-        if name in self.package_aliases:
-            return self.package_aliases[name]
+        alias = self.package_aliases.get(name)
+        if alias:
+            return alias
 
         if not name:
             return name
 
         return ".".join(
-            self.package_aliases.get(part) or self._package_name(part)
+            self.package_aliases.get(part)
+            or self.safe_name(part, self.package_safe_prefix, self.package_case)
             for part in name.split(".")
         )
-
-    def _package_name(self, part: str) -> str:
-        return self.package_case(utils.safe_snake(part, self.package_safe_prefix))
 
     def type_name(self, attr_type: AttrType) -> str:
         """Return native python type name or apply class name conventions."""
@@ -203,6 +205,26 @@ class Filters:
             return datatype.type.__name__
 
         return self.class_name(attr_type.alias or attr_type.name)
+
+    def safe_name(
+        self, name: str, prefix: str, name_case: Callable, **kwargs: Any
+    ) -> str:
+        """Sanitize names for safe generation."""
+        if not name:
+            return self.safe_name(prefix, prefix, name_case, **kwargs)
+
+        if re.match(r"^-\d*\.?\d+$", name):
+            return self.safe_name(f"{prefix}_minus_{name}", prefix, name_case, **kwargs)
+
+        slug = text.alnum(name)
+        if not slug or not slug[0].isalpha():
+            return self.safe_name(f"{prefix}_{name}", prefix, name_case, **kwargs)
+
+        result = name_case(name, **kwargs)
+        if text.is_reserved(result):
+            return self.safe_name(f"{name}_{prefix}", prefix, name_case, **kwargs)
+
+        return result
 
     def import_module(self, module: str, from_module: str) -> str:
         """Convert import module to relative path if config is enabled."""
@@ -488,7 +510,7 @@ class Filters:
 
         qname, reference = attr.default[6:].split("::", 1)
         qname = next(x.alias or qname for x in attr.types if x.qname == qname)
-        name = local_name(qname)
+        name = namespaces.local_name(qname)
         class_name = self.class_name(name)
 
         if attr.is_tokens:

@@ -5,6 +5,64 @@ from typing import List
 from typing import Match
 from typing import Tuple
 
+stop_words = {
+    "",
+    "Decimal",
+    "Dict",
+    "Enum",
+    "False",
+    "List",
+    "Meta",
+    "None",
+    "Optional",
+    "QName",
+    "True",
+    "Type",
+    "Tuple",
+    "Union",
+    "and",
+    "as",
+    "assert",
+    "bool",
+    "break",
+    "class",
+    "continue",
+    "def",
+    "del",
+    "dict",
+    "elif",
+    "else",
+    "except",
+    "field",
+    "finally",
+    "float",
+    "for",
+    "from",
+    "global",
+    "if",
+    "import",
+    "in",
+    "int",
+    "is",
+    "lambda",
+    "list",
+    "nonlocal",
+    "not",
+    "object",  # py36 specific
+    "or",
+    "pass",
+    "raise",
+    "return",
+    "self",
+    "str",
+    "try",
+    "while",
+    "with",
+    "yield",
+}
+
+is_reserved = stop_words.__contains__
+
 
 def prefix(value: str, sep: str = ":") -> str:
     """Return the first part of the string before the separator."""
@@ -117,11 +175,15 @@ class StringType:
 
 def classify(character: str) -> int:
     """String classifier."""
-    if character.isupper():
+
+    code_point = ord(character)
+    if 64 < code_point < 91:
         return StringType.UPPER
-    if character.islower():
+
+    if 96 < code_point < 123:
         return StringType.LOWER
-    if character.isnumeric():
+
+    if 47 < code_point < 58:
         return StringType.NUMERIC
 
     return StringType.OTHER
@@ -154,11 +216,10 @@ def escape_string(value: str) -> str:
     return ESCAPE.sub(replace, value)
 
 
-_punctuation = set(string.punctuation + string.whitespace)
+__alnum_ascii__ = set(string.digits + string.ascii_letters)
 
 
 def alnum(value: str) -> str:
-    for remove in set(value).intersection(_punctuation):
-        value = value.replace(remove, "")
-
-    return value.lower()
+    """Return a lower case version of the string only with ascii alphanumerical
+    characters."""
+    return "".join(filter(__alnum_ascii__.__contains__, value)).lower()

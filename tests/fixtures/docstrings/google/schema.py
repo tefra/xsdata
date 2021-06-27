@@ -47,8 +47,8 @@ class RootB(Enum):
 
 
 class RootD(Enum):
-    TRUE_VALUE = "true"
-    FALSE_VALUE = "false"
+    TRUE = "true"
+    FALSE = "false"
 
 
 @dataclass

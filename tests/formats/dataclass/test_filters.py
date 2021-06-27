@@ -37,30 +37,34 @@ class FiltersTests(FactoryTestCase):
         self.assertEqual("XsString", self.filters.class_name("xs:string"))
         self.assertEqual("FooBarBam", self.filters.class_name("foo:bar_bam"))
         self.assertEqual("ListType", self.filters.class_name("List"))
-        self.assertEqual("Type", self.filters.class_name(".*"))
+        self.assertEqual("TypeType", self.filters.class_name(".*"))
         self.assertEqual("Bang", self.filters.class_name("boom"))
 
     def test_field_name(self):
         self.filters.field_aliases["boom"] = "Bang"
 
+        self.assertEqual("value", self.filters.field_name("", "cls"))
         self.assertEqual("foo", self.filters.field_name("foo", "cls"))
         self.assertEqual("foo_bar", self.filters.field_name("foo:bar", "cls"))
         self.assertEqual("foo_bar", self.filters.field_name("FooBar", "cls"))
-        self.assertEqual("none_value", self.filters.field_name("None", "cls"))
-        self.assertEqual("br_eak_value", self.filters.field_name("BrEak", "cls"))
+        self.assertEqual("none", self.filters.field_name("None", "cls"))
+        self.assertEqual("br_eak", self.filters.field_name("BrEak", "cls"))
         self.assertEqual("value_1", self.filters.field_name("1", "cls"))
         self.assertEqual("Bang", self.filters.field_name("boom", "cls"))
+        self.assertEqual("value_minus_1_1", self.filters.field_name("-1.1", "cls"))
 
     def test_constant_name(self):
         self.filters.field_aliases["boom"] = "Bang"
 
+        self.assertEqual("VALUE", self.filters.constant_name("", "cls"))
         self.assertEqual("FOO", self.filters.constant_name("foo", "cls"))
         self.assertEqual("FOO_BAR", self.filters.constant_name("foo:bar", "cls"))
         self.assertEqual("FOO_BAR", self.filters.constant_name("FooBar", "cls"))
-        self.assertEqual("NONE_VALUE", self.filters.constant_name("None", "cls"))
-        self.assertEqual("BR_EAK_VALUE", self.filters.constant_name("BrEak", "cls"))
+        self.assertEqual("NONE", self.filters.constant_name("None", "cls"))
+        self.assertEqual("BR_EAK", self.filters.constant_name("BrEak", "cls"))
         self.assertEqual("VALUE_1", self.filters.constant_name("1", "cls"))
         self.assertEqual("Bang", self.filters.constant_name("boom", "cls"))
+        self.assertEqual("VALUE_MINUS_1", self.filters.constant_name("-1", "cls"))
 
     def test_module_name(self):
         self.filters.module_aliases["http://github.com/tefra/xsdata"] = "xsdata"

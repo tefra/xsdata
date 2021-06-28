@@ -383,10 +383,7 @@ class XmlSerializer(AbstractSerializer):
         if isinstance(value, (str, QName)) or var is None:
             return value
 
-        if isinstance(value, tuple) and hasattr(value, "_fields"):
-            return converter.serialize(value, format=var.format)
-
-        if isinstance(value, (tuple, list)):
+        if collections.is_array(value):
             return [cls.encode(v, var) for v in value]
 
         if isinstance(value, Enum):

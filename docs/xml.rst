@@ -100,12 +100,13 @@ Parse from xml Path
     '8 Oak Avenue'
 
 
-Parse from lxml Element or Tree
-===============================
+Parse from Element or ElementTree
+=================================
 
-The :class:`~xsdata.formats.dataclass.parsers.handlers.LxmlEventHandler`, which is
-the default one when lxml is installed, can also be used to bind data directly
-from an Element or Tree.
+For selective parsing you can use an Element or ElementTree as source. This way
+you can modify the dom or pick from which node to start binding data.
+
+Using lxml and :class:`~xsdata.formats.dataclass.parsers.handlers.LxmlEventHandler`
 
 .. doctest::
 
@@ -119,11 +120,36 @@ from an Element or Tree.
     Usaddress(name='Robert Smith', street='8 Oak Avenue', city='Old Town', state='PA', zip=Decimal('95819'), country='US')
 
 
+Using the xml module and
+:class:`~xsdata.formats.dataclass.parsers.handlers.XmlEventHandler`
+
+.. doctest::
+
+    >>> from xml.etree import ElementTree as ET
+    >>> from xsdata.formats.dataclass.parsers.handlers import XmlEventHandler
+    ...
+    >>> parser = XmlParser(handler=XmlEventHandler)
+    >>> tree = ET.parse(str(xml_path))
+    >>> ship_to = parser.parse(tree.find('.//shipTo'), Usaddress)
+    >>> ship_to
+    Usaddress(name='Alice Smith', street='123 Maple Street', city='Mill Valley', state='CA', zip=Decimal('90952'), country='US')
+
+
+.. note::
+
+    The :mod:`python:xml.etree.ElementTree` api doesn't preserve the namespace prefixes,
+    the handler will auto generate new ones.
+
+
+
 Parse with unknown xml target type
 ==================================
 
 It's optimal to provide the target model but completely optional. The parser can scan
 all the imported modules to find a matching dataclass.
+
+
+.. doctest::
 
     >>> order = parser.from_bytes(xml_path.read_bytes())
     >>> type(order)
@@ -135,6 +161,7 @@ Parser Config
 
 The configuration allows to enable/disable various features and failures.
 
+.. doctest::
 
     >>> from xsdata.formats.dataclass.parsers.config import ParserConfig
     ...
@@ -164,12 +191,14 @@ performance and features.
     :class:`~xsdata.formats.dataclass.parsers.handlers.LxmlEventHandler` otherwise
     :class:`~xsdata.formats.dataclass.parsers.handlers.XmlEventHandler` will be used.
 
->>> from xsdata.formats.dataclass.parsers.handlers import XmlEventHandler
-...
->>> parser = XmlParser(handler=XmlEventHandler)
->>> order = parser.from_path(xml_path)
->>> order.bill_to.street
-'8 Oak Avenue'
+.. doctest::
+
+    >>> from xsdata.formats.dataclass.parsers.handlers import XmlEventHandler
+    ...
+    >>> parser = XmlParser(handler=XmlEventHandler)
+    >>> order = parser.from_path(xml_path)
+    >>> order.bill_to.street
+    '8 Oak Avenue'
 
 .. hint::
 
@@ -180,6 +209,33 @@ performance and features.
     customize the default behaviour.
 
 Read :ref:`more... <XML Handlers>`
+
+
+Parse xml with xinclude statements
+==================================
+
+The :class:`~xsdata.formats.dataclass.parsers.handlers.LxmlEventHandler` and
+:class:`~xsdata.formats.dataclass.parsers.handlers.XmlEventHandler` both support
+processing xinclude directives.
+
+If you are parsing from memory you need to specify the base url in the config in order
+to load the children documents.
+
+.. doctest::
+
+    >>> from xsdata.formats.dataclass.parsers.handlers import XmlEventHandler
+    ...
+    >>> xml = """<?xml version="1.0" encoding="UTF-8"?>
+    ... <brk:books xmlns:brk="urn:books" xmlns:xi="http://www.w3.org/2001/XInclude">
+    ...   <xi:include href="bk001.xml"/>
+    ...   <xi:include href="bk002.xml"/>
+    ... </brk:books>"""
+    >>> base_url = fixtures_dir.joinpath("books/books-xinclude.xml")
+    >>> config = ParserConfig(process_xinclude=True, base_url=str(base_url))
+    >>> parser = XmlParser(config=config)
+    >>> books = parser.from_string(xml)
+    >>> print(books.book[1])
+    BookForm(author='Nagata, Suanne', title='Becoming Somebody', genre='Biography', price=33.95, pub_date=XmlDate(2001, 1, 10), review='A masterpiece of the fine art of gossiping.', id='bk002', lang='en')
 
 
 Serialize xml to string

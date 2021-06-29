@@ -2,9 +2,8 @@
 Models Metadata
 ***************
 
-The code generator's default output format is python
-`dataclasses <https://docs.python.org/3/library/dataclasses.html>`_  and ships with its
-own modules for xml and json marshalling.
+The code generator's default output format is python :mod:`python:dataclasses` and ships
+with its own modules for xml and json marshalling.
 
 The generated models don't depend on the xsdata library, except for specific xsd
 data types that can't be mapped directly to python's builtin types. They only include
@@ -119,8 +118,7 @@ procedures.
 Field Typing
 ============
 
-Simply follow the Python lib
-`dataclasses <https://docs.python.org/3/library/dataclasses.html>`_ documentation.
+Simply follow the Python lib :mod:`python:dataclasses` documentation.
 
 .. warning::
 

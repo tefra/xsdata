@@ -25,10 +25,8 @@ from xsdata.models.wsdl import PortTypeMessage
 from xsdata.models.wsdl import PortTypeOperation
 from xsdata.models.wsdl import ServicePort
 from xsdata.utils import collections
+from xsdata.utils import namespaces
 from xsdata.utils import text
-from xsdata.utils.collections import first
-from xsdata.utils.namespaces import build_qname
-from xsdata.utils.namespaces import local_name
 
 
 class DefinitionsMapper:
@@ -115,7 +113,7 @@ class DefinitionsMapper:
         assert definitions.location is not None
 
         yield Class(
-            qname=build_qname(definitions.target_namespace, name),
+            qname=namespaces.build_qname(definitions.target_namespace, name),
             status=Status.FLATTENED,
             tag=type(binding_operation).__name__,
             location=definitions.location,
@@ -210,7 +208,7 @@ class DefinitionsMapper:
         assert definitions.location is not None
 
         target = Class(
-            qname=build_qname(definitions.target_namespace, name),
+            qname=namespaces.build_qname(definitions.target_namespace, name),
             meta_name="Envelope",
             tag=Tag.BINDING_MESSAGE,
             location=definitions.location,
@@ -221,7 +219,7 @@ class DefinitionsMapper:
 
         for ext in binding_message.extended_elements:
             assert ext.qname is not None
-            class_name = local_name(ext.qname).title()
+            class_name = namespaces.local_name(ext.qname).title()
             inner = cls.build_inner_class(target, class_name)
 
             if style == "rpc" and class_name == "Body":
@@ -249,7 +247,7 @@ class DefinitionsMapper:
         assert definitions.location is not None
 
         return Class(
-            qname=build_qname(definitions.target_namespace, message_name),
+            qname=namespaces.build_qname(definitions.target_namespace, message_name),
             status=Status.FLATTENED,
             tag=Tag.ELEMENT,
             location=definitions.location,
@@ -268,10 +266,10 @@ class DefinitionsMapper:
         This helper will also create a forward reference attribute for
         the parent class.
         """
-        inner = first(inner for inner in target.inner if inner.name == name)
+        inner = collections.first(inner for inner in target.inner if inner.name == name)
         if not inner:
             inner = Class(
-                qname=build_qname(name),
+                qname=namespaces.build_qname(name),
                 tag=Tag.BINDING_MESSAGE,
                 location=target.location,
                 ns_map=target.ns_map.copy(),
@@ -291,7 +289,9 @@ class DefinitionsMapper:
         prefix, name = text.split(message.message)
         source_namespace = message.ns_map.get(prefix)
         yield cls.build_attr(
-            name, qname=build_qname(source_namespace, name), namespace=namespace
+            name,
+            qname=namespaces.build_qname(source_namespace, name),
+            namespace=namespace,
         )
 
     @classmethod
@@ -307,7 +307,7 @@ class DefinitionsMapper:
             parts.extend(extended.attributes["parts"].split())
 
         if "message" in extended.attributes:
-            message_name = local_name(extended.attributes["message"])
+            message_name = namespaces.local_name(extended.attributes["message"])
         else:
             message_name = text.suffix(message)
 
@@ -340,7 +340,7 @@ class DefinitionsMapper:
 
             ns_map.update(part.ns_map)
             namespace = part.ns_map.get(prefix)
-            type_qname = build_qname(namespace, type_name)
+            type_qname = namespaces.build_qname(namespace, type_name)
             native = namespace == Namespace.XS.uri
             namespace = "" if part.type else namespace
 
@@ -359,7 +359,7 @@ class DefinitionsMapper:
     def attributes(cls, elements: Iterator[AnyElement]) -> Dict:
         """Return all attributes from all extended elements as a dictionary."""
         return {
-            local_name(qname): value
+            namespaces.local_name(qname): value
             for element in elements
             if isinstance(element, AnyElement)
             for qname, value in element.attributes.items()

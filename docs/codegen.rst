@@ -95,13 +95,6 @@ altogether.
     $ xsdata schema.xsd --package models --structure-style single-package
 
 
-.. warning::
-
-    Auto :ref:`locating types <Parse with unknown xml target type>` during parsing
-    might not work since all classes are bundled together under the same module
-    namespace.
-
-
 Initialize Config
 =================
 

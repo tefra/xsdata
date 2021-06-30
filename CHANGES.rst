@@ -1,3 +1,25 @@
+21.7 (2021-07-01)
+-----------------
+
+- Fixed docstrings backslash escaping `#518 <https://github.com/tefra/xsdata/pull/518>`_
+- Fixed analyzer flattening bare types `#541 <https://github.com/tefra/xsdata/pull/541>`_
+- Fixed multiple issues with compound fields and override fields `#533 <https://github.com/tefra/xsdata/pull/533>`_
+- Fixed missing derived elements types during xml parsing `#541 <https://github.com/tefra/xsdata/pull/541>`_
+- Added structure style: clusters for smaller packages `#509 <https://github.com/tefra/xsdata/pull/509>`_
+- Added configuration to generate relative imports `#519 <https://github.com/tefra/xsdata/pull/519>`_
+- Added configuration to toggle all dataclasses features `#529 <https://github.com/tefra/xsdata/pull/529>`_
+- Added binding support for tuple typing annotations (frozen dataclasses) `#529 <https://github.com/tefra/xsdata/pull/529>`_
+- Added support to bind data directly from xml/lxml Element and ElementTree `#531 <https://github.com/tefra/xsdata/pull/531>`_ `#546 <https://github.com/tefra/xsdata/pull/546>`_
+- Updated analyzer to avoid same name for outer-inner classes `#511 <https://github.com/tefra/xsdata/pull/511>`_
+- Updated cli to fail early if config file is invalid `#514 <https://github.com/tefra/xsdata/pull/514>`_
+- Updated cli to remove setuptools from runtime dependencies `#515 <https://github.com/tefra/xsdata/pull/515>`_
+- Updated analyzer to relax override field validations completely `#516 <https://github.com/tefra/xsdata/pull/516>`_
+- Updated analyzer to sort classes before class name conflict resolution `#517 <https://github.com/tefra/xsdata/pull/517>`_
+- Updated JSON parser to attempt binding against subclasses `#527 <https://github.com/tefra/xsdata/pull/527>`_
+- Updated analyzer to guard against multiple substitution group runs `#538 <https://github.com/tefra/xsdata/pull/538>`_
+- Updated code generation to use case sensitive reserved words `#545 <https://github.com/tefra/xsdata/pull/545>`_
+
+
 21.6 (2021-06-01)
 -----------------
 - Fixed no args Dict annotation, raising an exception `#494 <https://github.com/tefra/xsdata/issues/494>`_

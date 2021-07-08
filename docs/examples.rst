@@ -22,6 +22,7 @@ Advance Topics
     :maxdepth: 1
 
     examples/custom-property-names
+    examples/custom-class-factory
 
 
 Test Suites

@@ -13,6 +13,7 @@ from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.parsers.bases import NodeParser
+from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.mixins import EventsHandler
 from xsdata.formats.dataclass.parsers.mixins import XmlNode
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
@@ -32,18 +33,35 @@ class UnionNode(XmlNode):
     :param attrs: Key-value attribute mapping
     :param ns_map: Namespace prefix-URI map
     :param position: The node position of objects cache
+    :param config: Parser configuration
     :param context: Model context provider
     """
 
-    __slots__ = "var", "attrs", "ns_map", "position", "context", "level", "events"
+    __slots__ = (
+        "var",
+        "attrs",
+        "ns_map",
+        "position",
+        "config",
+        "context",
+        "level",
+        "events",
+    )
 
     def __init__(
-        self, var: XmlVar, attrs: Dict, ns_map: Dict, position: int, context: XmlContext
+        self,
+        var: XmlVar,
+        attrs: Dict,
+        ns_map: Dict,
+        position: int,
+        config: ParserConfig,
+        context: XmlContext,
     ):
         self.var = var
         self.attrs = attrs
         self.ns_map = ns_map
         self.position = position
+        self.config = config
         self.context = context
         self.level = 0
         self.events: List[Tuple[str, str, Any, Any]] = []
@@ -94,7 +112,9 @@ class UnionNode(XmlNode):
             with warnings.catch_warnings():
                 warnings.filterwarnings("error", category=ConverterWarning)
 
-                parser = NodeParser(context=self.context, handler=EventsHandler)
+                parser = NodeParser(
+                    config=self.config, context=self.context, handler=EventsHandler
+                )
                 return parser.parse(self.events, clazz)
         except Exception:
             return None

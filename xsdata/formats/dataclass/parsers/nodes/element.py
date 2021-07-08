@@ -31,7 +31,7 @@ class ElementNode(XmlNode):
     :param context: Model context provider
     :param position: The node position of objects cache
     :param mixed: The node supports mixed content
-    :param derived: The xml element is derived from a base type
+    :param derived_factory: Derived element factory
     :param xsi_type: The xml type substitution
     """
 
@@ -92,7 +92,7 @@ class ElementNode(XmlNode):
             if isinstance(params[key], PendingCollection):
                 params[key] = params[key].evaluate()
 
-        obj = self.meta.clazz(**params)
+        obj = self.config.class_factory(self.meta.clazz, params)
         if self.derived_factory:
             obj = self.derived_factory(qname=qname, value=obj, type=self.xsi_type)
 
@@ -330,6 +330,7 @@ class ElementNode(XmlNode):
                 var=var,
                 attrs=attrs,
                 ns_map=ns_map,
+                config=self.config,
                 context=self.context,
                 position=position,
             )

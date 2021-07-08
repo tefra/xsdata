@@ -6,18 +6,31 @@ from tests.fixtures.models import UnionType
 from xsdata.exceptions import ParserError
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlType
+from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.nodes import UnionNode
 from xsdata.models.mixins import attribute
 from xsdata.utils.testing import XmlVarFactory
 
 
 class UnionNodeTests(TestCase):
+    def setUp(self) -> None:
+        super().setUp()
+
+        self.context = XmlContext()
+        self.config = ParserConfig()
+
     def test_child(self):
         attrs = {"id": "1"}
         ns_map = {"ns0": "xsdata"}
-        ctx = XmlContext()
         var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo", qname="foo")
-        node = UnionNode(position=0, var=var, context=ctx, attrs={}, ns_map={})
+        node = UnionNode(
+            position=0,
+            var=var,
+            config=self.config,
+            context=self.context,
+            attrs={},
+            ns_map={},
+        )
         self.assertEqual(node, node.child("foo", attrs, ns_map, 10))
 
         self.assertEqual(1, node.level)
@@ -25,9 +38,15 @@ class UnionNodeTests(TestCase):
         self.assertIsNot(attrs, node.events[0][2])
 
     def test_bind_appends_end_event_when_level_not_zero(self):
-        ctx = XmlContext()
         var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo", qname="foo")
-        node = UnionNode(position=0, var=var, context=ctx, attrs={}, ns_map={})
+        node = UnionNode(
+            position=0,
+            var=var,
+            config=self.config,
+            context=self.context,
+            attrs={},
+            ns_map={},
+        )
         node.level = 1
         objects = []
 
@@ -43,12 +62,18 @@ class UnionNodeTests(TestCase):
         item2 = make_dataclass("Item2", [("a", int, attribute())])
         root = make_dataclass("Root", [("item", Union[str, int, item2, item])])
 
-        ctx = XmlContext()
-        meta = ctx.build(root)
+        meta = self.context.build(root)
         var = next(meta.find_children("item"))
         attrs = {"a": "1", "b": 2}
         ns_map = {}
-        node = UnionNode(position=0, var=var, context=ctx, attrs=attrs, ns_map=ns_map)
+        node = UnionNode(
+            position=0,
+            var=var,
+            config=self.config,
+            context=self.context,
+            attrs=attrs,
+            ns_map=ns_map,
+        )
         objects = []
 
         self.assertTrue(node.bind("item", "1", None, objects))
@@ -73,11 +98,17 @@ class UnionNodeTests(TestCase):
         self.assertEqual("a", objects[-1][1])
 
     def test_bind_raises_parser_error_on_failure(self):
-        ctx = XmlContext()
-        meta = ctx.build(UnionType)
+        meta = self.context.build(UnionType)
         var = next(meta.find_children("element"))
 
-        node = UnionNode(position=0, var=var, context=ctx, attrs={}, ns_map={})
+        node = UnionNode(
+            position=0,
+            var=var,
+            config=self.config,
+            context=self.context,
+            attrs={},
+            ns_map={},
+        )
 
         with self.assertRaises(ParserError) as cm:
             node.bind("element", None, None, [])

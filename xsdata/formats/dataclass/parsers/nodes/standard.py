@@ -15,9 +15,8 @@ class StandardNode(XmlNode):
 
     :param datatype: Standard xsi data type
     :param ns_map: Namespace prefix-URI map
-    :param derived: Specify whether the value needs to be wrapped with
-        :class:`~xsdata.formats.dataclass.models.generics.DerivedElement`
     :param nillable: Specify whether the node supports nillable content
+    :param derived_factory: Optional derived element factory
     """
 
     __slots__ = "datatype", "ns_map", "nillable", "derived_factory"

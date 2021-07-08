@@ -90,8 +90,7 @@ class JsonParser(AbstractParser):
         if list_type != isinstance(data, list):
             if list_type:
                 raise ParserError("Document is object, expected array")
-            else:
-                raise ParserError("Document is array, expected object")
+            raise ParserError("Document is array, expected object")
 
         return clazz  # type: ignore
 
@@ -128,7 +127,7 @@ class JsonParser(AbstractParser):
                 params[var.name] = self.bind_value(meta, var, value)
 
         try:
-            return clazz(**params)  # type: ignore
+            return self.config.class_factory(clazz, params)
         except TypeError as e:
             raise ParserError(e)
 
@@ -257,22 +256,22 @@ class JsonParser(AbstractParser):
         if var.is_clazz_union:
             # Union of dataclasses
             return self.bind_best_dataclass(data, var.types)
-        elif var.elements:
+        if var.elements:
             # Compound field with multiple choices
             return self.bind_best_dataclass(data, var.element_types)
-        elif var.any_type or var.is_wildcard:
+        if var.any_type or var.is_wildcard:
             # xs:anyType element, check all meta classes
             return self.bind_best_dataclass(data, meta.element_types)
-        else:
-            assert var.clazz is not None
 
-            subclasses = set(self.context.get_subclasses(var.clazz))
-            if subclasses:
-                # field annotation is an abstract/base type
-                subclasses.add(var.clazz)
-                return self.bind_best_dataclass(data, subclasses)
+        assert var.clazz is not None
 
-            return self.bind_dataclass(data, var.clazz)
+        subclasses = set(self.context.get_subclasses(var.clazz))
+        if subclasses:
+            # field annotation is an abstract/base type
+            subclasses.add(var.clazz)
+            return self.bind_best_dataclass(data, subclasses)
+
+        return self.bind_dataclass(data, var.clazz)
 
     def bind_derived_value(self, meta: XmlMeta, var: XmlVar, data: Dict) -> T:
         """Bind derived element entry point."""

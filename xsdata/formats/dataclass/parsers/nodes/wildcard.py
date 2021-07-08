@@ -20,6 +20,7 @@ class WildcardNode(XmlNode):
     :param attrs: Key-value attribute mapping
     :param ns_map: Namespace prefix-URI map
     :param position: The node position of objects cache
+    :param factory: Wildcard element factory
     """
 
     __slots__ = "var", "attrs", "ns_map", "position", "factory"

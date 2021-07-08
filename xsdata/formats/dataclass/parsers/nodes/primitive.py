@@ -15,6 +15,7 @@ class PrimitiveNode(XmlNode):
 
     :param var: Class field xml var instance
     :param ns_map: Namespace prefix-URI map
+    :param derived_factory: Derived element factory
     """
 
     __slots__ = "var", "ns_map", "derived_factory"

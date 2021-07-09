@@ -44,7 +44,7 @@ class Alias:
         }
     )
     value: Optional[str] = field(
-        default=None,
+        default=None
     )
 
 
@@ -88,7 +88,7 @@ class Gender:
         }
     )
     value: Optional[str] = field(
-        default=None,
+        default=None
     )
 
 

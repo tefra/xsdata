@@ -34,6 +34,9 @@ def index_aliases(aliases: List[GeneratorAlias]) -> Dict:
 
 class Filters:
 
+    DEFAULT_KEY = "default"
+    FACTORY_KEY = "default_factory"
+
     __slots__ = (
         "class_aliases",
         "field_aliases",
@@ -53,6 +56,7 @@ class Filters:
         "max_line_length",
         "relative_imports",
         "format",
+        "import_patterns",
     )
 
     def __init__(self, config: GeneratorConfig):
@@ -75,6 +79,9 @@ class Filters:
         self.relative_imports: bool = config.output.relative_imports
         self.format = config.output.format
 
+        # Build things
+        self.import_patterns = self.build_import_patterns()
+
     def register(self, env: Environment):
         env.globals.update(
             {
@@ -85,9 +92,10 @@ class Filters:
         env.filters.update(
             {
                 "field_name": self.field_name,
+                "field_type": self.field_type,
                 "field_default": self.field_default_value,
                 "field_metadata": self.field_metadata,
-                "field_type": self.field_type,
+                "field_definition": self.field_definition,
                 "class_name": self.class_name,
                 "class_params": self.class_params,
                 "format_string": self.format_string,
@@ -139,6 +147,30 @@ class Filters:
             return alias
 
         return self.safe_name(name, self.class_safe_prefix, self.class_case)
+
+    def field_definition(
+        self,
+        attr: Attr,
+        ns_map: Dict,
+        parent_namespace: Optional[str],
+        parents: List[str],
+    ) -> str:
+        """Return the field definition with any extra metadata."""
+        default_value = self.field_default_value(attr, ns_map)
+        metadata = self.field_metadata(attr, parent_namespace, parents)
+
+        kwargs: Dict[str, Any] = {}
+        if attr.fixed:
+            kwargs["init"] = False
+
+        if default_value is not False:
+            key = self.FACTORY_KEY if attr.is_factory else self.DEFAULT_KEY
+            kwargs[key] = default_value
+
+        if metadata:
+            kwargs["metadata"] = metadata
+
+        return f"field({self.format_arguments(kwargs, 4)})"
 
     def field_name(self, name: str, class_name: str) -> str:
         """
@@ -316,7 +348,7 @@ class Filters:
             if choice.is_nameless:
                 del metadata["name"]
 
-            default_key = "default_factory" if choice.is_factory else "default"
+            default_key = self.FACTORY_KEY if choice.is_factory else self.DEFAULT_KEY
             metadata[default_key] = self.field_default_value(choice)
             metadata.update(restrictions)
 
@@ -334,6 +366,17 @@ class Filters:
             for key, value in data.items()
             if value is not None and value is not False
         }
+
+    def format_arguments(self, data: Dict, indent: int = 0) -> str:
+        """Return a pretty keyword arguments representation."""
+        ind = " " * indent
+        fmt = "    {}{}={}"
+        lines = [
+            fmt.format(ind, key, self.format_metadata(value, indent + 4, key))
+            for key, value in data.items()
+        ]
+
+        return "\n{}\n{}".format(",\n".join(lines), ind) if lines else ""
 
     def format_metadata(self, data: Any, indent: int = 0, key: str = "") -> str:
         """Prettify field metadata for code generation."""
@@ -384,7 +427,7 @@ class Filters:
         if data.startswith("Literal[") and data.endswith("]"):
             return data[8:-1]
 
-        if key in ("default_factory", "default"):
+        if key in (self.FACTORY_KEY, self.DEFAULT_KEY):
             return data
 
         if key == "pattern":
@@ -630,14 +673,24 @@ class Filters:
 
         return repr(value).replace("'", '"')
 
-    @classmethod
-    def default_imports(cls, output: str) -> str:
+    def default_imports(self, output: str) -> str:
         """Generate the default imports for the given package output."""
+        result = []
+        for library, types in self.import_patterns.items():
+            names = [
+                name
+                for name, searches in types.items()
+                if any(search in output for search in searches)
+            ]
+            if names:
+                result.append(f"from {library} import {', '.join(names)}")
 
-        def type_patterns(x: str) -> Tuple:
-            return f": {x} =", f"[{x}]", f"[{x},", f" {x},", f" {x}]", f" {x}("
+        return "\n".join(result)
 
-        patterns: Dict[str, Dict] = {
+    @classmethod
+    def build_import_patterns(cls) -> Dict[str, Dict]:
+        type_patterns = cls.build_type_patterns
+        return {
             "dataclasses": {"dataclass": ["@dataclass"], "field": [" = field("]},
             "decimal": {"Decimal": type_patterns("Decimal")},
             "enum": {"Enum": ["(Enum)"]},
@@ -659,14 +712,6 @@ class Filters:
             },
         }
 
-        result = []
-        for library, types in patterns.items():
-            names = [
-                name
-                for name, searches in types.items()
-                if any(search in output for search in searches)
-            ]
-            if names:
-                result.append(f"from {library} import {', '.join(names)}")
-
-        return "\n".join(result)
+    @classmethod
+    def build_type_patterns(cls, x: str) -> Tuple:
+        return f": {x} =", f"[{x}]", f"[{x},", f" {x},", f" {x}]", f" {x}("

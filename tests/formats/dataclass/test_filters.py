@@ -1,4 +1,5 @@
 from collections import namedtuple
+from unittest import mock
 
 from tests.fixtures.datatypes import Telephone
 from xsdata.codegen.models import Restrictions
@@ -111,6 +112,34 @@ class FiltersTests(FactoryTestCase):
 
         attr = AttrFactory.create(types=[AttrTypeFactory.create(alias="alias")])
         self.assertEqual("Alias", self.filters.constant_value(attr))
+
+    @mock.patch.object(Filters, "field_default_value")
+    def test_field_definition(self, mock_field_default_value):
+        mock_field_default_value.side_effect = [1, False]
+        attr = AttrFactory.native(DataType.INT)
+
+        result = self.filters.field_definition(attr, {}, None, ["Root"])
+        expected = (
+            "field(\n"
+            "        default=1,\n"
+            "        metadata={\n"
+            '            "name": "attr_B",\n'
+            '            "type": "Element",\n'
+            "        }\n"
+            "    )"
+        )
+        self.assertEqual(expected, result)
+
+        result = self.filters.field_definition(attr, {}, None, ["Root"])
+        expected = (
+            "field(\n"
+            "        metadata={\n"
+            '            "name": "attr_B",\n'
+            '            "type": "Element",\n'
+            "        }\n"
+            "    )"
+        )
+        self.assertEqual(expected, result)
 
     def test_field_default_value_with_value_none(self):
         attr = AttrFactory.create(types=[type_str])

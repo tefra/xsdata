@@ -33,17 +33,9 @@ class {{ class_name }}{{"({})".format(base_classes) if base_classes }}:
     pass
 {%- endif -%}
 {%- for attr in obj.attrs %}
-    {%- set metadata = attr|field_metadata(parent_namespace, parents) %}
-    {%- set default_property = "default_factory" if attr.is_factory else "default" %}
-    {{ attr.name|field_name(obj.name) }}: {{ attr|field_type(parents) }} = field(
-        {% if attr.fixed -%}
-        init=False,
-        {% endif -%}
-        {{ default_property }}={{ attr|field_default(obj.ns_map) }},
-        {%- if metadata %}
-        metadata={{ metadata|format_metadata(8) }}
-        {%- endif %}
-    )
+    {%- set field_typing = attr|field_type(parents) %}
+    {%- set field_definition = attr|field_definition(obj.ns_map, parent_namespace, parents) %}
+    {{ attr.name|field_name(obj.name) }}: {{ field_typing }} = {{ field_definition }}
 {%- endfor -%}
 {%- for inner in obj.inner %}
     {%- set tpl = "enum.jinja2" if inner.is_enumeration else "class.jinja2" -%}

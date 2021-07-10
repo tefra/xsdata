@@ -309,7 +309,7 @@ class XmlVarBuilder:
         existing_types: Set[type] = set()
 
         for index, choice in enumerate(choices):
-            default_value = choice.get("default_factory", choice.get("default"))
+            default_value = self.class_type.default_choice_value(choice)
 
             metadata = choice.copy()
             metadata["name"] = choice.get("name", "any")

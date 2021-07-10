@@ -682,7 +682,10 @@ class Filters:
                 for name, searches in types.items()
                 if any(search in output for search in searches)
             ]
-            if names:
+
+            if len(names) == 1 and names[0] == "__module__":
+                result.append(f"import {library}")
+            elif names:
                 result.append(f"from {library} import {', '.join(names)}")
 
         return "\n".join(result)

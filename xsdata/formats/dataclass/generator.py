@@ -30,7 +30,7 @@ class DataclassGenerator(AbstractGenerator):
 
         tpl_dir = Path(__file__).parent.joinpath("templates")
         self.env = Environment(loader=FileSystemLoader(str(tpl_dir)), autoescape=False)
-        self.filters = Filters(config)
+        self.filters = self.init_filters(config)
         self.filters.register(self.env)
 
     def render(self, classes: List[Class]) -> Iterator[GeneratorResult]:
@@ -134,6 +134,14 @@ class DataclassGenerator(AbstractGenerator):
 
         return "\n\n\n".join(map(render_class, classes)) + "\n"
 
+    def module_name(self, name: str) -> str:
+        """Convert the given module name to safe snake case."""
+        return self.filters.module_name(name)
+
+    def package_name(self, name: str) -> str:
+        """Convert the given package name to safe snake case."""
+        return self.filters.package_name(name)
+
     @classmethod
     def ensure_packages(cls, package: Path) -> Iterator[GeneratorResult]:
         """Ensure all the __init__ files exists for the target package path,
@@ -148,10 +156,6 @@ class DataclassGenerator(AbstractGenerator):
                 )
             package = package.parent
 
-    def module_name(self, name: str) -> str:
-        """Convert the given module name to safe snake case."""
-        return self.filters.module_name(name)
-
-    def package_name(self, name: str) -> str:
-        """Convert the given package name to safe snake case."""
-        return self.filters.package_name(name)
+    @classmethod
+    def init_filters(cls, config: GeneratorConfig) -> Filters:
+        return Filters(config)

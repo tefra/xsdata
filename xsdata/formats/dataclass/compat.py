@@ -1,4 +1,5 @@
 import abc
+from dataclasses import Field
 from dataclasses import fields
 from dataclasses import is_dataclass
 from dataclasses import MISSING
@@ -48,6 +49,11 @@ class ClassType(abc.ABC):
     @abc.abstractmethod
     def default_value(self, field: Any) -> Any:
         """Return the default value or factory of the given model field."""
+
+    @abc.abstractmethod
+    def default_choice_value(self, choice: Dict) -> Any:
+        """Return the default value or factory of the given model field
+        choice."""
 
     def score_object(self, obj: Any) -> float:
         """
@@ -108,7 +114,8 @@ class Dataclasses(ClassType):
     def get_fields(self, obj: Any) -> Tuple[Any, ...]:
         return fields(obj)
 
-    def default_value(self, field: Any) -> Any:
+    def default_value(self, field: Field) -> Any:
+        # Ignore type because of https://github.com/python/mypy/issues/6910
         if field.default_factory is not MISSING:  # type: ignore
             return field.default_factory  # type: ignore
 
@@ -116,6 +123,13 @@ class Dataclasses(ClassType):
             return field.default
 
         return None
+
+    def default_choice_value(self, choice: Dict) -> Any:
+        factory = choice.get("default_factory")
+        if callable(factory):
+            return factory
+
+        return choice.get("default")
 
 
 class_types = ClassTypes()

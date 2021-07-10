@@ -633,6 +633,14 @@ class FiltersTests(FactoryTestCase):
 
         self.assertEqual(expected, self.filters.default_imports(output))
 
+    def test_default_imports_with_module(self):
+        output = "@attrs.s\n"
+
+        self.filters.import_patterns["attrs"] = {"__module__": ["@attrs.s"]}
+
+        expected = "import attrs"
+        self.assertEqual(expected, self.filters.default_imports(output))
+
     def test_format_metadata(self):
         data = dict(
             num=1,

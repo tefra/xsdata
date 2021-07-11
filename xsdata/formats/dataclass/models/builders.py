@@ -45,8 +45,7 @@ class XmlMetaBuilder:
     def build(self, clazz: Type, parent_ns: Optional[str]) -> XmlMeta:
         """Build the binding metadata for a dataclass and its fields."""
 
-        if not self.class_type.is_model(clazz):
-            raise XmlContextError(f"Type '{clazz}' is not a dataclass.")
+        self.class_type.verify_model(clazz)
 
         # Fetch the dataclass meta settings and make sure we don't inherit
         # the parent class meta.

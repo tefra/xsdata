@@ -9,6 +9,7 @@ from typing import Set
 from typing import Tuple
 from typing import Type
 
+from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.utils.hooks import load_entry_points
@@ -40,7 +41,15 @@ class ClassType(abc.ABC):
 
     @abc.abstractmethod
     def is_model(self, obj: Any) -> bool:
-        """Return whether the given type is binding model."""
+        """Return whether the given value is binding model."""
+
+    @abc.abstractmethod
+    def verify_model(self, obj: Any):
+        """
+        Verify the given value is a binding model.
+
+        :raises xsdata.exceptions.XmlContextError: if not supported
+        """
 
     @abc.abstractmethod
     def get_fields(self, obj: Any) -> Tuple[Any, ...]:
@@ -110,6 +119,10 @@ class Dataclasses(ClassType):
 
     def is_model(self, obj: Any) -> bool:
         return is_dataclass(obj)
+
+    def verify_model(self, obj: Any):
+        if not self.is_model(obj):
+            raise XmlContextError(f"Type '{obj}' is not a dataclass.")
 
     def get_fields(self, obj: Any) -> Tuple[Any, ...]:
         return fields(obj)

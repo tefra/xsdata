@@ -115,7 +115,6 @@ class Filters:
     @classmethod
     def build_class_annotation(cls, format: OutputFormat) -> str:
         args = []
-
         if not format.repr:
             args.append("repr=False")
         if not format.eq:
@@ -126,6 +125,10 @@ class Filters:
             args.append("unsafe_hash=True")
         if format.frozen:
             args.append("frozen=True")
+        if format.slots:
+            args.append("slots=True")
+        if format.kw_only:
+            args.append("kw_only=True")
 
         return f"@dataclass({', '.join(args)})" if args else "@dataclass"
 
@@ -531,7 +534,7 @@ class Filters:
         if attr.is_dict:
             return "dict"
         if attr.default is None:
-            return None
+            return False if self.format.kw_only and not attr.is_optional else None
         if not isinstance(attr.default, str):
             return self.literal_value(attr.default)
         if attr.default.startswith("@enum@"):
@@ -593,19 +596,22 @@ class Filters:
         if len(type_names) > 1:
             result = f"Union[{result}]"
 
+        iterable = "Tuple[{}, ...]" if self.format.frozen else "List[{}]"
+
         if attr.is_tokens:
-            result = (
-                f"Tuple[{result}, ...]" if self.format.frozen else f"List[{result}]"
-            )
+            result = iterable.format(result)
 
         if attr.is_list:
-            result = (
-                f"Tuple[{result}, ...]" if self.format.frozen else f"List[{result}]"
-            )
-        elif attr.is_dict:
-            result = "Dict[str, str]"
-        elif attr.default is None and not attr.is_factory:
-            result = f"Optional[{result}]"
+            return iterable.format(result)
+
+        if attr.is_tokens:
+            return result
+
+        if attr.is_dict:
+            return "Dict[str, str]"
+
+        if attr.default is None and (attr.is_optional or not self.format.kw_only):
+            return f"Optional[{result}]"
 
         return result
 

@@ -145,6 +145,12 @@ class FiltersTests(FactoryTestCase):
         attr = AttrFactory.create(types=[type_str])
         self.assertEqual(None, self.filters.field_default_value(attr))
 
+        self.filters.format.kw_only = True
+        self.assertEqual(False, self.filters.field_default_value(attr))
+
+        attr.restrictions.min_occurs = 0
+        self.assertEqual(None, self.filters.field_default_value(attr))
+
     def test_field_default_value_with_type_str(self):
         attr = AttrFactory.create(types=[type_str], default="foo")
         self.assertEqual('"foo"', self.filters.field_default_value(attr))
@@ -401,6 +407,12 @@ class FiltersTests(FactoryTestCase):
 
         self.assertEqual("Optional[FooBar]", self.filters.field_type(attr, []))
 
+        self.filters.format.kw_only = True
+        self.assertEqual("FooBar", self.filters.field_type(attr, []))
+
+        attr.restrictions.min_occurs = 0
+        self.assertEqual("Optional[FooBar]", self.filters.field_type(attr, []))
+
     def test_field_type_with_circular_reference(self):
         attr = AttrFactory.create(
             types=AttrTypeFactory.list(1, qname="foo_bar", circular=True)
@@ -458,6 +470,11 @@ class FiltersTests(FactoryTestCase):
         attr.restrictions.max_occurs = 1
         self.filters.format.frozen = True
         self.assertEqual("Tuple[FooBar, ...]", self.filters.field_type(attr, []))
+
+        attr.restrictions.max_occurs = 2
+        self.assertEqual(
+            "Tuple[Tuple[FooBar, ...], ...]", self.filters.field_type(attr, [])
+        )
 
     def test_field_type_with_alias(self):
         attr = AttrFactory.create(
@@ -719,10 +736,12 @@ class FiltersTests(FactoryTestCase):
         format.eq = False
         format.order = True
         format.unsafe_hash = True
+        format.slots = True
+        format.kw_only = True
         actual = self.filters.build_class_annotation(format)
         expected = (
             "@dataclass(repr=False, eq=False, order=True,"
-            " unsafe_hash=True, frozen=True)"
+            " unsafe_hash=True, frozen=True, slots=True, kw_only=True)"
         )
 
         self.assertEqual(expected, actual)

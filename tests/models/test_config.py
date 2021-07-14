@@ -1,4 +1,6 @@
+import sys
 import tempfile
+import warnings
 from pathlib import Path
 from unittest import TestCase
 
@@ -24,8 +26,8 @@ class GeneratorConfigTests(TestCase):
             f'<Config xmlns="http://pypi.org/project/xsdata" version="{__version__}">\n'
             '  <Output maxLineLength="79">\n'
             "    <Package>generated</Package>\n"
-            '    <Format repr="true" eq="true" order="false" '
-            'unsafeHash="false" frozen="false">dataclasses</Format>\n'
+            '    <Format repr="true" eq="true" order="false" unsafeHash="false"'
+            ' frozen="false" slots="false" kwOnly="false">dataclasses</Format>\n'
             "    <Structure>filenames</Structure>\n"
             "    <DocstringStyle>reStructuredText</DocstringStyle>\n"
             "    <RelativeImports>false</RelativeImports>\n"
@@ -74,8 +76,8 @@ class GeneratorConfigTests(TestCase):
             f'<Config xmlns="http://pypi.org/project/xsdata" version="{__version__}">\n'
             '  <Output maxLineLength="79">\n'
             "    <Package>foo.bar</Package>\n"
-            '    <Format repr="true" eq="true" order="false" unsafeHash="false" '
-            'frozen="false">dataclasses</Format>\n'
+            '    <Format repr="true" eq="true" order="false" unsafeHash="false"'
+            ' frozen="false" slots="false" kwOnly="false">dataclasses</Format>\n'
             "    <Structure>filenames</Structure>\n"
             "    <DocstringStyle>reStructuredText</DocstringStyle>\n"
             "    <RelativeImports>false</RelativeImports>\n"
@@ -113,3 +115,31 @@ class GeneratorConfigTests(TestCase):
             OutputFormat(eq=False, order=True)
 
         self.assertEqual("eq must be true if order is true", str(cm.exception))
+
+    def test_format_slots_requires_310(self):
+        if sys.version_info < (3, 10):
+            self.assertTrue(OutputFormat(slots=True, value="attrs").slots)
+
+            with warnings.catch_warnings(record=True) as w:
+                self.assertFalse(OutputFormat(slots=True).slots)
+
+            self.assertEqual(
+                "Reverting config slots, requires python >= 3.10", str(w[-1].message)
+            )
+
+        else:
+            self.assertIsNotNone(OutputFormat(slots=True))
+
+    def test_format_kw_only_requires_310(self):
+        if sys.version_info < (3, 10):
+            self.assertTrue(OutputFormat(kw_only=True, value="attrs").kw_only)
+
+            with warnings.catch_warnings(record=True) as w:
+                self.assertFalse(OutputFormat(kw_only=True).kw_only)
+
+            self.assertEqual(
+                "Reverting config kw_only, requires python >= 3.10", str(w[-1].message)
+            )
+
+        else:
+            self.assertIsNotNone(OutputFormat(kw_only=True))

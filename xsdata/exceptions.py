@@ -2,6 +2,10 @@ class CodeGenerationError(TypeError):
     """Unexpected state during code generation related errors."""
 
 
+class CodeGenerationWarning(Warning):
+    """Recovered errors during code generation recovered errors."""
+
+
 class GeneratorConfigError(CodeGenerationError):
     """Unexpected state during generator config related errors."""
 

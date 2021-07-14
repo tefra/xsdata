@@ -1,3 +1,5 @@
+import sys
+import warnings
 from dataclasses import dataclass
 from dataclasses import field
 from enum import Enum
@@ -9,6 +11,7 @@ from typing import List
 from typing import TextIO
 
 from xsdata import __version__
+from xsdata.exceptions import CodeGenerationWarning
 from xsdata.exceptions import GeneratorConfigError
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers import XmlParser
@@ -135,6 +138,8 @@ class OutputFormat:
     :param order: Generate rich comparison methods
     :param unsafe_hash: Generate hash method when frozen is false
     :param frozen: Enable read only properties with immutable containers
+    :param slots: Enable __slots__,  python >= 3.10
+    :param kw_only: Enable keyword only constructor arguments, python >= 3.10
     """
 
     value: str = field(default="dataclasses")
@@ -143,10 +148,27 @@ class OutputFormat:
     order: bool = attribute(default=False)
     unsafe_hash: bool = attribute(default=False)
     frozen: bool = attribute(default=False)
+    slots: bool = attribute(default=False)
+    kw_only: bool = attribute(default=False)
 
     def __post_init__(self):
         if self.order and not self.eq:
             raise GeneratorConfigError("eq must be true if order is true")
+
+        if self.value == "dataclasses" and sys.version_info < (3, 10):
+            if self.slots:
+                self.slots = False
+                warnings.warn(
+                    "Reverting config slots, requires python >= 3.10",
+                    CodeGenerationWarning,
+                )
+
+            if self.kw_only:
+                self.kw_only = False
+                warnings.warn(
+                    "Reverting config kw_only, requires python >= 3.10",
+                    CodeGenerationWarning,
+                )
 
 
 @dataclass

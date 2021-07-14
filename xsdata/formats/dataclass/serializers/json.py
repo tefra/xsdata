@@ -67,7 +67,7 @@ class JsonSerializer(AbstractSerializer):
             return self.dict_factory(
                 [
                     (var.local_name, self.convert(getattr(obj, var.name), var))
-                    for var in self.context.build(obj.__class__).get_all_vars()
+                    for var in self.context.build(obj.__class__).get_all_vars() if var.required
                 ]
             )
 

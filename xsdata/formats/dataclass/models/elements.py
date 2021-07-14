@@ -91,6 +91,7 @@ class XmlVar(MetaMixin):
         "nillable",
         "sequential",
         "default",
+        "required",
         "namespaces",
         "elements",
         "wildcards",
@@ -125,6 +126,7 @@ class XmlVar(MetaMixin):
         nillable: bool,
         sequential: bool,
         default: Any,
+        required: bool,
         xml_type: str,
         namespaces: Sequence[str],
         elements: Mapping[str, "XmlVar"],
@@ -146,6 +148,7 @@ class XmlVar(MetaMixin):
         self.sequential = sequential
         self.list_element = factory in (list, tuple)
         self.default = default
+        self.required = required
         self.namespaces = namespaces
         self.elements = elements
         self.wildcards = wildcards

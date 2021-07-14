@@ -248,6 +248,7 @@ class XmlVarBuilder:
         nillable = metadata.get("nillable", False)
         format_str = metadata.get("format", None)
         sequential = metadata.get("sequential", False)
+        required = metadata.get("required", False)
 
         origin, sub_origin, types = self.analyze_types(type_hint, globalns)
 
@@ -299,6 +300,7 @@ class XmlVarBuilder:
             namespaces=namespaces,
             xml_type=xml_type,
             derived=False,
+            required=required,
         )
 
     def build_choices(

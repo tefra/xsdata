@@ -354,6 +354,8 @@ class XmlSerializer(AbstractSerializer):
                 value = getattr(obj, var.name)
                 if value is None or collections.is_array(value) and not value:
                     continue
+                if not var.required:
+                    continue
 
                 yield var.qname, cls.encode(value, var)
             else:

@@ -75,6 +75,23 @@ class DictMapperTests(FactoryTestCase):
         self.assertEqual(expected, target.attrs[0])
         self.assertEqual(restrictions, target.attrs[0].restrictions)
 
+    def test_build_class_attribute_from_empty_list(self):
+        target = ClassFactory.create()
+        data = []
+
+        DictMapper.build_class_attribute(target, "a", data)
+
+        expected = AttrFactory.create(
+            name="a",
+            tag=Tag.ELEMENT,
+            types=[
+                AttrTypeFactory.native(DataType.ANY_SIMPLE_TYPE, tag=Tag.ELEMENT),
+            ],
+        )
+        restrictions = Restrictions(max_occurs=sys.maxsize)
+        self.assertEqual(expected, target.attrs[0])
+        self.assertEqual(restrictions, target.attrs[0].restrictions)
+
     def test_build_class_attribute_from_dict(self):
         target = ClassFactory.create()
         data = {"sub1": 1, "sub2": "value"}

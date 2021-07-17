@@ -32,9 +32,13 @@ class DictMapper:
     @classmethod
     def build_class_attribute(cls, target: Class, name: str, value: Any):
         if isinstance(value, list):
-            for val in value:
-                cls.build_class_attribute(target, name, val)
+            if not value:
+                cls.build_class_attribute(target, name, None)
                 target.attrs[-1].restrictions.max_occurs = sys.maxsize
+            else:
+                for val in value:
+                    cls.build_class_attribute(target, name, val)
+                    target.attrs[-1].restrictions.max_occurs = sys.maxsize
         else:
             if isinstance(value, dict):
                 inner = cls.build_class(value, name)

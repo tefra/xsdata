@@ -22,7 +22,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         container = ClassContainer(config=GeneratorConfig())
         self.processor = AttributeTypeHandler(container=container)
 
-    @mock.patch.object(AttributeTypeHandler, "filter_types")
+    @mock.patch.object(ClassUtils, "filter_types")
     @mock.patch.object(AttributeTypeHandler, "process_type")
     def test_process(self, mock_process_type, mock_filter_types):
         xs_int = AttrTypeFactory.native(DataType.INT)
@@ -395,31 +395,3 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         attr = AttrFactory.create()
         self.processor.update_restrictions(attr, DataType.HEX_BINARY)
         self.assertEqual("base16", attr.restrictions.format)
-
-    def test_filter_types(self):
-        xs_string = AttrTypeFactory.native(DataType.STRING)
-        xs_error = AttrTypeFactory.native(DataType.ERROR)
-        xs_any = AttrTypeFactory.native(DataType.ANY_TYPE)
-
-        types = [
-            xs_string.clone(),
-            xs_string.clone(),
-            xs_string.clone(),
-            xs_error.clone(),
-        ]
-
-        actual = self.processor.filter_types(types)
-
-        self.assertEqual(1, len(actual))
-
-        types.append(xs_any)
-        actual = self.processor.filter_types(types)
-        self.assertEqual(1, len(actual))
-        self.assertEqual(xs_string, actual[0])
-
-        actual = self.processor.filter_types([])
-        self.assertEqual(xs_string, actual[0])
-
-        types = [xs_any]
-        actual = self.processor.filter_types(types)
-        self.assertEqual(1, len(actual))

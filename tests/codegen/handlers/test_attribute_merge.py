@@ -1,6 +1,8 @@
 from xsdata.codegen.handlers import AttributeMergeHandler
 from xsdata.codegen.models import Restrictions
+from xsdata.models.enums import DataType
 from xsdata.utils.testing import AttrFactory
+from xsdata.utils.testing import AttrTypeFactory
 from xsdata.utils.testing import ClassFactory
 from xsdata.utils.testing import FactoryTestCase
 
@@ -25,8 +27,10 @@ class AttributeMergeHandlerTests(FactoryTestCase):
         four = AttrFactory.enumeration()
         four_clone = four.clone()
         five = AttrFactory.element()
+        five.types = [AttrTypeFactory.native(DataType.INT)]
         five_clone = five.clone()
         five_clone_two = five.clone()
+        five_clone_two.types.append(AttrTypeFactory.native(DataType.FLOAT))
 
         target = ClassFactory.create(
             attrs=[
@@ -61,3 +65,4 @@ class AttributeMergeHandlerTests(FactoryTestCase):
         self.assertIsNone(four.restrictions.max_occurs)
         self.assertEqual(0, five.restrictions.min_occurs)
         self.assertEqual(3, five.restrictions.max_occurs)
+        self.assertEqual(["int", "float"], [x.name for x in five.types])

@@ -342,3 +342,31 @@ class ClassUtilsTests(FactoryTestCase):
         ClassUtils.rename_attribute_by_preference(one, two)
         self.assertEqual("a_Element", one.name)
         self.assertEqual("a", two.name)
+
+    def test_filter_types(self):
+        xs_string = AttrTypeFactory.native(DataType.STRING)
+        xs_error = AttrTypeFactory.native(DataType.ERROR)
+        xs_any = AttrTypeFactory.native(DataType.ANY_TYPE)
+
+        types = [
+            xs_string.clone(),
+            xs_string.clone(),
+            xs_string.clone(),
+            xs_error.clone(),
+        ]
+
+        actual = ClassUtils.filter_types(types)
+
+        self.assertEqual(1, len(actual))
+
+        types.append(xs_any)
+        actual = ClassUtils.filter_types(types)
+        self.assertEqual(1, len(actual))
+        self.assertEqual(xs_string, actual[0])
+
+        actual = ClassUtils.filter_types([])
+        self.assertEqual(xs_string, actual[0])
+
+        types = [xs_any]
+        actual = ClassUtils.filter_types(types)
+        self.assertEqual(1, len(actual))

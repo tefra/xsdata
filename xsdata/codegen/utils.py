@@ -11,6 +11,7 @@ from xsdata.codegen.models import Extension
 from xsdata.codegen.models import get_slug
 from xsdata.codegen.models import Restrictions
 from xsdata.exceptions import CodeGenerationError
+from xsdata.models.enums import DataType
 from xsdata.utils import collections
 from xsdata.utils import namespaces
 from xsdata.utils import text
@@ -256,3 +257,26 @@ class ClassUtils:
             return f"{name}_{index}"
 
         return name
+
+    @classmethod
+    def filter_types(cls, types: List[AttrType]) -> List[AttrType]:
+        """
+        Remove duplicate and invalid types.
+
+        Invalid:
+            1. xs:error
+            2. xs:anyType and xs:anySimpleType when there are other types present
+        """
+        types = collections.unique_sequence(types, key="qname")
+        types = collections.remove(types, lambda x: x.datatype == DataType.ERROR)
+
+        if len(types) > 1:
+            types = collections.remove(
+                types,
+                lambda x: x.datatype in (DataType.ANY_TYPE, DataType.ANY_SIMPLE_TYPE),
+            )
+
+        if not types:
+            types.append(AttrType(qname=str(DataType.STRING), native=True))
+
+        return types

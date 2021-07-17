@@ -3,6 +3,7 @@ from typing import List
 from xsdata.codegen.mixins import HandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Class
+from xsdata.codegen.utils import ClassUtils
 from xsdata.utils import collections
 
 
@@ -18,7 +19,7 @@ class AttributeMergeHandler(HandlerInterface):
         restrictions.
 
         Two attributes are considered equal if they have the same name,
-        types and namespace.
+        tag and namespace.
         """
         result: List[Attr] = []
         for attr in target.attrs:
@@ -30,16 +31,25 @@ class AttributeMergeHandler(HandlerInterface):
             elif not (attr.is_attribute or attr.is_enumeration):
                 existing.help = existing.help or attr.help
 
-                min_occurs = existing.restrictions.min_occurs or 0
-                max_occurs = existing.restrictions.max_occurs or 1
-                attr_min_occurs = attr.restrictions.min_occurs or 0
-                attr_max_occurs = attr.restrictions.max_occurs or 1
+                e_res = existing.restrictions
+                a_res = attr.restrictions
 
-                existing.restrictions.min_occurs = min(min_occurs, attr_min_occurs)
-                existing.restrictions.max_occurs = max_occurs + attr_max_occurs
+                min_occurs = e_res.min_occurs or 0
+                max_occurs = e_res.max_occurs or 1
+                attr_min_occurs = a_res.min_occurs or 0
+                attr_max_occurs = a_res.max_occurs or 1
+
+                e_res.min_occurs = min(min_occurs, attr_min_occurs)
+                e_res.max_occurs = max_occurs + attr_max_occurs
+                e_res.sequential = a_res.sequential or e_res.sequential
                 existing.fixed = False
-                existing.restrictions.sequential = (
-                    existing.restrictions.sequential or attr.restrictions.sequential
-                )
+                existing.types.extend(attr.types)
 
         target.attrs = result
+
+        cls.filter_types(target)
+
+    @classmethod
+    def filter_types(cls, target: Class):
+        for attr in target.attrs:
+            attr.types = ClassUtils.filter_types(attr.types)

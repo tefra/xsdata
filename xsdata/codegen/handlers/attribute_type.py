@@ -1,5 +1,4 @@
 from typing import Dict
-from typing import List
 from typing import Optional
 from typing import Set
 from typing import Tuple
@@ -37,7 +36,7 @@ class AttributeTypeHandler(RelativeHandlerInterface):
             for attr_type in list(attr.types):
                 self.process_type(target, attr, attr_type)
 
-            attr.types = self.filter_types(attr.types)
+            attr.types = ClassUtils.filter_types(attr.types)
 
     def process_type(self, target: Class, attr: Attr, attr_type: AttrType):
         """Process attribute type, split process for xml schema and user
@@ -214,26 +213,3 @@ class AttributeTypeHandler(RelativeHandlerInterface):
 
         if datatype in (DataType.NMTOKENS, DataType.IDREFS):
             attr.restrictions.tokens = True
-
-    @classmethod
-    def filter_types(cls, types: List[AttrType]) -> List[AttrType]:
-        """
-        Remove duplicate and invalid types.
-
-        Invalid:
-            1. xs:error
-            2. xs:anyType and xs:anySimpleType when there are other types present
-        """
-        types = collections.unique_sequence(types, key="qname")
-        types = collections.remove(types, lambda x: x.datatype == DataType.ERROR)
-
-        if len(types) > 1:
-            types = collections.remove(
-                types,
-                lambda x: x.datatype in (DataType.ANY_TYPE, DataType.ANY_SIMPLE_TYPE),
-            )
-
-        if not types:
-            types.append(AttrType(qname=str(DataType.STRING), native=True))
-
-        return types

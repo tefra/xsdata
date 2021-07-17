@@ -2,7 +2,7 @@ exclude: tests/fixtures
 
 repos:
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.20.0
+    rev: v2.21.2
     hooks:
       - id: pyupgrade
         args: [--py37-plus]
@@ -11,7 +11,7 @@ repos:
     hooks:
       - id: reorder-python-imports
   - repo: https://github.com/ambv/black
-    rev: 21.6b0
+    rev: 21.7b0
     hooks:
       - id: black
   - repo: https://gitlab.com/pycqa/flake8

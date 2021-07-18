@@ -3,6 +3,7 @@ from typing import List
 from xsdata.codegen.mixins import ContainerHandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Class
+from xsdata.codegen.models import get_location
 from xsdata.codegen.models import get_name
 from xsdata.codegen.models import get_qname
 from xsdata.models.config import StructureStyle
@@ -24,13 +25,28 @@ class ClassNameConflictHandler(ContainerHandlerInterface):
         depending the configuration and start renaming classes and
         dependencies."""
 
-        use_name = self.container.config.output.structure in REQUIRE_UNIQUE_NAMES
+        use_name = self.should_use_names()
         getter = get_name if use_name else get_qname
         groups = collections.group_by(self.container, lambda x: text.alnum(getter(x)))
 
         for classes in groups.values():
             if len(classes) > 1:
                 self.rename_classes(classes, use_name)
+
+    def should_use_names(self) -> bool:
+        """
+        Determine if we should be using names or qualified names to detect
+        collisions.
+
+        Strict unique names:
+        - Single package
+        - Clustered packages
+        - All classes have the same source location.
+        """
+        return (
+            self.container.config.output.structure in REQUIRE_UNIQUE_NAMES
+            or len(set(map(get_location, self.container))) == 1
+        )
 
     def rename_classes(self, classes: List[Class], use_name: bool):
         """

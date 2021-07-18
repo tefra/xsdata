@@ -26,7 +26,7 @@ class ClassNameConflictHandlerTests(FactoryTestCase):
             ClassFactory.create(qname="{foo}a"),
             ClassFactory.create(qname="_a"),
             ClassFactory.create(qname="_b"),
-            ClassFactory.create(qname="b"),
+            ClassFactory.create(qname="b", location="!@#$"),
         ]
         self.container.extend(classes)
         self.processor.run()
@@ -40,6 +40,18 @@ class ClassNameConflictHandlerTests(FactoryTestCase):
 
     @mock.patch.object(ClassNameConflictHandler, "rename_classes")
     def test_run_with_single_package_structure(self, mock_rename_classes):
+        classes = [
+            ClassFactory.create(qname="{foo}a"),
+            ClassFactory.create(qname="{bar}a"),
+            ClassFactory.create(qname="a"),
+        ]
+        self.container.extend(classes)
+        self.processor.run()
+
+        mock_rename_classes.assert_called_once_with(classes, True)
+
+    @mock.patch.object(ClassNameConflictHandler, "rename_classes")
+    def test_run_with_single_location_source(self, mock_rename_classes):
         classes = [
             ClassFactory.create(qname="{foo}a"),
             ClassFactory.create(qname="{bar}a"),

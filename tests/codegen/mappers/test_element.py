@@ -41,7 +41,7 @@ class ElementMapperTests(FactoryTestCase):
         actual = ElementMapper.build_class(element, "target")
         expected = ClassFactory.create(
             tag=Tag.ELEMENT,
-            qname="{target}root",
+            qname="{xsdata}root",
             namespace="xsdata",
             location="",
             module=None,
@@ -86,7 +86,7 @@ class ElementMapperTests(FactoryTestCase):
         actual = ElementMapper.build_class(element, "target")
         expected = ClassFactory.create(
             tag=Tag.ELEMENT,
-            qname="{target}root",
+            qname="{xsdata}root",
             namespace="xsdata",
             location="",
             module=None,
@@ -124,7 +124,7 @@ class ElementMapperTests(FactoryTestCase):
         actual = ElementMapper.build_class(element, None)
         expected = ClassFactory.create(
             tag=Tag.ELEMENT,
-            qname="root",
+            qname="{xsdata}root",
             namespace="xsdata",
             location="",
             module=None,

@@ -71,7 +71,7 @@ class DictMapperTests(FactoryTestCase):
                 AttrTypeFactory.native(DataType.FLOAT, tag=Tag.ELEMENT),
             ],
         )
-        restrictions = Restrictions(max_occurs=sys.maxsize)
+        restrictions = Restrictions(min_occurs=0, max_occurs=sys.maxsize)
         self.assertEqual(expected, target.attrs[0])
         self.assertEqual(restrictions, target.attrs[0].restrictions)
 
@@ -88,7 +88,7 @@ class DictMapperTests(FactoryTestCase):
                 AttrTypeFactory.native(DataType.ANY_SIMPLE_TYPE, tag=Tag.ELEMENT),
             ],
         )
-        restrictions = Restrictions(max_occurs=sys.maxsize)
+        restrictions = Restrictions(min_occurs=0, max_occurs=sys.maxsize)
         self.assertEqual(expected, target.attrs[0])
         self.assertEqual(restrictions, target.attrs[0].restrictions)
 

@@ -97,12 +97,12 @@ class SchemaTransformerTests(FactoryTestCase):
 
         mock_process_schema.assert_has_calls([mock.call(uri) for uri in uris])
 
-    @mock.patch.object(ClassUtils, "reduce")
+    @mock.patch.object(ClassUtils, "reduce_classes")
     @mock.patch.object(ElementMapper, "map")
     @mock.patch.object(TreeParser, "from_bytes")
     @mock.patch.object(SchemaTransformer, "load_resource")
     def test_process_xml_documents(
-        self, mock_load_resource, mock_from_bytes, mock_map, mock_reduce
+        self, mock_load_resource, mock_from_bytes, mock_map, mock_reduce_classes
     ):
         uris = ["foo/a.xml", "foo/b.xml", "foo/c.xml"]
         resources = [b"a", None, b"c"]
@@ -114,7 +114,7 @@ class SchemaTransformerTests(FactoryTestCase):
         mock_load_resource.side_effect = resources
         mock_from_bytes.side_effect = elements
         mock_map.side_effect = [classes_a, classes_c]
-        mock_reduce.return_value = classes_a + classes_c
+        mock_reduce_classes.return_value = classes_a + classes_c
 
         self.transformer.process_xml_documents(uris)
 
@@ -124,12 +124,14 @@ class SchemaTransformerTests(FactoryTestCase):
             [mock.call(resources[0]), mock.call(resources[2])]
         )
         mock_map.assert_has_calls([mock.call(x, "foo") for x in elements])
-        mock_reduce.assert_called_once_with(classes_a + classes_c)
+        mock_reduce_classes.assert_called_once_with(classes_a + classes_c)
 
-    @mock.patch.object(ClassUtils, "reduce")
+    @mock.patch.object(ClassUtils, "reduce_classes")
     @mock.patch.object(DictMapper, "map")
     @mock.patch.object(SchemaTransformer, "load_resource")
-    def test_process_json_documents(self, mock_load_resource, mock_map, mock_reduce):
+    def test_process_json_documents(
+        self, mock_load_resource, mock_map, mock_reduce_classes
+    ):
         uris = ["foo/a.json", "foo/b.json", "foo/c.json"]
         resources = [b'{"foo": 1}', None, b'[{"foo": true}]']
 
@@ -138,7 +140,7 @@ class SchemaTransformerTests(FactoryTestCase):
 
         mock_load_resource.side_effect = resources
         mock_map.side_effect = [classes_a, classes_c]
-        mock_reduce.return_value = classes_a + classes_c
+        mock_reduce_classes.return_value = classes_a + classes_c
 
         self.transformer.config.output.package = "some.books"
         self.transformer.process_json_documents(uris)
@@ -151,7 +153,7 @@ class SchemaTransformerTests(FactoryTestCase):
                 mock.call({"foo": True}, "books", "foo"),
             ]
         )
-        mock_reduce.assert_called_once_with(classes_a + classes_c)
+        mock_reduce_classes.assert_called_once_with(classes_a + classes_c)
 
     @mock.patch("xsdata.codegen.transformer.logger.info")
     @mock.patch.object(CodeWriter, "print")

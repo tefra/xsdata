@@ -46,10 +46,4 @@ class AttributeMergeHandler(HandlerInterface):
                 existing.types.extend(attr.types)
 
         target.attrs = result
-
-        cls.filter_types(target)
-
-    @classmethod
-    def filter_types(cls, target: Class):
-        for attr in target.attrs:
-            attr.types = ClassUtils.filter_types(attr.types)
+        ClassUtils.cleanup_class(target)

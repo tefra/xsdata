@@ -259,16 +259,16 @@ class Series:
             "type": "Element",
         }
     )
+    network: Optional[Network] = field(
+        default=None,
+        metadata={
+            "type": "Element",
+        }
+    )
     web_channel: Optional[object] = field(
         default=None,
         metadata={
             "name": "webChannel",
-            "type": "Element",
-        }
-    )
-    network: Optional[Network] = field(
-        default=None,
-        metadata={
             "type": "Element",
         }
     )

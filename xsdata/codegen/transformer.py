@@ -140,7 +140,7 @@ class SchemaTransformer:
                 any_element: AnyElement = parser.from_bytes(input_stream)
                 classes.extend(ElementMapper.map(any_element, location))
 
-        self.classes.extend(ClassUtils.reduce(classes))
+        self.classes.extend(ClassUtils.reduce_classes(classes))
 
     def process_json_documents(self, uris: List[str]):
         """Process a list of json resources."""
@@ -160,7 +160,7 @@ class SchemaTransformer:
                 for obj in data:
                     classes.extend(DictMapper.map(obj, name, dirname))
 
-        self.classes.extend(ClassUtils.reduce(classes))
+        self.classes.extend(ClassUtils.reduce_classes(classes))
 
     def process_classes(self):
         """Process the generated classes and write or print the final

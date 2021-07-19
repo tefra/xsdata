@@ -8,6 +8,7 @@ from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Extension
+from xsdata.codegen.models import get_qname
 from xsdata.codegen.models import get_slug
 from xsdata.codegen.models import Restrictions
 from xsdata.exceptions import CodeGenerationError
@@ -177,46 +178,62 @@ class ClassUtils:
         yield target
 
     @classmethod
-    def reduce(cls, classes: List[Class]) -> List[Class]:
+    def reduce_classes(cls, classes: List[Class]) -> List[Class]:
         result = []
-        indexed = collections.group_by(classes, key=lambda x: x.qname)
-        for group in indexed.values():
-            group.sort(key=lambda x: len(x.attrs))
-            target = group.pop()
+        for group in collections.group_by(classes, key=get_qname).values():
+            target = group[0].clone()
+            target.attrs = cls.reduce_attributes(group)
+            target.mixed = any(x.mixed for x in group)
 
-            for source in group:
-                target.mixed = target.mixed or source.mixed
-                cls.merge_attributes(target, source)
-
+            cls.cleanup_class(target)
             result.append(target)
 
         return result
 
     @classmethod
-    def merge_attributes(cls, target: Class, source: Class):
-        for attr in source.attrs:
+    def reduce_attributes(cls, classes: List[Class]) -> List[Attr]:
+        attrs: List[Attr] = []
+        classes.sort(key=lambda x: len(x.attrs), reverse=True)
 
-            existing = collections.first(
-                x
-                for x in target.attrs
-                if x.name == attr.name
-                and x.tag == attr.tag
-                and x.namespace == attr.namespace
-            )
+        for obj in classes:
+            i = 0
+            while obj.attrs:
+                pos = collections.find(attrs, obj.attrs[i])
+                i += 1
 
-            if not existing:
-                target.attrs.append(attr)
-            else:
-                min_occurs = existing.restrictions.min_occurs or 0
-                max_occurs = existing.restrictions.max_occurs or 1
-                attr_min_occurs = attr.restrictions.min_occurs or 0
-                attr_max_occurs = attr.restrictions.max_occurs or 1
+                if pos > -1:
+                    insert = obj.attrs[:i]
+                    del obj.attrs[:i]
 
-                existing.restrictions.min_occurs = min(min_occurs, attr_min_occurs)
-                existing.restrictions.max_occurs = max(max_occurs, attr_max_occurs)
-                existing.types.extend(attr.types)
+                    merge = insert.pop()
+                    cls.merge_attributes(attrs[pos], merge)
+                    while insert:
+                        attrs.insert(pos, insert.pop())
 
-        target.attrs.sort(key=lambda x: x.index)
+                    i = 0
+                else:
+                    if i == len(obj.attrs):
+                        attrs.extend(obj.attrs)
+                        obj.attrs.clear()
+
+        return attrs
+
+    @classmethod
+    def merge_attributes(cls, target: Attr, source: Attr):
+        target.types.extend(tp for tp in source.types if tp not in target.types)
+
+        target.restrictions.min_occurs = min(
+            target.restrictions.min_occurs or 0,
+            source.restrictions.min_occurs or 0,
+        )
+
+        target.restrictions.max_occurs = max(
+            target.restrictions.max_occurs or 1,
+            source.restrictions.max_occurs or 1,
+        )
+
+        if source.restrictions.sequential:
+            target.restrictions.sequential = True
 
     @classmethod
     def rename_attribute_by_preference(cls, a: Attr, b: Attr):
@@ -257,6 +274,11 @@ class ClassUtils:
             return f"{name}_{index}"
 
         return name
+
+    @classmethod
+    def cleanup_class(cls, target: Class):
+        for attr in target.attrs:
+            attr.types = cls.filter_types(attr.types)
 
     @classmethod
     def filter_types(cls, types: List[AttrType]) -> List[AttrType]:

@@ -115,10 +115,11 @@ class ClassFactory(Factory):
         container: Optional[str] = None,
         default: Any = None,
         fixed: bool = False,
+        prefix: str = "class_",
         **kwargs: Any,
     ) -> Class:
         if not qname:
-            qname = build_qname("xsdata", f"class_{cls.next_letter()}")
+            qname = build_qname("xsdata", f"{prefix}{cls.next_letter()}")
 
         if ns_map is None:
             ns_map = copy.deepcopy(DEFAULT_NS_MAP)
@@ -190,7 +191,7 @@ class ExtensionFactory(Factory):
         **kwargs: Any,
     ) -> Extension:
         return Extension(
-            type=attr_type or AttrTypeFactory.create(),
+            type=attr_type or AttrTypeFactory.create(**kwargs),
             restrictions=restrictions or Restrictions(),
         )
 
@@ -218,10 +219,11 @@ class AttrTypeFactory(Factory):
         forward: bool = False,
         circular: bool = False,
         reference: int = 0,
+        prefix: str = "attr_",
         **kwargs: Any,
     ) -> AttrType:
         if not qname:
-            qname = build_qname("xsdata", f"attr_{cls.next_letter()}")
+            qname = build_qname("xsdata", f"{prefix}{cls.next_letter()}")
 
         return AttrType(
             qname=str(qname),
@@ -254,9 +256,10 @@ class AttrFactory(Factory):
         fixed: bool = False,
         mixed: bool = False,
         restrictions: Optional[Restrictions] = None,
+        prefix: str = "attr_",
         **kwargs: Any,
     ) -> Attr:
-        name = name or f"attr_{cls.next_letter()}"
+        name = name or f"{prefix}{cls.next_letter()}"
         return Attr(
             name=name,
             index=cls.counter if index is None else index,
@@ -358,10 +361,11 @@ class XmlVarFactory(Factory):
         namespaces: Optional[Sequence[str]] = None,
         elements: Optional[Dict[str, XmlVar]] = None,
         wildcards: Optional[Sequence[XmlVar]] = None,
+        prefix: str = "field_",
         **kwargs: Any,
     ) -> XmlVar:
 
-        name = name or f"field_{cls.next_letter()}"
+        name = name or f"{prefix}{cls.next_letter()}"
 
         if qname is None:
             qname = name

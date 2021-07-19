@@ -267,55 +267,61 @@ class ClassUtilsTests(FactoryTestCase):
             self.assertEqual(1, len(attr.types))
             self.assertFalse(attr.types[0].forward)
 
-    @mock.patch.object(ClassUtils, "merge_attributes")
-    def test_reduce(self, mock_merge_attributes):
-        first = ClassFactory.elements(2)
-        second = first.clone()
-        second.attrs.append(AttrFactory.create())
-        third = second.clone()
-        third.attrs.append(AttrFactory.create())
-        fourth = ClassFactory.create()
+    def test_reduce_classes(self):
+        class_a = ClassFactory.elements(3)
+        class_a_clone = class_a.clone()
+        class_a_clone.mixed = True
+        class_a.attrs.pop()
+        class_b = ClassFactory.elements(2)
 
-        actual = ClassUtils.reduce([first, second, third, fourth])
+        result = ClassUtils.reduce_classes([class_a, class_b, class_a_clone])
 
-        self.assertEqual([third, fourth], list(actual))
-        mock_merge_attributes.assert_has_calls(
-            [
-                mock.call(third, first),
-                mock.call(third, second),
-            ]
+        self.assertEqual(2, len(result))
+        self.assertTrue(result[0].mixed)
+
+        self.assertEqual(
+            ["attr_B", "attr_C", "attr_D"], [x.name for x in result[0].attrs]
         )
+        self.assertEqual(["attr_E", "attr_F"], [x.name for x in result[1].attrs])
+
+    def test_reduce_attributes(self):
+        attrs = AttrFactory.list(5, prefix="")
+
+        class_a = ClassFactory.create()
+        class_a.attrs = [x.clone() for x in attrs[:2]]
+
+        class_b = ClassFactory.create()
+        class_b.attrs = [x.clone() for x in attrs[2:4]]
+
+        class_c = ClassFactory.create()
+        class_c.attrs = [x.clone() for x in attrs[3:]]
+
+        class_d = ClassFactory.create()
+        class_d.attrs.append(attrs[0].clone())
+        class_d.attrs.append(attrs[4].clone())
+
+        result = ClassUtils.reduce_attributes([class_a, class_b, class_c, class_d])
+        self.assertEqual(["B", "C", "D", "E", "F"], [x.name for x in result])
 
     def test_merge_attributes(self):
-        target = ClassFactory.create(
-            attrs=[
-                AttrFactory.element(name="a", index=10),
-                AttrFactory.element(name="b", index=1),
-                AttrFactory.element(name="c", index=2),
-                AttrFactory.attribute(name="id", index=0),
-            ]
-        )
+        a = AttrFactory.native(DataType.INT, name="a")
+        c = AttrFactory.native(DataType.FLOAT, name="c")
 
-        source = target.clone()
+        ClassUtils.merge_attributes(a, c)
+        self.assertEqual(["int", "float"], [x.name for x in a.types])
 
-        target.attrs[0].restrictions.min_occurs = 2
-        target.attrs[0].restrictions.max_occurs = 3
+        self.assertEqual(0, a.restrictions.min_occurs)
+        self.assertEqual(1, a.restrictions.max_occurs)
+        self.assertFalse(a.restrictions.sequential)
 
-        source.attrs[1].restrictions.min_occurs = 3
-        source.attrs[1].restrictions.max_occurs = 4
-        source.attrs[3].restrictions.min_occurs = 3
-        source.attrs[3].restrictions.max_occurs = 4
-        source.attrs.append(AttrFactory.enumeration(name="d", index=4))
+        c.restrictions.min_occurs = 2
+        a.restrictions.sequential = True
+        a.restrictions.max_occurs = 4
 
-        ClassUtils.merge_attributes(target, source)
-
-        names = ["id", "b", "c", "d", "a"]
-        min_occurs = [0, 0, 0, None, 0]
-        max_occurs = [4, 4, 1, None, 3]
-
-        self.assertEqual(names, [x.name for x in target.attrs])
-        self.assertEqual(min_occurs, [x.restrictions.min_occurs for x in target.attrs])
-        self.assertEqual(max_occurs, [x.restrictions.max_occurs for x in target.attrs])
+        ClassUtils.merge_attributes(c, a)
+        self.assertEqual(0, c.restrictions.min_occurs)
+        self.assertEqual(4, c.restrictions.max_occurs)
+        self.assertTrue(c.restrictions.sequential)
 
     def test_rename_attribute_by_preference(self):
         one = AttrFactory.create(name="a", tag=Tag.ELEMENT)

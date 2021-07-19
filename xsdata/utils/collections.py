@@ -7,6 +7,9 @@ from typing import Iterator
 from typing import List
 from typing import Optional
 from typing import Sequence
+from typing import TypeVar
+
+T = TypeVar("T")
 
 
 def is_array(value: Any) -> bool:
@@ -16,7 +19,7 @@ def is_array(value: Any) -> bool:
     return False
 
 
-def unique_sequence(items: Iterable, key: Optional[str] = None) -> List:
+def unique_sequence(items: Iterable[T], key: Optional[str] = None) -> List[T]:
     """
     Return a new list with the unique values from an iterable.
 
@@ -38,12 +41,12 @@ def unique_sequence(items: Iterable, key: Optional[str] = None) -> List:
     return [item for item in items if is_new(item)]
 
 
-def remove(items: Iterable, predicate: Callable) -> List:
+def remove(items: Iterable[T], predicate: Callable) -> List[T]:
     """Return a new list without the items that match the predicate."""
     return [x for x in items if not predicate(x)]
 
 
-def group_by(items: Iterable, key: Callable) -> Dict[Any, List]:
+def group_by(items: Iterable[T], key: Callable) -> Dict[Any, List[T]]:
     """Group the items of an iterable object by the result of the callable."""
     result = defaultdict(list)
     for item in items:
@@ -66,7 +69,7 @@ def find(items: Sequence, value: Any) -> int:
         return -1
 
 
-def first(items: Iterator) -> Any:
+def first(items: Iterator[T]) -> Optional[T]:
     """Return the first item of the iterator."""
     return next(items, None)
 

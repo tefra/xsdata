@@ -34,14 +34,15 @@ class ElementMapper:
         return list(ClassUtils.flatten(target, f"{location}/{name}"))
 
     @classmethod
-    def build_class(cls, element: AnyElement, target_namespace: Optional[str]) -> Class:
+    def build_class(cls, element: AnyElement, parent_namespace: Optional[str]) -> Class:
 
         assert element.qname is not None
 
         namespace, name = split_qname(element.qname)
+        namespace = cls.select_namespace(namespace, parent_namespace)
         target = Class(
-            qname=build_qname(target_namespace, name),
-            namespace=cls.select_namespace(namespace, target_namespace),
+            qname=build_qname(namespace, name),
+            namespace=namespace,
             tag=Tag.ELEMENT,
             location="",
         )
@@ -50,7 +51,7 @@ class ElementMapper:
 
         for key, value in element.attributes.items():
             attr_type = cls.build_attribute_type(key, value)
-            cls.build_attribute(target, key, attr_type, target_namespace, Tag.ATTRIBUTE)
+            cls.build_attribute(target, key, attr_type, parent_namespace, Tag.ATTRIBUTE)
 
         for child in children:
 
@@ -60,7 +61,7 @@ class ElementMapper:
                 target.mixed = True
 
             if child.attributes or child.children:
-                inner = cls.build_class(child, target_namespace)
+                inner = cls.build_class(child, parent_namespace)
                 attr_type = AttrType(qname=inner.qname, forward=True)
                 target.inner.append(inner)
             else:
@@ -70,7 +71,7 @@ class ElementMapper:
                 target,
                 child.qname,
                 attr_type,
-                target_namespace,
+                parent_namespace,
                 Tag.ELEMENT,
                 child.qname in sequential_set,
             )
@@ -108,36 +109,33 @@ class ElementMapper:
         target: Class,
         qname: str,
         attr_type: AttrType,
-        target_namespace: Optional[str] = None,
+        parent_namespace: Optional[str] = None,
         tag: str = Tag.ELEMENT,
         sequential: bool = False,
     ):
 
         namespace, name = split_qname(qname)
-        namespace = cls.select_namespace(namespace, target_namespace, tag)
+        namespace = cls.select_namespace(namespace, parent_namespace, tag)
         index = len(target.attrs)
 
         attr = Attr(index=index, name=name, tag=tag, namespace=namespace)
         attr.types.append(attr_type)
         attr.restrictions.sequential = sequential or None
+        attr.restrictions.min_occurs = 0
+        attr.restrictions.max_occurs = 1
         cls.add_attribute(target, attr)
 
     @classmethod
     def add_attribute(cls, target: Class, attr: Attr):
-        existing = collections.first(
-            x
-            for x in target.attrs
-            if x.name == attr.name
-            and x.tag == attr.tag
-            and x.namespace == attr.namespace
-        )
+        pos = collections.find(target.attrs, attr)
 
-        if existing:
-            if attr.restrictions.sequential:
-                existing.restrictions.sequential = True
-
+        if pos > -1:
+            existing = target.attrs[pos]
             existing.restrictions.max_occurs = sys.maxsize
             existing.types.extend(attr.types)
+
+            if attr.restrictions.sequential:
+                existing.restrictions.sequential = True
         else:
             target.attrs.append(attr)
 
@@ -145,13 +143,13 @@ class ElementMapper:
     def select_namespace(
         cls,
         namespace: Optional[str],
-        target_namespace: Optional[str],
+        parent_namespace: Optional[str],
         tag: str = Tag.ELEMENT,
     ) -> Optional[str]:
         if tag == Tag.ATTRIBUTE:
             return namespace
 
-        if namespace is None and target_namespace is not None:
+        if namespace is None and parent_namespace is not None:
             return ""
 
         return namespace
@@ -169,6 +167,6 @@ class ElementMapper:
             total = len(pos)
 
             if 1 < total < pos[-1] - pos[0] + 1:
-                indices.update(range(pos[0], pos[-1] + 1))
+                indices.update(list(range(pos[0], pos[-1] + 1)))
 
         return {names[index] for index in indices}

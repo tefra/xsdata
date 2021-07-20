@@ -33,7 +33,7 @@ class AttributeDefaultValueHandler(RelativeHandlerInterface):
         if attr.is_enumeration:
             return
 
-        if attr.is_optional or attr.is_xsi_type or attr.is_list:
+        if self.should_reset_default(attr):
             attr.fixed = False
             attr.default = None
 
@@ -90,3 +90,28 @@ class AttributeDefaultValueHandler(RelativeHandlerInterface):
             return None
 
         return self.container.find(attr_type.qname, condition=is_enumeration)
+
+    @classmethod
+    def should_reset_default(cls, attr: Attr) -> bool:
+        """
+        Return whether we should unset the default value of the attribute.
+
+        - Default value is not set
+        - Attribute is xsi:type (ignorable)
+        - Attribute is part of a choice
+
+
+        :param attr:
+        :return:
+        """
+        return attr.default is not None and (
+            attr.is_xsi_type
+            or attr.is_list
+            or (
+                attr.is_optional
+                and (
+                    attr.restrictions.sequential is True
+                    or attr.restrictions.choice is not None
+                )
+            )
+        )

@@ -72,8 +72,8 @@ class RelativeHandlerInterface(HandlerInterface, metaclass=ABCMeta):
 
             assert base is not None
 
-            attrs.extend(base.attrs)
             attrs.extend(self.base_attrs(base))
+            attrs.extend(base.attrs)
 
         return attrs
 

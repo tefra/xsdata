@@ -55,9 +55,31 @@ class AttributeDefaultValueHandlerTests(FactoryTestCase):
             ]
         )
 
-    def test_process_attribute_with_optional_field(self):
+    def test_process_attribute_with_choice_field(self):
         target = ClassFactory.create()
         attr = AttrFactory.create(fixed=True, default=2)
+        attr.restrictions.min_occurs = 1
+        attr.restrictions.choice = "a"
+        self.processor.process_attribute(target, attr)
+
+        self.assertEqual(2, attr.default)
+        self.assertTrue(attr.fixed)
+
+        attr.restrictions.min_occurs = 0
+        self.processor.process_attribute(target, attr)
+        self.assertFalse(attr.fixed)
+        self.assertIsNone(attr.default)
+
+    def test_process_attribute_with_sequential_field(self):
+        target = ClassFactory.create()
+        attr = AttrFactory.create(fixed=True, default=2)
+        attr.restrictions.min_occurs = 1
+        attr.restrictions.sequential = True
+        self.processor.process_attribute(target, attr)
+
+        self.assertEqual(2, attr.default)
+        self.assertTrue(attr.fixed)
+
         attr.restrictions.min_occurs = 0
         self.processor.process_attribute(target, attr)
         self.assertFalse(attr.fixed)

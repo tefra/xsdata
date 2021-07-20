@@ -451,7 +451,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         ClassExtensionHandler.add_default_attribute(item, extension)
 
         expected.types.append(xs_int)
-        expected_restrictions = Restrictions(tokens=True, min_occurs=1, max_occurs=1)
+        expected_restrictions = Restrictions(tokens=True, min_occurs=0, max_occurs=1)
 
         self.assertEqual(2, len(item.attrs))
         self.assertEqual(0, len(item.extensions))

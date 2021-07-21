@@ -55,6 +55,7 @@ class AttributeSubstitutionHandler(RelativeHandlerInterface):
 
             attr_type.substituted = True
             for substitution in self.substitutions.get(attr_type.qname, []):
+                attr.restrictions.min_occurs = 0
                 clone = ClassUtils.clone_attribute(substitution, attr.restrictions)
 
                 pos = collections.find(target.attrs, clone)

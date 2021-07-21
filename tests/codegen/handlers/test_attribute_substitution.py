@@ -47,10 +47,14 @@ class AttributeSubstitutionHandlerTests(FactoryTestCase):
 
         first_attr = target.attrs[0]
         second_attr = target.attrs[1]
+        first_attr.restrictions.min_occurs = 1
         first_attr.restrictions.max_occurs = 2
+        second_attr.restrictions.min_occurs = 1
 
         attr_qname = first_attr.types[0].qname
         reference_attrs = AttrFactory.list(2)
+        reference_attrs[0].restrictions.min_occurs = 1
+        reference_attrs[1].restrictions.min_occurs = 1
 
         self.processor.create_substitutions()
         self.processor.substitutions[attr_qname] = reference_attrs
@@ -68,6 +72,11 @@ class AttributeSubstitutionHandlerTests(FactoryTestCase):
         self.assertIsNot(reference_attrs[1], target.attrs[3])
         self.assertEqual(2, target.attrs[0].restrictions.max_occurs)
         self.assertEqual(2, target.attrs[3].restrictions.max_occurs)
+
+        self.assertEqual(0, target.attrs[0].restrictions.min_occurs)
+        self.assertEqual(0, target.attrs[1].restrictions.min_occurs)
+        self.assertEqual(1, target.attrs[2].restrictions.min_occurs)
+        self.assertEqual(0, target.attrs[3].restrictions.min_occurs)
 
         self.processor.process_attribute(target, second_attr)
         self.assertEqual(4, len(target.attrs))

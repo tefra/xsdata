@@ -6,8 +6,8 @@ from xsdata.models.xsd import Any
 
 
 class AnyTests(TestCase):
-    def test_property_is_attribute(self):
-        self.assertTrue(Any().is_attribute)
+    def test_property_is_property(self):
+        self.assertTrue(Any().is_property)
 
     def test_property_attr_types(self):
         obj = Any()

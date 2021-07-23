@@ -11,7 +11,7 @@ from xsdata.models.xsd import SimpleType
 
 
 class ElementTests(TestCase):
-    def test_property_is_attribute(self):
+    def test_property_is_property(self):
         obj = Element()
         self.assertTrue(obj)
 

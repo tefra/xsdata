@@ -4,9 +4,9 @@ from xsdata.models.xsd import Enumeration
 
 
 class EnumerationTests(TestCase):
-    def test_property_is_attribute(self):
+    def test_property_is_property(self):
         obj = Enumeration()
-        self.assertTrue(obj.is_attribute)
+        self.assertTrue(obj.is_property)
 
     def test_property_is_fixed(self):
         obj = Enumeration()

@@ -140,7 +140,7 @@ class AnyAttribute(AnnotationBase):
         self.namespace = " ".join(unique_sequence(self.namespace.split()))
 
     @property
-    def is_attribute(self) -> bool:
+    def is_property(self) -> bool:
         return True
 
     @property
@@ -185,7 +185,7 @@ class SimpleType(AnnotationBase):
     union: Optional["Union"] = element()
 
     @property
-    def is_attribute(self) -> bool:
+    def is_property(self) -> bool:
         return True
 
     @property
@@ -228,7 +228,7 @@ class List(AnnotationBase):
     item_type: str = attribute(name="itemType", default="")
 
     @property
-    def is_attribute(self) -> bool:
+    def is_property(self) -> bool:
         return True
 
     @property
@@ -262,7 +262,7 @@ class Union(AnnotationBase):
             yield from self.member_types.split()
 
     @property
-    def is_attribute(self) -> bool:
+    def is_property(self) -> bool:
         return True
 
     @property
@@ -319,7 +319,7 @@ class Attribute(AnnotationBase):
             yield DataType.STRING.prefixed(self.xs_prefix)
 
     @property
-    def is_attribute(self) -> bool:
+    def is_property(self) -> bool:
         return True
 
     @property
@@ -367,7 +367,7 @@ class AttributeGroup(AnnotationBase):
     attribute_groups: Array["AttributeGroup"] = array_element(name="attributeGroup")
 
     @property
-    def is_attribute(self) -> bool:
+    def is_property(self) -> bool:
         return True
 
     @property
@@ -396,7 +396,7 @@ class Any(AnnotationBase):
         self.namespace = " ".join(unique_sequence(self.namespace.split()))
 
     @property
-    def is_attribute(self) -> bool:
+    def is_property(self) -> bool:
         return True
 
     @property
@@ -536,7 +536,7 @@ class Group(AnnotationBase):
     sequence: Optional[Sequence] = element()
 
     @property
-    def is_attribute(self) -> bool:
+    def is_property(self) -> bool:
         return True
 
     @property
@@ -618,7 +618,7 @@ class Enumeration(AnnotationBase):
     value: str = attribute()
 
     @property
-    def is_attribute(self) -> bool:
+    def is_property(self) -> bool:
         return True
 
     @property
@@ -1110,7 +1110,7 @@ class Element(AnnotationBase):
             yield DataType.ANY_TYPE.prefixed(self.xs_prefix)
 
     @property
-    def is_attribute(self) -> bool:
+    def is_property(self) -> bool:
         return True
 
     @property

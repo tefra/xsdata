@@ -9,6 +9,7 @@ from xsdata.models.enums import Mode
 from xsdata.models.enums import Namespace
 from xsdata.models.xsd import All
 from xsdata.models.xsd import Any
+from xsdata.models.xsd import AnyAttribute
 from xsdata.models.xsd import Attribute
 from xsdata.models.xsd import AttributeGroup
 from xsdata.models.xsd import ComplexContent
@@ -16,6 +17,7 @@ from xsdata.models.xsd import ComplexType
 from xsdata.models.xsd import DefaultOpenContent
 from xsdata.models.xsd import Element
 from xsdata.models.xsd import Extension
+from xsdata.models.xsd import Group
 from xsdata.models.xsd import Import
 from xsdata.models.xsd import Include
 from xsdata.models.xsd import OpenContent
@@ -23,6 +25,8 @@ from xsdata.models.xsd import Override
 from xsdata.models.xsd import Redefine
 from xsdata.models.xsd import Restriction
 from xsdata.models.xsd import Schema
+from xsdata.models.xsd import Sequence
+from xsdata.models.xsd import SimpleContent
 
 
 class SchemaParserTests(TestCase):
@@ -283,25 +287,31 @@ class SchemaParserTests(TestCase):
         self.assertEqual([expected], complex_type.attribute_groups)
         self.assertIsNone(complex_type.open_content)
 
-        default_open_content = DefaultOpenContent()
-        self.parser.default_attributes = None
+        default_open_content = DefaultOpenContent(applies_to_empty=False)
         self.parser.default_open_content = default_open_content
         self.parser.end_complex_type(complex_type)
-        self.assertIs(default_open_content, complex_type.open_content)
+        self.assertIsNone(complex_type.open_content)
 
-        open_content = OpenContent()
-        complex_type.open_content = open_content
+        default_open_content.applies_to_empty = True
+        complex_type.simple_content = SimpleContent()
         self.parser.end_complex_type(complex_type)
-        self.assertIs(open_content, complex_type.open_content)
+        self.assertIsNone(complex_type.open_content)
 
-        complex_type = ComplexType()
+        complex_type.simple_content = None
         complex_type.complex_content = ComplexContent()
         self.parser.end_complex_type(complex_type)
         self.assertIsNone(complex_type.open_content)
 
-        obj = Extension()
-        self.parser.end_complex_type(obj)
-        self.assertIsNone(obj.open_content)
+        complex_type.complex_content = None
+        complex_type.open_content = OpenContent()
+        self.parser.end_complex_type(complex_type)
+        self.assertIsNot(default_open_content, complex_type.open_content)
+
+        complex_type.open_content = None
+        default_open_content.applies_to_empty = False
+        complex_type.sequence = Sequence(elements=[Element()])
+        self.parser.end_complex_type(complex_type)
+        self.assertIs(default_open_content, complex_type.open_content)
 
     def test_end_default_open_content(self):
         default_open_content = DefaultOpenContent()
@@ -423,3 +433,17 @@ class SchemaParserTests(TestCase):
         mock_set_schema_namespaces.assert_called_once_with(schema)
         mock_add_default_imports.assert_called_once_with(schema)
         mock_resolve_schemas_locations.assert_called_once_with(schema)
+
+    def test_has_elements(self):
+        restriction = Restriction()
+        restriction.sequence = Sequence()
+        restriction.sequence.any_attribute = AnyAttribute()
+
+        self.assertFalse(self.parser.has_elements(restriction))
+
+        restriction.sequence.elements.append(Element())
+        self.assertTrue(self.parser.has_elements(restriction))
+
+        restriction.sequence.elements.clear()
+        restriction.sequence.groups.append(Group())
+        self.assertTrue(self.parser.has_elements(restriction))

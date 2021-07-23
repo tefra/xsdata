@@ -142,7 +142,7 @@ class SchemaMapper:
         be class attributes, with all their restrictions."""
 
         for child in obj.children():
-            if child.is_attribute:
+            if child.is_property:
                 yield child, parent_restrictions
             else:
                 restrictions = parent_restrictions.clone()
@@ -188,7 +188,7 @@ class SchemaMapper:
         result.
         """
         for child in obj.children():
-            if child.is_attribute:
+            if child.is_property:
                 continue
 
             for ext in child.bases:

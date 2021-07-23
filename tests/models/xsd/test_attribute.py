@@ -10,7 +10,7 @@ from xsdata.models.xsd import SimpleType
 
 
 class AttributeTests(TestCase):
-    def test_property_is_attribute(self):
+    def test_property_is_property(self):
         obj = Attribute()
         self.assertTrue(obj)
 

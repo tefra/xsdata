@@ -4,9 +4,9 @@ from xsdata.models.xsd import AttributeGroup
 
 
 class AttributeGroupTests(TestCase):
-    def test_property_is_attribute(self):
+    def test_property_is_property(self):
         obj = AttributeGroup()
-        self.assertTrue(obj.is_attribute)
+        self.assertTrue(obj.is_property)
 
     def test_property_attr_types(self):
         obj = AttributeGroup()

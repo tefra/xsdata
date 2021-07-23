@@ -8,7 +8,7 @@ from xsdata.models.xsd import AnyAttribute
 class AnyAttributeTests(TestCase):
     def test_is_attribute(self):
         obj = AnyAttribute()
-        self.assertTrue(obj.is_attribute)
+        self.assertTrue(obj.is_property)
 
     def test_property_raw_namespace(self):
         obj = AnyAttribute()

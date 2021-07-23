@@ -6,6 +6,7 @@ from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Type
+from typing import Union
 from urllib.parse import urljoin
 
 from xsdata.formats.bindings import T
@@ -16,6 +17,9 @@ from xsdata.models import xsd
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Mode
 from xsdata.models.enums import Namespace
+from xsdata.models.mixins import ElementBase
+
+OPEN_CONTENT_ELEMENT = Union[xsd.ComplexType, xsd.Restriction, xsd.Extension]
 
 
 @dataclass
@@ -99,8 +103,14 @@ class SchemaParser(UserXmlParser):
             obj.form = FormType(self.attribute_form)
 
     def end_complex_type(self, obj: T):
-        """Prepend an attribute group reference when default attributes
-        apply."""
+        """
+        Post parsing processor to apply default open content and attributes if
+        applicable.
+
+        Default open content doesn't apply if the current complex type
+        has one of complex content, simple content or has its own open
+        content.
+        """
         if not isinstance(obj, xsd.ComplexType):
             return
 
@@ -108,7 +118,15 @@ class SchemaParser(UserXmlParser):
             attribute_group = xsd.AttributeGroup(ref=self.default_attributes)
             obj.attribute_groups.insert(0, attribute_group)
 
-        if not obj.open_content and not obj.complex_content:
+        if (
+            obj.simple_content
+            or obj.complex_content
+            or obj.open_content
+            or not self.default_open_content
+        ):
+            return
+
+        if self.default_open_content.applies_to_empty or self.has_elements(obj):
             obj.open_content = self.default_open_content
 
     def end_default_open_content(self, obj: T):
@@ -165,42 +183,6 @@ class SchemaParser(UserXmlParser):
         namespaces if the are missing xsi, xlink, xml, xs."""
         obj.target_namespace = obj.target_namespace or self.target_namespace
 
-    @staticmethod
-    def set_namespace_map(obj: Any, ns_map: Optional[Dict]):
-        """Add common namespaces like xml, xsi, xlink if they are missing."""
-        if hasattr(obj, "ns_map"):
-
-            if ns_map:
-                obj.ns_map.update(
-                    {prefix: uri for prefix, uri in ns_map.items() if uri}
-                )
-
-            ns_list = obj.ns_map.values()
-            ns_common = (Namespace.XS, Namespace.XSI, Namespace.XML, Namespace.XLINK)
-            obj.ns_map.update(
-                {ns.prefix: ns.uri for ns in ns_common if ns.uri not in ns_list}
-            )
-
-    @staticmethod
-    def set_index(obj: Any, index: int):
-        if hasattr(obj, "index"):
-            obj.index = index
-
-    @staticmethod
-    def add_default_imports(obj: xsd.Schema):
-        """Add missing imports to the standard schemas if the namespace is
-        declared and."""
-        imp_namespaces = [imp.namespace for imp in obj.imports]
-        xsi_ns = Namespace.XSI.uri
-        if xsi_ns in obj.ns_map.values() and xsi_ns not in imp_namespaces:
-            obj.imports.insert(0, xsd.Import(namespace=xsi_ns))
-
-    @staticmethod
-    def reset_element_occurs(obj: xsd.Schema):
-        for element in obj.elements:
-            element.min_occurs = None
-            element.max_occurs = None
-
     def resolve_schemas_locations(self, obj: xsd.Schema):
         """Resolve the locations of the schema overrides, redefines, includes
         and imports relatively to the schema location."""
@@ -239,3 +221,47 @@ class SchemaParser(UserXmlParser):
             return local_path
 
         return self.resolve_path(location)
+
+    @classmethod
+    def has_elements(cls, obj: ElementBase) -> bool:
+        accepted_types = (xsd.Element, xsd.Any, xsd.Group)
+        return any(
+            isinstance(child, accepted_types) or cls.has_elements(child)
+            for child in obj.children()
+        )
+
+    @classmethod
+    def set_namespace_map(cls, obj: Any, ns_map: Optional[Dict]):
+        """Add common namespaces like xml, xsi, xlink if they are missing."""
+        if hasattr(obj, "ns_map"):
+
+            if ns_map:
+                obj.ns_map.update(
+                    {prefix: uri for prefix, uri in ns_map.items() if uri}
+                )
+
+            ns_list = obj.ns_map.values()
+            ns_common = (Namespace.XS, Namespace.XSI, Namespace.XML, Namespace.XLINK)
+            obj.ns_map.update(
+                {ns.prefix: ns.uri for ns in ns_common if ns.uri not in ns_list}
+            )
+
+    @classmethod
+    def set_index(cls, obj: Any, index: int):
+        if hasattr(obj, "index"):
+            obj.index = index
+
+    @classmethod
+    def add_default_imports(cls, obj: xsd.Schema):
+        """Add missing imports to the standard schemas if the namespace is
+        declared and."""
+        imp_namespaces = [imp.namespace for imp in obj.imports]
+        xsi_ns = Namespace.XSI.uri
+        if xsi_ns in obj.ns_map.values() and xsi_ns not in imp_namespaces:
+            obj.imports.insert(0, xsd.Import(namespace=xsi_ns))
+
+    @classmethod
+    def reset_element_occurs(cls, obj: xsd.Schema):
+        for element in obj.elements:
+            element.min_occurs = None
+            element.max_occurs = None

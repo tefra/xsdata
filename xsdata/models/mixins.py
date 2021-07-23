@@ -84,9 +84,8 @@ class ElementBase:
         return getattr(self, "abstract", False)
 
     @property
-    def is_attribute(self) -> bool:
-        """Return whether or not this element is qualified to be a class
-        attribute."""
+    def is_property(self) -> bool:
+        """Return whether this element is qualified to be a class property."""
         return False
 
     @property

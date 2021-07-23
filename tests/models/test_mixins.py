@@ -81,9 +81,9 @@ class ElementBaseTests(TestCase):
         element.abstract = True
         self.assertTrue(element.is_abstract)
 
-    def test_property_is_attribute(self):
+    def test_property_is_property(self):
         element = ElementBase()
-        self.assertFalse(element.is_attribute)
+        self.assertFalse(element.is_property)
 
     def test_property_is_fixed(self):
         element = ElementBase()

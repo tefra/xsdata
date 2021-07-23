@@ -6,7 +6,7 @@ from xsdata.models.xsd import List
 class ListTests(TestCase):
     def test_is_attribute(self):
         obj = List()
-        self.assertTrue(obj.is_attribute)
+        self.assertTrue(obj.is_property)
 
     def test_real_name(self):
         obj = List()

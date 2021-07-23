@@ -33,9 +33,9 @@ class SimpleTypeTests(TestCase):
         obj.restriction.enumerations.append(Enumeration())
         self.assertEqual([], list(obj.attr_types))
 
-    def test_property_is_attribute(self):
+    def test_property_is_property(self):
         obj = SimpleType()
-        self.assertTrue(obj.is_attribute)
+        self.assertTrue(obj.is_property)
 
     def test_property_is_enumeration(self):
         obj = SimpleType()

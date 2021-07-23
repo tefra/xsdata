@@ -19,9 +19,9 @@ class UnionTests(TestCase):
         obj.member_types = "foo bar   "
         self.assertEqual(["foo", "bar"], list(obj.bases))
 
-    def test_property_is_attribute(self):
+    def test_property_is_property(self):
         obj = Union()
-        self.assertTrue(obj.is_attribute)
+        self.assertTrue(obj.is_property)
 
     def test_property_real_name(self):
         obj = Union()

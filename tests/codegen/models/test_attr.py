@@ -29,7 +29,7 @@ class AttrTests(FactoryTestCase):
         attr.namespace = __file__
         self.assertNotEqual(attr, clone)
 
-    def test_property_is_attribute(self):
+    def test_property_is_property(self):
         self.assertTrue(AttrFactory.attribute().is_attribute)
         self.assertTrue(AttrFactory.any_attribute().is_attribute)
         self.assertFalse(AttrFactory.element().is_attribute)

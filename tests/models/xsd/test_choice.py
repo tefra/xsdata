@@ -10,7 +10,7 @@ class ChoiceTests(TestCase):
 
         expected = {
             "choice": str(id(obj)),
-            "min_occurs": 0,
+            "min_occurs": 1,
             "max_occurs": 2,
         }
         self.assertEqual(expected, obj.get_restrictions())
@@ -18,7 +18,7 @@ class ChoiceTests(TestCase):
         obj = Choice(max_occurs="unbounded")
         expected = {
             "choice": str(id(obj)),
-            "min_occurs": 0,
+            "min_occurs": 1,
             "max_occurs": sys.maxsize,
         }
         self.assertEqual(expected, obj.get_restrictions())

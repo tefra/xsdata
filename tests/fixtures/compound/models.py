@@ -49,5 +49,6 @@ class Root:
                     "type": Bravo,
                 },
             ),
+            "min_occurs": 1,
         }
     )

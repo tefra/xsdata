@@ -29,7 +29,7 @@ class AttributeCompoundChoiceHandler(RelativeHandlerInterface):
         if self.compound_fields:
             groups = group_by(target.attrs, get_restriction_choice)
             for choice, attrs in groups.items():
-                if choice and len(attrs) > 1 and any(attr.is_list for attr in attrs):
+                if choice and len(attrs) > 1 and any(attr.is_list or get_restriction_choice(attr) for attr in attrs):
                     self.group_fields(target, attrs)
 
         for index in range(len(target.attrs)):

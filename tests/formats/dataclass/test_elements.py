@@ -189,20 +189,30 @@ class XmlMetaTests(TestCase):
 
         mock_match_namespace.assert_has_calls([mock.call("a") for _ in range(4)])
 
-    @mock.patch.object(XmlVar, "match_namespace")
-    def test_find_wildcard(self, mock_match_namespace):
-        mock_match_namespace.side_effect = [False, False, False, True]
-
+    def test_find_wildcard(self):
         wildcards = [
-            XmlVarFactory.create(xml_type=XmlType.WILDCARD, qname="any", name="any"),
-            XmlVarFactory.create(xml_type=XmlType.WILDCARD, qname="other", name="any"),
+            XmlVarFactory.create(xml_type=XmlType.WILDCARD, namespaces=("a",)),
+            XmlVarFactory.create(xml_type=XmlType.WILDCARD, namespaces=("b",)),
+            XmlVarFactory.create(
+                xml_type=XmlType.WILDCARD,
+                namespaces=["##any"],
+                elements={
+                    "{c}root": XmlVarFactory.create(
+                        xml_type=XmlType.ELEMENT, name="root", qname="{c}root"
+                    ),
+                },
+            ),
         ]
-        self.meta.wildcards = wildcards
 
         self.assertIsNone(self.meta.find_wildcard("a"))
-        self.assertEqual(wildcards[1], self.meta.find_wildcard("a"))
+        self.meta.wildcards = wildcards
 
-        mock_match_namespace.assert_has_calls([mock.call("a") for _ in range(4)])
+        self.assertIs(wildcards[0], self.meta.find_wildcard("{a}root"))
+        self.assertIs(wildcards[1], self.meta.find_wildcard("{b}root"))
+        self.assertIs(
+            wildcards[2].elements["{c}root"], self.meta.find_wildcard("{c}root")
+        )
+        self.assertIs(wildcards[2], self.meta.find_wildcard("{c}random"))
 
     def test_find_any_wildcard(self):
         meta = self.context.build(TypeDuplicate)

@@ -8,36 +8,41 @@ from xsdata.codegen.models import Restrictions
 from xsdata.models.enums import DataType
 from xsdata.models.enums import NamespaceType
 from xsdata.models.enums import Tag
-from xsdata.utils.collections import first
 
 
 class AttributeMixedContentHandler(HandlerInterface):
-    """Add/Update a wildcard field for classes that support mixed content."""
+    """
+    Mixed content handler.
+
+    If the target class supports mixed content, a new wildcard attr will
+    replace the originals except any attributes. All the previous attrs
+    derived from  xs:element will be moved as choices for the new
+    content attr.
+    """
 
     __slots__ = ()
 
-    @classmethod
-    def process(cls, target: Class):
-        """Add or update an existing an xs:anyType derived attribute if the
-        target class supports mixed content."""
-
-        if not target.mixed:
+    def process(self, target: Class):
+        if not target.is_mixed:
             return
 
-        wildcard = first(attr for attr in target.attrs if attr.tag == Tag.ANY)
+        attrs = []
+        choices = []
+        for attr in list(target.attrs):
+            if attr.is_attribute:
+                attrs.append(attr)
+            elif attr.tag != Tag.ANY:
+                choices.append(attr)
 
-        if wildcard:
-            wildcard.mixed = True
-            if not wildcard.is_list:
-                wildcard.restrictions.min_occurs = 0
-                wildcard.restrictions.max_occurs = sys.maxsize
-        else:
-            attr = Attr(
-                name="content",
-                types=[AttrType(qname=str(DataType.ANY_TYPE), native=True)],
-                tag=Tag.ANY,
-                mixed=True,
-                namespace=NamespaceType.ANY_NS,
-                restrictions=Restrictions(min_occurs=0, max_occurs=sys.maxsize),
-            )
-            target.attrs.insert(0, attr)
+        wildcard = Attr(
+            name="content",
+            types=[AttrType(qname=str(DataType.ANY_TYPE), native=True)],
+            tag=Tag.ANY,
+            mixed=True,
+            choices=choices,
+            namespace=NamespaceType.ANY_NS,
+            restrictions=Restrictions(min_occurs=0, max_occurs=sys.maxsize),
+        )
+        attrs.append(wildcard)
+
+        target.attrs = attrs

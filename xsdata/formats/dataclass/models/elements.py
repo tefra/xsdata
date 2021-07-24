@@ -370,7 +370,16 @@ class XmlMeta(MetaMixin):
         return find_by_namespace(self.any_attributes, qname)
 
     def find_wildcard(self, qname: str) -> Optional[XmlVar]:
-        return find_by_namespace(self.wildcards, qname)
+        """Match the given qualified name to a wildcard and optionally to one
+        of its choice elements."""
+        wildcard = find_by_namespace(self.wildcards, qname)
+
+        if wildcard and wildcard.elements:
+            choice = wildcard.find_choice(qname)
+            if choice:
+                return choice
+
+        return wildcard
 
     def find_any_wildcard(self) -> Optional[XmlVar]:
         if self.wildcards:

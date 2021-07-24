@@ -180,3 +180,13 @@ class ClassTests(FactoryTestCase):
 
         obj.package = "foo"
         self.assertEqual("foo.bar", obj.target_module)
+
+    def test_property_is_mixed(self):
+        obj = ClassFactory.create()
+        self.assertFalse(obj.is_mixed)
+
+        obj.attrs.append(AttrFactory.any(mixed=True))
+        self.assertTrue(obj.is_mixed)
+
+        obj = ClassFactory.create(mixed=True)
+        self.assertTrue(obj.is_mixed)

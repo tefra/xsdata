@@ -484,6 +484,11 @@ class Class:
         return self.nillable or any(x.restrictions.nillable for x in self.extensions)
 
     @property
+    def is_mixed(self) -> bool:
+        """Return whether this class supports mixed content."""
+        return self.mixed or any(x.mixed for x in self.attrs)
+
+    @property
     def is_service(self) -> bool:
         """Return whether this instance is derived from wsdl:operation."""
         return self.tag == Tag.BINDING_OPERATION

@@ -275,8 +275,10 @@ class AttrFactory(Factory):
         )
 
     @classmethod
-    def reference(cls, qname: str, **kwargs: Any) -> Attr:
-        return cls.create(types=[AttrTypeFactory.create(qname=qname, **kwargs)])
+    def reference(cls, qname: str, tag: str = Tag.ELEMENT, **kwargs: Any) -> Attr:
+        return cls.create(
+            tag=tag, types=[AttrTypeFactory.create(qname=qname, **kwargs)]
+        )
 
     @classmethod
     def native(cls, datatype: DataType, tag: str = Tag.ELEMENT, **kwargs: Any) -> Attr:

@@ -1053,6 +1053,12 @@ class Alternative(AnnotationBase):
         if self.type:
             yield self.type
 
+    def get_restrictions(self) -> Dict[str, Anything]:
+        return {
+            "choice": str(id(self)),
+            "min_occurs": 0,
+        }
+
 
 @dataclass
 class Element(AnnotationBase):

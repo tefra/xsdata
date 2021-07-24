@@ -14,9 +14,10 @@ class AttributeDefaultValueHandler(RelativeHandlerInterface):
 
     Cases:
         1. Ignore enumerations.
-        2. List fields can not have a fixed value.
-        3. Optional fields or xsi:type can not have a default or fixed value.
-        4. Convert string literal default value for enum fields.
+        2. List fields can not have a default value
+        3. Optional choice/sequential fields can not have a default value
+        4. xsi:type fields are ignored, mark them as optional
+        5. Convert string literal default value for enum fields.
     """
 
     __slots__ = ()
@@ -36,6 +37,9 @@ class AttributeDefaultValueHandler(RelativeHandlerInterface):
         if self.should_reset_default(attr):
             attr.fixed = False
             attr.default = None
+
+            if attr.is_xsi_type:
+                attr.restrictions.min_occurs = 0
 
         if attr.default:
             self.process_attribute_default_enum(target, attr)
@@ -99,10 +103,6 @@ class AttributeDefaultValueHandler(RelativeHandlerInterface):
         - Default value is not set
         - Attribute is xsi:type (ignorable)
         - Attribute is part of a choice
-
-
-        :param attr:
-        :return:
         """
         return attr.default is not None and (
             attr.is_xsi_type

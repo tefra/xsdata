@@ -1,6 +1,7 @@
 import sys
 
 from xsdata.codegen.handlers import AttributeMixedContentHandler
+from xsdata.codegen.models import Restrictions
 from xsdata.models.enums import DataType
 from xsdata.models.enums import NamespaceType
 from xsdata.models.enums import Tag
@@ -16,10 +17,11 @@ class AttributeMixedContentHandlerTests(FactoryTestCase):
         self.processor = AttributeMixedContentHandler()
 
     def test_process(self):
+        res = Restrictions(min_occurs=1, max_occurs=1, sequential=True)
         attrs = [
             AttrFactory.attribute(),  # keep
-            AttrFactory.reference("foo"),  # choice
-            AttrFactory.native(DataType.INT),  # choice
+            AttrFactory.reference("foo", restrictions=res.clone()),  # choice
+            AttrFactory.native(DataType.INT, restrictions=res.clone()),  # choice
             AttrFactory.any(),  # drop
         ]
         item = ClassFactory.create(attrs=attrs)
@@ -38,6 +40,13 @@ class AttributeMixedContentHandlerTests(FactoryTestCase):
         )
         expected.restrictions.min_occurs = 0
         expected.restrictions.max_occurs = sys.maxsize
-        expected.choices = attrs[1:]
+        choices = []
+        for attr in attrs[1:-1]:
+            choice = attr.clone()
+            choice.restrictions.min_occurs = None
+            choice.restrictions.max_occurs = None
+            choice.restrictions.sequential = None
+            choices.append(choice)
 
         self.assertEqual(expected, item.attrs[1])
+        self.assertEqual(choices, item.attrs[1].choices)

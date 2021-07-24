@@ -32,7 +32,11 @@ class AttributeMixedContentHandler(HandlerInterface):
             if attr.is_attribute:
                 attrs.append(attr)
             elif attr.tag != Tag.ANY:
-                choices.append(attr)
+                choice = attr.clone()
+                choice.restrictions.min_occurs = None
+                choice.restrictions.max_occurs = None
+                choice.restrictions.sequential = None
+                choices.append(choice)
 
         wildcard = Attr(
             name="content",

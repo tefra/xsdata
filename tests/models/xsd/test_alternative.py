@@ -20,3 +20,8 @@ class AlternativeTests(TestCase):
 
         obj.type = "foo"
         self.assertEqual(["foo"], list(obj.bases))
+
+    def test_get_restrictions(self):
+        obj = Alternative()
+        expected = {"min_occurs": 0, "choice": str(id(obj))}
+        self.assertEqual(expected, obj.get_restrictions())

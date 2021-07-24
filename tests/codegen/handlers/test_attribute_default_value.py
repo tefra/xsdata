@@ -2,6 +2,7 @@ from unittest import mock
 
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import AttributeDefaultValueHandler
+from xsdata.codegen.models import Restrictions
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
@@ -96,11 +97,16 @@ class AttributeDefaultValueHandlerTests(FactoryTestCase):
     def test_process_attribute_with_xsi_type(self):
         target = ClassFactory.create()
         attr = AttrFactory.create(
-            fixed=True, default=2, name="type", namespace=Namespace.XSI.uri
+            fixed=True,
+            default="xs:int",
+            name="type",
+            namespace=Namespace.XSI.uri,
+            restrictions=Restrictions(min_occurs=1, max_occurs=1),
         )
         self.processor.process_attribute(target, attr)
         self.assertFalse(attr.fixed)
         self.assertIsNone(attr.default)
+        self.assertEqual(0, attr.restrictions.min_occurs)
 
     def test_process_attribute_with_valid_case(self):
         target = ClassFactory.create()

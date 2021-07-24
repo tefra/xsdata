@@ -416,7 +416,7 @@ class Any(AnnotationBase):
         max_occurs = sys.maxsize if self.max_occurs == "unbounded" else self.max_occurs
 
         return {
-            "min_occurs": self.min_occurs,
+            "min_occurs": 0,
             "max_occurs": max_occurs,
         }
 

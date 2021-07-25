@@ -224,7 +224,7 @@ class JsonParser(AbstractParser):
     def bind_text(self, meta: XmlMeta, var: XmlVar, value: Any) -> Any:
         """Bind text/tokens value entrypoint."""
 
-        if var.elements:
+        if var.is_elements:
             # Compound field we need to match the value to one of the choice elements
             check_subclass = self.context.class_type.is_model(value)
             choice = var.find_value_choice(value, check_subclass)

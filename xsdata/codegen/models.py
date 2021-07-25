@@ -579,6 +579,7 @@ class Import:
 get_location = operator.attrgetter("location")
 get_name = operator.attrgetter("name")
 get_qname = operator.attrgetter("qname")
+get_tag = operator.attrgetter("tag")
 get_restriction_choice = operator.attrgetter("restrictions.choice")
 get_slug = operator.attrgetter("slug")
 get_target_namespace = operator.attrgetter("target_namespace")

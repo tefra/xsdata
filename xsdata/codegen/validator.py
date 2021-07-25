@@ -5,7 +5,9 @@ from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Extension
+from xsdata.codegen.models import get_tag
 from xsdata.codegen.utils import ClassUtils
+from xsdata.logger import logger
 from xsdata.models.enums import Tag
 from xsdata.utils import collections
 from xsdata.utils.collections import group_by
@@ -57,12 +59,19 @@ class ClassValidator:
         """Handle classes with same namespace, name that are derived from the
         same xs type."""
 
-        grouped = group_by(classes, lambda x: f"{x.tag}{x.qname}")
-        for items in grouped.values():
+        for items in group_by(classes, get_tag).values():
             if len(items) == 1:
                 continue
 
             index = cls.select_winner(list(items))
+
+            if index == -1:
+                logger.warning(
+                    "Duplicate types (%d) found: %s, will keep the last defined",
+                    len(items),
+                    items[0].qname,
+                )
+
             winner = items.pop(index)
 
             for item in items:

@@ -114,6 +114,15 @@ class SchemaMapperTests(FactoryTestCase):
         attribute.target_namespace = "tns"
         self.assertEqual("tns", SchemaMapper.element_namespace(attribute, target_ns))
 
+        element = Element(ref="something")
+        self.assertEqual("foobar", SchemaMapper.element_namespace(element, target_ns))
+
+        element.ns_map["foo"] = "foobar"
+        self.assertEqual("", SchemaMapper.element_namespace(element, target_ns))
+
+        element.ns_map[None] = "foobar"
+        self.assertEqual("foobar", SchemaMapper.element_namespace(element, target_ns))
+
     @mock.patch.object(SchemaMapper, "element_namespace")
     @mock.patch.object(SchemaMapper, "build_class_attributes")
     @mock.patch.object(SchemaMapper, "build_class_extensions")

@@ -22,6 +22,8 @@ from xsdata.models.xsd import SimpleType
 from xsdata.utils import collections
 from xsdata.utils import text
 from xsdata.utils.namespaces import build_qname
+from xsdata.utils.namespaces import is_default
+from xsdata.utils.namespaces import prefix_exists
 
 
 class SchemaMapper:
@@ -172,7 +174,12 @@ class SchemaMapper:
         if prefix:
             return obj.ns_map.get(prefix)
 
-        if obj.is_qualified:
+        if obj.is_qualified and (
+            not obj.is_ref
+            or not target_namespace
+            or not prefix_exists(target_namespace, obj.ns_map)
+            or is_default(target_namespace, obj.ns_map)
+        ):
             return target_namespace
 
         return "" if isinstance(obj, Element) else None

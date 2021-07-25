@@ -60,41 +60,35 @@ class ClassValidatorTests(FactoryTestCase):
         self.validator.remove_invalid_classes(classes)
         self.assertEqual([second, third], classes)
 
-    @mock.patch.object(ClassValidator, "select_winner")
-    def test_handle_duplicate_types(self, mock_select_winner):
-
-        one = ClassFactory.create()
+    @mock.patch("xsdata.codegen.mappers.definitions.logger.warning")
+    def test_handle_duplicate_types(self, mock_warning):
+        one = ClassFactory.create(tag=Tag.ELEMENT)
         two = one.clone()
         three = one.clone()
-        four = ClassFactory.create()
-
-        mock_select_winner.return_value = 0
-
+        four = ClassFactory.create(tag=Tag.ATTRIBUTE)
         classes = [one, two, three, four]
 
         self.validator.handle_duplicate_types(classes)
-        self.assertEqual([one, four], classes)
-        mock_select_winner.assert_called_once_with([one, two, three])
+        self.assertEqual([three, four], classes)
+        mock_warning.assert_called_once_with(
+            "Duplicate types (%d) found: %s, will keep the last defined",
+            3,
+            "{xsdata}class_B",
+        )
 
     @mock.patch.object(ClassValidator, "merge_redefined_type")
-    @mock.patch.object(ClassValidator, "select_winner")
     def test_handle_duplicate_types_with_redefined_type(
-        self, mock_select_winner, mock_merge_redefined_type
+        self, mock_merge_redefined_type
     ):
-
-        one = ClassFactory.create()
+        one = ClassFactory.create(tag=Tag.ELEMENT)
         two = one.clone()
         three = one.clone()
-        four = ClassFactory.create()
-
-        mock_select_winner.return_value = 0
+        four = ClassFactory.create(tag=Tag.ATTRIBUTE)
         one.container = Tag.REDEFINE
-
         classes = [one, two, three, four]
 
         self.validator.handle_duplicate_types(classes)
         self.assertEqual([one, four], classes)
-        mock_select_winner.assert_called_once_with([one, two, three])
         mock_merge_redefined_type.assert_has_calls(
             [mock.call(two, one), mock.call(three, one)]
         )

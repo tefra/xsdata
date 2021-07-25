@@ -1,4 +1,5 @@
 from xsdata.codegen.handlers import AttributeDefaultValidateHandler
+from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
 from xsdata.utils.testing import AttrFactory
@@ -30,6 +31,10 @@ class AttributeDefaultValidateHandlerTests(FactoryTestCase):
         for attr in target.attrs:
             self.assertNotEqual("4", attr.default)
             self.assertFalse(attr.fixed)
+
+            if attr.xml_type == XmlType.ELEMENT:
+                self.assertIsNone(attr.default)
+                self.assertEqual(0, attr.restrictions.min_occurs)
 
         target.nillable = False
         self.processor.process(target)

@@ -24,6 +24,16 @@ class ParserUtilsTests(FactoryTestCase):
         attrs = {QNames.XSI_TYPE: "bar:foo"}
         self.assertEqual("{xsdata}foo", ParserUtils.xsi_type(attrs, ns_map))
 
+    def test_xsi_nil(self):
+        attrs = {}
+        self.assertIsNone(ParserUtils.xsi_nil(attrs))
+
+        attrs = {QNames.XSI_NIL: "true"}
+        self.assertTrue(ParserUtils.xsi_nil(attrs))
+
+        attrs = {QNames.XSI_NIL: "false"}
+        self.assertFalse(ParserUtils.xsi_nil(attrs))
+
     @mock.patch.object(ConverterFactory, "deserialize", return_value=2)
     def test_parse_value(self, mock_deserialize):
         self.assertEqual(1, ParserUtils.parse_value(None, [int], 1))

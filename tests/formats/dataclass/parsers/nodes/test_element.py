@@ -63,6 +63,13 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual("foo", objects[-1][0])
         self.assertEqual(expected, objects[-1][1])
 
+    def test_bind_nil_value(self):
+        self.node.xsi_nil = True
+        objects = []
+
+        self.assertTrue(self.node.bind("foo", None, None, objects))
+        self.assertEqual(("foo", None), objects[-1])
+
     def test_bind_with_derived_element(self):
         self.node.meta = self.context.build(TypeA)
         self.node.derived_factory = DerivedElement

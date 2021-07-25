@@ -33,6 +33,7 @@ class ElementNode(XmlNode):
     :param mixed: The node supports mixed content
     :param derived_factory: Derived element factory
     :param xsi_type: The xml type substitution
+    :param xsi_nil: The xml type substitution
     """
 
     __slots__ = (
@@ -45,6 +46,7 @@ class ElementNode(XmlNode):
         "mixed",
         "derived_factory",
         "xsi_type",
+        "xsi_nil",
         "assigned",
     )
 
@@ -59,6 +61,7 @@ class ElementNode(XmlNode):
         mixed: bool = False,
         derived_factory: Optional[Type] = None,
         xsi_type: Optional[str] = None,
+        xsi_nil: Optional[bool] = None,
     ):
         self.meta = meta
         self.attrs = attrs
@@ -69,6 +72,7 @@ class ElementNode(XmlNode):
         self.mixed = mixed
         self.derived_factory = derived_factory
         self.xsi_type = xsi_type
+        self.xsi_nil = xsi_nil
         self.assigned: Set[int] = set()
 
     def bind(
@@ -92,7 +96,11 @@ class ElementNode(XmlNode):
             if isinstance(params[key], PendingCollection):
                 params[key] = params[key].evaluate()
 
-        obj = self.config.class_factory(self.meta.clazz, params)
+        if not params and self.xsi_nil:
+            obj = None
+        else:
+            obj = self.config.class_factory(self.meta.clazz, params)
+
         if self.derived_factory:
             obj = self.derived_factory(qname=qname, value=obj, type=self.xsi_type)
 
@@ -336,6 +344,7 @@ class ElementNode(XmlNode):
             )
 
         xsi_type = ParserUtils.xsi_type(attrs, ns_map)
+        xsi_nil = ParserUtils.xsi_nil(attrs)
         derived_factory = self.context.class_type.derived_element
 
         if var.clazz:
@@ -346,6 +355,7 @@ class ElementNode(XmlNode):
                 position,
                 derived_factory if var.derived else None,
                 xsi_type,
+                xsi_nil,
             )
 
         if not var.any_type and not var.is_wildcard:
@@ -371,6 +381,7 @@ class ElementNode(XmlNode):
                 position,
                 derived_factory if derived else None,
                 xsi_type,
+                xsi_nil,
             )
 
         if node:
@@ -392,11 +403,12 @@ class ElementNode(XmlNode):
         position: int,
         derived_factory: Optional[Type] = None,
         xsi_type: Optional[str] = None,
+        xsi_nil: Optional[bool] = None,
     ) -> Optional[XmlNode]:
 
         meta = self.context.fetch(clazz, self.meta.namespace, xsi_type)
 
-        if not meta or (meta.nillable and not ParserUtils.is_nillable(attrs)):
+        if not meta or (meta.nillable and xsi_nil is False):
             return None
 
         return ElementNode(
@@ -408,5 +420,6 @@ class ElementNode(XmlNode):
             position=position,
             derived_factory=derived_factory,
             xsi_type=xsi_type,
+            xsi_nil=xsi_nil,
             mixed=self.meta.mixed_content,
         )

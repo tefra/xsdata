@@ -163,6 +163,12 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self.processor.process_dependency_type(target, attr, attr_type)
         mock_set_circular_flag.assert_called_once_with(complex_type, target, attr_type)
 
+        self.assertFalse(attr.restrictions.nillable)
+
+        complex_type.nillable = True
+        self.processor.process_dependency_type(target, attr, attr_type)
+        self.assertTrue(attr.restrictions.nillable)
+
     @mock.patch.object(AttributeTypeHandler, "update_restrictions")
     @mock.patch.object(AttributeTypeHandler, "copy_attribute_properties")
     def test_process_inner_type_with_simple_type(

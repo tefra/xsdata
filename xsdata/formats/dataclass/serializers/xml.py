@@ -281,8 +281,7 @@ class XmlSerializer(AbstractSerializer):
 
         yield from func(value, choice, namespace)
 
-    @classmethod
-    def write_element(cls, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
+    def write_element(self, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
         """Produce an element events stream for the given simple type value."""
         yield XmlWriterEvent.START, var.qname
 
@@ -294,7 +293,7 @@ class XmlSerializer(AbstractSerializer):
             if datatype != DataType.STRING:
                 yield XmlWriterEvent.ATTR, QNames.XSI_TYPE, QName(str(datatype))
 
-        yield XmlWriterEvent.DATA, cls.encode(value, var)
+        yield XmlWriterEvent.DATA, self.encode(value, var)
         yield XmlWriterEvent.END, var.qname
 
     @classmethod

@@ -37,9 +37,9 @@ class ParserUtils:
         return build_qname(namespace, name)
 
     @classmethod
-    def is_nillable(cls, attrs: Dict) -> bool:
-        """Return whether the element attrs has xsi:nil="false"."""
-        return attrs.get(QNames.XSI_NIL) != constants.XML_FALSE
+    def xsi_nil(cls, attrs: Dict) -> Optional[bool]:
+        xsi_nil = attrs.get(QNames.XSI_NIL)
+        return xsi_nil == constants.XML_TRUE if xsi_nil else None
 
     @classmethod
     def parse_value(

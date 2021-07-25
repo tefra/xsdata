@@ -128,6 +128,8 @@ class AttributeTypeHandler(RelativeHandlerInterface):
             )
             attr_type.reference = id(source)
         else:
+            if source.nillable:
+                attr.restrictions.nillable = True
             self.set_circular_flag(source, target, attr_type)
 
     @classmethod

@@ -6,6 +6,7 @@ from xsdata.utils.namespaces import build_qname
 from xsdata.utils.namespaces import clean_prefixes
 from xsdata.utils.namespaces import clean_uri
 from xsdata.utils.namespaces import generate_prefix
+from xsdata.utils.namespaces import is_default
 from xsdata.utils.namespaces import is_ncname
 from xsdata.utils.namespaces import is_uri
 from xsdata.utils.namespaces import load_prefix
@@ -104,3 +105,10 @@ class NamespacesTests(TestCase):
         self.assertTrue(is_uri("a"))
         self.assertTrue(is_uri("urn:books"))
         self.assertTrue(is_uri(Namespace.XS.uri))
+
+    def test_is_default(self):
+        self.assertFalse(is_default("foo", {}))
+        self.assertFalse(is_default("foo", {"a": "foo"}))
+        self.assertTrue(is_default("foo", {"": "foo"}))
+        self.assertTrue(is_default("foo", {None: "foo"}))
+        self.assertTrue(is_default("foo", {"a": "foo", None: "foo"}))

@@ -46,6 +46,15 @@ def prefix_exists(uri: str, ns_map: Dict) -> bool:
     return uri in ns_map.values()
 
 
+def is_default(uri: str, ns_map: Dict) -> bool:
+    """Check if the uri exists and it has no prefix."""
+    for prefix, ns in ns_map.items():
+        if uri == ns and not prefix:
+            return True
+
+    return False
+
+
 def clean_prefixes(ns_map: Dict) -> Dict:
     """Remove default namespace if it's also assigned to a prefix."""
     result = {}

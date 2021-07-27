@@ -211,6 +211,7 @@ Serialize json to string
 
     >>> from xsdata.formats.dataclass.context import XmlContext
     >>> from xsdata.formats.dataclass.serializers import JsonSerializer
+    >>> from xsdata.formats.dataclass.serializers.config import SerializerConfig
     >>> from xsdata.models.datatype import XmlDate
     >>> books = Books(
     ...    book=[
@@ -232,7 +233,8 @@ Serialize json to string
     ...        ),
     ...    ]
     ... )
-    >>> serializer = JsonSerializer(context=XmlContext(), indent=2)
+    >>> config = SerializerConfig(pretty_print=True)
+    >>> serializer = JsonSerializer(context=XmlContext(), config=config)
     >>> print(serializer.render(books))
     {
       "book": [
@@ -313,7 +315,8 @@ By using a custom dict factory you can change the output behaviour, like filter 
     ...     return {k: v for k, v in x if v is not None}
     >>>
     >>> books.book[0].genre = None
-    >>> serializer = JsonSerializer(dict_factory=filter_none, indent=2)
+    >>> config = SerializerConfig(pretty_print=True)
+    >>> serializer = JsonSerializer(dict_factory=filter_none, config=config)
     >>> print(serializer.render(books.book[0]))
     {
       "author": "Hightower, Kim",
@@ -346,4 +349,4 @@ other implementation as long as it's has a compatible signature.
 
     import ujson
 
-    serializer = JsonSerializer(dump_factory=ujson.dump, indent=0)
+    serializer = JsonSerializer(dump_factory=ujson.dump)

@@ -15,7 +15,8 @@ def validate_bindings(schema: Path, clazz: Type):
 
     sample = schema.parent.joinpath("sample.xml")
     obj = XmlParser().from_path(sample, clazz)
-    actual = JsonSerializer(indent=4).render(obj)
+    config = SerializerConfig(pretty_print=True)
+    actual = JsonSerializer(config=config).render(obj)
 
     expected = sample.with_suffix(".json")
     if expected.exists():

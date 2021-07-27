@@ -158,10 +158,9 @@ class AttributeTypeHandler(RelativeHandlerInterface):
         restrictions = source_attr.restrictions.clone()
         restrictions.merge(attr.restrictions)
 
-        if attr.is_attribute:
-            # Attributes maintain their occurrences no matter what!
-            restrictions.min_occurs = attr.restrictions.min_occurs
-            restrictions.max_occurs = attr.restrictions.max_occurs
+        # Maintain occurrences no matter what!
+        restrictions.min_occurs = attr.restrictions.min_occurs
+        restrictions.max_occurs = attr.restrictions.max_occurs
 
         if source.nillable:
             restrictions.nillable = True

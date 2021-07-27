@@ -219,6 +219,8 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         source = ClassFactory.elements(1, qname="Foobar")
         source.attrs[0].restrictions.max_length = 100
         source.attrs[0].restrictions.min_length = 1
+        source.attrs[0].restrictions.min_occurs = 0
+        source.attrs[0].restrictions.max_occurs = 10
         source.attrs[0].help = "foo"
         source.attrs[0].types = [
             AttrTypeFactory.create(qname="first"),
@@ -227,6 +229,8 @@ class AttributeTypeHandlerTests(FactoryTestCase):
 
         target = ClassFactory.elements(1)
         attr = target.attrs[0]
+        attr.restrictions.min_occurs = 1
+        attr.restrictions.max_occurs = 2
         attr.restrictions.min_length = 2
         attr.types.clear()
         attr.types.append(AttrTypeFactory.create(qname=source.name))
@@ -237,7 +241,10 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self.assertEqual("first", attr.types[0].name)
         self.assertEqual("second", attr.types[1].name)
         self.assertEqual("foo", attr.help)
-        self.assertEqual(Restrictions(min_length=2, max_length=100), attr.restrictions)
+        self.assertEqual(
+            Restrictions(min_length=2, min_occurs=1, max_occurs=2, max_length=100),
+            attr.restrictions,
+        )
         mock_copy_inner_class.assert_has_calls(
             [
                 mock.call(source, target, attr, source.attrs[0].types[0]),
@@ -252,20 +259,6 @@ class AttributeTypeHandlerTests(FactoryTestCase):
 
         self.processor.copy_attribute_properties(source, target, attr, attr.types[0])
         self.assertTrue(attr.restrictions.nillable)
-
-    def test_copy_attribute_properties_to_attribute_target_preserve_occurrences(self):
-        source = ClassFactory.elements(1, nillable=True)
-        target = ClassFactory.create(attrs=AttrFactory.list(1, tag=Tag.ATTRIBUTE))
-        attr = target.attrs[0]
-        attr.restrictions.min_occurs = 1
-        attr.restrictions.max_occurs = 1
-
-        source.attrs[0].restrictions.min_occurs = 0
-        source.attrs[0].restrictions.max_occurs = 1
-
-        self.assertFalse(attr.is_optional)
-        self.processor.copy_attribute_properties(source, target, attr, attr.types[0])
-        self.assertFalse(attr.is_optional)
 
     def test_copy_attribute_properties_set_default_value_if_none(self):
         target = ClassFactory.create(attrs=AttrFactory.list(1, tag=Tag.ATTRIBUTE))

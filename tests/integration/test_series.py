@@ -8,6 +8,7 @@ from tests import root
 from xsdata.cli import cli
 from xsdata.formats.dataclass.parsers import JsonParser
 from xsdata.formats.dataclass.serializers import JsonSerializer
+from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.utils.testing import load_class
 
 os.chdir(root)
@@ -27,7 +28,8 @@ def test_json_documents():
     clazz = load_class(result.output, "Series")
 
     parser = JsonParser()
-    serializer = JsonSerializer(indent=4)
+    config = SerializerConfig(pretty_print=True)
+    serializer = JsonSerializer(config=config)
 
     for i in range(1, 3):
         ori = filepath.joinpath(f"samples/show{i}.json").read_text()

@@ -1,28 +1,28 @@
 {
-    "alpha_or_bravo": [
-        {
-            "a": true
-        },
-        {
-            "a": true
-        },
-        {
-            "b": true
-        },
-        {
-            "b": true
-        },
-        {
-            "a": true
-        },
-        {
-            "b": true
-        },
-        {
-            "a": true
-        },
-        {
-            "b": true
-        }
-    ]
+  "alpha_or_bravo": [
+    {
+      "a": true
+    },
+    {
+      "a": true
+    },
+    {
+      "b": true
+    },
+    {
+      "b": true
+    },
+    {
+      "a": true
+    },
+    {
+      "b": true
+    },
+    {
+      "a": true
+    },
+    {
+      "b": true
+    }
+  ]
 }

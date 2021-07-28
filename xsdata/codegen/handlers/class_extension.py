@@ -267,7 +267,7 @@ class ClassExtensionHandler(RelativeHandlerInterface):
         attr = ClassUtils.find_attr(target, name)
         if attr is None:
             attr = Attr(name=name, tag=tag)
-            attr.restrictions.min_occurs = 0
+            attr.restrictions.min_occurs = 1
             attr.restrictions.max_occurs = 1
             target.attrs.insert(0, attr)
 

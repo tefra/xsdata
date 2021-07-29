@@ -1125,7 +1125,8 @@ class Element(AnnotationBase):
 
     @property
     def default_type(self) -> str:
-        return DataType.ANY_TYPE.prefixed(self.xs_prefix)
+        datatype = DataType.STRING if self.fixed else DataType.ANY_TYPE
+        return datatype.prefixed(self.xs_prefix)
 
     @property
     def attr_types(self) -> Iterator[str]:

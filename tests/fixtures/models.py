@@ -57,6 +57,18 @@ class BaseB(BaseA):
 class BaseC(BaseB):
     z: str
 
+@dataclass
+class NillableType:
+    class Meta:
+        nillable = True
+
+    value: Optional[str] = field(default="abc")
+
+
+@dataclass
+class FixedType:
+    value: str = field(init=False, default="abc")
+
 
 @dataclass
 class ExtendedType:

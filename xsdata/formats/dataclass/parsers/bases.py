@@ -106,6 +106,8 @@ class NodeParser(PushParser):
             else:
                 derived_factory = self.context.class_type.derived_element
 
+            xsi_nil = ParserUtils.xsi_nil(attrs)
+
             from xsdata.formats.dataclass.parsers.nodes import ElementNode
 
             child = ElementNode(
@@ -117,6 +119,7 @@ class NodeParser(PushParser):
                 context=self.context,
                 derived_factory=derived_factory,
                 xsi_type=xsi_type if derived_factory else None,
+                xsi_nil=xsi_nil,
             )
 
         queue.append(child)

@@ -48,6 +48,7 @@ class ElementNode(XmlNode):
         "xsi_type",
         "xsi_nil",
         "assigned",
+        "tail_processed",
     )
 
     def __init__(
@@ -74,44 +75,50 @@ class ElementNode(XmlNode):
         self.xsi_type = xsi_type
         self.xsi_nil = xsi_nil
         self.assigned: Set[int] = set()
+        self.tail_processed: bool = False
 
     def bind(
         self, qname: str, text: Optional[str], tail: Optional[str], objects: List
     ) -> bool:
-        params: Dict = {}
-        self.bind_attrs(params)
 
-        wild_var = self.meta.find_any_wildcard()
-        if wild_var and wild_var.mixed:
-            self.bind_mixed_objects(params, wild_var, objects)
-            bind_text = False
-        else:
-            self.bind_objects(params, objects)
-            bind_text = self.bind_content(params, text)
-
-        if not bind_text and wild_var:
-            self.bind_wild_content(params, wild_var, text, tail)
-
-        for key in params.keys():
-            if isinstance(params[key], PendingCollection):
-                params[key] = params[key].evaluate()
-
-        if not params and self.xsi_nil:
-            obj = None
-        else:
+        if not self.xsi_nil or self.meta.nillable:
+            params: Dict = {}
+            self.bind_attrs(params)
+            self.bind_content(params, text, tail, objects)
             obj = self.config.class_factory(self.meta.clazz, params)
+        else:
+            obj = None
 
         if self.derived_factory:
             obj = self.derived_factory(qname=qname, value=obj, type=self.xsi_type)
 
         objects.append((qname, obj))
 
-        if self.mixed and not wild_var:
+        if self.mixed and not self.tail_processed:
             tail = ParserUtils.normalize_content(tail)
             if tail:
                 objects.append((None, tail))
 
         return True
+
+    def bind_content(
+        self, params: Dict, text: Optional[str], tail: Optional[str], objects: List[Any]
+    ):
+        wild_var = self.meta.find_any_wildcard()
+        if wild_var and wild_var.mixed:
+            self.bind_mixed_objects(params, wild_var, objects)
+            bind_text = False
+        else:
+            self.bind_objects(params, objects)
+            bind_text = self.bind_text(params, text)
+
+        if not bind_text and wild_var:
+            self.bind_wild_text(params, wild_var, text, tail)
+            self.tail_processed = True
+
+        for key in params.keys():
+            if isinstance(params[key], PendingCollection):
+                params[key] = params[key].evaluate()
 
     def bind_attrs(self, params: Dict):
         """Parse the given element's attributes and any text content and return
@@ -249,7 +256,7 @@ class ElementNode(XmlNode):
 
         return value
 
-    def bind_content(self, params: Dict, txt: Optional[str]) -> bool:
+    def bind_text(self, params: Dict, text: Optional[str]) -> bool:
         """
         Add the given element's text content if any to the params dictionary
         with the text var name as key.
@@ -257,22 +264,26 @@ class ElementNode(XmlNode):
         Return if any data was bound.
         """
 
-        if txt is not None:
-            var = self.meta.text
-            if var and var.init:
+        var = self.meta.text
+
+        if not var or (text is None and not self.xsi_nil):
+            return False
+
+        if var.init:
+            if self.xsi_nil and not text:
+                params[var.name] = None
+            else:
                 params[var.name] = ParserUtils.parse_value(
-                    value=txt,
+                    value=text,
                     types=var.types,
                     default=var.default,
                     ns_map=self.ns_map,
                     tokens_factory=var.tokens_factory,
                     format=var.format,
                 )
-                return True
+        return True
 
-        return False
-
-    def bind_wild_content(
+    def bind_wild_text(
         self, params: Dict, var: XmlVar, txt: Optional[str], tail: Optional[str]
     ) -> bool:
         """

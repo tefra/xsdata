@@ -2,6 +2,7 @@ import sys
 from unittest import mock
 
 from xsdata.codegen.mappers.element import ElementMapper
+from xsdata.codegen.models import Restrictions
 from xsdata.codegen.utils import ClassUtils
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.models.enums import DataType
@@ -132,12 +133,52 @@ class ElementMapperTests(FactoryTestCase):
             ns_map={},
             attrs=[
                 AttrFactory.native(
-                    DataType.STRING, name="child", namespace="xsdata", index=0
+                    DataType.STRING,
+                    name="child",
+                    namespace="xsdata",
+                    index=0,
+                    restrictions=Restrictions(min_occurs=0, max_occurs=1),
                 ),
-                AttrFactory.native(DataType.STRING, name="something", index=1),
+                AttrFactory.native(
+                    DataType.STRING,
+                    namespace="",
+                    name="something",
+                    index=1,
+                    restrictions=Restrictions(min_occurs=0, max_occurs=1),
+                ),
             ],
         )
         self.assertEqual(expected, actual)
+
+        element = AnyElement(
+            qname="{xsdata}root",
+            text="foo",
+            children=[
+                AnyElement(qname="{xsdata}child", text="primitive"),
+            ],
+        )
+        actual = ElementMapper.build_class(element, None)
+        self.assertTrue(actual.mixed)
+
+    def test_build_class_nillable(self):
+        element = AnyElement(qname="{xsdata}root", attributes={QNames.XSI_NIL: "1"})
+        target = ElementMapper.build_class(element, None)
+        self.assertTrue(target.nillable)
+
+        element.attributes[QNames.XSI_NIL] = " true "
+        target = ElementMapper.build_class(element, None)
+        self.assertTrue(target.nillable)
+
+    def test_build_class_ignore_invalid(self):
+        element = AnyElement(
+            qname="{xsdata}root",
+            children=[
+                AnyElement(text="primitive"),
+                "",
+            ],
+        )
+        actual = ElementMapper.build_class(element, None)
+        self.assertEqual(0, len(actual.attrs))
 
     def test_build_attribute_type(self):
         actual = ElementMapper.build_attribute_type(QNames.XSI_TYPE, "")
@@ -197,19 +238,22 @@ class ElementMapperTests(FactoryTestCase):
     def test_sequential_names(self):
         a = AnyElement(qname="a")
         b = AnyElement(qname="b")
-
-        actual = ElementMapper.sequential_names([a, b])
-        self.assertEqual(0, len(actual))
-
-        actual = ElementMapper.sequential_names([a, b, a])
-        self.assertEqual({"a", "b"}, actual)
-
         c = AnyElement(qname="c")
-        actual = ElementMapper.sequential_names([a, b, a, c])
-        self.assertEqual({"a", "b"}, actual)
-
         d = AnyElement(qname="d")
         e = AnyElement(qname="e")
 
-        actual = ElementMapper.sequential_names([a, b, a, c, d, e, d])
+        p = AnyElement(children=[a, b])
+        actual = ElementMapper.sequential_names(p)
+        self.assertEqual(0, len(actual))
+
+        p = AnyElement(children=[a, b, a])
+        actual = ElementMapper.sequential_names(p)
+        self.assertEqual({"a", "b"}, actual)
+
+        p = AnyElement(children=[a, b, a, c])
+        actual = ElementMapper.sequential_names(p)
+        self.assertEqual({"a", "b"}, actual)
+
+        p = AnyElement(children=[a, b, a, c, d, e, d])
+        actual = ElementMapper.sequential_names(p)
         self.assertEqual({"a", "b", "d", "e"}, actual)

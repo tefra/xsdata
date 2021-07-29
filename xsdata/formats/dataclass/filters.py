@@ -610,7 +610,9 @@ class Filters:
         if attr.is_dict:
             return "Dict[str, str]"
 
-        if attr.default is None and (attr.is_optional or not self.format.kw_only):
+        if attr.is_nillable or (
+            attr.default is None and (attr.is_optional or not self.format.kw_only)
+        ):
             return f"Optional[{result}]"
 
         return result

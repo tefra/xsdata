@@ -397,10 +397,13 @@ class FiltersTests(FactoryTestCase):
 
     def test_field_type_with_default_value(self):
         attr = AttrFactory.create(
-            default="foo", types=AttrTypeFactory.list(1, qname="foo_bar")
+            default="1", types=AttrTypeFactory.list(1, qname="foo_bar")
         )
 
         self.assertEqual("FooBar", self.filters.field_type(attr, []))
+
+        attr.restrictions.nillable = True
+        self.assertEqual("Optional[FooBar]", self.filters.field_type(attr, []))
 
     def test_field_type_with_optional_value(self):
         attr = AttrFactory.create(types=AttrTypeFactory.list(1, qname="foo_bar"))

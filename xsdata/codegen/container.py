@@ -5,13 +5,13 @@ from typing import List
 from typing import Optional
 
 from xsdata.codegen.handlers import AttributeCompoundChoiceHandler
-from xsdata.codegen.handlers import AttributeDefaultValidateHandler
 from xsdata.codegen.handlers import AttributeDefaultValueHandler
 from xsdata.codegen.handlers import AttributeEffectiveChoiceHandler
 from xsdata.codegen.handlers import AttributeGroupHandler
 from xsdata.codegen.handlers import AttributeMergeHandler
 from xsdata.codegen.handlers import AttributeMixedContentHandler
 from xsdata.codegen.handlers import AttributeNameConflictHandler
+from xsdata.codegen.handlers import AttributeNormalizeHandler
 from xsdata.codegen.handlers import AttributeOverridesHandler
 from xsdata.codegen.handlers import AttributeSubstitutionHandler
 from xsdata.codegen.handlers import AttributeTypeHandler
@@ -58,7 +58,7 @@ class ClassContainer(ContainerInterface):
                 AttributeTypeHandler(self),
                 AttributeMergeHandler(),
                 AttributeMixedContentHandler(),
-                AttributeDefaultValidateHandler(),
+                AttributeNormalizeHandler(),
             ],
             Steps.SANITIZE: [
                 AttributeEffectiveChoiceHandler(),

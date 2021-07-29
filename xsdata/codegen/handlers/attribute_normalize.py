@@ -6,12 +6,11 @@ from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.formats.converter import converter
-from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.models.enums import DataType
 from xsdata.utils import collections
 
 
-class AttributeDefaultValidateHandler(HandlerInterface):
+class AttributeNormalizeHandler(HandlerInterface):
     """
     Validate attribute types against default values.
 
@@ -23,34 +22,27 @@ class AttributeDefaultValidateHandler(HandlerInterface):
     __slots__ = ()
 
     def process(self, target: Class):
-        is_nillable = target.is_nillable
-        default_value = target.default
-        fixed = target.fixed
-        ns_map = target.ns_map
         for attr in target.attrs:
-            if is_nillable:
-                self.set_optional(attr)
-            elif default_value:
-                self.set_default_value(attr, default_value, fixed)
+            if attr.xml_type is None:
+                self.cascade_properties(
+                    attr, target.nillable, target.fixed, target.default
+                )
 
-            self.reset_unsupported_types(attr, ns_map)
-
-    @classmethod
-    def set_optional(cls, attr: Attr):
-        if attr.xml_type == XmlType.ELEMENT:
-            attr.restrictions.min_occurs = 0
-            attr.default = None
-            attr.fixed = False
+            if attr.default is not None:
+                self.reset_unsupported_types(attr, target.ns_map)
+            elif object in attr.native_types and not attr.is_list:
+                attr.restrictions.min_occurs = 0
 
     @classmethod
-    def set_default_value(cls, attr: Attr, default_value: Any, fixed: bool):
-        """
-        Set the text xml field default value from parent.
+    def cascade_properties(
+        cls, attr: Attr, nillable: bool, fixed: bool, default_value: Any
+    ):
+        """Cascade xsd:element properties to the default value field of the
+        class."""
+        if nillable:
+            attr.restrictions.nillable = True
 
-        At this stage all flattening and merging has finished only one
-        xml text field should exists.
-        """
-        if not attr.xml_type and attr.default is None:
+        if default_value and attr.default is None:
             attr.default = default_value
             attr.fixed = fixed
 

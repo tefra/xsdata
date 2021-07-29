@@ -298,6 +298,10 @@ class Attr:
         return self.tag not in (Tag.ATTRIBUTE, Tag.ELEMENT)
 
     @property
+    def is_nillable(self) -> bool:
+        return self.restrictions.nillable is True
+
+    @property
     def is_optional(self) -> bool:
         """Return whether this attribute is not required."""
         return self.restrictions.is_optional

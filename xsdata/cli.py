@@ -12,6 +12,7 @@ from xsdata import __version__
 from xsdata.codegen.transformer import SchemaTransformer
 from xsdata.codegen.writer import CodeWriter
 from xsdata.logger import logger
+from xsdata.models.config import CompoundFieldStyle
 from xsdata.models.config import DocstringStyle
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.config import OutputFormat
@@ -132,8 +133,7 @@ def download(source: str, output: str):
 @click.option(
     "-cf",
     "--compound-fields",
-    is_flag=True,
-    default=False,
+    default="simplify",
     help=(
         "Use compound fields for repeating choices in order to maintain elements "
         "ordering between data binding operations."
@@ -174,7 +174,7 @@ def generate(**kwargs: Any):
         config.output.format = OutputFormat(value=kwargs["output"])
         config.output.package = kwargs["package"]
         config.output.relative_imports = kwargs["relative_imports"]
-        config.output.compound_fields = kwargs["compound_fields"]
+        config.output.compound_fields = CompoundFieldStyle(kwargs["compound_fields"])
         config.output.docstring_style = DocstringStyle(kwargs["docstring_style"])
 
     if kwargs["structure_style"] != StructureStyle.FILENAMES.value:

@@ -503,12 +503,11 @@ class Choice(AnnotationBase):
     any: Array["Any"] = array_element()
 
     def get_restrictions(self) -> Dict[str, Anything]:
-        min_occurs = self.min_occurs if self.min_occurs > 1 else 0
         max_occurs = sys.maxsize if self.max_occurs == "unbounded" else self.max_occurs
 
         return {
             "choice": str(id(self)),
-            "min_occurs": min_occurs,
+            "min_occurs": self.min_occurs,
             "max_occurs": max_occurs,
         }
 
@@ -1056,7 +1055,7 @@ class Alternative(AnnotationBase):
     def get_restrictions(self) -> Dict[str, Anything]:
         return {
             "choice": str(id(self)),
-            "min_occurs": 0,
+            "min_occurs": 1,
         }
 
 

@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from enum import Enum
 from pathlib import Path
+from types import Union
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -127,6 +128,20 @@ class DocstringStyle(Enum):
     BLANK = "Blank"
 
 
+class CompoundFieldStyle(Enum):
+    """
+    Compound field style.
+
+    :cvar SIMPLIFY: simplify will only group mixed content elements
+    :cvar SELECT: select will group fields if necessary for elements ordering
+    :cvar PRESERVE: preserve will always group together repeatable elements
+    """
+
+    SIMPLIFY = "simplify"
+    SELECT = "select"
+    PRESERVE = "preserve"
+
+
 @dataclass
 class OutputFormat:
     """
@@ -192,7 +207,14 @@ class GeneratorOutput:
     structure: StructureStyle = element(default=StructureStyle.FILENAMES)
     docstring_style: DocstringStyle = element(default=DocstringStyle.RST)
     relative_imports: bool = element(default=False)
-    compound_fields: bool = element(default=False)
+    compound_fields: CompoundFieldStyle = element(default=CompoundFieldStyle.SIMPLIFY)
+
+    def __post_init__(self):
+        if self.compound_fields is True:
+            self.compound_fields = CompoundFieldStyle.SELECT
+
+        if self.compound_fields is False:
+            self.compound_fields = CompoundFieldStyle.SIMPLIFY
 
 
 @dataclass

@@ -129,7 +129,7 @@ class XmlMetaBuilder:
 
         for index, field in enumerate(self.class_type.get_fields(clazz)):
             var = builder.build(
-                index,
+                index + 1,
                 field.name,
                 type_hints[field.name],
                 field.metadata,
@@ -273,14 +273,14 @@ class XmlVarBuilder:
 
         elements = {}
         wildcards = []
-        for choice in self.build_choices(name, choices, origin, globalns):
+        for choice in self.build_choices(index, name, choices, origin, globalns):
             if choice.is_element:
                 elements[choice.qname] = choice
             else:  # choice.is_wildcard:
                 wildcards.append(choice)
 
         return XmlVar(
-            index=index + 1,
+            index=index,
             name=name,
             qname=qname,
             init=init,
@@ -302,12 +302,13 @@ class XmlVarBuilder:
         )
 
     def build_choices(
-        self, name: str, choices: List[Dict], factory: Callable, globalns: Any
+        self, index: int, name: str, choices: List[Dict], factory: Callable, globalns: Any
     ) -> Iterator[XmlVar]:
         """Build the binding metadata for a compound dataclass field."""
         existing_types: Set[type] = set()
 
-        for index, choice in enumerate(choices):
+
+        for point, choice in enumerate(choices):
             default_value = self.class_type.default_choice_value(choice)
 
             metadata = choice.copy()
@@ -320,7 +321,7 @@ class XmlVarBuilder:
                 metadata["type"] = XmlType.ELEMENT
 
             var = self.build(
-                index,
+                float(f"{index}.{point}"),
                 name,
                 type_hint,
                 metadata,

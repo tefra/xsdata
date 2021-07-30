@@ -9,6 +9,7 @@ from xsdata.codegen.models import get_restriction_choice
 from xsdata.codegen.models import get_slug
 from xsdata.codegen.models import Restrictions
 from xsdata.codegen.utils import ClassUtils
+from xsdata.models.config import CompoundFieldStyle
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
 from xsdata.utils.collections import group_by
@@ -18,18 +19,19 @@ class AttributeCompoundChoiceHandler(RelativeHandlerInterface):
     """Group attributes that belong in the same choice and replace them by
     compound fields."""
 
-    __slots__ = "compound_fields"
+    __slots__ = "style"
 
     def __init__(self, container: ContainerInterface):
         super().__init__(container)
 
-        self.compound_fields = container.config.output.compound_fields
+        self.style = container.config.output.compound_fields
 
     def process(self, target: Class):
-        if self.compound_fields:
+        if self.style != CompoundFieldStyle.SIMPLIFY:
+            preserve = self.style == CompoundFieldStyle.PRESERVE
             groups = group_by(target.attrs, get_restriction_choice)
             for choice, attrs in groups.items():
-                if choice and len(attrs) > 1 and any(attr.is_list for attr in attrs):
+                if choice and len(attrs) > 1 and  (preserve or any(attr.is_list for attr in attrs)):
                     self.group_fields(target, attrs)
 
         for index in range(len(target.attrs)):

@@ -379,18 +379,18 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         mock_class_dependencies.assert_called_once_with()
 
     def test_update_restrictions(self):
-        attr = AttrFactory.create()
-        self.processor.update_restrictions(attr, DataType.NMTOKENS)
+        attr = AttrFactory.native(DataType.NMTOKENS)
+        self.processor.update_restrictions(attr, attr.types[0].datatype)
         self.assertTrue(attr.restrictions.tokens)
 
-        attr = AttrFactory.create()
-        self.processor.update_restrictions(attr, DataType.IDREFS)
+        attr = AttrFactory.native(DataType.IDREFS)
+        self.processor.update_restrictions(attr, attr.types[0].datatype)
         self.assertTrue(attr.restrictions.tokens)
 
-        attr = AttrFactory.create()
-        self.processor.update_restrictions(attr, DataType.BASE64_BINARY)
+        attr = AttrFactory.native(DataType.BASE64_BINARY)
+        self.processor.update_restrictions(attr, attr.types[0].datatype)
         self.assertEqual("base64", attr.restrictions.format)
 
-        attr = AttrFactory.create()
-        self.processor.update_restrictions(attr, DataType.HEX_BINARY)
+        attr = AttrFactory.native(DataType.HEX_BINARY)
+        self.processor.update_restrictions(attr, attr.types[0].datatype)
         self.assertEqual("base16", attr.restrictions.format)

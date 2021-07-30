@@ -35,7 +35,6 @@ class ElementMapper:
 
     @classmethod
     def build_class(cls, element: AnyElement, parent_namespace: Optional[str]) -> Class:
-
         assert element.qname is not None
 
         namespace, name = split_qname(element.qname)
@@ -46,41 +45,61 @@ class ElementMapper:
             tag=Tag.ELEMENT,
             location="",
         )
-        children = [c for c in element.children if isinstance(c, AnyElement)]
-        sequential_set = cls.sequential_names(children)
 
+        cls.build_attributes(target, element, namespace)
+        cls.build_elements(target, element, namespace)
+        cls.build_text(target, element)
+
+        return target
+
+    @classmethod
+    def build_attributes(
+        cls, target: Class, element: AnyElement, namespace: Optional[str]
+    ):
         for key, value in element.attributes.items():
-            attr_type = cls.build_attribute_type(key, value)
-            cls.build_attribute(target, key, attr_type, parent_namespace, Tag.ATTRIBUTE)
 
-        for child in children:
-
-            assert child.qname is not None
-
-            if child.tail:
-                target.mixed = True
-
-            if child.attributes or child.children:
-                inner = cls.build_class(child, parent_namespace)
-                attr_type = AttrType(qname=inner.qname, forward=True)
-                target.inner.append(inner)
+            if key == QNames.XSI_NIL:
+                target.nillable = value.strip() in ("true", "1")
             else:
-                attr_type = cls.build_attribute_type(child.qname, child.text)
+                attr_type = cls.build_attribute_type(key, value)
+                cls.build_attribute(target, key, attr_type, namespace, Tag.ATTRIBUTE)
 
-            cls.build_attribute(
-                target,
-                child.qname,
-                attr_type,
-                parent_namespace,
-                Tag.ELEMENT,
-                child.qname in sequential_set,
-            )
+    @classmethod
+    def build_elements(
+        cls, target: Class, element: AnyElement, namespace: Optional[str]
+    ):
+        sequential_set = cls.sequential_names(element)
+        for child in element.children:
+            if isinstance(child, AnyElement) and child.qname:
+                if child.tail:
+                    target.mixed = True
 
+                if child.attributes or child.children:
+                    inner = cls.build_class(child, namespace)
+                    attr_type = AttrType(qname=inner.qname, forward=True)
+                    target.inner.append(inner)
+                else:
+                    attr_type = cls.build_attribute_type(child.qname, child.text)
+
+                sequential = child.qname in sequential_set
+
+                cls.build_attribute(
+                    target,
+                    child.qname,
+                    attr_type,
+                    namespace,
+                    Tag.ELEMENT,
+                    sequential,
+                )
+
+    @classmethod
+    def build_text(cls, target: Class, element: AnyElement):
         if element.text:
             attr_type = cls.build_attribute_type("value", element.text)
             cls.build_attribute(target, "value", attr_type, None, Tag.SIMPLE_TYPE)
 
-        return target
+            if any(attr.tag == Tag.ELEMENT for attr in target.attrs):
+                target.mixed = True
 
     @classmethod
     def build_attribute_type(cls, qname: str, value: Any) -> AttrType:
@@ -155,9 +174,13 @@ class ElementMapper:
         return namespace
 
     @classmethod
-    def sequential_names(cls, children: List[AnyElement]) -> Set[str]:
+    def sequential_names(cls, element: AnyElement) -> Set[str]:
         mapping = defaultdict(list)
-        names = [child.qname for child in children if child.qname]
+        names = [
+            child.qname
+            for child in element.children
+            if isinstance(child, AnyElement) and child.qname
+        ]
         indices: Set[int] = set()
 
         for index, name in enumerate(names):

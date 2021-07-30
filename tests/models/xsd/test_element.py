@@ -23,6 +23,9 @@ class ElementTests(TestCase):
         obj.ns_map["foo"] = Namespace.XS.uri
         self.assertEqual("foo:anyType", obj.default_type)
 
+        obj.fixed = "aa"
+        self.assertEqual("foo:string", obj.default_type)
+
     def test_property_bases(self):
         obj = Element()
         obj.ns_map["xs"] = Namespace.XS.uri

@@ -43,6 +43,8 @@ class AttributeDefaultValueHandler(RelativeHandlerInterface):
 
         if attr.default:
             self.process_attribute_default_enum(target, attr)
+        elif attr.xml_type is None and str in attr.native_types:
+            attr.default = ""
 
     def process_attribute_default_enum(self, target: Class, attr: Attr):
         """

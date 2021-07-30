@@ -159,6 +159,23 @@ class NodeParserTests(TestCase):
         self.assertEqual(DerivedElement, actual.derived_factory)
         self.assertEqual("b", actual.xsi_type)
 
+    def test_start_with_nillable_element(self):
+        a = make_dataclass("a", fields=[])
+
+        parser = NodeParser()
+        queue = []
+        objects = []
+
+        attrs = {QNames.XSI_NIL: "true"}
+        ns_map = {}
+        parser.start(a, queue, objects, "a", attrs, ns_map)
+
+        actual = queue[0]
+
+        self.assertEqual(1, len(queue))
+        self.assertEqual(0, actual.position)
+        self.assertTrue("b", actual.xsi_nil)
+
     @mock.patch.object(PrimitiveNode, "bind", return_value=True)
     def test_end(self, mock_assemble):
         parser = NodeParser()

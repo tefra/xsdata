@@ -6,6 +6,8 @@ from tests.fixtures.books import Books
 from tests.fixtures.models import AttrsType
 from tests.fixtures.models import ExtendedListType
 from tests.fixtures.models import ExtendedType
+from tests.fixtures.models import FixedType
+from tests.fixtures.models import NillableType
 from tests.fixtures.models import Paragraph
 from tests.fixtures.models import SequentialType
 from tests.fixtures.models import TypeA
@@ -70,6 +72,21 @@ class ElementNodeTests(FactoryTestCase):
         self.assertTrue(self.node.bind("foo", None, None, objects))
         self.assertEqual(("foo", None), objects[-1])
 
+    def test_bind_nillable_type(self):
+        self.node.meta = self.context.build(NillableType)
+        self.node.xsi_nil = True
+
+        objects = []
+        self.assertTrue(self.node.bind("foo", None, None, objects))
+        self.assertEqual(("foo", NillableType(None)), objects[-1])
+
+    def test_bind_fixed_value(self):
+        self.node.meta = self.context.build(FixedType)
+
+        objects = []
+        self.assertTrue(self.node.bind("foo", "not the fixed value", None, objects))
+        self.assertEqual(("foo", FixedType()), objects[-1])
+
     def test_bind_with_derived_element(self):
         self.node.meta = self.context.build(TypeA)
         self.node.derived_factory = DerivedElement
@@ -128,22 +145,22 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual("foo", objects[-1][0])
         self.assertEqual(expected, objects[-1][1])
 
-    def test_bind_wild_content(self):
+    def test_bind_wild_text(self):
         self.node.meta = self.context.build(ExtendedType)
         var = self.node.meta.wildcards[0]
 
         params = {}
-        self.node.bind_wild_content(params, var, None, None)
+        self.node.bind_wild_text(params, var, None, None)
         self.assertEqual(0, len(params))
 
         params = {}
-        self.node.bind_wild_content(params, var, "txt", "tail")
+        self.node.bind_wild_text(params, var, "txt", "tail")
         expected = AnyElement(text="txt", tail="tail")
         self.assertEqual({"wildcard": expected}, params)
 
         self.node.attrs = {"a": "b"}
         self.node.ns_map = {"ns0": "a"}
-        self.node.bind_wild_content(params, var, "txt", "tail")
+        self.node.bind_wild_text(params, var, "txt", "tail")
         expected = AnyElement(
             text="txt", tail="tail", children=[expected], attributes=self.node.attrs
         )
@@ -153,13 +170,13 @@ class ElementNodeTests(FactoryTestCase):
         var = self.node.meta.wildcards[0]
 
         params = {}
-        self.node.bind_wild_content(params, var, "txt", "tail")
+        self.node.bind_wild_text(params, var, "txt", "tail")
         self.assertEqual({"wildcard": ["txt", "tail"]}, params)
 
-        self.node.bind_wild_content(params, var, None, "tail")
+        self.node.bind_wild_text(params, var, None, "tail")
         self.assertEqual({"wildcard": ["txt", "tail", "tail"]}, params)
 
-        self.node.bind_wild_content(params, var, "first", None)
+        self.node.bind_wild_text(params, var, "first", None)
         self.assertEqual({"wildcard": ["first", "txt", "tail", "tail"]}, params)
 
     def test_bind_attrs(self):

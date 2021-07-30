@@ -6,6 +6,7 @@ from xsdata.codegen.models import Restrictions
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
+from xsdata.models.enums import Tag
 from xsdata.utils.testing import AttrFactory
 from xsdata.utils.testing import AttrTypeFactory
 from xsdata.utils.testing import ClassFactory
@@ -58,7 +59,7 @@ class AttributeDefaultValueHandlerTests(FactoryTestCase):
 
     def test_process_attribute_with_choice_field(self):
         target = ClassFactory.create()
-        attr = AttrFactory.create(fixed=True, default=2)
+        attr = AttrFactory.element(fixed=True, default=2)
         attr.restrictions.min_occurs = 1
         attr.restrictions.choice = "a"
         self.processor.process_attribute(target, attr)
@@ -73,7 +74,7 @@ class AttributeDefaultValueHandlerTests(FactoryTestCase):
 
     def test_process_attribute_with_sequential_field(self):
         target = ClassFactory.create()
-        attr = AttrFactory.create(fixed=True, default=2)
+        attr = AttrFactory.element(fixed=True, default=2)
         attr.restrictions.min_occurs = 1
         attr.restrictions.sequential = True
         self.processor.process_attribute(target, attr)
@@ -88,7 +89,7 @@ class AttributeDefaultValueHandlerTests(FactoryTestCase):
 
     def test_process_attribute_with_list_field(self):
         target = ClassFactory.create()
-        attr = AttrFactory.create(fixed=True, default=2)
+        attr = AttrFactory.element(fixed=True, default=2)
         attr.restrictions.max_occurs = 5
         self.processor.process_attribute(target, attr)
         self.assertFalse(attr.fixed)
@@ -96,7 +97,7 @@ class AttributeDefaultValueHandlerTests(FactoryTestCase):
 
     def test_process_attribute_with_xsi_type(self):
         target = ClassFactory.create()
-        attr = AttrFactory.create(
+        attr = AttrFactory.attribute(
             fixed=True,
             default="xs:int",
             name="type",
@@ -114,6 +115,17 @@ class AttributeDefaultValueHandlerTests(FactoryTestCase):
         self.processor.process_attribute(target, attr)
         self.assertTrue(attr.fixed)
         self.assertEqual(2, attr.default)
+
+    def test_process_attribute_with_text_attr(self):
+        target = ClassFactory.create()
+
+        attr = AttrFactory.native(DataType.INT, tag=Tag.EXTENSION)
+        self.processor.process_attribute(target, attr)
+        self.assertIsNone(attr.default)
+
+        attr = AttrFactory.native(DataType.STRING, tag=Tag.EXTENSION)
+        self.processor.process_attribute(target, attr)
+        self.assertEqual("", attr.default)
 
     @mock.patch("xsdata.codegen.handlers.attribute_default_value.logger.warning")
     @mock.patch.object(AttributeDefaultValueHandler, "find_enum")

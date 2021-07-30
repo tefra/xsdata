@@ -137,8 +137,11 @@ class Comment:
     class Meta:
         name = "comment"
 
-    value: Optional[str] = field(
-        default=None
+    value: str = field(
+        default="",
+        metadata={
+            "required": True,
+        }
     )
 
 

@@ -33,12 +33,14 @@ class StructureStyle(Enum):
     :cvar NAMESPACES: namespaces
     :cvar CLUSTERS: clusters
     :cvar SINGLE_PACKAGE: single-package
+    :cvar NAMESPACE_CLUSTERS: namespace-clusters
     """
 
     FILENAMES = "filenames"
     NAMESPACES = "namespaces"
     CLUSTERS = "clusters"
     SINGLE_PACKAGE = "single-package"
+    NAMESPACE_CLUSTERS = "namespace-clusters"
 
 
 class NameCase(Enum):

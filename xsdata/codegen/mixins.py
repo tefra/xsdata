@@ -34,6 +34,11 @@ class ContainerInterface(abc.ABC):
         """Search by qualified name for a specific inner class or fail."""
 
     @abc.abstractmethod
+    def first(self, qname: str) -> Class:
+        """Search by qualified name for a specific class and return the first
+        available."""
+
+    @abc.abstractmethod
     def add(self, item: Class):
         """Add class item to the container."""
 

@@ -150,3 +150,56 @@ def is_uri(uri: Optional[str]) -> bool:
     """Verify given string is a valid uri."""
 
     return bool(URI_REGEX.search(uri)) if uri else False
+
+
+@functools.lru_cache(maxsize=50)
+def to_package_name(uri: Optional[str]) -> str:
+    """Util method to convert a namespace to a dot style package name."""
+
+    if not uri:
+        return ""
+
+    # Remove scheme
+    domain_sep = "."
+    if uri.startswith("http://"):
+        uri = uri[7:]
+    elif uri.startswith("urn:"):
+        uri = uri[4:]
+        domain_sep = "-"
+
+        if uri.startswith("xmlns:"):
+            uri = uri[6:]
+
+        uri = uri.replace(":", "/")
+
+    # Remote target
+    pos = uri.find("#")
+    if pos > 0:
+        uri = uri[:pos]
+
+    tokens = [token for token in uri.split("/") if token.strip()]
+
+    if not tokens:
+        return ""
+
+    # Remove extension
+    if len(tokens) > 1:
+        last = tokens[-1]
+        pos = tokens[-1].rfind(".")
+        if pos > 0:
+            tokens[-1] = last[:pos]
+
+    # Remove port from domain
+    domain = tokens.pop(0)
+    pos = domain.find(":")
+    if pos > 0:
+        domain = domain[:pos]
+
+    # Remove www from domain
+    if domain.startswith("www"):
+        domain = domain[3:]
+
+    for part in domain.split(domain_sep):
+        tokens.insert(0, part)
+
+    return ".".join(token for token in tokens if token)

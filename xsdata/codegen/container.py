@@ -98,6 +98,13 @@ class ClassContainer(ContainerInterface):
 
         return inner
 
+    def first(self, qname: str) -> Class:
+        classes = self.data.get(qname)
+        if not classes:
+            raise KeyError(f"Class {qname} not found")
+
+        return classes[0]
+
     def process(self):
         """
         Run all the process handlers.

@@ -99,6 +99,7 @@ class ClassFactory(Factory):
         qname: Optional[str] = None,
         meta_name: Optional[str] = None,
         namespace: Optional[str] = None,
+        target_namespace: Optional[str] = None,
         tag: Optional[str] = None,
         abstract: bool = False,
         mixed: bool = False,

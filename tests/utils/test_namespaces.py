@@ -12,6 +12,7 @@ from xsdata.utils.namespaces import is_uri
 from xsdata.utils.namespaces import load_prefix
 from xsdata.utils.namespaces import prefix_exists
 from xsdata.utils.namespaces import split_qname
+from xsdata.utils.namespaces import to_package_name
 
 
 class NamespacesTests(TestCase):
@@ -112,3 +113,25 @@ class NamespacesTests(TestCase):
         self.assertTrue(is_default("foo", {"": "foo"}))
         self.assertTrue(is_default("foo", {None: "foo"}))
         self.assertTrue(is_default("foo", {"a": "foo", None: "foo"}))
+
+    def test_to_package_name(self):
+        cases = {
+            "http://www.w3.org/XML/1998/namespace": "org.w3.XML.1998.namespace",
+            "http://www.w3.org/XML/2008/06/xlink.xsd": "org.w3.XML.2008.06.xlink",
+            "http://xsdtesting": "xsdtesting",
+            "http://xsdtesting:8080": "xsdtesting",
+            "http://xsdtesting:8080#target": "xsdtesting",
+            "myNS.tempuri.org": "org.tempuri.myNS",
+            "ElemDecl/disallowedSubst": "ElemDecl.disallowedSubst",
+            "http://xstest-tns/schema11": "xstest-tns.schema11",
+            "http://uri.etsi.org/#": "org.etsi.uri",
+            "urn:xmlns:25hoursaday-com:address": "com.25hoursaday.address",
+            "urn:my.test:SchemaB": "my.test.SchemaB",
+            "http://": "",
+            "": "",
+            " ": "",
+            None: "",
+        }
+
+        for uri, package in cases.items():
+            self.assertEqual(package, to_package_name(uri))

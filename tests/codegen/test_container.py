@@ -100,6 +100,14 @@ class ClassContainerTests(FactoryTestCase):
         self.assertEqual(second, self.container.find_inner(obj, "{a}b"))
         mock_process_class.assert_called_once_with(first, Steps.FLATTEN)
 
+    def test_first(self):
+        obj = ClassFactory.create()
+        self.container.add(obj)
+        self.assertEqual(obj, self.container.first(obj.qname))
+
+        with self.assertRaises(KeyError) as cm:
+            self.container.first("aa")
+
     def test_process_class(self):
         target = ClassFactory.create(
             inner=[ClassFactory.elements(2), ClassFactory.elements(1)]

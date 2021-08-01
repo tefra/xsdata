@@ -85,6 +85,33 @@ type substitutions, redefines.
     $ xsdata schema.xsd --package models --structure-style namespaces
 
 
+Since v21.8, the generator converts namespaces to packages similar to jaxb in order
+to facilitate runs against multiple schemas from the same vendor.
+
+.. list-table::
+    :widths: 20 20
+    :header-rows: 1
+
+    * - Examples (before naming conventions)
+      -
+    * - http://www.w3.org/XML/1998/namespace
+      - org.w3.xml.1998.namespace
+    * - myNS.tempuri.org
+      - org.tempuri.myNS
+    * - urn:xmlns:25hoursaday-com:address
+      - com.25hoursaday.address
+
+
+**namespace-clusters**
+
+This style combines the clusters and the namespace styles. It will fail if there
+are strongly connected classes in the same graph from different namespaces.
+
+.. code-block:: console
+
+    $ xsdata schema.xsd --package models --structure-style namespace-clusters
+
+
 **single-package**
 
 This style will group all classes together into a single package eliminating imports

@@ -131,6 +131,60 @@ class ClassDesignateHandlerTests(FactoryTestCase):
         self.assertEqual("class_E", classes[2].module)
         self.assertEqual("class_E", classes[3].module)
 
+    def test_group_by_namespace_clusters(self):
+        classes = [
+            ClassFactory.create("{urn:foo-bar:com}a"),
+            ClassFactory.create("{urn:foo-bar:add}b"),
+            ClassFactory.create("{urn:foo-bar:add}c"),
+            ClassFactory.create("{urn:foo-bar:add}d"),
+        ]
+
+        classes[0].attrs.append(AttrFactory.reference(classes[1].qname))
+        classes[1].attrs.append(AttrFactory.reference(classes[2].qname))
+        classes[2].attrs.append(AttrFactory.reference(classes[3].qname))
+        classes[3].attrs.append(AttrFactory.reference(classes[1].qname, circular=True))
+
+        self.config.output.structure = StructureStyle.NAMESPACE_CLUSTERS
+        self.config.output.package = "models"
+        self.container.extend(classes)
+
+        self.handler.run()
+        self.assertEqual("a", classes[0].module)
+        self.assertEqual("d", classes[1].module)
+        self.assertEqual("d", classes[2].module)
+        self.assertEqual("d", classes[3].module)
+
+        self.assertEqual("models.bar.foo.com", classes[0].package)
+        self.assertEqual("models.bar.foo.add", classes[1].package)
+        self.assertEqual("models.bar.foo.add", classes[2].package)
+        self.assertEqual("models.bar.foo.add", classes[3].package)
+
+    def test_group_by_namespace_clusters_raises_exception(self):
+        classes = [
+            ClassFactory.create("{urn:foo-bar:com}a"),
+            ClassFactory.create("{urn:foo-bar:add}b"),
+            ClassFactory.create("{urn:foo-bar:exc}c"),
+            ClassFactory.create("{urn:foo-bar:add}d"),
+        ]
+
+        classes[0].attrs.append(AttrFactory.reference(classes[1].qname))
+        classes[1].attrs.append(AttrFactory.reference(classes[2].qname))
+        classes[2].attrs.append(AttrFactory.reference(classes[3].qname))
+        classes[3].attrs.append(AttrFactory.reference(classes[1].qname, circular=True))
+
+        self.config.output.structure = StructureStyle.NAMESPACE_CLUSTERS
+        self.config.output.package = "models"
+        self.container.extend(classes)
+
+        with self.assertRaises(CodeGenerationError) as cm:
+            self.handler.run()
+
+        self.assertEqual(
+            "Found strongly connected classes from different namespaces, "
+            "grouping them is impossible!",
+            str(cm.exception),
+        )
+
     def test_combine_ns_package(self):
         namespace = "urn:foo-bar:add"
         result = self.handler.combine_ns_package(namespace)

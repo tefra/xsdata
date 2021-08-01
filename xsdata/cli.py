@@ -125,6 +125,8 @@ def download(source: str, output: str):
         "\n\n"
         "clusters: group by strong connected dependencies"
         "\n\n"
+        "namespace-clusters: group by strong connected dependencies and namespaces"
+        "\n\n"
         "single-package: group all classes together"
     ),
     default="filenames",

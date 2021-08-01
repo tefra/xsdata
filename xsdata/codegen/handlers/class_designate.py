@@ -14,6 +14,7 @@ from xsdata.codegen.mixins import ContainerHandlerInterface
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import get_location
 from xsdata.codegen.models import get_target_namespace
+from xsdata.exceptions import CodeGenerationError
 from xsdata.models.config import StructureStyle
 from xsdata.models.enums import COMMON_SCHEMA_DIR
 from xsdata.utils import collections
@@ -36,6 +37,8 @@ class ClassDesignateHandler(ContainerHandlerInterface):
             self.group_all_together()
         elif structure_style == StructureStyle.CLUSTERS:
             self.group_by_strong_components()
+        elif structure_style == StructureStyle.NAMESPACE_CLUSTERS:
+            self.group_by_namespace_clusters()
         else:
             self.group_by_filenames()
 
@@ -83,6 +86,19 @@ class ClassDesignateHandler(ContainerHandlerInterface):
             classes = self.sorted_classes(group)
             module = classes[0].name
             self.assign(classes, package, module)
+
+    def group_by_namespace_clusters(self):
+        for group in self.strongly_connected_classes():
+            classes = self.sorted_classes(group)
+            if len(set(map(get_target_namespace, classes))) > 1:
+                raise CodeGenerationError(
+                    "Found strongly connected classes from different "
+                    "namespaces, grouping them is impossible!"
+                )
+
+            parts = self.combine_ns_package(classes[0].target_namespace)
+            module = classes[0].name
+            self.assign(classes, ".".join(parts), module)
 
     def sorted_classes(self, qnames: Set[str]) -> List[Class]:
         edges = {

@@ -75,6 +75,7 @@ html_sidebars = {
 
 html_extra_path = ["robots.txt"]
 
+html_favicon = "_static/favicon.png"
 
 # Material theme options (see theme.conf for more information)
 html_theme_options = {

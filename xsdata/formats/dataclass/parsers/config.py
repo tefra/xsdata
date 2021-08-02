@@ -1,18 +1,15 @@
-from dataclasses import dataclass
 from typing import Callable
 from typing import Dict
 from typing import Optional
 from typing import Type
-from typing import TypeVar
 
-T = TypeVar("T")
+from xsdata.formats.bindings import T
 
 
 def default_class_factory(cls: Type[T], params: Dict) -> T:
     return cls(**params)  # type: ignore
 
 
-@dataclass
 class ParserConfig:
     """
     Parsing configuration options.
@@ -27,8 +24,24 @@ class ParserConfig:
         exceptions
     """
 
-    base_url: Optional[str] = None
-    process_xinclude: bool = False
-    class_factory: Callable[[Type[T], Dict], T] = default_class_factory
-    fail_on_unknown_properties: bool = True
-    fail_on_converter_warnings: bool = False
+    __slots__ = (
+        "base_url",
+        "process_xinclude",
+        "class_factory",
+        "fail_on_unknown_properties",
+        "fail_on_converter_warnings",
+    )
+
+    def __init__(
+        self,
+        base_url: Optional[str] = None,
+        process_xinclude: bool = False,
+        class_factory: Callable[[Type[T], Dict], T] = default_class_factory,
+        fail_on_unknown_properties: bool = True,
+        fail_on_converter_warnings: bool = False,
+    ):
+        self.base_url = base_url
+        self.process_xinclude = process_xinclude
+        self.class_factory = class_factory
+        self.fail_on_unknown_properties = fail_on_unknown_properties
+        self.fail_on_converter_warnings = fail_on_converter_warnings

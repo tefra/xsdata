@@ -81,13 +81,12 @@ class ElementNode(XmlNode):
         self, qname: str, text: Optional[str], tail: Optional[str], objects: List
     ) -> bool:
 
+        obj: Any = None
         if not self.xsi_nil or self.meta.nillable:
             params: Dict = {}
             self.bind_attrs(params)
             self.bind_content(params, text, tail, objects)
             obj = self.config.class_factory(self.meta.clazz, params)
-        else:
-            obj = None
 
         if self.derived_factory:
             obj = self.derived_factory(qname=qname, value=obj, type=self.xsi_type)

@@ -245,6 +245,7 @@ class XmlVarBuilder:
         namespace = metadata.get("namespace")
         choices = metadata.get("choices", EMPTY_SEQUENCE)
         mixed = metadata.get("mixed", False)
+        required = metadata.get("required", False)
         nillable = metadata.get("nillable", False)
         format_str = metadata.get("format", None)
         sequential = metadata.get("sequential", False)
@@ -288,6 +289,7 @@ class XmlVarBuilder:
             format=format_str,
             clazz=clazz,
             any_type=any_type,
+            required=required,
             nillable=nillable,
             sequential=sequential,
             factory=origin,

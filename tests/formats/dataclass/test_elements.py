@@ -95,6 +95,18 @@ class XmlValTests(TestCase):
         self.assertEqual(var.elements["a"], var.find_value_choice(TypeA(1), True))
         self.assertEqual(var.elements["b"], var.find_value_choice(TypeB(1, "b"), True))
 
+    def test_is_optional(self):
+        var = XmlVarFactory.create(xml_type=XmlType.ATTRIBUTE, name="att")
+
+        self.assertTrue(var.is_optional(None))
+        self.assertFalse(var.is_optional("foo"))
+
+        var.default = lambda: [1, 2, 3]
+        self.assertTrue(var.is_optional([1, 2, 3]))
+
+        var.required = True
+        self.assertFalse(var.is_optional([1, 2, 3]))
+
     def test_match_namespace(self):
         var = XmlVarFactory.create(xml_type=XmlType.WILDCARD, name="foo")
         self.assertTrue(var.match_namespace("a"))

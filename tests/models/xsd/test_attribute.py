@@ -44,13 +44,6 @@ class AttributeTests(TestCase):
         obj = Attribute()
         self.assertEqual({"max_occurs": 1, "min_occurs": 0}, obj.get_restrictions())
 
-        obj.default = "foo"
-        self.assertEqual({"max_occurs": 1, "min_occurs": 1}, obj.get_restrictions())
-        obj.default = None
-        obj.fixed = "foo"
-        self.assertEqual({"max_occurs": 1, "min_occurs": 1}, obj.get_restrictions())
-
-        obj.fixed = None
         obj.use = UseType.REQUIRED
         expected = {"max_occurs": 1, "min_occurs": 1}
         self.assertEqual(expected, obj.get_restrictions())

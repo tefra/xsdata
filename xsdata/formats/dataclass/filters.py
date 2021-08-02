@@ -302,9 +302,6 @@ class Filters:
 
         restrictions = attr.restrictions.asdict(attr.native_types)
 
-        if attr.default or attr.is_factory:
-            restrictions.pop("required", None)
-
         metadata = {
             "name": name,
             "type": attr.xml_type,

@@ -116,3 +116,25 @@ class JsonSerializerTests(TestCase):
             "JsonSerializer indent property is deprecated, use SerializerConfig",
             str(w[-1].message),
         )
+
+    def test_next_value(self):
+        book = self.books.book[0]
+        serializer = JsonSerializer()
+
+        actual = [name for name, value in serializer.next_value(book)]
+        expected = [
+            "author",
+            "title",
+            "genre",
+            "price",
+            "pub_date",
+            "review",
+            "id",
+            "lang",
+        ]
+        self.assertEqual(expected, actual)
+
+        serializer.config.ignore_default_attributes = True
+        expected = expected[:-1]
+        actual = [name for name, value in serializer.next_value(book)]
+        self.assertEqual(expected, actual)

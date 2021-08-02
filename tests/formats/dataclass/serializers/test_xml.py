@@ -505,7 +505,7 @@ class XmlSerializerTests(TestCase):
         self.assertEqual(expected, list(result))
 
     def test_next_value(self):
-        obj = SequentialType(x0=1, x1=[2, 3, 4], x2=[6, 7], x3=[9])
+        obj = SequentialType(x0=1, x1=[2, 3, 4, None], x2=[6, 7], x3=[9])
         meta = self.serializer.context.build(SequentialType)
         x0 = meta.text
         x1 = next(meta.find_children("x1"))
@@ -530,7 +530,7 @@ class XmlSerializerTests(TestCase):
         obj = SequentialType(a0="foo", a1={"b": "c", "d": "e"})
         meta = self.serializer.context.build(SequentialType)
 
-        actual = self.serializer.next_attribute(obj, meta, False, None)
+        actual = self.serializer.next_attribute(obj, meta, False, None, False)
         expected = [
             ("a0", "foo"),
             ("b", "c"),
@@ -540,13 +540,24 @@ class XmlSerializerTests(TestCase):
         self.assertIsInstance(actual, Generator)
         self.assertEqual(expected, list(actual))
 
-        actual = self.serializer.next_attribute(obj, meta, True, "xs:bool")
+        actual = self.serializer.next_attribute(obj, meta, True, "xs:bool", False)
         expected.extend(
             [
                 (QNames.XSI_TYPE, "xs:bool"),
                 (QNames.XSI_NIL, "true"),
             ]
         )
+        self.assertEqual(expected, list(actual))
+
+        meta.attributes["a0"].required = False
+        meta.attributes["a0"].default = "foo"
+        actual = self.serializer.next_attribute(obj, meta, False, None, True)
+        expected = [
+            ("b", "c"),
+            ("d", "e"),
+        ]
+
+        self.assertIsInstance(actual, Generator)
         self.assertEqual(expected, list(actual))
 
     def test_render_mixed_content(self):

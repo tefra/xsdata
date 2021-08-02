@@ -65,6 +65,7 @@ class XmlVar(MetaMixin):
     :param format: Value format information
     :param derived: Wrap parsed values with a generic type
     :param any_type: Field supports dynamic value types
+    :param required: Field is mandatory
     :param nillable: Field supports nillable content
     :param sequential: Render values in sequential mode
     :param list_element: Field is a list of elements
@@ -88,6 +89,7 @@ class XmlVar(MetaMixin):
         "format",
         "derived",
         "any_type",
+        "required",
         "nillable",
         "sequential",
         "default",
@@ -122,6 +124,7 @@ class XmlVar(MetaMixin):
         format: Optional[str],
         derived: bool,
         any_type: bool,
+        required: bool,
         nillable: bool,
         sequential: bool,
         default: Any,
@@ -142,6 +145,7 @@ class XmlVar(MetaMixin):
         self.format = format
         self.derived = derived
         self.any_type = any_type
+        self.required = required
         self.nillable = nillable
         self.sequential = sequential
         self.list_element = factory in (list, tuple)
@@ -218,6 +222,16 @@ class XmlVar(MetaMixin):
                 return element
 
         return None
+
+    def is_optional(self, value: Any) -> bool:
+        """Return whether this var instance is not required and the given value
+        matches the default one."""
+        if self.required:
+            return False
+
+        if callable(self.default):
+            return self.default() == value
+        return self.default == value
 
     @classmethod
     def match_type(

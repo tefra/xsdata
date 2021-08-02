@@ -144,6 +144,7 @@ class XmlMetaBuilderTests(FactoryTestCase):
                 name="author",
                 qname="Author",
                 types=(str,),
+                required=True,
             ),
             XmlVarFactory.create(
                 xml_type=XmlType.ELEMENT,
@@ -151,6 +152,7 @@ class XmlMetaBuilderTests(FactoryTestCase):
                 name="title",
                 qname="Title",
                 types=(str,),
+                required=True,
             ),
             XmlVarFactory.create(
                 xml_type=XmlType.ELEMENT,
@@ -158,6 +160,7 @@ class XmlMetaBuilderTests(FactoryTestCase):
                 name="genre",
                 qname="Genre",
                 types=(str,),
+                required=True,
             ),
             XmlVarFactory.create(
                 xml_type=XmlType.ELEMENT,
@@ -165,6 +168,7 @@ class XmlMetaBuilderTests(FactoryTestCase):
                 name="price",
                 qname="Price",
                 types=(float,),
+                required=True,
             ),
             XmlVarFactory.create(
                 xml_type=XmlType.ELEMENT,
@@ -172,6 +176,7 @@ class XmlMetaBuilderTests(FactoryTestCase):
                 name="pub_date",
                 qname="PubDate",
                 types=(XmlDate,),
+                required=True,
             ),
             XmlVarFactory.create(
                 xml_type=XmlType.ELEMENT,
@@ -179,6 +184,7 @@ class XmlMetaBuilderTests(FactoryTestCase):
                 name="review",
                 qname="Review",
                 types=(str,),
+                required=True,
             ),
             XmlVarFactory.create(
                 xml_type=XmlType.ATTRIBUTE, index=7, name="id", qname="ID", types=(str,)

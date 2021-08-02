@@ -392,12 +392,13 @@ Serializer Config
     ...     encoding="UTF-8",
     ...     xml_version="1.1",
     ...     xml_declaration=False,
+    ...     ignore_default_attributes=True,
     ...     schema_location="urn books.xsd",
     ...     no_namespace_schema_location=None,
     ... ))
     >>> print(serializer.render(books))
     <ns0:books xmlns:ns0="urn:books" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn books.xsd">
-      <book id="bk001" lang="en">
+      <book id="bk001">
         <author>Hightower, Kim</author>
         <title>The First Book</title>
         <genre>Fiction</genre>

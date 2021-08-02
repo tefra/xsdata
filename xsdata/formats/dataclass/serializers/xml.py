@@ -6,9 +6,11 @@ from typing import Any
 from typing import Dict
 from typing import Generator
 from typing import Iterable
+from typing import Iterator
 from typing import List
 from typing import Optional
 from typing import TextIO
+from typing import Tuple
 from typing import Type
 from xml.etree.ElementTree import QName
 
@@ -105,12 +107,13 @@ class XmlSerializer(AbstractSerializer):
 
         yield XmlWriterEvent.START, qname
 
-        for key, value in self.next_attribute(obj, meta, nillable, xsi_type):
+        for key, value in self.next_attribute(
+            obj, meta, nillable, xsi_type, self.config.ignore_default_attributes
+        ):
             yield XmlWriterEvent.ATTR, key, value
 
         for var, value in self.next_value(obj, meta):
-            if value is not None or var.nillable:
-                yield from self.write_value(value, var, namespace)
+            yield from self.write_value(value, var, namespace)
 
         yield XmlWriterEvent.END, qname
 
@@ -302,7 +305,7 @@ class XmlSerializer(AbstractSerializer):
         yield XmlWriterEvent.DATA, cls.encode(value, var)
 
     @classmethod
-    def next_value(cls, obj: Any, meta: XmlMeta):
+    def next_value(cls, obj: Any, meta: XmlMeta) -> Iterator[Tuple[XmlVar, Any]]:
         """
         Return the non attribute variables with their object values in the
         correct order according to their definition and the sequential metadata
@@ -318,7 +321,9 @@ class XmlSerializer(AbstractSerializer):
             var = attrs[index]
 
             if not var.sequential:
-                yield var, getattr(obj, var.name)
+                value = getattr(obj, var.name)
+                if value is not None or var.nillable:
+                    yield var, value
                 index += 1
                 continue
 
@@ -335,23 +340,40 @@ class XmlSerializer(AbstractSerializer):
                     values = getattr(obj, var.name)
                     if j < len(values):
                         rolling = True
-                        yield var, values[j]
+                        value = values[j]
+
+                        if value is not None or var.nillable:
+                            yield var, value
                 j += 1
 
     @classmethod
     def next_attribute(
-        cls, obj: Any, meta: XmlMeta, xsi_nil: bool, xsi_type: Optional[str]
-    ) -> Generator:
+        cls,
+        obj: Any,
+        meta: XmlMeta,
+        nillable: bool,
+        xsi_type: Optional[str],
+        ignore_optionals: bool,
+    ) -> Iterator[Tuple[str, Any]]:
         """
-        Return the attribute variables with their object values.
+        Return the attribute variables with their object values if set and not
+        empty iterables.
 
-        Ignores None values and empty lists. Optionally include the xsi
-        properties type and nil.
+        :param obj: Input object
+        :param meta: Object metadata
+        :param nillable: Is model nillable
+        :param xsi_type: The true xsi:type of the object
+        :param ignore_optionals: Skip optional attributes with default value
+        :return:
         """
         for var in meta.get_attribute_vars():
             if var.is_attribute:
                 value = getattr(obj, var.name)
-                if value is None or collections.is_array(value) and not value:
+                if (
+                    value is None
+                    or (collections.is_array(value) and not value)
+                    or (ignore_optionals and var.is_optional(value))
+                ):
                     continue
 
                 yield var.qname, cls.encode(value, var)
@@ -361,7 +383,7 @@ class XmlSerializer(AbstractSerializer):
         if xsi_type:
             yield QNames.XSI_TYPE, QName(xsi_type)
 
-        if xsi_nil:
+        if nillable:
             yield QNames.XSI_NIL, "true"
 
     @classmethod

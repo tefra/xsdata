@@ -332,17 +332,12 @@ class Attribute(AnnotationBase):
             yield self.ref
 
     def get_restrictions(self) -> Dict[str, Anything]:
-        restrictions = {}
-
-        if self.default or self.fixed:
-            self.use = UseType.REQUIRED
-
         if self.use == UseType.REQUIRED:
-            restrictions.update({"min_occurs": 1, "max_occurs": 1})
+            restrictions = {"min_occurs": 1, "max_occurs": 1}
         elif self.use == UseType.PROHIBITED:
-            restrictions.update({"max_occurs": 0, "min_occurs": 0})
+            restrictions = {"max_occurs": 0, "min_occurs": 0}
         else:
-            restrictions.update({"max_occurs": 1, "min_occurs": 0})
+            restrictions = {"max_occurs": 1, "min_occurs": 0}
 
         if self.simple_type:
             restrictions.update(self.simple_type.get_restrictions())

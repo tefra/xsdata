@@ -329,14 +329,9 @@ class FiltersTests(FactoryTestCase):
         expected = {"nillable": True, "max_inclusive": 2}
         self.assertEqual(expected, self.filters.field_metadata(attr, None, []))
 
-        attr.default = "foo"
-        attr.restrictions.nillable = False
-        expected = {"max_inclusive": 2}
-        self.assertEqual(expected, self.filters.field_metadata(attr, None, []))
-
         attr.default = None
         attr.restrictions.tokens = True
-        expected = {"max_inclusive": 2, "tokens": True}
+        expected = {"max_inclusive": 2, "nillable": True, "tokens": True}
         self.assertEqual(expected, self.filters.field_metadata(attr, None, []))
 
     def test_field_metadata_mixed(self):

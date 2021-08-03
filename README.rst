@@ -96,23 +96,35 @@ Features
   - Customize behaviour through config
 
 
-Changelog: 21.7 (2021-07-01)
+Changelog: 21.8 (2021-08-03)
 ----------------------------
+- Deprecated JsonSerializer indent property, use SerializerConfig instead
+- Fixed SchemaMapper assigning wrong namespace for imported unqualified elements
+- Fixed AttributeTypeHandler to maintain occurs between any flattening
+- Fixed missing required field metadata property
+- Fixed nillable fields not being marked as optional
+- Fixed fields ordering during class reduce process (Codegen from xml/json)
+- Added support for xs:defaultOpenContent:appliesToEmpty attribute
+- Added ParserConfig class factory option `#549 <https://github.com/tefra/xsdata/pull/549>`_
+- Added SerializerConfig option to ignore optional default attributes `#555 <https://github.com/tefra/xsdata/pull/555>`_
+- Added warning on unexpected duplicate types `#564 <https://github.com/tefra/xsdata/pull/564>`_
+- Added GeneratorConfig support for kw_only and slots for python >= 3.10
+- Added structure style namespace-clusters `#573 <https://github.com/tefra/xsdata/pull/573>`_
+- Updated text fields default value to empty string and marked as required `#570 <https://github.com/tefra/xsdata/pull/570>`_
+- Updated fields derived from xs:substitutionGroups to optional
+- Updated fields derived from xs:any to optional
+- Updated AttributeDefaultValueHandler to preserve acceptable default values
+- Updated AttributeDefaultValueHandler to mark as optional any xsi:type attribute
+- Updated xs:alternative handling to resemble xs:choice
+- Updated mixed content handler to group all elements under wildcard
+- Updated ElementMapper to detect nillable types
+- Updated DictMapper to generate list of xs:anySimpleType for empty list nodes
+- Updated the compatibility layer for dataclass style plugins
+- Updated namespaces structure style to convert namespaces similar to jaxb
 
-- Fixed docstrings backslash escaping `#518 <https://github.com/tefra/xsdata/pull/518>`_
-- Fixed analyzer flattening bare types `#541 <https://github.com/tefra/xsdata/pull/541>`_
-- Fixed multiple issues with compound fields and override fields `#533 <https://github.com/tefra/xsdata/pull/533>`_
-- Fixed missing derived elements types during xml parsing `#541 <https://github.com/tefra/xsdata/pull/541>`_
-- Added structure style: clusters for smaller packages `#509 <https://github.com/tefra/xsdata/pull/509>`_
-- Added configuration to generate relative imports `#519 <https://github.com/tefra/xsdata/pull/519>`_
-- Added configuration to toggle all dataclasses features `#529 <https://github.com/tefra/xsdata/pull/529>`_
-- Added binding support for tuple typing annotations (frozen dataclasses) `#529 <https://github.com/tefra/xsdata/pull/529>`_
-- Added support to bind data directly from xml/lxml Element and ElementTree `#531 <https://github.com/tefra/xsdata/pull/531>`_ `#546 <https://github.com/tefra/xsdata/pull/546>`_
-- Updated analyzer to avoid same name for outer-inner classes `#511 <https://github.com/tefra/xsdata/pull/511>`_
-- Updated cli to fail early if config file is invalid `#514 <https://github.com/tefra/xsdata/pull/514>`_
-- Updated cli to remove setuptools from runtime dependencies `#515 <https://github.com/tefra/xsdata/pull/515>`_
-- Updated analyzer to relax override field validations completely `#516 <https://github.com/tefra/xsdata/pull/516>`_
-- Updated analyzer to sort classes before class name conflict resolution `#517 <https://github.com/tefra/xsdata/pull/517>`_
-- Updated JSON parser to attempt binding against subclasses `#527 <https://github.com/tefra/xsdata/pull/527>`_
-- Updated analyzer to guard against multiple substitution group runs `#538 <https://github.com/tefra/xsdata/pull/538>`_
-- Updated code generation to use case sensitive reserved words `#545 <https://github.com/tefra/xsdata/pull/545>`_
+  - `http://www.w3.org/XML/1998/namespace` to `org.w3.XML.1998.namespace`
+
+- Update binding process for nillable types and fields
+
+  - nillable types can be initialized
+  - nillable fields are initialized with None values

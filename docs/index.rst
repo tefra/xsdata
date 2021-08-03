@@ -25,6 +25,7 @@
     examples
     data-types
     api
+    faq
     changelog
 
 

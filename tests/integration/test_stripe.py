@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 
 from click.testing import CliRunner
 
@@ -15,9 +16,7 @@ os.chdir(root)
 
 
 def test_json_documents():
-
     filepath = fixtures_dir.joinpath("stripe")
-    package = "tests.fixtures.series"
     runner = CliRunner()
     result = runner.invoke(
         cli,

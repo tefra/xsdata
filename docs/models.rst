@@ -379,12 +379,26 @@ Wildcards can have a normal uri namespace or use one of xml schema generics.
         metadata={
             "type": "Wildcard",
             "namespace": "##any",
+            "choices": (
+                {
+                    "name": "DSAKeyValue",
+                    "type": DsakeyValue,
+                    "namespace": "http://www.w3.org/2000/09/xmldsig#",
+                },
+                {
+                    "name": "RSAKeyValue",
+                    "type": RsakeyValue,
+                    "namespace": "http://www.w3.org/2000/09/xmldsig#",
+                },
+            ),
         }
     )
 
 This type of field accepts any primitive value or an another dataclass instance or a
 generic :class:`~xsdata.formats.dataclass.models.generics.AnyElement` instance.
 
+This type optionally can have a list of acceptable elements similar to compound fields,
+otherwise during binding the parsers will try to find a suitable model automatically.
 
 Type: Attributes
 ~~~~~~~~~~~~~~~~

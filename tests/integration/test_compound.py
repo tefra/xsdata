@@ -16,7 +16,7 @@ def test_xml_documents():
     package = "tests.fixtures.compound.models"
     runner = CliRunner()
     result = runner.invoke(
-        cli, [str(schema), "-p", package, "-ss", "single-package", "-cf"]
+        cli, [str(schema), "-p", package, "-ss", "single-package", "--compound-fields"]
     )
 
     if result.exception:

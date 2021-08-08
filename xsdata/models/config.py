@@ -22,6 +22,7 @@ from xsdata.formats.dataclass.serializers.writers import XmlEventWriter
 from xsdata.models.mixins import array_element
 from xsdata.models.mixins import attribute
 from xsdata.models.mixins import element
+from xsdata.utils import objects
 from xsdata.utils import text
 
 
@@ -29,11 +30,12 @@ class StructureStyle(Enum):
     """
     Code writer output structure strategies.
 
-    :cvar FILENAMES: filenames
-    :cvar NAMESPACES: namespaces
-    :cvar CLUSTERS: clusters
-    :cvar SINGLE_PACKAGE: single-package
-    :cvar NAMESPACE_CLUSTERS: namespace-clusters
+    :cvar FILENAMES: filenames: groups classes by the schema location
+    :cvar NAMESPACES: namespaces: group classes by the target namespace
+    :cvar CLUSTERS: clusters: group by strong connected dependencies
+    :cvar SINGLE_PACKAGE: single-package: group all classes together
+    :cvar NAMESPACE_CLUSTERS: namespace-clusters: group by strong
+        connected dependencies and namespaces
     """
 
     FILENAMES = "filenames"
@@ -134,14 +136,14 @@ class OutputFormat:
     """
     Output format options.
 
-    :param value: Name of the format
-    :param repr: Generate repr methods
-    :param eq: Generate equal method
-    :param order: Generate rich comparison methods
-    :param unsafe_hash: Generate hash method when frozen is false
-    :param frozen: Enable read only properties with immutable containers
-    :param slots: Enable __slots__,  python >= 3.10
-    :param kw_only: Enable keyword only constructor arguments, python >= 3.10
+    :param value: Output format name, default: dataclasses
+    :param repr: Generate __repr__ method, default: true
+    :param eq: Generate __eq__ method, default: true
+    :param order: Generate  __lt__, __le__, __gt__, and __ge__ methods, default: false
+    :param unsafe_hash: Generate __hash__ method if not frozen, default: false
+    :param frozen: Enable read only properties, default false
+    :param slots: Enable __slots__, default: false, python>=3.10 Only
+    :param kw_only: Enable keyword only arguments, default: false, python>=3.10 Only
     """
 
     value: str = field(default="dataclasses")
@@ -178,23 +180,27 @@ class GeneratorOutput:
     """
     Main generator output options.
 
-    :param max_line_length: Maximum line length
-    :param package: Package name eg foo.bar.models
-    :param format: Code generator output format name
-    :param structure: Select an output structure
-    :param docstring_style: Select a docstring style
-    :param relative_imports: Enable relative imports
-    :param compound_fields: Use compound fields for repeating choices.
-        Enable if elements ordering matters for your case.
+    :param package: Target package, default: generated
+    :param format: Output format
+    :param structure_style: Output structure style, default: filenames
+    :param docstring_style: Docstring style, default: reStructuredText
+    :param relative_imports: Use relative imports, default: false
+    :param compound_fields: Use compound fields for repeatable elements, default: false
+    :param max_line_length: Adjust the maximum line length, default: 79
     """
 
-    max_line_length: int = attribute(default=79)
     package: str = element(default="generated")
     format: OutputFormat = element(default_factory=OutputFormat)
-    structure: StructureStyle = element(default=StructureStyle.FILENAMES)
+    structure_style: StructureStyle = element(
+        default=StructureStyle.FILENAMES, name="Structure"
+    )
     docstring_style: DocstringStyle = element(default=DocstringStyle.RST)
     relative_imports: bool = element(default=False)
     compound_fields: bool = element(default=False)
+    max_line_length: int = attribute(default=79)
+
+    def update(self, **kwargs: Any):
+        objects.update(self, **kwargs)
 
 
 @dataclass
@@ -320,6 +326,9 @@ class GeneratorConfig:
 
     @classmethod
     def read(cls, path: Path) -> "GeneratorConfig":
+        if not path.exists():
+            return cls()
+
         ctx = XmlContext(
             element_name_generator=text.pascal_case,
             attribute_name_generator=text.camel_case,

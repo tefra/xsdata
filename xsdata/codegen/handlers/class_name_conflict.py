@@ -44,7 +44,7 @@ class ClassNameConflictHandler(ContainerHandlerInterface):
         - All classes have the same source location.
         """
         return (
-            self.container.config.output.structure in REQUIRE_UNIQUE_NAMES
+            self.container.config.output.structure_style in REQUIRE_UNIQUE_NAMES
             or len(set(map(get_location, self.container))) == 1
         )
 

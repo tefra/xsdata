@@ -64,7 +64,7 @@ class ClassDesignateHandlerTests(FactoryTestCase):
         ]
 
         self.container.extend(classes)
-        self.config.output.structure = StructureStyle.NAMESPACES
+        self.config.output.structure_style = StructureStyle.NAMESPACES
         self.config.output.package = "bar"
 
         self.handler.run()
@@ -84,7 +84,7 @@ class ClassDesignateHandlerTests(FactoryTestCase):
         ]
 
         self.container.extend(classes)
-        self.config.output.structure = StructureStyle.SINGLE_PACKAGE
+        self.config.output.structure_style = StructureStyle.SINGLE_PACKAGE
         self.config.output.package = "foo.bar.thug"
 
         self.handler.run()
@@ -113,7 +113,7 @@ class ClassDesignateHandlerTests(FactoryTestCase):
         classes[1].attrs.append(AttrFactory.reference(classes[2].qname))
         classes[2].attrs.append(AttrFactory.reference(classes[3].qname))
 
-        self.config.output.structure = StructureStyle.CLUSTERS
+        self.config.output.structure_style = StructureStyle.CLUSTERS
         self.config.output.package = "foo.bar"
         self.container.extend(classes)
 
@@ -144,7 +144,7 @@ class ClassDesignateHandlerTests(FactoryTestCase):
         classes[2].attrs.append(AttrFactory.reference(classes[3].qname))
         classes[3].attrs.append(AttrFactory.reference(classes[1].qname, circular=True))
 
-        self.config.output.structure = StructureStyle.NAMESPACE_CLUSTERS
+        self.config.output.structure_style = StructureStyle.NAMESPACE_CLUSTERS
         self.config.output.package = "models"
         self.container.extend(classes)
 
@@ -172,7 +172,7 @@ class ClassDesignateHandlerTests(FactoryTestCase):
         classes[2].attrs.append(AttrFactory.reference(classes[3].qname))
         classes[3].attrs.append(AttrFactory.reference(classes[1].qname, circular=True))
 
-        self.config.output.structure = StructureStyle.NAMESPACE_CLUSTERS
+        self.config.output.structure_style = StructureStyle.NAMESPACE_CLUSTERS
         self.config.output.package = "models"
         self.container.extend(classes)
 

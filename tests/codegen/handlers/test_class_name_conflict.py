@@ -58,7 +58,7 @@ class ClassNameConflictHandlerTests(FactoryTestCase):
             ClassFactory.create(qname="a"),
         ]
 
-        self.container.config.output.structure = StructureStyle.SINGLE_PACKAGE
+        self.container.config.output.structure_style = StructureStyle.SINGLE_PACKAGE
         self.container.extend(classes)
         self.processor.run()
 
@@ -71,7 +71,7 @@ class ClassNameConflictHandlerTests(FactoryTestCase):
             ClassFactory.create(qname="{bar}a"),
             ClassFactory.create(qname="a"),
         ]
-        self.container.config.output.structure = StructureStyle.CLUSTERS
+        self.container.config.output.structure_style = StructureStyle.CLUSTERS
         self.container.extend(classes)
         self.processor.run()
 

@@ -30,7 +30,7 @@ class ClassDesignateHandler(ContainerHandlerInterface):
     __slots__ = ()
 
     def run(self):
-        structure_style = self.container.config.output.structure
+        structure_style = self.container.config.output.structure_style
         if structure_style == StructureStyle.NAMESPACES:
             self.group_by_namespace()
         elif structure_style == StructureStyle.SINGLE_PACKAGE:

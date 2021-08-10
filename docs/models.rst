@@ -99,7 +99,7 @@ procedures.
      - The real/local name of the element this class represents.
    * - nillable
      - bool
-     - Specifies whether an explicit empty value can be assigned, default: False
+     - Specifies whether this class can be initialized with no values
    * - namespace
      - str
      - The element xml namespace.
@@ -145,27 +145,24 @@ binding procedures.
    * - type
      - str
      - The field xml type:
-       ``Ignore | Text | Element | Elements | Attribute | Wildcard | Attributes ``,
+       ``Ignore | Text | Element | Elements | Attribute | Wildcard | Attributes``,
        default: ``Text`` or ``Element``
    * - nillable
      - bool
-     - Specifies whether an explicit empty value can be assigned.
+     - Specifies whether an explicit ``None`` value is allowed, default: False
    * - mixed
      - bool
-     - Specifies whether the field supports mixed content. ([#M1]_)
+     - Specifies whether the field supports mixed content. [#M1]_
    * - sequential
      - bool
      - Specifies whether the field value(s) must appear in sequence with other
        sequential sibling fields. eg ``<a /><b /><a /><b />``
    * - tokens
      - bool
-     - Use a list to map simple values.
-
-       eg ``element: List[Union[int, bool, str]]
-       -> <element>1 a true</element> -> [1, "a", True]``
+     - Map the field value to a python sequence, [#M2]_
    * - namespace
      - str
-     - Specifies the field xml namespace. ([#M2]_)
+     - Specifies the field xml namespace. [#M3]_
    * - format
      - str
      - Format option for types like datetime, or bytes, see :ref:`Data Types`
@@ -177,7 +174,13 @@ but currently they are only used to troubleshoot the code generator.
 .. [#M1] Mixed content must be combined ``Wildcard`` fields with type ``List[object]``.
     `w3schools <https://www.w3schools.com/xml/schema_complex_mixed.asp>`_
 
-.. [#M2] It's a common practice in schema definitions to require elements to be
+.. [#M2] Declaration: ``List[Union[int, bool, str]]``
+
+    Serialized value: ``<element>1 a true</element>``
+
+    Parsed value: ``[1, "a", True]``
+
+.. [#M3] It's a common practice in schema definitions to require elements to be
     qualified and attributes to be unqualified.
 
     ``Element`` fields with an omitted namespace inherit the namespace from the parent
@@ -294,10 +297,7 @@ marshalling.
      - Specifies whether this is a ``Wildcard`` that can match any tag.
    * - tokens
      - bool
-     - Use a list to map simple values.
-
-       eg ``element: List[Union[int, bool, str]]
-       -> <element>1 a true</element> -> [1, "a", True]``
+     - Map the field value to a python sequence
    * - namespace
      - str
      - Specifies the field xml namespace.

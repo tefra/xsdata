@@ -1,4 +1,5 @@
 .. include:: ../README.rst
+    :start-line: 3
 
 .. admonition:: Why naive?
 

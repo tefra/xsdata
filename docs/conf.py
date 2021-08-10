@@ -12,14 +12,10 @@ import os
 import sys
 from importlib import metadata
 
-import sphinx_material
-
 sys.path.insert(0, os.path.abspath(".."))
 
-# -- Project information -----------------------------------------------------
-
 project = "xsData"
-copyright = "2020, Christodoulos Tsoulloftas"
+copyright = "2021, Christodoulos Tsoulloftas"
 author = "Christodoulos Tsoulloftas"
 
 # The full version, including alpha/beta/rc tags
@@ -36,7 +32,6 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.viewcode",
-    "sphinx.ext.githubpages",
     "sphinx.ext.autosummary",
     "sphinx_autodoc_typehints",
     "sphinx_inline_tabs",
@@ -62,39 +57,16 @@ html_static_path = ["_static"]
 
 
 # Required theme setup
-extensions.append("sphinx_material")
-html_theme = "sphinx_material"
-html_theme_path = sphinx_material.html_theme_path()
-html_context = sphinx_material.get_html_context()
+# extensions.append("sphinx_material")
+html_theme = "furo"
+html_favicon = "_static/favicon.png"
+html_logo = "_static/logo.svg"
+html_theme_options = {
+    "sidebar_hide_name": True,
+}
 
 html_show_sourcelink = True
-
-html_sidebars = {
-    "**": ["logo-text.html", "globaltoc.html", "localtoc.html", "searchbox.html"]
-}
-
 html_extra_path = ["robots.txt"]
-
-html_favicon = "_static/favicon.png"
-
-# Material theme options (see theme.conf for more information)
-html_theme_options = {
-    # Set the name of the project to appear in the navigation.
-    "nav_title": "xsData",
-    # Set the color and the accent color
-    "color_primary": "deep-purple",
-    "color_accent": "light-blue",
-    # Set the repo location to get a badge with stats
-    "repo_url": "https://github.com/tefra/xsdata/",
-    "repo_name": "xsData: naive xml bindings",
-    # Visible levels of the global TOC; -1 means unlimited
-    "globaltoc_depth": 3,
-    # If False, expand all TOC entries
-    "globaltoc_collapse": True,
-    # If True, show hidden TOC entries
-    "globaltoc_includehidden": False,
-    "base_url": "https://xsdata.readthedocs.io/en/latest/",
-}
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
@@ -110,4 +82,4 @@ autodoc_default_options = {
 
 autosummary_generate = True
 set_type_checking_flag = True
-always_document_param_types = True
+always_document_param_types = False

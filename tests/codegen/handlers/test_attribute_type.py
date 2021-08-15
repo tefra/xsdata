@@ -22,40 +22,58 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         container = ClassContainer(config=GeneratorConfig())
         self.processor = AttributeTypeHandler(container=container)
 
-    @mock.patch.object(ClassUtils, "filter_types")
-    @mock.patch.object(AttributeTypeHandler, "process_type")
-    def test_process(self, mock_process_type, mock_filter_types):
-        xs_int = AttrTypeFactory.native(DataType.INT)
-        xs_bool = AttrTypeFactory.native(DataType.BOOLEAN)
-        xs_string = AttrTypeFactory.native(DataType.STRING)
-        mock_filter_types.side_effect = lambda x: x
-
-        target = ClassFactory.create(
-            attrs=[
-                AttrFactory.create(types=[xs_int, xs_bool]),
-                AttrFactory.create(types=[xs_string, xs_string]),
-            ]
-        )
+    @mock.patch.object(AttributeTypeHandler, "cascade_properties")
+    @mock.patch.object(AttributeTypeHandler, "process_types")
+    def test_process(self, mock_process_types, mock_cascade_properties):
+        target = ClassFactory.elements(2)
 
         self.processor.process(target)
-        self.assertEqual(2, len(target.attrs[0].types))
-        self.assertEqual(2, len(target.attrs[1].types))
 
-        mock_filter_types.assert_has_calls(
-            [
-                mock.call(target.attrs[0].types),
-                mock.call(target.attrs[1].types),
-            ]
-        )
+        calls = [mock.call(target, attr) for attr in target.attrs]
+        mock_process_types.assert_has_calls(calls)
+        mock_cascade_properties.assert_has_calls(calls)
+        self.assertEqual(2, len(calls))
 
-        mock_process_type.assert_has_calls(
-            [
-                mock.call(target, target.attrs[0], xs_int),
-                mock.call(target, target.attrs[0], xs_bool),
-                mock.call(target, target.attrs[1], xs_string),
-                mock.call(target, target.attrs[1], xs_string),
-            ]
-        )
+    @mock.patch.object(AttributeTypeHandler, "process_type")
+    def test_process_types(self, mock_process_type):
+        target = ClassFactory.create()
+        attr = AttrFactory.create()
+        types = [
+            AttrTypeFactory.native(DataType.STRING),
+            AttrTypeFactory.native(DataType.INT),
+            AttrTypeFactory.native(DataType.STRING),
+        ]
+
+        attr.types = types
+
+        self.processor.process_types(target, attr)
+
+        mock_process_type.assrt_has_calls([mock.call(target, attr, tp) for tp in types])
+
+        self.assertEqual(types[:-1], attr.types)
+
+    def test_cascade_properties(self):
+        target = ClassFactory.create(default="2", fixed=True, nillable=True)
+        attr = AttrFactory.native(DataType.STRING, tag=Tag.EXTENSION)
+        self.processor.cascade_properties(target, attr)
+
+        self.assertEqual(target.default, attr.default)
+        self.assertTrue(attr.fixed)
+        self.assertTrue(attr.restrictions.nillable)
+
+        target.default = "3"
+        target.fixed = False
+        target.nillable = False
+        self.processor.cascade_properties(target, attr)
+        self.assertNotEqual(target.default, attr.default)
+        self.assertTrue(attr.fixed)
+        self.assertTrue(attr.restrictions.nillable)
+
+        attr = AttrFactory.native(DataType.STRING, tag=Tag.ELEMENT)
+        self.processor.cascade_properties(target, attr)
+        self.assertIsNone(attr.default)
+        self.assertFalse(attr.fixed)
+        self.assertFalse(attr.restrictions.nillable)
 
     @mock.patch.object(AttributeTypeHandler, "process_dependency_type")
     @mock.patch.object(AttributeTypeHandler, "process_native_type")

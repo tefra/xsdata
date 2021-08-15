@@ -16,7 +16,7 @@ from xsdata.exceptions import CodeGenerationError
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.models.enums import DataType
-from xsdata.models.enums import QNames
+from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
 from xsdata.models.mixins import ElementBase
 from xsdata.utils import namespaces
@@ -180,6 +180,12 @@ class Restrictions:
         return cls(**element.get_restrictions())
 
 
+class AttrCategory(IntEnum):
+    NATIVE = 0
+    FORWARD = 1
+    EXTERNAL = 2
+
+
 @dataclass(unsafe_hash=True)
 class AttrType:
     """
@@ -316,7 +322,7 @@ class Attr:
     def is_xsi_type(self) -> bool:
         """Return whether this attribute qualified name is equal to
         xsi:type."""
-        return QNames.XSI_TYPE == namespaces.build_qname(self.namespace, self.name)
+        return self.namespace == Namespace.XSI.uri and self.name == "type"
 
     @property
     def is_tokens(self) -> bool:
@@ -339,6 +345,13 @@ class Attr:
                 result.add(datatype.type)
 
         return list(result)
+
+    @property
+    def user_types(self) -> Iterator[AttrType]:
+        """Return an iterator of all the user defined types."""
+        for tp in self.types:
+            if not tp.native:
+                yield tp
 
     @property
     def slug(self) -> str:

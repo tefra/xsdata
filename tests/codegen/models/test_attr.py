@@ -108,6 +108,18 @@ class AttrTests(FactoryTestCase):
 
         self.assertCountEqual([float, int], attr.native_types)
 
+    def test_property_user_types(self):
+        attr = AttrFactory.create(
+            types=[
+                AttrTypeFactory.create(qname="foo"),
+                AttrTypeFactory.native(DataType.INT),
+                AttrTypeFactory.native(DataType.SHORT),
+                AttrTypeFactory.create(qname="bar"),
+            ]
+        )
+
+        self.assertCountEqual([attr.types[0], attr.types[-1]], list(attr.user_types))
+
     def test_property_xml_type(self):
         attr = AttrFactory.create(tag=Tag.ELEMENT)
         self.assertEqual("Element", attr.xml_type)

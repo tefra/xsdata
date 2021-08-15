@@ -20,23 +20,36 @@ class AttributeTypeHandler(RelativeHandlerInterface):
     """Minimize class attributes complexity by filtering and flattening
     types."""
 
-    __slots__ = ("dependencies",)
+    __slots__ = "dependencies"
 
     def __init__(self, container: ContainerInterface):
         super().__init__(container)
         self.dependencies: Dict = {}
 
     def process(self, target: Class):
-        """
-        Process the given class attributes and their types.
-
-        Ensure all types are unique.
-        """
+        """Process the given class attributes and their types."""
         for attr in list(target.attrs):
-            for attr_type in list(attr.types):
-                self.process_type(target, attr, attr_type)
+            self.process_types(target, attr)
+            self.cascade_properties(target, attr)
 
-            attr.types = ClassUtils.filter_types(attr.types)
+    def process_types(self, target: Class, attr: Attr):
+        """Process every attr type and filter out duplicates."""
+        for attr_type in list(attr.types):
+            self.process_type(target, attr, attr_type)
+
+        attr.types = ClassUtils.filter_types(attr.types)
+
+    @classmethod
+    def cascade_properties(cls, target: Class, attr: Attr):
+        """Cascade target class default/fixed/nillable properties to the given
+        attr if it's a text node."""
+        if attr.xml_type is None:
+            if target.default is not None and attr.default is None:
+                attr.default = target.default
+                attr.fixed = target.fixed
+
+            if target.nillable:
+                attr.restrictions.nillable = True
 
     def process_type(self, target: Class, attr: Attr, attr_type: AttrType):
         """Process attribute type, split process for xml schema and user

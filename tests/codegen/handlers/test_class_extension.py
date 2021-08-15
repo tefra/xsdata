@@ -121,26 +121,32 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         self.assertEqual(source.attrs[2], target.attrs[1])
 
     def test_process_enum_extension_with_simple_source(self):
-        qname_type = AttrTypeFactory.native(DataType.QNAME)
-        source = ClassFactory.create(
-            tag=Tag.SIMPLE_TYPE,
-            attrs=[
-                AttrFactory.create(
-                    types=[qname_type], restrictions=Restrictions(length=10)
-                )
-            ],
-        )
+        base = ClassFactory.enumeration(2)
+        base.attrs[0].types = [
+            AttrTypeFactory.native(DataType.FLOAT),
+            AttrTypeFactory.native(DataType.DECIMAL),
+        ]
+        source = ClassFactory.elements(1)
+        source.attrs[0].types = [
+            AttrTypeFactory.native(DataType.INT),
+            AttrTypeFactory.create(base.qname),
+        ]
+
         target = ClassFactory.enumeration(2)
+        target.attrs[0].name = base.attrs[0].name
         extension = ExtensionFactory.reference(source.qname)
         target.extensions.append(extension)
 
+        self.processor.container.add(base)
         self.processor.container.add(source)
         self.processor.container.add(target)
         self.processor.process_dependency_extension(target, extension)
 
-        for attr in target.attrs:
-            self.assertIn(qname_type, attr.types)
-            self.assertEqual(10, attr.restrictions.length)
+        self.assertEqual(2, len(target.attrs))
+        self.assertEqual(
+            ["float", "decimal"], [tp.name for tp in target.attrs[0].types]
+        )
+        self.assertEqual(["string", "int"], [tp.name for tp in target.attrs[1].types])
 
     def test_process_enum_extension_with_complex_source(self):
         source = ClassFactory.create(

@@ -50,7 +50,6 @@ class ClassContainerTests(FactoryTestCase):
                 "AttributeTypeHandler",
                 "AttributeMergeHandler",
                 "AttributeMixedContentHandler",
-                "AttributeNormalizeHandler",
             ],
             20: [
                 "AttributeEffectiveChoiceHandler",

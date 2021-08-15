@@ -10,6 +10,7 @@ from urllib.parse import urljoin
 from xml import sax
 from xml.etree import ElementInclude as xinclude
 from xml.etree import ElementTree as etree
+from xml.sax import SAXException
 
 from xsdata.exceptions import XmlHandlerError
 from xsdata.formats.dataclass.parsers.mixins import PushParser
@@ -121,11 +122,14 @@ class XmlSaxHandler(SaxHandler, sax.handler.ContentHandler):
                 f"{type(self).__name__} doesn't support xinclude elements."
             )
 
-        parser = sax.make_parser()  # nosec
-        parser.setFeature(sax.handler.feature_namespaces, True)
-        parser.setContentHandler(self)
-        parser.parse(source)
-        return self.close()
+        try:
+            parser = sax.make_parser()  # nosec
+            parser.setFeature(sax.handler.feature_namespaces, True)
+            parser.setContentHandler(self)
+            parser.parse(source)
+            return self.close()
+        except SAXException as e:
+            raise SyntaxError(e)
 
     def startElementNS(self, name: Tuple[Optional[str], str], qname: Any, attrs: Dict):
         """
@@ -201,7 +205,6 @@ def iterwalk(element: etree.Element, ns_map: Dict) -> Iterator[Tuple[str, Any]]:
 
 
 def get_base_url(base_url: Optional[str], source: Any) -> Optional[str]:
-
     if base_url:
         return base_url
 

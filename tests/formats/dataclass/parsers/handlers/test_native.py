@@ -11,6 +11,7 @@ from tests.fixtures.books import Books
 from tests.fixtures.books.fixtures import books
 from tests.fixtures.books.fixtures import events
 from tests.fixtures.books.fixtures import events_default_ns
+from xsdata.exceptions import ParserError
 from xsdata.exceptions import XmlHandlerError
 from xsdata.formats.dataclass.parsers.bases import RecordParser
 from xsdata.formats.dataclass.parsers.handlers import XmlEventHandler
@@ -42,6 +43,10 @@ class XmlEventHandlerTests(TestCase):
             handler.process_context(context)
 
         self.assertEqual("Unhandled event: `reverse`.", str(cm.exception))
+
+    def test_parse_with_xml_syntax_error(self):
+        with self.assertRaises(ParserError):
+            self.parser.from_string("<", Books)
 
     def test_parse_with_element_or_tree(self):
         path = fixtures_dir.joinpath("books/books.xml")
@@ -112,3 +117,7 @@ class SaxHandlerTests(TestCase):
         self.assertEqual(
             "XmlSaxHandler doesn't support xinclude elements.", str(cm.exception)
         )
+
+    def test_parse_with_xml_syntax_error(self):
+        with self.assertRaises(ParserError):
+            self.parser.from_string("<", Books)

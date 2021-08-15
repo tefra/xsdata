@@ -9,6 +9,7 @@ from tests.fixtures.books import Books
 from tests.fixtures.books.fixtures import books
 from tests.fixtures.books.fixtures import events
 from tests.fixtures.books.fixtures import events_default_ns
+from xsdata.exceptions import ParserError
 from xsdata.exceptions import XmlHandlerError
 from xsdata.formats.dataclass.parsers.bases import RecordParser
 from xsdata.formats.dataclass.parsers.handlers import LxmlEventHandler
@@ -67,6 +68,10 @@ class LxmlEventHandlerTests(TestCase):
 
         self.assertEqual("Unhandled event: `reverse`.", str(cm.exception))
 
+    def test_parse_with_xml_syntax_error(self):
+        with self.assertRaises(ParserError):
+            self.parser.from_string("<", Books)
+
 
 class LxmlSaxHandlerTests(TestCase):
     def setUp(self):
@@ -122,3 +127,7 @@ class LxmlSaxHandlerTests(TestCase):
         self.assertEqual(
             "LxmlSaxHandler doesn't support xinclude elements.", str(cm.exception)
         )
+
+    def test_parse_with_xml_syntax_error(self):
+        with self.assertRaises(ParserError):
+            self.parser.from_string("<", Books)

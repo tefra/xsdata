@@ -51,7 +51,7 @@ class NodeParser(PushParser):
 
             try:
                 result = handler.parse(source)
-            except ConverterWarning as e:
+            except (ConverterWarning, SyntaxError) as e:
                 raise ParserError(e)
 
         if result is not None:

@@ -108,7 +108,7 @@ class ElementMapper:
                 return DataType.from_value(val)
 
             for tp in converter.explicit_types():
-                if converter.test(val, [tp]):
+                if converter.test(val, [tp], strict=True):
                     return DataType.from_type(tp)
 
             return DataType.STRING

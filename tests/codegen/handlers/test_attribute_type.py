@@ -48,7 +48,9 @@ class AttributeTypeHandlerTests(FactoryTestCase):
 
         self.processor.process_types(target, attr)
 
-        mock_process_type.assrt_has_calls([mock.call(target, attr, tp) for tp in types])
+        mock_process_type.assert_has_calls(
+            [mock.call(target, attr, tp) for tp in types]
+        )
 
         self.assertEqual(types[:-1], attr.types)
 

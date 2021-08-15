@@ -294,6 +294,10 @@ class AttrFactory(Factory):
         return cls.create(tag=Tag.ELEMENT, **kwargs)
 
     @classmethod
+    def extension(cls, **kwargs: Any) -> Attr:
+        return cls.create(tag=Tag.EXTENSION, **kwargs)
+
+    @classmethod
     def any(cls, **kwargs: Any) -> Attr:
         return cls.create(
             tag=Tag.ANY, types=[AttrTypeFactory.native(DataType.ANY_TYPE)], **kwargs

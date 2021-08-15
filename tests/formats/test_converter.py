@@ -44,15 +44,19 @@ class ConverterFactoryTests(TestCase):
 
     def test_test(self):
         self.assertTrue(converter.test("1", [int]))
-        self.assertFalse(converter.test("1", [float]))
+        self.assertTrue(converter.test("1", [float]))
+        self.assertFalse(converter.test("1", [float], strict=True))
         self.assertFalse(converter.test(None, [int]))
 
         self.assertFalse(converter.test("a", [int]))
-        self.assertFalse(converter.test("01", [int]))
+        self.assertTrue(converter.test("01", [int]))
+        self.assertFalse(converter.test("01", [int], strict=True))
         self.assertTrue(converter.test("1", [int]))
 
-        self.assertFalse(converter.test("0", [float]))
-        self.assertFalse(converter.test(".0", [float]))
+        self.assertTrue(converter.test("0", [float]))
+        self.assertFalse(converter.test("0", [float], strict=True))
+        self.assertTrue(converter.test(".0", [float]))
+        self.assertFalse(converter.test(".0", [float], strict=True))
         self.assertTrue(converter.test("1.0", [float]))
 
     def test_unknown_converter(self):

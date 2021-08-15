@@ -100,13 +100,19 @@ class ConverterFactory:
         instance = self.value_converter(value)
         return instance.serialize(value, **kwargs)
 
-    def test(self, value: Optional[str], types: Sequence[Type], **kwargs: Any) -> bool:
+    def test(
+        self,
+        value: Optional[str],
+        types: Sequence[Type],
+        strict: bool = False,
+        **kwargs: Any,
+    ) -> bool:
         """
         Test the given string value can be parsed using the given list of types
         without warnings.
 
-        For certain types also validate roundtrip conversion matches
-        original value.
+        If strict flag is enabled validate the textual representation
+        also matches the original input.
         """
 
         if not isinstance(value, str):
@@ -118,7 +124,7 @@ class ConverterFactory:
         if w and w[-1].category is ConverterWarning:
             return False
 
-        if isinstance(decoded, (float, int, Decimal, XmlPeriod)):
+        if strict and isinstance(decoded, (float, int, Decimal, XmlPeriod)):
             encoded = self.serialize(decoded, **kwargs)
             return value.strip() == encoded
 

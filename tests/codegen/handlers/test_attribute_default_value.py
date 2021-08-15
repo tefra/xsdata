@@ -6,7 +6,6 @@ from xsdata.codegen.models import Restrictions
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
-from xsdata.models.enums import Tag
 from xsdata.utils.testing import AttrFactory
 from xsdata.utils.testing import AttrTypeFactory
 from xsdata.utils.testing import ClassFactory
@@ -57,169 +56,256 @@ class AttributeDefaultValueHandlerTests(FactoryTestCase):
             ]
         )
 
-    def test_process_attribute_with_choice_field(self):
+    @mock.patch.object(AttributeDefaultValueHandler, "process_types")
+    @mock.patch.object(AttributeDefaultValueHandler, "should_reset_default")
+    @mock.patch.object(AttributeDefaultValueHandler, "should_reset_required")
+    def test_process_attribute(
+        self, mock_should_reset_required, mock_should_reset_default, mock_process_types
+    ):
+
         target = ClassFactory.create()
-        attr = AttrFactory.element(fixed=True, default=2)
-        attr.restrictions.min_occurs = 1
-        attr.restrictions.choice = "a"
+        mock_should_reset_required.side_effect = [
+            True,
+            False,
+            False,
+            False,
+            False,
+            False,
+        ]
+        mock_should_reset_default.side_effect = [
+            False,
+            True,
+            False,
+            False,
+            False,
+            False,
+        ]
+
+        attr = AttrFactory.element(restrictions=Restrictions(min_occurs=2))
         self.processor.process_attribute(target, attr)
-
-        self.assertEqual(2, attr.default)
-        self.assertTrue(attr.fixed)
-
-        attr.restrictions.min_occurs = 0
-        self.processor.process_attribute(target, attr)
-        self.assertFalse(attr.fixed)
-        self.assertIsNone(attr.default)
-
-    def test_process_attribute_with_sequential_field(self):
-        target = ClassFactory.create()
-        attr = AttrFactory.element(fixed=True, default=2)
-        attr.restrictions.min_occurs = 1
-        attr.restrictions.sequential = True
-        self.processor.process_attribute(target, attr)
-
-        self.assertEqual(2, attr.default)
-        self.assertTrue(attr.fixed)
-
-        attr.restrictions.min_occurs = 0
-        self.processor.process_attribute(target, attr)
-        self.assertFalse(attr.fixed)
-        self.assertIsNone(attr.default)
-
-    def test_process_attribute_with_list_field(self):
-        target = ClassFactory.create()
-        attr = AttrFactory.element(fixed=True, default=2)
-        attr.restrictions.max_occurs = 5
-        self.processor.process_attribute(target, attr)
-        self.assertFalse(attr.fixed)
-        self.assertIsNone(attr.default)
-
-    def test_process_attribute_with_xsi_type(self):
-        target = ClassFactory.create()
-        attr = AttrFactory.attribute(
-            fixed=True,
-            default="xs:int",
-            name="type",
-            namespace=Namespace.XSI.uri,
-            restrictions=Restrictions(min_occurs=1, max_occurs=1),
-        )
-        self.processor.process_attribute(target, attr)
-        self.assertFalse(attr.fixed)
-        self.assertIsNone(attr.default)
         self.assertEqual(0, attr.restrictions.min_occurs)
 
-    def test_process_attribute_with_valid_case(self):
-        target = ClassFactory.create()
-        attr = AttrFactory.create(fixed=True, default=2)
-        self.processor.process_attribute(target, attr)
-        self.assertTrue(attr.fixed)
-        self.assertEqual(2, attr.default)
-
-    def test_process_attribute_with_text_attr(self):
-        target = ClassFactory.create()
-
-        attr = AttrFactory.native(DataType.INT, tag=Tag.EXTENSION)
+        attr = AttrFactory.element(fixed=True, default="abc")
         self.processor.process_attribute(target, attr)
         self.assertIsNone(attr.default)
+        self.assertFalse(attr.fixed)
 
-        attr = AttrFactory.native(DataType.STRING, tag=Tag.EXTENSION)
+        attr = AttrFactory.element(default="abc")
+        self.processor.process_attribute(target, attr)
+        mock_process_types.assert_called_once_with(target, attr)
+
+        attr = AttrFactory.extension()
         self.processor.process_attribute(target, attr)
         self.assertEqual("", attr.default)
 
+        attr = AttrFactory.extension(default="abc")
+        self.processor.process_attribute(target, attr)
+        self.assertEqual("abc", attr.default)
+
+        attr = AttrFactory.extension(types=[AttrTypeFactory.native(DataType.INTEGER)])
+        self.processor.process_attribute(target, attr)
+        self.assertIsNone(attr.default)
+
+    def test_should_reset_required(self):
+        attr = AttrFactory.create()
+        self.assertFalse(self.processor.should_reset_required(attr))
+
+        attr = AttrFactory.any(restrictions=Restrictions(max_occurs=2))
+        self.assertFalse(self.processor.should_reset_required(attr))
+
+        attr = AttrFactory.any(default="abc")
+        self.assertFalse(self.processor.should_reset_required(attr))
+
+        attr = AttrFactory.any()
+        self.assertTrue(self.processor.should_reset_required(attr))
+
+    def test_should_reset_default(self):
+        attr = AttrFactory.create()
+        self.assertFalse(self.processor.should_reset_default(attr))
+
+        attr = AttrFactory.create(name="type", namespace=Namespace.XSI.uri)
+        self.assertFalse(self.processor.should_reset_default(attr))
+
+        attr.default = "abc"
+        self.assertTrue(self.processor.should_reset_default(attr))
+
+        attr = AttrFactory.create(
+            default="abc", restrictions=Restrictions(min_occurs=0)
+        )
+        self.assertFalse(self.processor.should_reset_default(attr))
+
+        attr.restrictions.sequential = True
+        self.assertTrue(self.processor.should_reset_default(attr))
+
+        attr.restrictions.choice = "foo"
+        attr.restrictions.sequential = False
+        self.assertTrue(self.processor.should_reset_default(attr))
+
     @mock.patch("xsdata.codegen.handlers.attribute_default_value.logger.warning")
-    @mock.patch.object(AttributeDefaultValueHandler, "find_enum")
-    def test_process_attribute_enum(self, mock_find_enum, mock_logger_warning):
-        enum_one = ClassFactory.enumeration(1, qname="{a}root")
-        enum_one.attrs[0].default = "1"
-        enum_one.attrs[0].name = "one"
-        enum_two = ClassFactory.enumeration(1, qname="inner")
-        enum_two.attrs[0].default = "2"
-        enum_two.attrs[0].name = "two"
-        enum_three = ClassFactory.enumeration(2, qname="missing_member")
-        enum_three.attrs[0].default = "4"
-        enum_three.attrs[0].name = "four"
-        enum_three.attrs[1].default = "5"
-        enum_three.attrs[1].name = "five"
+    @mock.patch.object(AttributeDefaultValueHandler, "reset_attribute_types")
+    @mock.patch.object(AttributeDefaultValueHandler, "is_valid_native_value")
+    @mock.patch.object(AttributeDefaultValueHandler, "is_valid_external_value")
+    def test_process_types(
+        self,
+        mock_is_valid_external_value,
+        mock_is_valid_native_value,
+        mock_reset_attribute_types,
+        mock_warning,
+    ):
+        mock_is_valid_external_value.side_effect = [True, False, False]
+        mock_is_valid_native_value.side_effect = [True, False]
 
-        mock_find_enum.side_effect = [
-            None,
-            enum_one,
-            None,
-            enum_two,
-            enum_three,
-            enum_three,
-        ]
+        target = ClassFactory.create()
+        attr = AttrFactory.native(DataType.INT)
+        attr.restrictions.format = "foo"
 
-        target = ClassFactory.create(
-            qname="target",
-            attrs=[
-                AttrFactory.create(
-                    types=[
-                        AttrTypeFactory.create(),
-                        AttrTypeFactory.create(qname="foo"),
-                    ],
-                    default="1",
-                ),
-                AttrFactory.create(
-                    types=[
-                        AttrTypeFactory.create(),
-                        AttrTypeFactory.create(qname="bar", forward=True),
-                    ],
-                    default="2",
-                ),
-                AttrFactory.create(default="3"),
-                AttrFactory.create(default=" 4  5"),
-            ],
-        )
+        self.processor.process_types(target, attr)
+        self.assertEqual(0, mock_is_valid_native_value.call_count)
 
-        actual = []
-        for attr in target.attrs:
-            self.processor.process_attribute(target, attr)
-            actual.append(attr.default)
+        self.processor.process_types(target, attr)
+        self.assertEqual(0, mock_reset_attribute_types.call_count)
 
-        self.assertEqual(
-            [
-                "@enum@{a}root::one",
-                "@enum@inner::two",
-                None,
-                "@enum@missing_member::four@five",
-            ],
-            actual,
-        )
-        mock_logger_warning.assert_called_once_with(
-            "No enumeration member matched %s.%s default value `%s`",
+        self.processor.process_types(target, attr)
+        self.assertEqual(1, mock_reset_attribute_types.call_count)
+        mock_warning.assert_called_once_with(
+            "Failed to match %s.%s default value `%s` to one of %s",
             target.name,
-            target.attrs[2].local_name,
-            "3",
+            attr.local_name,
+            attr.default,
+            [str(DataType.INT)],
         )
 
-    def test_find_enum(self):
-        native_type = AttrTypeFactory.create()
-        matching_external = AttrTypeFactory.create("foo")
-        missing_external = AttrTypeFactory.create("bar")
-        enumeration = ClassFactory.enumeration(1, qname="foo")
-        inner = ClassFactory.enumeration(1, qname="foobar")
+    def test_is_valid_native_value(self):
+        target = ClassFactory.create()
 
-        target = ClassFactory.create(
-            attrs=[
-                AttrFactory.create(
-                    types=[
-                        native_type,
-                        matching_external,
-                        missing_external,
-                    ]
-                )
-            ],
-            inner=[inner],
+        # Not native types
+        attr = AttrFactory.create(types=[AttrTypeFactory.create("foo")], default="abc")
+        self.assertFalse(self.processor.is_valid_native_value(target, attr))
+
+        # Successful
+        attr = AttrFactory.native(DataType.INT, default="2")
+        self.assertTrue(self.processor.is_valid_native_value(target, attr))
+
+        # Failed: mixed types
+        attr = AttrFactory.native(
+            DataType.INT, default="2 a 3", restrictions=Restrictions(tokens=True)
         )
-        self.processor.container.extend([target, enumeration])
+        self.assertFalse(self.processor.is_valid_native_value(target, attr))
 
-        actual = self.processor.find_enum(native_type)
-        self.assertIsNone(actual)
+        # Successful: mixed types
+        attr.types.append(AttrTypeFactory.native(DataType.STRING))
+        self.assertTrue(self.processor.is_valid_native_value(target, attr))
 
-        actual = self.processor.find_enum(matching_external)
-        self.assertEqual(enumeration, actual)
+        # Successful: not strict
+        attr = AttrFactory.native(DataType.FLOAT, default="2.00")
+        self.assertTrue(self.processor.is_valid_native_value(target, attr))
 
-        actual = self.processor.find_enum(missing_external)
-        self.assertIsNone(actual)
+        # Failed: strict
+        attr.fixed = True
+        self.assertFalse(self.processor.is_valid_native_value(target, attr))
+
+        # Successful qname
+        attr = AttrFactory.enumeration()
+        attr.types = [AttrTypeFactory.native(DataType.QNAME)]
+        attr.restrictions.tokens = True
+        attr.fixed = True
+        attr.default = "a:b b:a"
+        target.ns_map["a"] = "b"
+        target.ns_map["b"] = "a"
+        self.assertTrue(self.processor.is_valid_native_value(target, attr))
+
+        # Filed qname: missing prefix / Bonus tokens downgrade
+        attr.default = "nope:a"
+        self.assertFalse(self.processor.is_valid_native_value(target, attr))
+        self.assertFalse(attr.restrictions.tokens)
+
+    @mock.patch.object(AttributeDefaultValueHandler, "is_valid_enum_type")
+    @mock.patch.object(AttributeDefaultValueHandler, "is_valid_inner_type")
+    def test_is_valid_external_value(
+        self, mock_is_valid_inner_type, mock_is_valid_enum_type
+    ):
+        mock_is_valid_inner_type.side_effect = [False, False, False, True]
+        mock_is_valid_enum_type.side_effect = [False, False, True]
+
+        attr = AttrFactory.create()
+        attr.types = [
+            AttrTypeFactory.create("foo"),
+            AttrTypeFactory.create("bar"),
+        ]
+        target = ClassFactory.create()
+        foo = ClassFactory.create(qname="foo")
+        bar = ClassFactory.create(qname="bar")
+        self.processor.container.add(foo)
+        self.processor.container.add(bar)
+
+        self.assertFalse(self.processor.is_valid_external_value(target, attr))
+        self.assertTrue(self.processor.is_valid_external_value(target, attr))
+        self.assertTrue(self.processor.is_valid_external_value(target, attr))
+
+    def test_is_valid_inner_type(self):
+        source = ClassFactory.elements(2)
+
+        attr_type = AttrTypeFactory.create()
+        attr = AttrFactory.create()
+
+        self.assertFalse(self.processor.is_valid_inner_type(source, attr, attr_type))
+
+        attr_type.forward = True
+        self.assertFalse(self.processor.is_valid_inner_type(source, attr, attr_type))
+
+        source.attrs.append(AttrFactory.extension())
+        attr.default = "abc"
+        attr.fixed = True
+        self.assertTrue(self.processor.is_valid_inner_type(source, attr, attr_type))
+
+        self.assertFalse(attr.fixed)
+        self.assertIsNone(attr.default)
+        self.assertTrue(source.attrs[2].fixed)
+        self.assertEqual("abc", source.attrs[2].default)
+
+    def test_is_valid_enum_type(self):
+        enumeration = ClassFactory.enumeration(2, qname="{a}root")
+        enumeration.attrs[0].default = "1"
+        enumeration.attrs[0].name = "one"
+        enumeration.attrs[1].default = "2"
+        enumeration.attrs[1].name = "two"
+
+        attr = AttrFactory.create(default="1")
+        self.assertTrue(self.processor.is_valid_enum_type(enumeration, attr))
+        self.assertEqual("@enum@{a}root::one", attr.default)
+
+        attr = AttrFactory.create(default="  1  2")
+        self.assertTrue(self.processor.is_valid_enum_type(enumeration, attr))
+        self.assertEqual("@enum@{a}root::one@two", attr.default)
+
+        attr = AttrFactory.create(default="3")
+        self.assertFalse(self.processor.is_valid_enum_type(enumeration, attr))
+        self.assertEqual("3", attr.default)
+
+    def test_find_type(self):
+        target = ClassFactory.create()
+        attr_type = AttrTypeFactory.create("foo")
+        foo = ClassFactory.create(qname="foo")
+        self.processor.container.add(foo)
+
+        self.assertIs(foo, self.processor.find_type(target, attr_type))
+
+        attr_type = AttrTypeFactory.create("bar", forward=True)
+        bar = ClassFactory.create(qname="bar")
+        target.inner.append(bar)
+        self.assertIs(bar, self.processor.find_type(target, attr_type))
+
+    def test_reset_attribute_types(self):
+        attr = AttrFactory.create(
+            types=[
+                AttrTypeFactory.native(DataType.INT),
+                AttrTypeFactory.native(DataType.FLOAT),
+            ]
+        )
+        attr.restrictions.format = "foo"
+
+        self.processor.reset_attribute_types(attr)
+        self.assertIsNone(attr.restrictions.format)
+        self.assertEqual(1, len(attr.types))
+        self.assertEqual(str(DataType.STRING), attr.types[0].qname)
+        self.assertTrue(attr.types[0].native)

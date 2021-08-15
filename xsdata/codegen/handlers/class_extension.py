@@ -59,43 +59,65 @@ class ClassExtensionHandler(RelativeHandlerInterface):
         else:
             self.process_complex_extension(source, target, extension)
 
-    @classmethod
-    def process_enum_extension(cls, source: Class, target: Class, ext: Extension):
+    def process_enum_extension(
+        self, source: Class, target: Class, ext: Optional[Extension]
+    ):
         """
         Process enumeration class extension.
 
         Extension cases:
             1. Enumeration: copy all attr properties
-            2. Simple type: copy value attr properties
+            2. Simple type: copy value attr properties recursively
             3. Complex type:
-                3.1 Target has one member, clone source and set fixed default value
+                3.1 Target has one enumeration member, convert to complex type
                 3.2 Invalid schema.
         """
+        if ext:
+            target.extensions.remove(ext)
+
         if source.is_enumeration:
-            source_attrs = {attr.name: attr for attr in source.attrs}
-            target.attrs = [
-                source_attrs[attr.name].clone() if attr.name in source_attrs else attr
-                for attr in target.attrs
-            ]
-            target.extensions.remove(ext)
+            self.merge_enumerations(source, target)
         elif len(source.attrs) == 1:
-            source_attr = source.attrs[0]
-            for attr in target.attrs:
-                attr.types.extend([x.clone() for x in source_attr.types])
-                attr.restrictions.merge(source_attr.restrictions)
-
-            target.extensions.remove(ext)
-        elif len(target.attrs) == 1:  # We are not an enumeration pal.
-            default = target.attrs[0].default
-            target.attrs = [attr.clone() for attr in source.attrs]
-            target.extensions = [ext.clone() for ext in source.extensions]
-
-            for attr in target.attrs:
-                if attr.xml_type is None:
-                    attr.default = default
-                    attr.fixed = True
+            self.merge_enumeration_types(source, target)
+        elif len(target.attrs) == 1:
+            # We are not an enumeration pal.
+            self.convert_to_complex_type(source, target)
         else:
             raise CodeGenerationError("Enumeration class with a complex extension.")
+
+    @classmethod
+    def merge_enumerations(cls, source: Class, target: Class):
+        source_attrs = {attr.name: attr for attr in source.attrs}
+        target.attrs = [
+            source_attrs[attr.name].clone() if attr.name in source_attrs else attr
+            for attr in target.attrs
+        ]
+
+    def merge_enumeration_types(self, source: Class, target: Class):
+        source_attr = source.attrs[0]
+        for tp in source_attr.types:
+            if tp.native:
+                for target_attr in target.attrs:
+                    target_attr.types.append(tp.clone())
+                    target_attr.restrictions.merge(source_attr.restrictions)
+            else:
+                base = self.find_dependency(tp)
+                # It's impossible to have a missing reference now, the
+                # source class has passed through AttributeTypeHandler
+                # and any missing types have been reset.
+                assert base is not None
+                self.process_enum_extension(base, target, None)
+
+    @classmethod
+    def convert_to_complex_type(cls, source: Class, target: Class):
+        default = target.attrs[0].default
+        target.attrs = [attr.clone() for attr in source.attrs]
+        target.extensions = [ext.clone() for ext in source.extensions]
+
+        for attr in target.attrs:
+            if attr.xml_type is None:
+                attr.default = default
+                attr.fixed = True
 
     @classmethod
     def process_simple_extension(cls, source: Class, target: Class, ext: Extension):

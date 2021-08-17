@@ -84,7 +84,6 @@ class CliTests(TestCase):
 
         self.assertIsNone(result.exception)
         self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
-        self.assertEqual(logging.ERROR, logger.getEffectiveLevel())
         self.assertTrue(mock_init.call_args[1]["print"])
 
     @mock.patch("xsdata.cli.logger.info")

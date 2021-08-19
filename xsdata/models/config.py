@@ -156,6 +156,9 @@ class OutputFormat:
     kw_only: bool = attribute(default=False)
 
     def __post_init__(self):
+        self.validate()
+
+    def validate(self):
         if self.order and not self.eq:
             raise GeneratorConfigError("eq must be true if order is true")
 
@@ -201,6 +204,7 @@ class GeneratorOutput:
 
     def update(self, **kwargs: Any):
         objects.update(self, **kwargs)
+        self.format.validate()
 
 
 @dataclass

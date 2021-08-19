@@ -1,10 +1,12 @@
 import logging
 import sys
+import warnings
 from pathlib import Path
 from typing import Any
 from typing import Iterator
 
 import click
+from click import Context
 from click_default_group import DefaultGroup
 
 from xsdata import __version__
@@ -27,7 +29,6 @@ handler.formatter = LogFormatter()
 
 logger.handlers = [handler]
 logger.propagate = False
-logger.setLevel(logging.INFO)
 
 # Attach the cli handler to the python warnings logger
 py_warnings = logging.getLogger("py.warnings")
@@ -39,9 +40,23 @@ logging.captureWarnings(True)
 
 
 @click.group(cls=DefaultGroup, default="generate", default_if_no_args=False)
+@click.pass_context
 @click.version_option(__version__)
-def cli(**kwargs: Any):
+def cli(ctx: Context, **kwargs: Any):
     """xsdata command line interface."""
+
+    logger.setLevel(logging.INFO)
+    formatwarning_orig = warnings.formatwarning
+
+    def format_warning(message: Any, category: Any, *args: Any) -> str:
+        return f"{category.__name__}: {message}" if category else message
+
+    def format_warning_restore():
+        warnings.formatwarning = formatwarning_orig
+
+    warnings.formatwarning = format_warning  # type: ignore
+
+    ctx.call_on_close(format_warning_restore)
 
 
 @cli.command("init-config")
@@ -63,6 +78,8 @@ def init_config(**kwargs: Any):
         with file_path.open("w") as fp:
             config.write(fp, config)
 
+    handler.emit_warnings()
+
 
 @cli.command("download")
 @click.argument("source", required=True)
@@ -77,6 +94,8 @@ def download(source: str, output: str):
     """Download a schema or a definition locally with all its dependencies."""
     downloader = Downloader(output=Path(output).resolve())
     downloader.wget(source)
+
+    handler.emit_warnings()
 
 
 @cli.command("generate")

@@ -1,38 +1,64 @@
 import logging
 import sys
+import warnings
 from pathlib import Path
 from typing import Any
 from typing import Iterator
 
 import click
-import click_log
+from click import Context
 from click_default_group import DefaultGroup
 
 from xsdata import __version__
 from xsdata.codegen.transformer import SchemaTransformer
-from xsdata.codegen.writer import CodeWriter
 from xsdata.logger import logger
-from xsdata.models.config import DocstringStyle
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.config import GeneratorOutput
-from xsdata.models.config import StructureStyle
+from xsdata.utils.click import LogFormatter
+from xsdata.utils.click import LogHandler
 from xsdata.utils.click import model_options
 from xsdata.utils.downloader import Downloader
 from xsdata.utils.hooks import load_entry_points
 
+# Load cli plugins
 load_entry_points("xsdata.plugins.cli")
 
-outputs = click.Choice(CodeWriter.generators.keys())
-docstring_styles = click.Choice([x.value for x in DocstringStyle])
-structure_styles = click.Choice([x.value for x in StructureStyle])
-click_log.basic_config(logger)
+# Setup xsdata logger to print records to stdout/stderr
+handler = LogHandler()
+handler.formatter = LogFormatter()
+
+logger.handlers = [handler]
+logger.propagate = False
+
+# Attach the cli handler to the python warnings logger
+py_warnings = logging.getLogger("py.warnings")
+py_warnings.handlers = [handler]
+py_warnings.propagate = False
+
+# Log warnings as well
+logging.captureWarnings(True)
 
 
 @click.group(cls=DefaultGroup, default="generate", default_if_no_args=False)
+@click.pass_context
 @click.version_option(__version__)
-@click_log.simple_verbosity_option(logger)
-def cli():
+def cli(ctx: Context, **kwargs: Any):
     """xsdata command line interface."""
+
+    logger.setLevel(logging.INFO)
+    formatwarning_orig = warnings.formatwarning
+
+    def format_warning(message: Any, category: Any, *args: Any) -> str:
+        return (
+            f"{category.__name__}: {message}" if category else message
+        )  # pragma: no cover
+
+    def format_warning_restore():
+        warnings.formatwarning = formatwarning_orig
+
+    warnings.formatwarning = format_warning  # type: ignore
+
+    ctx.call_on_close(format_warning_restore)
 
 
 @cli.command("init-config")
@@ -40,10 +66,6 @@ def cli():
 @click.option("-pp", "--print", is_flag=True, default=False, help="Print output")
 def init_config(**kwargs: Any):
     """Create or update a configuration file."""
-
-    if kwargs["print"]:
-        logger.setLevel(logging.ERROR)
-
     file_path = Path(kwargs["output"])
     if file_path.exists():
         config = GeneratorConfig.read(file_path)
@@ -57,6 +79,8 @@ def init_config(**kwargs: Any):
     else:
         with file_path.open("w") as fp:
             config.write(fp, config)
+
+    handler.emit_warnings()
 
 
 @cli.command("download")
@@ -72,6 +96,8 @@ def download(source: str, output: str):
     """Download a schema or a definition locally with all its dependencies."""
     downloader = Downloader(output=Path(output).resolve())
     downloader.wget(source)
+
+    handler.emit_warnings()
 
 
 @cli.command("generate")
@@ -91,15 +117,14 @@ def generate(**kwargs: Any):
     stdout = kwargs.pop("print")
     config_file = Path(kwargs.pop("config")).resolve()
 
-    if stdout:
-        logger.setLevel(logging.ERROR)
-
     params = {k.replace("__", "."): v for k, v in kwargs.items() if v is not None}
     config = GeneratorConfig.read(config_file)
     config.output.update(**params)
 
     transformer = SchemaTransformer(config=config, print=stdout)
     transformer.process(list(resolve_source(source)))
+
+    handler.emit_warnings()
 
 
 def resolve_source(source: str) -> Iterator[str]:

@@ -67,8 +67,7 @@ class ClassValidator:
 
             if index == -1:
                 logger.warning(
-                    "Duplicate types (%d) found: %s, will keep the last defined",
-                    len(items),
+                    "Duplicate type %s, will keep the last defined",
                     items[0].qname,
                 )
 

@@ -124,7 +124,7 @@ class GeneratorConfigTests(TestCase):
                 self.assertFalse(OutputFormat(slots=True).slots)
 
             self.assertEqual(
-                "Reverting config slots, requires python >= 3.10", str(w[-1].message)
+                "slots requires python >= 3.10, reverting...", str(w[-1].message)
             )
 
         else:
@@ -138,7 +138,7 @@ class GeneratorConfigTests(TestCase):
                 self.assertFalse(OutputFormat(kw_only=True).kw_only)
 
             self.assertEqual(
-                "Reverting config kw_only, requires python >= 3.10", str(w[-1].message)
+                "kw_only requires python >= 3.10, reverting...", str(w[-1].message)
             )
 
         else:

@@ -49,7 +49,9 @@ def cli(ctx: Context, **kwargs: Any):
     formatwarning_orig = warnings.formatwarning
 
     def format_warning(message: Any, category: Any, *args: Any) -> str:
-        return f"{category.__name__}: {message}" if category else message
+        return (
+            f"{category.__name__}: {message}" if category else message
+        )  # pragma: no cover
 
     def format_warning_restore():
         warnings.formatwarning = formatwarning_orig

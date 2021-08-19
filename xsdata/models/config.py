@@ -166,14 +166,14 @@ class OutputFormat:
             if self.slots:
                 self.slots = False
                 warnings.warn(
-                    "Reverting config slots, requires python >= 3.10",
+                    "slots requires python >= 3.10, reverting...",
                     CodeGenerationWarning,
                 )
 
             if self.kw_only:
                 self.kw_only = False
                 warnings.warn(
-                    "Reverting config kw_only, requires python >= 3.10",
+                    "kw_only requires python >= 3.10, reverting...",
                     CodeGenerationWarning,
                 )
 

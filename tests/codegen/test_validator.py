@@ -71,8 +71,7 @@ class ClassValidatorTests(FactoryTestCase):
         self.validator.handle_duplicate_types(classes)
         self.assertEqual([three, four], classes)
         mock_warning.assert_called_once_with(
-            "Duplicate types (%d) found: %s, will keep the last defined",
-            3,
+            "Duplicate type %s, will keep the last defined",
             "{xsdata}class_B",
         )
 

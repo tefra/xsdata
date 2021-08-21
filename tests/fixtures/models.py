@@ -57,6 +57,7 @@ class BaseB(BaseA):
 class BaseC(BaseB):
     z: str
 
+
 @dataclass
 class NillableType:
     class Meta:
@@ -94,12 +95,18 @@ class ChoiceType:
                 {"name": "int2", "type": int, "nillable": True},
                 {"name": "float", "type": float},
                 {"name": "qname", "type": QName},
-                {"name": "tokens", "type": List[int], "tokens": True, "default_factory": return_true},
+                {
+                    "name": "tokens",
+                    "type": List[int],
+                    "tokens": True,
+                    "default_factory": return_true
+                },
                 {"name": "union", "type": Type["UnionType"], "namespace": "foo"},
                 {"name": "p", "type": float, "fixed": True, "default": 1.1},
-                {"wildcard": True,
-                "type": object,
-                "namespace": "http://www.w3.org/1999/xhtml",
+                {
+                    "wildcard": True,
+                    "type": object,
+                    "namespace": "http://www.w3.org/1999/xhtml",
                 },
             ),
         }

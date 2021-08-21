@@ -6,7 +6,6 @@ from xsdata.exceptions import SchemaValueError
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Namespace
 from xsdata.models.mixins import ElementBase
-from xsdata.models.wsdl import Definitions
 from xsdata.models.xsd import Alternative
 from xsdata.models.xsd import ComplexType
 from xsdata.models.xsd import Element

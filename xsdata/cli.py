@@ -6,7 +6,6 @@ from typing import Any
 from typing import Iterator
 
 import click
-from click import Context
 from click_default_group import DefaultGroup
 
 from xsdata import __version__
@@ -42,7 +41,7 @@ logging.captureWarnings(True)
 @click.group(cls=DefaultGroup, default="generate", default_if_no_args=False)
 @click.pass_context
 @click.version_option(__version__)
-def cli(ctx: Context, **kwargs: Any):
+def cli(ctx: click.Context, **kwargs: Any):
     """xsdata command line interface."""
 
     logger.setLevel(logging.INFO)

@@ -1,4 +1,3 @@
-import logging
 import tempfile
 from pathlib import Path
 from unittest import mock
@@ -12,11 +11,9 @@ from xsdata.cli import resolve_source
 from xsdata.codegen.transformer import SchemaTransformer
 from xsdata.codegen.writer import CodeWriter
 from xsdata.formats.dataclass.generator import DataclassGenerator
-from xsdata.logger import logger
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.config import StructureStyle
 from xsdata.utils.downloader import Downloader
-
 
 CodeWriter.register_generator("testing", DataclassGenerator)
 

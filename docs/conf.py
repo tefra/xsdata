@@ -13,6 +13,8 @@ import sys
 from importlib import metadata
 
 sys.path.insert(0, os.path.abspath(".."))
+sys.path.append(os.path.abspath("_ext"))
+# sys.path.append(os.abspath(os.join(os.dirname(__file__), "_ext")))
 
 project = "xsData"
 copyright = "2021, Christodoulos Tsoulloftas"
@@ -27,6 +29,7 @@ version = release = metadata.version("xsdata")
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    "xsdatadocs",
     "sphinx.ext.doctest",
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
@@ -36,7 +39,6 @@ extensions = [
     "sphinx_autodoc_typehints",
     "sphinx_inline_tabs",
     "sphinx_copybutton",
-    "sphinxcontrib.programoutput",
 ]
 
 # Add any paths that contain templates here, relative to this directory.

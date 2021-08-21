@@ -40,7 +40,7 @@ repos:
     rev: v0.910
     hooks:
       - id: mypy
-        additional_dependencies: [tokenize-rt, types-requests, types-Jinja2, types-click]
+        additional_dependencies: [tokenize-rt, types-requests, types-Jinja2, types-click, types-docutils]
   - repo: https://github.com/asottile/setup-cfg-fmt
     rev: v1.17.0
     hooks:

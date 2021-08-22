@@ -80,7 +80,7 @@ autodoc_default_options = {
     "member-order": "bysource",
     "special-members": None,
     # Exclude "standard" methods.
-    "exclude-members": "__dict__,__weakref__,__init__,__repr__",
+    "exclude-members": "__dict__,__weakref__,__init__,__repr__,__new__",
 }
 
 autosummary_generate = True

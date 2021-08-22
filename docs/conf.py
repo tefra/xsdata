@@ -62,9 +62,10 @@ html_static_path = ["_static"]
 # extensions.append("sphinx_material")
 html_theme = "furo"
 html_favicon = "_static/favicon.png"
-html_logo = "_static/logo.svg"
 html_theme_options = {
     "sidebar_hide_name": True,
+    "light_logo": "logo.svg",
+    "dark_logo": "logo-dark.svg",
 }
 
 html_show_sourcelink = True

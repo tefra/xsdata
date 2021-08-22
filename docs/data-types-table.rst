@@ -8,10 +8,8 @@
       -
       -
       -
-      -
     * - :class:`bool`
       - boolean
-      -
       -
       -
       -
@@ -20,10 +18,8 @@
       - base64Binary
       -
       -
-      -
     * - :class:`~decimal.Decimal`
       - decimal
-      -
       -
       -
       -
@@ -32,23 +28,24 @@
       - double
       -
       -
-      -
     * - :class:`int`
       - integer
       - nonPositiveInteger
       - negativeInteger
       - long
-      - int
     * -
+      - int
       - short
       - byte
       - nonNegativeInteger
+    * -
       - unsignedLong
       - unsignedInt
-    * -
       - unsignedShort
       - unsignedByte
+    * -
       - positiveInteger
+      -
       -
       -
     * - :class:`object`
@@ -56,11 +53,9 @@
       - anySimpleType
       -
       -
-      -
     * - :class:`~xml.etree.ElementTree.QName`
       - QName
       - NOTATION
-      -
       -
       -
     * - :class:`str`
@@ -68,28 +63,23 @@
       - anyURI
       - normalizedString
       - token
-      - language
     * -
+      - language
       - NMTOKEN
       - NMTOKENS
       - Name
+    * -
       - NCName
       - ID
-    * -
       - IDREF
       - IDREFS
+    * -
       - ENTITIES
       - ENTITY
       - anyAtomicType
-    * -
       - error
-      -
-      -
-      -
-      -
     * - :class:`~xsdata.models.datatype.XmlDate`
       - date
-      -
       -
       -
       -
@@ -98,28 +88,28 @@
       - dateTimeStamp
       -
       -
-      -
     * - :class:`~xsdata.models.datatype.XmlDuration`
       - duration
       - dayTimeDuration
       - yearMonthDuration
-      -
       -
     * - :class:`~xsdata.models.datatype.XmlPeriod`
       - gYearMonth
       - gYear
       - gMonthDay
       - gMonth
+    * -
       - gDay
+      -
+      -
+      -
     * - :class:`~xsdata.models.datatype.XmlTime`
       - time
       -
       -
       -
-      -
     * - :class:`enum.Enum`
       - enumeration
-      -
       -
       -
       -

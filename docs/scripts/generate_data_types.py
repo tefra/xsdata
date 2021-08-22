@@ -16,7 +16,6 @@ output = [
     "      -",
     "      -",
     "      -",
-    "      -",
 ]
 
 groups = group_by(list(DataType), key=lambda x: x.type.__name__.lower())
@@ -31,18 +30,17 @@ for key in sorted(groups):
     for dt in groups[key]:
         output.append(f"      - {dt.code}")
         count += 1
-        if count == 5:
+        if count == 4:
             output.append("    * -")
             count = 0
 
     if count:
-        output.extend(["      -" for _ in range(5 - count)])
+        output.extend(["      -" for _ in range(4 - count)])
     else:
         output.pop()
 
 output.append("    * - :class:`enum.Enum`")
 output.append("      - enumeration")
-output.append("      -")
 output.append("      -")
 output.append("      -")
 output.append("      -")

@@ -29,6 +29,13 @@
     faq
     changelog
 
+.. toctree::
+    :caption: Links
+
+    PyPI <https://pypi.org/project/xsdata/>
+    Conda <https://anaconda.org/conda-forge/xsdata>
+    Github <https://github.com/tefra/xsdata-attrs>
+
 
 .. meta::
    :google-site-verification: VSyrlSSIOrwnZhhAo3dS6hf1efs-8FxF3KezQ-bH_js

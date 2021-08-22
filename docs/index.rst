@@ -1,4 +1,5 @@
 .. include:: ../README.rst
+    :start-line: 3
 
 .. admonition:: Why naive?
 
@@ -27,6 +28,13 @@
     api
     faq
     changelog
+
+.. toctree::
+    :caption: Links
+
+    PyPI <https://pypi.org/project/xsdata/>
+    Conda <https://anaconda.org/conda-forge/xsdata>
+    Github <https://github.com/tefra/xsdata-attrs>
 
 
 .. meta::

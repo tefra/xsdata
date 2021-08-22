@@ -8,8 +8,6 @@ from tests.fixtures.books import BookForm
 from tests.fixtures.books import BooksForm
 from tests.fixtures.models import BaseType
 from tests.fixtures.models import ChoiceType
-from tests.fixtures.models import TypeA
-from tests.fixtures.models import TypeC
 from tests.fixtures.models import UnionType
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.models.enums import DataType

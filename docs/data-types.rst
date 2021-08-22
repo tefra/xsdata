@@ -46,10 +46,10 @@ of the builtin adapter's behavior you can register you own.
     ...     bad: float
     ...
     >>> class TheGoodFloatConverter(Converter):
-    ...    def deserialize(self, value: str, **kwargs) -> str:
-    ...        return round(float(value), 1)  # Even nicer
+    ...    def deserialize(self, value: str, **kwargs) -> TheGoodFloat:
+    ...        return round(TheGoodFloat(value), 1)  # Even nicer
     ...
-    ...    def serialize(self, value: float, **kwargs) -> str:
+    ...    def serialize(self, value: TheGoodFloat, **kwargs) -> str:
     ...        if kwargs["format"]:
     ...            return kwargs["format"].format(value)
     ...        return str(value)

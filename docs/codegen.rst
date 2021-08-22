@@ -10,13 +10,13 @@ Make sure the cli requirements are installed.
     $ pip install xsdata[cli]
 
 
-.. command-output:: xsdata --help
+.. cli:: xsdata --help
 
 
 Generate Code
 =============
 
-.. command-output:: xsdata generate --help
+.. cli:: xsdata generate --help
 
 .. admonition:: See also
     :class: hint
@@ -128,7 +128,7 @@ Initialize Config
 Initialize a project configuration with more advanced features, see
 :ref:`more <Generator Config>`.
 
-.. command-output:: xsdata init-config --help
+.. cli:: xsdata init-config --help
 
 .. code-block:: console
 
@@ -138,7 +138,7 @@ Initialize a project configuration with more advanced features, see
 Download Schemas
 ================
 
-.. command-output:: xsdata download --help
+.. cli:: xsdata download --help
 
 .. admonition:: Examples
     :class: hint

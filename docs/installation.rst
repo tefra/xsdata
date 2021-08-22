@@ -37,7 +37,7 @@ Verify installation
 
 Verify installation using the cli entry point.
 
-.. command-output:: xsdata --help
+.. cli:: xsdata --help
 
 
 Requirements

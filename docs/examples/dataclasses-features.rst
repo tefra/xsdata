@@ -2,9 +2,8 @@
 Dataclasses Features
 ====================
 
-By default xsdata with generate :mod:`python:dataclasses` with the default features on
-but you can use the cli flags or a :ref:`generator config <Generator Config>` to toggle
-all of them.
+The code generator uses the default :mod:`python:dataclasses` options but you can
+toggle all of them through the cli flags or a :ref:`generator config <Generator Config>`
 
 
 .. literalinclude:: /../tests/fixtures/stripe/.xsdata.xml

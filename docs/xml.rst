@@ -3,7 +3,7 @@ XML Binding
 ===========
 
 All binding modules rely on a :class:`~xsdata.formats.dataclass.context.XmlContext`
-instance to cache marshalling information.
+instance to cache model metadata and binding information.
 
 It's recommended to either reuse the same parser/serializer instance or reuse the
 context instance.
@@ -380,8 +380,12 @@ exceptions when handling mixed content with ``pretty_print=True``.
 Read :ref:`more... <XML Writers>`
 
 
-Serializer Config
-=================
+Serialize with omit default attributes
+======================================
+
+Attributes are allowed to have default or fixed values and be marked as optional. The
+default behaviour is to write them explicitly during serialization but you can disable
+them through config.
 
 .. doctest::
 
@@ -389,8 +393,6 @@ Serializer Config
     ...
     >>> serializer = XmlSerializer(config=SerializerConfig(
     ...     pretty_print=True,
-    ...     encoding="UTF-8",
-    ...     xml_version="1.1",
     ...     xml_declaration=False,
     ...     ignore_default_attributes=True,
     ...     schema_location="urn books.xsd",
@@ -411,3 +413,7 @@ Serializer Config
 
 
 Read :ref:`more... <SerializerConfig>`
+
+
+.. meta::
+    :keywords: xml, parse, serialize, python

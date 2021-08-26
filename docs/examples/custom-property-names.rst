@@ -4,10 +4,15 @@ Customize property names
 
 Through the model and field metadata you can explicitly specify the serialized
 names. You can also provide callables to set the real/local names per model or
-for each binding context.
+per binding context.
 
 
 **Ordered by priority**
+
+.. testsetup:: *
+
+    from dataclasses import dataclass, field
+
 
 .. tab:: Explicit names
 
@@ -17,7 +22,6 @@ for each binding context.
 
     .. doctest::
 
-        >>> from dataclasses import dataclass, field
         >>> from datetime import date
         >>> from xsdata.formats.dataclass.serializers import XmlSerializer
         >>> from xsdata.formats.dataclass.serializers.config import SerializerConfig

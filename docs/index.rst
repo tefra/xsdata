@@ -34,7 +34,7 @@
 
     PyPI <https://pypi.org/project/xsdata/>
     Conda <https://anaconda.org/conda-forge/xsdata>
-    Github <https://github.com/tefra/xsdata-attrs>
+    Github <https://github.com/tefra/xsdata>
 
 
 .. meta::

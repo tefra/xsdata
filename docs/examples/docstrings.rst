@@ -2,7 +2,9 @@
 Docstring styles
 ================
 
-The default output format also comes with four different docstring styles to choose.
+xsdata relies on `docformatter <https://pypi.org/project/docformatter/>`_  to follow
+the `PEP 257 <https://www.python.org/dev/peps/pep-0257/>`_ -- docstring conventions and
+offers the ability to switch between the most popular styles or disable them completely.
 
 .. tab:: reStructuredText
 
@@ -24,7 +26,8 @@ The default output format also comes with four different docstring styles to cho
 
 .. tab:: Accessible
 
-    This custom xsdata style offers easy access to the docstrings during runtime.
+    This custom style sets the docstrings directly to enum members and fields
+    metadata for runtime access.
 
     .. literalinclude:: /../tests/fixtures/docstrings/accessible/schema.py
        :language: python

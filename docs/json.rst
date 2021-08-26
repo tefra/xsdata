@@ -3,7 +3,7 @@ JSON Binding
 ============
 
 All binding modules rely on a :class:`~xsdata.formats.dataclass.context.XmlContext`
-instance to cache marshalling information.
+instance to cache model metadata and binding information.
 
 It's recommended to either reuse the same parser/serializer instance or reuse the
 context instance.
@@ -55,7 +55,7 @@ Parse from json file object
 
     >>> json_path = fixtures_dir.joinpath("books/books.json")
     >>> with json_path.open("rb") as fp:
-    ...     order = parser.parse(fp, Books)
+    ...     books = parser.parse(fp, Books)
     >>> books.book[0]
     BookForm(author='Hightower, Kim', title='The First Book', genre='Fiction', price=44.95, pub_date=XmlDate(2000, 10, 1), review='An amazing story of nothing.', id='bk001', lang='en')
 
@@ -66,7 +66,7 @@ Parse from json stream
 .. doctest::
 
     >>> import io
-    >>> order = parser.parse(io.BytesIO(json_path.read_bytes()), Books)
+    >>> books = parser.parse(io.BytesIO(json_path.read_bytes()), Books)
     >>> books.book[0]
     BookForm(author='Hightower, Kim', title='The First Book', genre='Fiction', price=44.95, pub_date=XmlDate(2000, 10, 1), review='An amazing story of nothing.', id='bk001', lang='en')
 
@@ -76,7 +76,7 @@ Parse from json string
 
 .. doctest::
 
-    >>> order = parser.from_string(json_path.read_text(), Books)
+    >>> books = parser.from_string(json_path.read_text(), Books)
     >>> books.book[0]
     BookForm(author='Hightower, Kim', title='The First Book', genre='Fiction', price=44.95, pub_date=XmlDate(2000, 10, 1), review='An amazing story of nothing.', id='bk001', lang='en')
 
@@ -86,7 +86,7 @@ Parse from json bytes
 
 .. doctest::
 
-    >>> order = parser.from_bytes(json_path.read_bytes(), Books)
+    >>> books = parser.from_bytes(json_path.read_bytes(), Books)
     >>> books.book[0]
     BookForm(author='Hightower, Kim', title='The First Book', genre='Fiction', price=44.95, pub_date=XmlDate(2000, 10, 1), review='An amazing story of nothing.', id='bk001', lang='en')
 
@@ -96,7 +96,7 @@ Parse from json Path
 
 .. doctest::
 
-    >>> order = parser.from_path(json_path, Books)
+    >>> books = parser.from_path(json_path, Books)
     >>> books.book[0]
     BookForm(author='Hightower, Kim', title='The First Book', genre='Fiction', price=44.95, pub_date=XmlDate(2000, 10, 1), review='An amazing story of nothing.', id='bk001', lang='en')
 
@@ -186,8 +186,8 @@ Specify the target binding type to ``List[ModelName]``
     ...     }
     ...   ]"""
     >>> parser = JsonParser()
-    >>> books = parser.from_string(json_string, List[BookForm])
-    >>> books[1].author
+    >>> booklist = parser.from_string(json_string, List[BookForm])
+    >>> booklist[1].author
     'Nagata, Suanne'
 
 
@@ -271,7 +271,7 @@ Serialize json to stream
     ...
     >>> path = Path("output.json")
     >>> with path.open("w") as fp:
-    ...     serializer.write(fp, order)
+    ...     serializer.write(fp, books)
     ...
     >>> print(path.read_text())
     {
@@ -281,7 +281,7 @@ Serialize json to stream
           "title": "The First Book",
           "genre": "Fiction",
           "price": 44.95,
-          "pub_date": "2000-10-01",
+          "pub_date": null,
           "review": "An amazing story of nothing.",
           "id": "bk001",
           "lang": "en"
@@ -289,15 +289,16 @@ Serialize json to stream
         {
           "author": "Nagata, Suanne",
           "title": "Becoming Somebody",
-          "genre": "Biography",
-          "price": null,
-          "pub_date": null,
+          "genre": null,
+          "price": 33.95,
+          "pub_date": "2001-01-10",
           "review": "A masterpiece of the fine art of gossiping.",
           "id": "bk002",
           "lang": "en"
         }
       ]
     }
+
     >>> path.unlink()
 
 
@@ -335,8 +336,6 @@ or conveniently
     >>> from xsdata.formats.dataclass.serializers.json import DictFactory
     >>>
     >>> serializer = JsonSerializer(dict_factory=DictFactory.FILTER_NONE)
-    >>> print(serializer.render(books.book[1]))
-    {"author": "Nagata, Suanne", "title": "Becoming Somebody", "price": 33.95, "pub_date": "2001-01-10", "review": "A masterpiece of the fine art of gossiping.", "id": "bk002", "lang": "en"}
 
 
 Serialize with custom json dump factory
@@ -350,3 +349,7 @@ other implementation as long as it's has a compatible signature.
     import ujson
 
     serializer = JsonSerializer(dump_factory=ujson.dump)
+
+
+.. meta::
+    :keywords: json, parse, serialize, python

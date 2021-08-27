@@ -3,9 +3,10 @@ Custom class factory
 ====================
 
 
-It's not recommended to modify the generated models. If you need to add any pre/post
-initialization logic or even validations you can use the parser config to override the
-default class factory.
+The philosophy behind xsdata is to have plain objects without additional methods and
+logic. If you need an entry point to add any pre/post initialization logic or even
+validations you can use the parser config to override the default class factory.
+
 
 .. doctest::
 
@@ -33,3 +34,7 @@ default class factory.
     ...
     >>> print(parser.from_string(json_str, Person))
     Person(first_name='CHRIS', last_name='FOO')
+
+.. warning::
+
+    It's not recommended to modify the generated models!

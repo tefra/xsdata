@@ -3,8 +3,10 @@ JSON Modeling
 =============
 
 
-By using multiple samples you can create more complete models. The generator will merge
-duplicate classes and their fields and their field types.
+The code generator supports processing json documents directly. That means even without
+a schema you can easily create at the very least an initial draft of your models just
+from samples. If you use a directory with multiple samples the transformer will merge
+and flatten duplicate classes, fields and field types.
 
 
 .. code-block:: console

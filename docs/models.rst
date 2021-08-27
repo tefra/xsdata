@@ -11,16 +11,6 @@ some metadata properties in order to control how the data structures are transfe
 during data binding.
 
 
-.. hint::
-
-    The code generator supports processing xml documents directly. That means even
-    without a schema you can easily create at the very least an initial draft of your
-    models just from samples. If you use a directory with multiple samples the
-    transformer will merge and flatten duplicate classes, fields and field types.
-
-    .. versionadded:: 20.4
-
-
 .. testsetup:: *
 
     from dataclasses import dataclass

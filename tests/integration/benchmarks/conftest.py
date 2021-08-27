@@ -74,9 +74,7 @@ if __name__ == "__main__":
 
     components = [
         "LxmlEventHandler",
-        "LxmlSaxHandler",
         "XmlEventHandler",
-        "XmlSaxHandler",
         "LxmlEventWriter",
         "XmlEventWriter",
         "JsonParser",

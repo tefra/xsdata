@@ -4,7 +4,6 @@ from typing import Iterable
 from lxml import etree
 
 from xsdata.exceptions import XmlHandlerError
-from xsdata.formats.dataclass.parsers.mixins import SaxHandler
 from xsdata.formats.dataclass.parsers.mixins import XmlHandler
 from xsdata.models.enums import EventType
 
@@ -75,38 +74,3 @@ class LxmlEventHandler(XmlHandler):
                 raise XmlHandlerError(f"Unhandled event: `{event}`.")
 
         return self.objects[-1][1] if self.objects else None
-
-
-class LxmlSaxHandler(SaxHandler):
-    """
-    Sax content handler based on :class:`lxml.etree.XMLParser` api.
-
-    :param parser: The parser instance to feed with events
-    :param clazz: The target binding model, auto located if omitted.
-    """
-
-    __slots__ = ()
-
-    def parse(self, source: Any) -> Any:
-        """
-        Parse an XML document from a system identifier or an InputSource.
-
-        The xml parser will ignore comments, recover from errors and
-        clean duplicate namespace prefixes.
-        """
-
-        if self.parser.config.process_xinclude:
-            raise XmlHandlerError(
-                f"{type(self).__name__} doesn't support xinclude elements."
-            )
-
-        parser = etree.XMLParser(
-            target=self,
-            recover=True,
-            remove_comments=True,
-            ns_clean=True,
-            resolve_entities=False,
-            no_network=True,
-        )
-
-        return etree.parse(source, parser=parser)  # nosec

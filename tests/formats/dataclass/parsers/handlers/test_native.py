@@ -1,5 +1,4 @@
 import sys
-from unittest import mock
 from unittest.case import TestCase
 from xml import etree
 
@@ -15,7 +14,6 @@ from xsdata.exceptions import ParserError
 from xsdata.exceptions import XmlHandlerError
 from xsdata.formats.dataclass.parsers.bases import RecordParser
 from xsdata.formats.dataclass.parsers.handlers import XmlEventHandler
-from xsdata.formats.dataclass.parsers.handlers import XmlSaxHandler
 from xsdata.formats.dataclass.parsers.handlers.native import get_base_url
 
 
@@ -82,42 +80,3 @@ class XmlEventHandlerTests(TestCase):
         self.assertIsNone(get_base_url(None, None))
         self.assertIsNone(get_base_url(None, None))
         self.assertEqual("config/", get_base_url("config/", "/tmp/foo.xml"))
-
-
-class SaxHandlerTests(TestCase):
-    def setUp(self):
-        self.parser = RecordParser(handler=XmlSaxHandler)
-
-    def test_parse(self):
-        path = fixtures_dir.joinpath("books/books.xml")
-        self.assertEqual(books, self.parser.from_path(path, Books))
-        self.assertEqual({"brk": "urn:books"}, self.parser.ns_map)
-        self.assertEqual(events, self.parser.events)
-
-    def test_parse_with_default_ns(self):
-        path = fixtures_dir.joinpath("books/books_default_ns.xml")
-        self.assertEqual(books, self.parser.from_path(path, Books))
-        self.assertEqual({None: "urn:books"}, self.parser.ns_map)
-        self.assertEqual(events_default_ns, self.parser.events)
-
-    @mock.patch.object(RecordParser, "end")
-    @mock.patch.object(RecordParser, "start")
-    def test_parse_returns_none_if_objects_empty(self, mock_start, mock_end):
-        path = fixtures_dir.joinpath("books/books.xml")
-        handler = XmlSaxHandler(parser=self.parser, clazz=Books)
-        self.assertIsNone(handler.parse(path.as_uri()))
-
-    def test_parse_with_xinclude_raises_exception(self):
-        self.parser.config.process_xinclude = True
-        path = fixtures_dir.joinpath("books/books.xml")
-
-        with self.assertRaises(XmlHandlerError) as cm:
-            self.parser.from_path(path, Books)
-
-        self.assertEqual(
-            "XmlSaxHandler doesn't support xinclude elements.", str(cm.exception)
-        )
-
-    def test_parse_with_xml_syntax_error(self):
-        with self.assertRaises(ParserError):
-            self.parser.from_string("<", Books)

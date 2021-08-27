@@ -9,11 +9,6 @@ per binding context.
 
 **Ordered by priority**
 
-.. testsetup:: *
-
-    from dataclasses import dataclass, field
-
-
 .. tab:: Explicit names
 
     Explicit model and field names is the most straight forward way to customize
@@ -22,6 +17,7 @@ per binding context.
 
     .. doctest::
 
+        >>> from dataclasses import dataclass, field
         >>> from datetime import date
         >>> from xsdata.formats.dataclass.serializers import XmlSerializer
         >>> from xsdata.formats.dataclass.serializers.config import SerializerConfig

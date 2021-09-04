@@ -96,35 +96,16 @@ Features
   - Customize behaviour through config
 
 
-Changelog: 21.8 (2021-08-03)
+Changelog: 21.9 (2021-09-04)
 ----------------------------
-- Deprecated JsonSerializer indent property, use SerializerConfig instead
-- Fixed SchemaMapper assigning wrong namespace for imported unqualified elements
-- Fixed AttributeTypeHandler to maintain occurs between any flattening
-- Fixed missing required field metadata property
-- Fixed nillable fields not being marked as optional
-- Fixed fields ordering during class reduce process (Codegen from xml/json)
-- Added support for xs:defaultOpenContent:appliesToEmpty attribute
-- Added ParserConfig class factory option `#549 <https://github.com/tefra/xsdata/pull/549>`_
-- Added SerializerConfig option to ignore optional default attributes `#555 <https://github.com/tefra/xsdata/pull/555>`_
-- Added warning on unexpected duplicate types `#564 <https://github.com/tefra/xsdata/pull/564>`_
-- Added GeneratorConfig support for kw_only and slots for python >= 3.10
-- Added structure style namespace-clusters `#573 <https://github.com/tefra/xsdata/pull/573>`_
-- Updated text fields default value to empty string and marked as required `#570 <https://github.com/tefra/xsdata/pull/570>`_
-- Updated fields derived from xs:substitutionGroups to optional
-- Updated fields derived from xs:any to optional
-- Updated AttributeDefaultValueHandler to preserve acceptable default values
-- Updated AttributeDefaultValueHandler to mark as optional any xsi:type attribute
-- Updated xs:alternative handling to resemble xs:choice
-- Updated mixed content handler to group all elements under wildcard
-- Updated ElementMapper to detect nillable types
-- Updated DictMapper to generate list of xs:anySimpleType for empty list nodes
-- Updated the compatibility layer for dataclass style plugins
-- Updated namespaces structure style to convert namespaces similar to jaxb
+- Automate cli generate options `#578 <https://github.com/tefra/xsdata/pull/578>`_
 
-  - `http://www.w3.org/XML/1998/namespace` to `org.w3.XML.1998.namespace`
+  - Generate cli options by the config model
+  - Allow to enable/disable any flag
+  - Allow to bypass any value from the config
+  - Removed -cf/-ri as we can't have switches with short names
 
-- Update binding process for nillable types and fields
-
-  - nillable types can be initialized
-  - nillable fields are initialized with None values
+- Fixed generator not cascading default values to inner classes `#579 <https://github.com/tefra/xsdata/issues/579>`_
+- Re-raise xml syntax errors as xsdata.exceptions.ParserError `#571 <https://github.com/tefra/xsdata/issues/571>`_
+- Added cli summary with recovered warnings and issues `#583 <https://github.com/tefra/xsdata/pull/583>`_
+- Removed the native and lxml SAX handlers `#582 <https://github.com/tefra/xsdata/issues/582>`_

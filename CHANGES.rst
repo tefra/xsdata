@@ -1,3 +1,17 @@
+21.9 (2021-09-04)
+-----------------
+- Automate cli generate options `#578 <https://github.com/tefra/xsdata/pull/578>`_
+
+  - Generate cli options by the config model
+  - Allow to enable/disable any flag
+  - Allow to bypass any value from the config
+  - Removed -cf/-ri as we can't have switches with short names
+
+- Fixed generator not cascading default values to inner classes `#579 <https://github.com/tefra/xsdata/issues/579>`_
+- Re-raise xml syntax errors as xsdata.exceptions.ParserError `#571 <https://github.com/tefra/xsdata/issues/571>`_
+- Added cli summary with recovered warnings and issues `#583 <https://github.com/tefra/xsdata/pull/583>`_
+- Removed the native and lxml SAX handlers `#582 <https://github.com/tefra/xsdata/issues/582>`_
+
 21.8 (2021-08-03)
 -----------------
 - Deprecated JsonSerializer indent property, use SerializerConfig instead

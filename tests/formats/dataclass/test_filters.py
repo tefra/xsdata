@@ -141,6 +141,26 @@ class FiltersTests(FactoryTestCase):
         )
         self.assertEqual(expected, result)
 
+    @mock.patch.object(Filters, "field_default_value")
+    def test_field_definition_with_restriction_pattern(self, mock_field_default_value):
+        mock_field_default_value.return_value = None
+        str_attr = AttrFactory.create(types=[type_str], tag=Tag.RESTRICTION)
+        # intentionally using a double-quote in the pattern to test for a regression in
+        # https://github.com/tefra/xsdata/issues/592
+        pattern = '([^\\ \\? > < \\* / " ": |]{1,256})'
+        str_attr.restrictions.pattern = pattern
+
+        result = self.filters.field_definition(str_attr, {}, None, ["Root"])
+        expected = (
+            "field(\n"
+            "        default=None,\n"
+            "        metadata={\n"
+            '            "pattern": r"([^\\ \\? > < \\* / \\" \\": |]{1,256})",\n'
+            "        }\n"
+            "    )"
+        )
+        self.assertEqual(expected, result)
+
     def test_field_default_value_with_value_none(self):
         attr = AttrFactory.create(types=[type_str])
         self.assertEqual(None, self.filters.field_default_value(attr))

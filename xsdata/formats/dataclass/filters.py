@@ -36,6 +36,7 @@ class Filters:
 
     DEFAULT_KEY = "default"
     FACTORY_KEY = "default_factory"
+    UNESCAPED_DBL_QUOTE_REGEX = re.compile(r"([^\\])\"")
 
     __slots__ = (
         "class_aliases",
@@ -431,7 +432,10 @@ class Filters:
             return data
 
         if key == "pattern":
-            return f'r"{data}"'
+            # escape double quotes because double quotes surround the regex string
+            # in the rendered output
+            value = re.sub(self.UNESCAPED_DBL_QUOTE_REGEX, r'\1\\"', data)
+            return f'r"{value}"'
 
         if data == "":
             return '""'
@@ -518,7 +522,7 @@ class Filters:
         )
 
         if params:
-            content = content.rstrip('"""').strip()
+            content = content.rstrip('"""').strip()  # noqa
             new_lines = "\n" if content.endswith('"""') else "\n\n"
             content += f'{new_lines}{params}\n"""'
 

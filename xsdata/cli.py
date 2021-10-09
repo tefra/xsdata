@@ -87,7 +87,7 @@ def init_config(**kwargs: Any):
 @click.option(
     "-o",
     "--output",
-    type=click.Path(resolve_path=True),
+    type=click.Path(),
     default="./",
     help="Output directory, default cwd",
 )

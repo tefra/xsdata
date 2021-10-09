@@ -140,7 +140,7 @@ class CliTests(TestCase):
         result = self.runner.invoke(cli, ["download", uri, "--output", "here/schemas"])
 
         self.assertIsNone(result.exception)
-        mock_init.assert_called_once_with(output=Path.cwd().joinpath("here/schemas"))
+        mock_init.assert_called_once_with(output=Path("here/schemas").resolve())
         mock_wget.assert_called_once_with(uri)
 
     def test_resolve_source(self):

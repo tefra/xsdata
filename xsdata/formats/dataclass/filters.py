@@ -522,7 +522,7 @@ class Filters:
         )
 
         if params:
-            content = content.rstrip('"""').strip()
+            content = content.rstrip('"""').strip()  # noqa
             new_lines = "\n" if content.endswith('"""') else "\n\n"
             content += f'{new_lines}{params}\n"""'
 

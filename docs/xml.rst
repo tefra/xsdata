@@ -169,6 +169,7 @@ The configuration allows to enable/disable various features and failures.
     ...     base_url=None,
     ...     process_xinclude=False,
     ...     fail_on_unknown_properties=False,
+    ...     fail_on_unknown_attributes=False,
     ... )
     >>> parser = XmlParser(config=config)
     >>> order = parser.from_bytes(xml_path.read_bytes())

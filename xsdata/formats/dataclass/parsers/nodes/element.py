@@ -137,7 +137,9 @@ class ElementNode(XmlNode):
                     self.bind_any_attr(params, var, qname, value)
                 else:
                     if self.config.fail_on_unknown_attributes:
-                        raise ParserError(f"Unknown attribute {self.meta.qname}:{qname}")
+                        raise ParserError(
+                            f"Unknown attribute {self.meta.qname}:{qname}"
+                        )
 
     def bind_attr(self, params: Dict, var: XmlVar, value: Any):
         if var.init:

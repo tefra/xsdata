@@ -193,7 +193,7 @@ class ElementNodeTests(FactoryTestCase):
 
         expected = {"attrs": {"extended": "attr", "{what}ever": "qname"}, "index": 0}
         self.assertEqual(expected, params)
-    
+
     def test_bind_attrs_with_fail_on_unknown_attributes(self):
         self.node.meta = self.context.build(AttrsType)
         self.node.config.fail_on_unknown_attributes = True

@@ -41,7 +41,7 @@ class ParserConfig:
         process_xinclude: bool = False,
         class_factory: Callable[[Type[T], Dict], T] = default_class_factory,
         fail_on_unknown_properties: bool = True,
-        fail_on_unknown_attributes: bool = True,
+        fail_on_unknown_attributes: bool = False,
         fail_on_converter_warnings: bool = False,
     ):
         self.base_url = base_url

@@ -193,6 +193,22 @@ class ElementNodeTests(FactoryTestCase):
 
         expected = {"attrs": {"extended": "attr", "{what}ever": "qname"}, "index": 0}
         self.assertEqual(expected, params)
+    
+    def test_bind_attrs_with_fail_on_unknown_attributes(self):
+        self.node.meta = self.context.build(AttrsType)
+        self.node.config.fail_on_unknown_attributes = False
+        self.node.attrs = {
+            "index": "0",
+            "fixed": "will be ignored",
+            "{what}ever": "qname",
+            "extended": "attr",
+        }
+
+        params = {}
+        self.node.bind_attrs(params)
+
+        expected = {"attrs": {"extended": "attr", "{what}ever": "qname"}, "index": 0}
+        self.assertEqual(expected, params)
 
     @mock.patch("xsdata.formats.dataclass.parsers.nodes.element.logger.warning")
     def test_bind_objects(self, mock_warning):

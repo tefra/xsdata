@@ -196,7 +196,7 @@ class ElementNodeTests(FactoryTestCase):
     
     def test_bind_attrs_with_fail_on_unknown_attributes(self):
         self.node.meta = self.context.build(AttrsType)
-        self.node.config.fail_on_unknown_attributes = False
+        self.node.config.fail_on_unknown_attributes = True
         self.node.attrs = {
             "index": "0",
             "fixed": "will be ignored",

@@ -115,6 +115,7 @@ errors through configuration.
     ...
     >>> config = ParserConfig(
     ...     fail_on_unknown_properties=False,
+    ...     fail_on_unknown_attributes=False,
     ... )
     >>> json_string = """{
     ...   "author": "Hightower, Kim",

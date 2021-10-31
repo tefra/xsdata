@@ -20,6 +20,8 @@ class ParserConfig:
     :param class_factory: Override default object instantiation
     :param fail_on_unknown_properties: Skip unknown properties or
         fail with exception
+    :param fail_on_unknown_attributes: Skip unknown XML attributes
+        or fail with exception
     :param fail_on_converter_warnings: Turn converter warnings to
         exceptions
     """
@@ -29,6 +31,7 @@ class ParserConfig:
         "process_xinclude",
         "class_factory",
         "fail_on_unknown_properties",
+        "fail_on_unknown_attributes",
         "fail_on_converter_warnings",
     )
 
@@ -38,10 +41,12 @@ class ParserConfig:
         process_xinclude: bool = False,
         class_factory: Callable[[Type[T], Dict], T] = default_class_factory,
         fail_on_unknown_properties: bool = True,
+        fail_on_unknown_attributes: bool = False,
         fail_on_converter_warnings: bool = False,
     ):
         self.base_url = base_url
         self.process_xinclude = process_xinclude
         self.class_factory = class_factory
         self.fail_on_unknown_properties = fail_on_unknown_properties
+        self.fail_on_unknown_attributes = fail_on_unknown_attributes
         self.fail_on_converter_warnings = fail_on_converter_warnings

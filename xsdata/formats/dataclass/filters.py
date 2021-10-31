@@ -522,7 +522,8 @@ class Filters:
         )
 
         if params:
-            content = content.rstrip('"""').strip()  # noqa
+            # Remove trailing triple quotes
+            content = content[:-3].strip()
             new_lines = "\n" if content.endswith('"""') else "\n\n"
             content += f'{new_lines}{params}\n"""'
 

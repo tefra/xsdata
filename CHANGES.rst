@@ -1,3 +1,9 @@
+21.11 (2021-11-02)
+------------------
+- Fixed unescaped quotes in regex pattern `#592 <https://github.com/tefra/xsdata/issues/592>`_
+- Added config option fail_on_unknown_attributes `#597 <https://github.com/tefra/xsdata/issues/597>`_
+- Fixed build for python 3.10
+
 21.9 (2021-09-04)
 -----------------
 - Automate cli generate options `#578 <https://github.com/tefra/xsdata/pull/578>`_

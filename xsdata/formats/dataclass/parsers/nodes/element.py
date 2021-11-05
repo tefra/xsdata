@@ -5,7 +5,7 @@ from typing import Optional
 from typing import Set
 from typing import Type
 
-from xsdata.exceptions import ParserError
+from xsdata.exceptions import ConverterWarning, ParserError
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlMeta
@@ -17,7 +17,7 @@ from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.formats.dataclass.parsers.utils import PendingCollection
 from xsdata.logger import logger
 from xsdata.models.enums import DataType
-from xsdata.utils import namespaces
+from xsdata.utils import namespaces, warning_transform
 
 
 class ElementNode(XmlNode):
@@ -130,7 +130,10 @@ class ElementNode(XmlNode):
         for qname, value in self.attrs.items():
             var = self.meta.find_attribute(qname)
             if var and var.name not in params:
-                self.bind_attr(params, var, value)
+                with warning_transform.warning_transform(
+                        lambda msg: msg + f" when parsing {var.name} of {self.meta.clazz}",
+                        ConverterWarning):
+                    self.bind_attr(params, var, value)
             else:
                 var = self.meta.find_any_attributes(qname)
                 if var:

@@ -23,6 +23,7 @@ stop_words = {
     "and",
     "as",
     "assert",
+    "async",
     "bool",
     "break",
     "class",

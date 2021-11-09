@@ -252,6 +252,7 @@ class DefinitionsMapperTests(FactoryTestCase):
                     f"{name}_input",
                     style,
                     namespace,
+                    None,
                 ),
                 mock.call(
                     definitions,
@@ -260,6 +261,7 @@ class DefinitionsMapperTests(FactoryTestCase):
                     f"{name}_input",
                     style,
                     namespace,
+                    None,
                 ),
                 mock.call(
                     definitions,
@@ -268,6 +270,7 @@ class DefinitionsMapperTests(FactoryTestCase):
                     f"{name}_output",
                     style,
                     namespace,
+                    None,
                 ),
             ]
         )
@@ -293,6 +296,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         mock_build_envelope_class.return_value = target
 
         operation.input = BindingMessage()
+        operation.name = "Add"
         port_operation.input = PortTypeMessage()
 
         result = DefinitionsMapper.map_binding_operation_messages(
@@ -311,6 +315,7 @@ class DefinitionsMapperTests(FactoryTestCase):
             f"{name}_input",
             style,
             namespace,
+            "Add",
         )
 
     @mock.patch.object(DefinitionsMapper, "map_port_type_message")
@@ -340,7 +345,13 @@ class DefinitionsMapperTests(FactoryTestCase):
         binding_message.ns_map["foo"] = "bar"
 
         result = DefinitionsMapper.build_envelope_class(
-            definitions, binding_message, port_type_message, name, style, namespace
+            definitions,
+            binding_message,
+            port_type_message,
+            name,
+            style,
+            namespace,
+            None,
         )
 
         expected = Class(
@@ -416,7 +427,13 @@ class DefinitionsMapperTests(FactoryTestCase):
         binding_message.ns_map["foo"] = "bar"
 
         result = DefinitionsMapper.build_envelope_class(
-            definitions, binding_message, port_type_message, name, style, namespace
+            definitions,
+            binding_message,
+            port_type_message,
+            name,
+            style,
+            namespace,
+            None,
         )
 
         expected = Class(
@@ -431,7 +448,9 @@ class DefinitionsMapperTests(FactoryTestCase):
         self.assertEqual(1, len(result.inner[0].attrs))
         self.assertEqual(2, len(result.inner[1].attrs))
         self.maxDiff = None
-        mock_map_port_type_message.assert_called_once_with(port_type_message, "bodyns")
+        mock_map_port_type_message.assert_called_once_with(
+            None, port_type_message, "bodyns"
+        )
 
         mock_map_binding_message_parts.assert_has_calls(
             [
@@ -735,10 +754,20 @@ class DefinitionsMapperTests(FactoryTestCase):
         target_namespace = "xsdata"
 
         actual = DefinitionsMapper.map_port_type_message(
-            port_type_message, target_namespace
+            None, port_type_message, target_namespace
         )
         expected = DefinitionsMapper.build_attr(
             "bar", qname=build_qname("foobar", "bar"), namespace=target_namespace
+        )
+
+        self.assertIsInstance(actual, Generator)
+        self.assertEqual([expected], list(actual))
+
+        actual = DefinitionsMapper.map_port_type_message(
+            "Add", port_type_message, target_namespace
+        )
+        expected = DefinitionsMapper.build_attr(
+            "Add", qname=build_qname("foobar", "bar"), namespace=target_namespace
         )
 
         self.assertIsInstance(actual, Generator)

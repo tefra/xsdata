@@ -133,15 +133,19 @@ class DefinitionsMapper:
     ) -> Iterator[Class]:
         """Step 5: Map the BindingOperation messages to classes."""
 
-        messages: List[Tuple[str, BindingMessage, PortTypeMessage]] = []
+        messages: List[Tuple[str, BindingMessage, PortTypeMessage, Optional[str]]] = []
 
         if operation.input:
-            messages.append(("input", operation.input, port_type_operation.input))
+            messages.append(
+                ("input", operation.input, port_type_operation.input, operation.name)
+            )
 
         if operation.output:
-            messages.append(("output", operation.output, port_type_operation.output))
+            messages.append(
+                ("output", operation.output, port_type_operation.output, None)
+            )
 
-        for suffix, binding_message, port_type_message in messages:
+        for suffix, binding_message, port_type_message, operation_name in messages:
 
             if style == "rpc":
                 yield cls.build_message_class(definitions, port_type_message)
@@ -153,6 +157,7 @@ class DefinitionsMapper:
                 f"{name}_{suffix}",
                 style,
                 namespace,
+                operation_name,
             )
 
             if suffix == "output":
@@ -201,6 +206,7 @@ class DefinitionsMapper:
         name: str,
         style: str,
         namespace: Optional[str],
+        operation: Optional[str],
     ) -> Class:
         """Step 6.1: Build Envelope class for the given binding message with
         attributes from the port type message."""
@@ -224,7 +230,9 @@ class DefinitionsMapper:
 
             if style == "rpc" and class_name == "Body":
                 namespace = ext.attributes.get("namespace")
-                attrs = cls.map_port_type_message(port_type_message, namespace)
+                attrs = cls.map_port_type_message(
+                    operation, port_type_message, namespace
+                )
             else:
                 attrs = cls.map_binding_message_parts(
                     definitions, message, ext, inner.ns_map
@@ -283,13 +291,20 @@ class DefinitionsMapper:
 
     @classmethod
     def map_port_type_message(
-        cls, message: PortTypeMessage, namespace: Optional[str]
+        cls,
+        operation: Optional[str],
+        message: PortTypeMessage,
+        namespace: Optional[str],
     ) -> Iterator[Attr]:
         """Build an attribute for the given port type message."""
         prefix, name = text.split(message.message)
         source_namespace = message.ns_map.get(prefix)
+
+        if operation is None:
+            operation = name
+
         yield cls.build_attr(
-            name,
+            operation,
             qname=namespaces.build_qname(source_namespace, name),
             namespace=namespace,
         )

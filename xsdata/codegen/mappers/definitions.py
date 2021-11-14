@@ -248,14 +248,17 @@ class DefinitionsMapper:
     ) -> Class:
         """Step 6.2: Build the input/output message class of an rpc style
         operation."""
-        message_name = text.suffix(port_type_message.message)
-        definition_message = definitions.find_message(message_name)
+        prefix, name = text.split(port_type_message.message)
+
+        definition_message = definitions.find_message(name)
         ns_map = definition_message.ns_map.copy()
+        source_namespace = ns_map.get(prefix)
 
         assert definitions.location is not None
 
         return Class(
-            qname=namespaces.build_qname(definitions.target_namespace, message_name),
+            qname=namespaces.build_qname(source_namespace, name),
+            namespace=source_namespace,
             status=Status.FLATTENED,
             tag=Tag.ELEMENT,
             location=definitions.location,
@@ -357,8 +360,6 @@ class DefinitionsMapper:
             namespace = part.ns_map.get(prefix)
             type_qname = namespaces.build_qname(namespace, type_name)
             native = namespace == Namespace.XS.uri
-            namespace = "" if part.type else namespace
-
             yield cls.build_attr(name, type_qname, namespace=namespace, native=native)
 
     @classmethod
@@ -392,6 +393,9 @@ class DefinitionsMapper:
     ) -> Attr:
         """Builder method for attributes."""
         occurs = 1 if default is not None else None
+        if native:
+            namespace = ""
+
         return Attr(
             tag=Tag.ELEMENT,
             name=name,

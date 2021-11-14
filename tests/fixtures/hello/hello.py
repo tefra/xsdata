@@ -36,6 +36,7 @@ class HelloError:
 class GetHelloAsString:
     class Meta:
         name = "getHelloAsString"
+        namespace = "http://hello/"
 
     arg0: Optional[str] = field(
         default=None,
@@ -50,6 +51,7 @@ class GetHelloAsString:
 class GetHelloAsStringResponse:
     class Meta:
         name = "getHelloAsStringResponse"
+        namespace = "http://hello/"
 
     return_value: Optional[str] = field(
         default=None,

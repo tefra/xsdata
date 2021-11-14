@@ -694,7 +694,7 @@ class DefinitionsMapperTests(FactoryTestCase):
                 "arg0", str(DataType.STRING), namespace="", native=True
             ),
             DefinitionsMapper.build_attr(
-                "arg1", build_qname("boo", "cafe"), namespace="", native=False
+                "arg1", build_qname("boo", "cafe"), namespace="boo", native=False
             ),
         ]
         self.assertIsInstance(result, Generator)
@@ -714,10 +714,11 @@ class DefinitionsMapperTests(FactoryTestCase):
         mock_create_message_attributes.return_value = attrs
         actual = DefinitionsMapper.build_message_class(definitions, port_type_message)
         expected = Class(
-            qname=build_qname("xsdata", "bar"),
+            qname=build_qname("bar", "bar"),
             status=Status.FLATTENED,
             tag=Tag.ELEMENT,
             location="foo.wsdl",
+            namespace="bar",
             ns_map=message.ns_map,
             attrs=attrs,
         )

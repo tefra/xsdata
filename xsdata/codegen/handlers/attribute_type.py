@@ -144,6 +144,7 @@ class AttributeTypeHandler(RelativeHandlerInterface):
             if source.nillable:
                 attr.restrictions.nillable = True
             self.set_circular_flag(source, target, attr_type)
+            self.detect_lazy_namespace(source, target, attr)
 
     @classmethod
     def copy_attribute_properties(
@@ -227,3 +228,26 @@ class AttributeTypeHandler(RelativeHandlerInterface):
 
         if datatype in (DataType.NMTOKENS, DataType.IDREFS):
             attr.restrictions.tokens = True
+
+    @classmethod
+    def detect_lazy_namespace(cls, source: Class, target: Class, attr: Attr):
+        """
+        Override attr namespace with the source namespace when during the
+        initial mapping the namespace detection wasn't possible.
+
+        Case 1: WSDL message part type can be an element, complex or
+        simple type, we can't do the detection during the initial
+        mapping to class objects.
+        """
+        if attr.namespace == "##lazy":
+            logger.warning(
+                "Overriding field type namespace %s:%s (%s)",
+                target.name,
+                attr.name,
+                source.namespace,
+            )
+
+            if not source.namespace:
+                attr.namespace = "" if target.namespace else None
+            else:
+                attr.namespace = source.namespace

@@ -414,3 +414,21 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         attr = AttrFactory.native(DataType.HEX_BINARY)
         self.processor.update_restrictions(attr, attr.types[0].datatype)
         self.assertEqual("base16", attr.restrictions.format)
+
+    def test_detect_lazy_namespace(self):
+        source = ClassFactory.create(namespace="foo", tag=Tag.ELEMENT)
+        target = ClassFactory.create()
+        attr = AttrFactory.create(namespace="##lazy")
+
+        self.processor.detect_lazy_namespace(source, target, attr)
+        self.assertEqual("foo", attr.namespace)
+
+        attr.namespace = "##lazy"
+        source.namespace = None
+        self.processor.detect_lazy_namespace(source, target, attr)
+        self.assertIsNone(attr.namespace)
+
+        attr.namespace = "##lazy"
+        target.namespace = "foo"
+        self.processor.detect_lazy_namespace(source, target, attr)
+        self.assertEqual("", attr.namespace)

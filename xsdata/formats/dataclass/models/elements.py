@@ -191,34 +191,56 @@ class XmlVar(MetaMixin):
         match = self.elements.get(qname)
         return match or find_by_namespace(self.wildcards, qname)
 
-    def find_value_choice(self, value: Any, check_subclass: bool) -> Optional["XmlVar"]:
-        """Match and return a choice field that matches the given value
-        type."""
+    def find_value_choice(self, value: Any, is_class: bool) -> Optional["XmlVar"]:
+        """
+        Match and return a choice field that matches the given value.
 
-        if collections.is_array(value):
-            tp = type(None) if not value else type(value[0])
-            tokens = True
-            check_subclass = False
-        else:
-            tp = type(value)
-            tokens = False
+        Cases:
+            - value is none or empty tokens list: look for a nillable choice
+            - value is a dataclass: look for exact type or a subclass
+            - value is primitive: test value against the converter
+        """
+        is_tokens = collections.is_array(value)
+        if value is None or (not value and is_tokens):
+            return self.find_nillable_choice(is_tokens)
 
-        return self.find_type_choice(value, tp, tokens, check_subclass)
+        if is_class:
+            return self.find_clazz_choice(type(value))
 
-    def find_type_choice(
-        self, value: Any, tp: Type, tokens: bool, check_subclass: bool
-    ) -> Optional["XmlVar"]:
-        """Match and return a choice field that matches the given type."""
+        return self.find_primitive_choice(value, is_tokens)
 
+    def find_nillable_choice(self, is_tokens: bool) -> Optional["XmlVar"]:
+        return collections.first(
+            element
+            for element in self.elements.values()
+            if element.nillable and is_tokens == element.tokens
+        )
+
+    def find_clazz_choice(self, tp: Type) -> Optional["XmlVar"]:
+        derived = None
         for element in self.elements.values():
+            if element.clazz:
+                if tp in element.types:
+                    return element
 
-            if element.any_type or tokens != element.tokens:
+                if derived is None and any(issubclass(tp, t) for t in element.types):
+                    derived = element
+
+        return derived
+
+    def find_primitive_choice(self, value: Any, is_tokens: bool) -> Optional["XmlVar"]:
+        tp = type(value) if not is_tokens else type(value[0])
+        for element in self.elements.values():
+            if (element.any_type or element.clazz) or element.tokens != is_tokens:
                 continue
 
-            if tp is NoneType:
-                if element.nillable:
-                    return element
-            elif self.match_type(value, tp, element.types, check_subclass):
+            if tp in element.types:
+                return element
+
+            if is_tokens and all(converter.test(val, element.types) for val in value):
+                return element
+
+            if converter.test(value, element.types):
                 return element
 
         return None
@@ -232,20 +254,6 @@ class XmlVar(MetaMixin):
         if callable(self.default):
             return self.default() == value
         return self.default == value
-
-    @classmethod
-    def match_type(
-        cls, value: Any, tp: Type, types: Sequence[Type], check_subclass: bool
-    ) -> bool:
-
-        for candidate in types:
-            if tp == candidate or (check_subclass and issubclass(tp, candidate)):
-                return True
-
-        if isinstance(value, list):
-            return all(converter.test(val, types) for val in value)
-
-        return converter.test(value, types)
 
     def match_namespace(self, qname: str) -> bool:
         """Match the given qname to the wildcard allowed namespaces."""

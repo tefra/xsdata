@@ -5,9 +5,10 @@ from tests.fixtures.datatypes import Telephone
 from xsdata.codegen.models import Restrictions
 from xsdata.formats.dataclass.filters import Filters
 from xsdata.models.config import DocstringStyle
-from xsdata.models.config import GeneratorAlias
 from xsdata.models.config import GeneratorConfig
+from xsdata.models.config import GeneratorSubstitution
 from xsdata.models.config import NameCase
+from xsdata.models.config import ObjectType
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
@@ -33,16 +34,16 @@ class FiltersTests(FactoryTestCase):
         self.filters = Filters(config)
 
     def test_class_name(self):
-        self.filters.class_aliases["boom"] = "Bang"
+        self.filters.substitutions[ObjectType.CLASS]["Abc"] = "Cba"
 
         self.assertEqual("XsString", self.filters.class_name("xs:string"))
         self.assertEqual("FooBarBam", self.filters.class_name("foo:bar_bam"))
         self.assertEqual("ListType", self.filters.class_name("List"))
         self.assertEqual("TypeType", self.filters.class_name(".*"))
-        self.assertEqual("Bang", self.filters.class_name("boom"))
+        self.assertEqual("Cbad", self.filters.class_name("abcd"))
 
     def test_field_name(self):
-        self.filters.field_aliases["boom"] = "Bang"
+        self.filters.substitutions[ObjectType.FIELD]["abc"] = "cba"
 
         self.assertEqual("value", self.filters.field_name("", "cls"))
         self.assertEqual("foo", self.filters.field_name("foo", "cls"))
@@ -51,11 +52,11 @@ class FiltersTests(FactoryTestCase):
         self.assertEqual("none", self.filters.field_name("None", "cls"))
         self.assertEqual("br_eak", self.filters.field_name("BrEak", "cls"))
         self.assertEqual("value_1", self.filters.field_name("1", "cls"))
-        self.assertEqual("Bang", self.filters.field_name("boom", "cls"))
         self.assertEqual("value_minus_1_1", self.filters.field_name("-1.1", "cls"))
+        self.assertEqual("cbad", self.filters.field_name("abcd", "cls"))
 
     def test_constant_name(self):
-        self.filters.field_aliases["boom"] = "Bang"
+        self.filters.substitutions[ObjectType.FIELD]["ABC"] = "CBA"
 
         self.assertEqual("VALUE", self.filters.constant_name("", "cls"))
         self.assertEqual("FOO", self.filters.constant_name("foo", "cls"))
@@ -64,11 +65,13 @@ class FiltersTests(FactoryTestCase):
         self.assertEqual("NONE", self.filters.constant_name("None", "cls"))
         self.assertEqual("BR_EAK", self.filters.constant_name("BrEak", "cls"))
         self.assertEqual("VALUE_1", self.filters.constant_name("1", "cls"))
-        self.assertEqual("Bang", self.filters.constant_name("boom", "cls"))
         self.assertEqual("VALUE_MINUS_1", self.filters.constant_name("-1", "cls"))
+        self.assertEqual("CBAD", self.filters.constant_name("ABCD", "cls"))
 
     def test_module_name(self):
-        self.filters.module_aliases["http://github.com/tefra/xsdata"] = "xsdata"
+        self.filters.substitutions[ObjectType.MODULE].update(
+            {"http://pypi.org/project/xsdata/": "xsdata"}
+        )
 
         self.assertEqual("foo_bar", self.filters.module_name("fooBar"))
         self.assertEqual("foo_bar_wtf", self.filters.module_name("fooBar.wtf"))
@@ -77,22 +80,17 @@ class FiltersTests(FactoryTestCase):
         self.assertEqual("foo_bar_bam", self.filters.module_name("foo:bar_bam"))
         self.assertEqual("bar_bam", self.filters.module_name("urn:bar_bam"))
         self.assertEqual(
-            "pypi_org_project_xsdata",
-            self.filters.module_name("http://pypi.org/project/xsdata/"),
-        )
-        self.assertEqual(
-            "xsdata", self.filters.module_name("http://github.com/tefra/xsdata")
+            "xsdata", self.filters.module_name("http://pypi.org/project/xsdata/")
         )
 
     def test_package_name(self):
-        self.filters.package_aliases["boom"] = "bang"
-        self.filters.package_aliases["boom.boom"] = "booom"
+        self.filters.substitutions[ObjectType.PACKAGE]["bam"] = "boom"
+        self.filters.substitutions[ObjectType.PACKAGE]["abc"] = "a.b.c"
 
         self.assertEqual(
             "foo.bar_bar.pkg_1", self.filters.package_name("Foo.BAR_bar.1")
         )
-        self.assertEqual("foo.bang.pkg_1", self.filters.package_name("Foo.boom.1"))
-        self.assertEqual("booom", self.filters.package_name("boom.boom"))
+        self.assertEqual("foo.boom.pkg_1", self.filters.package_name("Foo.boom.1"))
         self.assertEqual("", self.filters.package_name(""))
 
     def test_type_name(self):
@@ -774,11 +772,12 @@ class FiltersTests(FactoryTestCase):
         config.conventions.field_name.case = NameCase.PASCAL
         config.conventions.module_name.safe_prefix = "safe_module"
         config.conventions.module_name.case = NameCase.SNAKE
-        config.aliases.class_name.append(GeneratorAlias("a", "b"))
-        config.aliases.class_name.append(GeneratorAlias("c", "d"))
-        config.aliases.field_name.append(GeneratorAlias("e", "f"))
-        config.aliases.package_name.append(GeneratorAlias("g", "h"))
-        config.aliases.module_name.append(GeneratorAlias("i", "j"))
+        config.substitutions.substitution.append(
+            GeneratorSubstitution(ObjectType.FIELD, "k", "l")
+        )
+        config.substitutions.substitution.append(
+            GeneratorSubstitution(ObjectType.PACKAGE, "m", "n")
+        )
 
         filters = Filters(config)
 
@@ -794,7 +793,10 @@ class FiltersTests(FactoryTestCase):
         self.assertEqual("cAB", filters.package_name("cAB"))
         self.assertEqual("c_ab", filters.module_name("cAB"))
 
-        self.assertEqual({"a": "b", "c": "d"}, filters.class_aliases)
-        self.assertEqual({"e": "f"}, filters.field_aliases)
-        self.assertEqual({"g": "h"}, filters.package_aliases)
-        self.assertEqual({"i": "j"}, filters.module_aliases)
+        expected_substitutions = {
+            ObjectType.CLASS: {},
+            ObjectType.FIELD: {"k": "l"},
+            ObjectType.MODULE: {},
+            ObjectType.PACKAGE: {"m": "n"},
+        }
+        self.assertEqual(expected_substitutions, filters.substitutions)

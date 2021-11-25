@@ -1,8 +1,9 @@
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import ClassDesignateHandler
 from xsdata.exceptions import CodeGenerationError
-from xsdata.models.config import GeneratorAlias
 from xsdata.models.config import GeneratorConfig
+from xsdata.models.config import GeneratorSubstitution
+from xsdata.models.config import ObjectType
 from xsdata.models.config import StructureStyle
 from xsdata.models.enums import Namespace
 from xsdata.utils.testing import AttrFactory
@@ -190,8 +191,10 @@ class ClassDesignateHandlerTests(FactoryTestCase):
         result = self.handler.combine_ns_package(namespace)
         self.assertEqual(["generated", "bar", "foo", "add"], result)
 
-        alias = GeneratorAlias(source=namespace, target="add.again")
-        self.config.aliases.package_name.append(alias)
+        alias = GeneratorSubstitution(
+            type=ObjectType.PACKAGE, search=namespace, replace="add.again"
+        )
+        self.config.substitutions.substitution.append(alias)
 
         result = self.handler.combine_ns_package(namespace)
         self.assertEqual(["generated", "add", "again"], result)

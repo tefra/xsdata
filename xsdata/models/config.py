@@ -8,6 +8,7 @@ from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import List
+from typing import Optional
 from typing import TextIO
 
 from xsdata import __version__
@@ -19,6 +20,8 @@ from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.formats.dataclass.serializers.writers import XmlEventWriter
+from xsdata.logger import logger
+from xsdata.models.enums import Namespace
 from xsdata.models.mixins import array_element
 from xsdata.models.mixins import attribute
 from xsdata.models.mixins import element
@@ -129,6 +132,22 @@ class DocstringStyle(Enum):
     GOOGLE = "Google"
     ACCESSIBLE = "Accessible"
     BLANK = "Blank"
+
+
+class ObjectType(Enum):
+    """
+    Object type enumeration.
+
+    :cvar CLASS: class
+    :cvar FIELD: field
+    :cvar MODULE: module
+    :cvar PACKAGE: package
+    """
+
+    CLASS = "class"
+    FIELD = "field"
+    MODULE = "module"
+    PACKAGE = "package"
 
 
 @dataclass
@@ -295,6 +314,37 @@ class GeneratorAliases:
 
 
 @dataclass
+class GeneratorSubstitution:
+    """
+    Search and replace substitution for a specific target type based on
+    :func:`re.sub`
+
+    :param type: The target object type
+    :param search: The search string or a pattern object
+    :param replace: The replacement string or pattern object
+    """
+
+    type: ObjectType = attribute(required=True)
+    search: str = attribute(required=True)
+    replace: str = attribute(required=True)
+
+
+@dataclass
+class GeneratorSubstitutions:
+    """
+    Generator search and replace substitutions for classes, fields, packages
+    and modules names. The process runs before and after the default naming
+    conventions.
+
+    .. warning:: The generator doesn't validate substitutions.
+
+    :param substitution: The list of substitutions
+    """
+
+    substitution: List[GeneratorSubstitution] = array_element()
+
+
+@dataclass
 class GeneratorConfig:
     """
     Generator configuration binding model.
@@ -312,20 +362,42 @@ class GeneratorConfig:
     version: str = attribute(init=False, default=__version__)
     output: GeneratorOutput = element(default_factory=GeneratorOutput)
     conventions: GeneratorConventions = element(default_factory=GeneratorConventions)
-    aliases: GeneratorAliases = element(default_factory=GeneratorAliases)
+    aliases: Optional[GeneratorAliases] = element(default=None)
+    substitutions: GeneratorSubstitutions = element(
+        default_factory=GeneratorSubstitutions
+    )
+
+    def __post_init__(self):
+        if self.aliases:
+            alias_map = {
+                ObjectType.CLASS: self.aliases.class_name,
+                ObjectType.FIELD: self.aliases.field_name,
+                ObjectType.PACKAGE: self.aliases.package_name,
+                ObjectType.MODULE: self.aliases.module_name,
+            }
+            for object_type, aliases in alias_map.items():
+                for alias in aliases:
+                    self.substitutions.substitution.append(
+                        GeneratorSubstitution(
+                            type=object_type, search=alias.source, replace=alias.target
+                        )
+                    )
 
     @classmethod
     def create(cls) -> "GeneratorConfig":
         obj = cls()
-        obj.aliases.class_name.append(GeneratorAlias("fooType", "Foo"))
-        obj.aliases.class_name.append(GeneratorAlias("ABCSomething", "ABCSomething"))
-        obj.aliases.field_name.append(
-            GeneratorAlias("ChangeofGauge", "change_of_gauge")
+
+        for ns in Namespace:
+            obj.substitutions.substitution.append(
+                GeneratorSubstitution(
+                    type=ObjectType.PACKAGE, search=ns.uri, replace=ns.prefix
+                )
+            )
+
+        obj.substitutions.substitution.append(
+            GeneratorSubstitution(type=ObjectType.CLASS, search="Class", replace="Type")
         )
-        obj.aliases.package_name.append(
-            GeneratorAlias("http://www.w3.org/1999/xhtml", "xtml")
-        )
-        obj.aliases.module_name.append(GeneratorAlias("2010.1", "2020a"))
+
         return obj
 
     @classmethod
@@ -337,12 +409,27 @@ class GeneratorConfig:
             element_name_generator=text.pascal_case,
             attribute_name_generator=text.camel_case,
         )
-        config = ParserConfig(
-            fail_on_unknown_properties=False,
-            fail_on_converter_warnings=True,
+        parser = XmlParser(
+            context=ctx,
+            config=ParserConfig(
+                fail_on_unknown_properties=False,
+                fail_on_converter_warnings=True,
+            ),
         )
-        parser = XmlParser(context=ctx, config=config)
-        return parser.from_path(path, cls)
+        config = parser.from_path(path, cls)
+
+        if config.aliases and (
+            config.aliases.class_name
+            or config.aliases.field_name
+            or config.aliases.package_name
+            or config.aliases.module_name
+        ):
+            config.aliases = None
+            logger.warning("Migrating aliases to substitutions config, verify output!")
+            with path.open("w") as fp:
+                config.write(fp, config)
+
+        return config
 
     @classmethod
     def write(cls, output: TextIO, obj: "GeneratorConfig"):

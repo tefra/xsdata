@@ -1,6 +1,7 @@
 import math
 import re
 import textwrap
+from collections import defaultdict
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -20,16 +21,12 @@ from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.formats.converter import converter
 from xsdata.models.config import DocstringStyle
-from xsdata.models.config import GeneratorAlias
 from xsdata.models.config import GeneratorConfig
+from xsdata.models.config import ObjectType
 from xsdata.models.config import OutputFormat
 from xsdata.utils import collections
 from xsdata.utils import namespaces
 from xsdata.utils import text
-
-
-def index_aliases(aliases: List[GeneratorAlias]) -> Dict:
-    return {alias.source: alias.target for alias in aliases}
 
 
 class Filters:
@@ -39,10 +36,7 @@ class Filters:
     UNESCAPED_DBL_QUOTE_REGEX = re.compile(r"([^\\])\"")
 
     __slots__ = (
-        "class_aliases",
-        "field_aliases",
-        "package_aliases",
-        "module_aliases",
+        "substitutions",
         "class_case",
         "field_case",
         "constant_case",
@@ -61,10 +55,10 @@ class Filters:
     )
 
     def __init__(self, config: GeneratorConfig):
-        self.class_aliases: Dict = index_aliases(config.aliases.class_name)
-        self.field_aliases: Dict = index_aliases(config.aliases.field_name)
-        self.package_aliases: Dict = index_aliases(config.aliases.package_name)
-        self.module_aliases: Dict = index_aliases(config.aliases.module_name)
+        self.substitutions: Dict[ObjectType, Dict[str, str]] = defaultdict(dict)
+        for sub in config.substitutions.substitution:
+            self.substitutions[sub.type][sub.search] = sub.replace
+
         self.class_case: Callable = config.conventions.class_name.case
         self.field_case: Callable = config.conventions.field_name.case
         self.constant_case: Callable = config.conventions.constant_name.case
@@ -146,11 +140,15 @@ class Filters:
     def class_name(self, name: str) -> str:
         """Convert the given string to a class name according to the selected
         conventions or use an existing alias."""
-        alias = self.class_aliases.get(name)
-        if alias:
-            return alias
+        name = self.apply_substitutions(name, ObjectType.CLASS)
+        name = self.safe_name(name, self.class_safe_prefix, self.class_case)
+        return self.apply_substitutions(name, ObjectType.CLASS)
 
-        return self.safe_name(name, self.class_safe_prefix, self.class_case)
+    def apply_substitutions(self, name: str, obj_type: ObjectType) -> str:
+        for search, replace in self.substitutions[obj_type].items():
+            name = re.sub(search, replace, name)
+
+        return name
 
     def field_definition(
         self,
@@ -183,13 +181,10 @@ class Filters:
 
         Provide the class name as context for the naming schemes.
         """
-        alias = self.field_aliases.get(name)
-        if alias:
-            return alias
-
-        return self.safe_name(
-            name, self.field_safe_prefix, self.field_case, class_name=class_name
-        )
+        prefix = self.field_safe_prefix
+        name = self.apply_substitutions(name, ObjectType.FIELD)
+        name = self.safe_name(name, prefix, self.field_case, class_name=class_name)
+        return self.apply_substitutions(name, ObjectType.FIELD)
 
     def constant_name(self, name: str, class_name: str) -> str:
         """
@@ -198,41 +193,36 @@ class Filters:
 
         Provide the class name as context for the naming schemes.
         """
-        alias = self.field_aliases.get(name)
-        if alias:
-            return alias
-
-        return self.safe_name(
-            name, self.constant_safe_prefix, self.constant_case, class_name=class_name
-        )
+        prefix = self.field_safe_prefix
+        name = self.apply_substitutions(name, ObjectType.FIELD)
+        name = self.safe_name(name, prefix, self.constant_case, class_name=class_name)
+        return self.apply_substitutions(name, ObjectType.FIELD)
 
     def module_name(self, name: str) -> str:
         """Convert the given string to a module name according to the selected
         conventions or use an existing alias."""
-        alias = self.module_aliases.get(name)
-        if alias:
-            return alias
-
-        return self.safe_name(
-            namespaces.clean_uri(name), self.module_safe_prefix, self.module_case
-        )
+        prefix = self.module_safe_prefix
+        name = self.apply_substitutions(name, ObjectType.MODULE)
+        name = self.safe_name(namespaces.clean_uri(name), prefix, self.module_case)
+        return self.apply_substitutions(name, ObjectType.MODULE)
 
     def package_name(self, name: str) -> str:
         """Convert the given string to a package name according to the selected
         conventions or use an existing alias."""
 
-        alias = self.package_aliases.get(name)
-        if alias:
-            return alias
+        name = self.apply_substitutions(name, ObjectType.PACKAGE)
 
         if not name:
             return name
 
-        return ".".join(
-            self.package_aliases.get(part)
-            or self.safe_name(part, self.package_safe_prefix, self.package_case)
-            for part in name.split(".")
-        )
+        def process_sub_package(pck: str) -> str:
+            pck = self.safe_name(pck, self.package_safe_prefix, self.package_case)
+            return self.apply_substitutions(pck, ObjectType.PACKAGE)
+
+        parts = map(process_sub_package, name.split("."))
+        name = ".".join(parts)
+
+        return self.apply_substitutions(name, ObjectType.PACKAGE)
 
     def type_name(self, attr_type: AttrType) -> str:
         """Return native python type name or apply class name conventions."""

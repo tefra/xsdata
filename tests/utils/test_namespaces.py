@@ -22,11 +22,11 @@ class NamespacesTests(TestCase):
         self.assertEqual("ns0", load_prefix("a", ns_map))
         self.assertEqual("ns0", load_prefix("a", ns_map))
         self.assertEqual("xs", load_prefix(Namespace.XS.uri, ns_map))
-        self.assertEqual("soap-env", load_prefix(Namespace.SOAP_ENV.uri, ns_map))
+        self.assertEqual("soapenv", load_prefix(Namespace.SOAP_ENV.uri, ns_map))
 
         expected = {
             "ns0": "a",
-            "soap-env": "http://schemas.xmlsoap.org/soap/envelope/",
+            "soapenv": "http://schemas.xmlsoap.org/soap/envelope/",
             "xs": "http://www.w3.org/2001/XMLSchema",
         }
         self.assertEqual(expected, ns_map)
@@ -35,13 +35,13 @@ class NamespacesTests(TestCase):
         ns_map: Dict = {}
         self.assertEqual("ns0", generate_prefix("a", ns_map))
         self.assertEqual("xs", generate_prefix(Namespace.XS.uri, ns_map))
-        self.assertEqual("soap-env", generate_prefix(Namespace.SOAP_ENV.uri, ns_map))
+        self.assertEqual("soapenv", generate_prefix(Namespace.SOAP_ENV.uri, ns_map))
         self.assertEqual("ns3", generate_prefix("b", ns_map))
 
         expected = {
             "ns0": "a",
             "ns3": "b",
-            "soap-env": "http://schemas.xmlsoap.org/soap/envelope/",
+            "soapenv": "http://schemas.xmlsoap.org/soap/envelope/",
             "xs": "http://www.w3.org/2001/XMLSchema",
         }
         self.assertEqual(expected, ns_map)

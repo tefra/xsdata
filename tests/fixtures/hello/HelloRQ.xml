@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/">
-  <soap-env:Body>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+  <soapenv:Body>
     <ns1:getHelloAsString xmlns:ns1="http://hello/">
       <arg0>chris</arg0>
     </ns1:getHelloAsString>
-  </soap-env:Body>
-</soap-env:Envelope>
+  </soapenv:Body>
+</soapenv:Envelope>

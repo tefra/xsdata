@@ -1,4 +1,5 @@
 import os
+import re
 from collections import defaultdict
 from pathlib import Path
 from typing import Iterable
@@ -15,6 +16,7 @@ from xsdata.codegen.models import Class
 from xsdata.codegen.models import get_location
 from xsdata.codegen.models import get_target_namespace
 from xsdata.exceptions import CodeGenerationError
+from xsdata.models.config import ObjectType
 from xsdata.models.config import StructureStyle
 from xsdata.models.enums import COMMON_SCHEMA_DIR
 from xsdata.utils import collections
@@ -141,11 +143,19 @@ class ClassDesignateHandler(ContainerHandlerInterface):
 
     def combine_ns_package(self, namespace: Optional[str]) -> List[str]:
         result = self.container.config.output.package.split(".")
-        aliases = self.container.config.aliases.package_name
-        alias = collections.first(x.target for x in aliases if x.source == namespace)
 
-        if alias:
-            result.extend(alias.split("."))
+        if namespace:
+            substitution = collections.first(
+                re.sub(sub.search, sub.replace, namespace)
+                for sub in self.container.config.substitutions.substitution
+                if sub.type == ObjectType.PACKAGE
+                and re.fullmatch(sub.search, namespace) is not None
+            )
+        else:
+            substitution = None
+
+        if substitution:
+            result.extend(substitution.split("."))
         else:
             result.extend(to_package_name(namespace).split("."))
 

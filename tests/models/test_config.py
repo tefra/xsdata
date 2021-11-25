@@ -7,7 +7,10 @@ from unittest import TestCase
 from xsdata import __version__
 from xsdata.exceptions import GeneratorConfigError
 from xsdata.exceptions import ParserError
+from xsdata.models.config import GeneratorAlias
+from xsdata.models.config import GeneratorAliases
 from xsdata.models.config import GeneratorConfig
+from xsdata.models.config import ObjectType
 from xsdata.models.config import OutputFormat
 
 
@@ -23,11 +26,10 @@ class GeneratorConfigTests(TestCase):
 
         expected = (
             '<?xml version="1.0" encoding="UTF-8"?>\n'
-            f'<Config xmlns="http://pypi.org/project/xsdata" version="{__version__}">\n'
+            '<Config xmlns="http://pypi.org/project/xsdata" version="21.11">\n'
             '  <Output maxLineLength="79">\n'
             "    <Package>generated</Package>\n"
-            '    <Format repr="true" eq="true" order="false" unsafeHash="false"'
-            ' frozen="false" slots="false" kwOnly="false">dataclasses</Format>\n'
+            '    <Format repr="true" eq="true" order="false" unsafeHash="false" frozen="false" slots="false" kwOnly="false">dataclasses</Format>\n'
             "    <Structure>filenames</Structure>\n"
             "    <DocstringStyle>reStructuredText</DocstringStyle>\n"
             "    <RelativeImports>false</RelativeImports>\n"
@@ -40,13 +42,17 @@ class GeneratorConfigTests(TestCase):
             '    <ModuleName case="snakeCase" safePrefix="mod"/>\n'
             '    <PackageName case="snakeCase" safePrefix="pkg"/>\n'
             "  </Conventions>\n"
-            "  <Aliases>\n"
-            '    <ClassName source="fooType" target="Foo"/>\n'
-            '    <ClassName source="ABCSomething" target="ABCSomething"/>\n'
-            '    <FieldName source="ChangeofGauge" target="change_of_gauge"/>\n'
-            '    <PackageName source="http://www.w3.org/1999/xhtml" target="xtml"/>\n'
-            '    <ModuleName source="2010.1" target="2020a"/>\n'
-            "  </Aliases>\n"
+            "  <Substitutions>\n"
+            '    <Substitution type="package" search="http://www.w3.org/2001/XMLSchema" replace="xs"/>\n'
+            '    <Substitution type="package" search="http://www.w3.org/XML/1998/namespace" replace="xml"/>\n'
+            '    <Substitution type="package" search="http://www.w3.org/2001/XMLSchema-instance" replace="xsi"/>\n'
+            '    <Substitution type="package" search="http://www.w3.org/1999/xlink" replace="xlink"/>\n'
+            '    <Substitution type="package" search="http://www.w3.org/1999/xhtml" replace="xhtml"/>\n'
+            '    <Substitution type="package" search="http://schemas.xmlsoap.org/wsdl/soap/" replace="soap"/>\n'
+            '    <Substitution type="package" search="http://schemas.xmlsoap.org/wsdl/soap12/" replace="soap12"/>\n'
+            '    <Substitution type="package" search="http://schemas.xmlsoap.org/soap/envelope/" replace="soapenv"/>\n'
+            '    <Substitution type="class" search="Class" replace="Type"/>\n'
+            "  </Substitutions>\n"
             "</Config>\n"
         )
         self.assertEqual(expected, file_path.read_text())
@@ -63,6 +69,7 @@ class GeneratorConfigTests(TestCase):
             '    <ClassName case="pascalCase" safePrefix="type"/>\n'
             "  </Conventions>\n"
             "  <Aliases/>\n"
+            "  <Substitutions/>\n"
             "</Config>\n"
         )
         file_path = Path(tempfile.mktemp())
@@ -91,6 +98,7 @@ class GeneratorConfigTests(TestCase):
             '    <PackageName case="snakeCase" safePrefix="pkg"/>\n'
             "  </Conventions>\n"
             "  <Aliases/>\n"
+            "  <Substitutions/>\n"
             "</Config>\n"
         )
         self.assertEqual(expected, file_path.read_text())
@@ -143,3 +151,29 @@ class GeneratorConfigTests(TestCase):
 
         else:
             self.assertIsNotNone(OutputFormat(kw_only=True))
+
+    def test_init_config_with_aliases(self):
+        config = GeneratorConfig(
+            aliases=GeneratorAliases(
+                class_name=[GeneratorAlias(source="a", target="b")],
+                field_name=[GeneratorAlias(source="c", target="d")],
+                package_name=[GeneratorAlias(source="e", target="f")],
+                module_name=[GeneratorAlias(source="g", target="h")],
+            )
+        )
+
+        self.assertEqual(4, len(config.substitutions.substitution))
+        self.assertEqual(ObjectType.CLASS, config.substitutions.substitution[0].type)
+        self.assertEqual(ObjectType.FIELD, config.substitutions.substitution[1].type)
+        self.assertEqual(ObjectType.PACKAGE, config.substitutions.substitution[2].type)
+        self.assertEqual(ObjectType.MODULE, config.substitutions.substitution[3].type)
+
+        output = tempfile.mktemp()
+        output_path = Path(output)
+        config.substitutions = None
+        with output_path.open("w") as fp:
+            config.write(fp, config)
+
+        config = GeneratorConfig.read(output_path)
+        self.assertIsNone(config.aliases)
+        self.assertEqual(4, len(config.substitutions.substitution))

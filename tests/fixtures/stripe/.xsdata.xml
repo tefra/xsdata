@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Config xmlns="http://pypi.org/project/xsdata" version="21.8">
+<Config xmlns="http://pypi.org/project/xsdata" version="21.11">
   <Output maxLineLength="79">
     <Package>tests.fixtures.stripe.models.balance</Package>
     <Format repr="true" eq="true" order="true" unsafeHash="false" frozen="true" slots="false" kwOnly="false">dataclasses</Format>
@@ -16,4 +16,5 @@
     <PackageName case="snakeCase" safePrefix="pkg"/>
   </Conventions>
   <Aliases/>
+  <Substitutions/>
 </Config>

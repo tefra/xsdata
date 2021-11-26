@@ -140,6 +140,10 @@ class AttributeTypeHandler(RelativeHandlerInterface):
                 x.restrictions.format for x in source.attrs if x.restrictions.format
             )
             attr_type.reference = id(source)
+        elif source.is_element and source.abstract:
+            # Substitution groups with abstract elements are used like
+            # placeholders and shouldn't be added as standalone fields.
+            target.attrs.remove(attr)
         else:
             if source.nillable:
                 attr.restrictions.nillable = True

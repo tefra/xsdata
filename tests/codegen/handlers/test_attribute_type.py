@@ -189,6 +189,22 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self.processor.process_dependency_type(target, attr, attr_type)
         self.assertTrue(attr.restrictions.nillable)
 
+    @mock.patch.object(AttributeTypeHandler, "find_dependency")
+    def test_process_dependency_type_with_abstract_type_type(
+        self, mock_find_dependency
+    ):
+        complex_type = ClassFactory.create(tag=Tag.ELEMENT, abstract=True)
+        mock_find_dependency.return_value = complex_type
+
+        attr = AttrFactory.create()
+        attr_type = attr.types[0]
+        target = ClassFactory.create()
+        target.attrs.append(attr)
+
+        self.assertEqual(1, len(target.attrs))
+        self.processor.process_dependency_type(target, attr, attr_type)
+        self.assertEqual(0, len(target.attrs))
+
     @mock.patch.object(AttributeTypeHandler, "update_restrictions")
     @mock.patch.object(AttributeTypeHandler, "copy_attribute_properties")
     def test_process_inner_type_with_simple_type(

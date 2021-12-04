@@ -112,6 +112,13 @@ class ClassTests(FactoryTestCase):
         obj = ClassFactory.create(tag=Tag.SIMPLE_TYPE)
         self.assertFalse(obj.is_complex)
 
+    def test_property_is_element(self):
+        obj = ClassFactory.create(tag=Tag.ELEMENT)
+        self.assertTrue(obj.is_element)
+
+        obj = ClassFactory.create(tag=Tag.SIMPLE_TYPE)
+        self.assertFalse(obj.is_element)
+
     def test_property_is_enumeration(self):
         obj = ClassFactory.enumeration(2)
         self.assertTrue(obj.is_enumeration)
@@ -122,7 +129,22 @@ class ClassTests(FactoryTestCase):
         obj.attrs.clear()
         self.assertFalse(obj.is_enumeration)
 
-    def test_is_simple_type(self):
+    def test_property_is_global_type(self):
+        obj = ClassFactory.create(abstract=True, tag=Tag.ELEMENT)
+        self.assertFalse(obj.is_global_type)
+
+        obj = ClassFactory.create(tag=Tag.ELEMENT)
+        self.assertTrue(obj.is_global_type)
+
+        obj = ClassFactory.create(tag=Tag.COMPLEX_TYPE)
+        obj.extensions.append(ExtensionFactory.create())
+        self.assertTrue(obj.is_global_type)
+
+        obj.extensions.clear()
+        obj.attrs.append(AttrFactory.create(tag=Tag.EXTENSION))
+        self.assertFalse(obj.is_global_type)
+
+    def test_property_is_simple_type(self):
         obj = ClassFactory.elements(2)
 
         self.assertFalse(obj.is_simple_type)
@@ -142,27 +164,27 @@ class ClassTests(FactoryTestCase):
         self.assertTrue(ClassFactory.create(tag=Tag.ATTRIBUTE_GROUP).is_group)
         self.assertFalse(ClassFactory.create(tag=Tag.ELEMENT).is_group)
 
-    def test_property_should_generate(self):
-        obj = ClassFactory.create(tag=Tag.ELEMENT)
-        self.assertTrue(obj.should_generate)
+    def test_property_ref(self):
+        obj = ClassFactory.create()
+        self.assertEqual(id(obj), obj.ref)
 
-        obj = ClassFactory.create(tag=Tag.COMPLEX_TYPE)
-        self.assertTrue(obj.should_generate)
+    def test_property_references(self):
+        ext_1 = ExtensionFactory.create(AttrTypeFactory.create(reference=1))
+        ext_2 = ExtensionFactory.create(AttrTypeFactory.create(reference=2))
 
-        obj.attrs.append(AttrFactory.create(tag=Tag.EXTENSION))
-        self.assertFalse(obj.should_generate)
+        obj = ClassFactory.elements(3)
+        obj.extensions.append(ext_1)
+        obj.extensions.append(ext_2)
 
-        obj = ClassFactory.create(tag=Tag.BINDING_OPERATION)
-        self.assertTrue(obj.should_generate)
+        obj.attrs[0].types[0].reference = 3
+        obj.attrs[1].choices.append(AttrFactory.create())
+        obj.attrs[1].choices[0].types[0].reference = 4
+        obj.attrs[2].types[0].reference = 5
 
-        obj = ClassFactory.create(tag=Tag.BINDING_MESSAGE)
-        self.assertTrue(obj.should_generate)
+        obj.inner.append(ClassFactory.elements(2))
+        obj.inner[0].attrs[1].types[0].reference = 6
 
-        obj = ClassFactory.enumeration(2)
-        self.assertTrue(obj.should_generate)
-
-        obj = ClassFactory.create(tag=Tag.SIMPLE_TYPE)
-        self.assertFalse(obj.should_generate)
+        self.assertEqual(list(range(1, 7)), list(obj.references))
 
     def test_property_target_module(self):
 

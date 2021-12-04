@@ -7,6 +7,7 @@ from xsdata.codegen.models import Status
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import Tag
 from xsdata.utils.testing import AttrFactory
+from xsdata.utils.testing import AttrTypeFactory
 from xsdata.utils.testing import ClassFactory
 from xsdata.utils.testing import FactoryTestCase
 
@@ -131,24 +132,25 @@ class ClassContainerTests(FactoryTestCase):
         for obj in self.container:
             self.assertEqual(Status.FLATTENED, obj.status)
 
-    @mock.patch.object(Class, "should_generate", new_callable=mock.PropertyMock)
-    def test_filter_classes(self, mock_class_should_generate):
-        mock_class_should_generate.side_effect = [True, False, False, True, False]
+    def test_filter_classes(self):
+        complex_type = ClassFactory.elements(1)
+        enum_1 = ClassFactory.enumeration(2)
+        complex_type.attrs[0].types[0].reference = enum_1.ref
 
-        classes = ClassFactory.list(5)
+        simple_type = ClassFactory.simple_type()
+        enum_2 = ClassFactory.enumeration(3)
+        simple_type.attrs[0].types[0].reference = enum_2.ref
+
+        element = ClassFactory.create(tag=Tag.ELEMENT, abstract=True)
+
         container = ClassContainer(config=GeneratorConfig())
-        container.extend(classes)
+        container.extend([complex_type, enum_1, enum_2, simple_type, element])
 
-        expected = [
-            classes[0],
-            classes[3],
-        ]
+        expected = [complex_type, enum_1]
         container.filter_classes()
         self.assertEqual(expected, list(container))
 
-    @mock.patch.object(Class, "should_generate", new_callable=mock.PropertyMock)
-    def test_filter_classes_with_only_simple_types(self, mock_class_should_generate):
-        mock_class_should_generate.return_value = False
+    def test_filter_classes_with_only_simple_types(self):
         classes = [ClassFactory.enumeration(2), ClassFactory.simple_type()]
         container = ClassContainer(config=GeneratorConfig())
         container.extend(classes)

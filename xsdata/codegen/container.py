@@ -22,7 +22,6 @@ from xsdata.codegen.handlers import ClassNameConflictHandler
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import get_qname
-from xsdata.codegen.models import should_generate
 from xsdata.codegen.models import Status
 from xsdata.codegen.utils import ClassUtils
 from xsdata.models.config import GeneratorConfig
@@ -152,13 +151,25 @@ class ClassContainer(ContainerInterface):
             designator.run()
 
     def filter_classes(self):
-        """If there is any class derived from complexType or element then
-        filter classes that should be generated, otherwise leave the container
-        as it is."""
+        """
+        Filter classes to be generated.
 
-        candidates = list(filter(should_generate, self))
-        if candidates:
-            self.data = collections.group_by(candidates, key=get_qname)
+        1. If there are no global elements generate them all
+        2. Generate all global types and the referred types
+        """
+
+        # No global elements, generate them all!!!
+        if not any(obj.is_global_type for obj in self):
+            return
+
+        occurs = {}
+        for obj in self:
+            if obj.is_global_type:
+                occurs[obj.ref] = None
+                occurs.update({ref: None for ref in obj.references})
+
+        candidates = [obj for obj in self if obj.ref in occurs]
+        self.data = collections.group_by(candidates, key=get_qname)
 
     def add(self, item: Class):
         """Add class item to the container."""

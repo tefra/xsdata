@@ -47,7 +47,7 @@ class AttributeCompoundChoiceHandler(RelativeHandlerInterface):
         min_occurs = []
         max_occurs = []
         for attr in attrs:
-            target.attrs.remove(attr)
+            ClassUtils.remove_attribute(target, attr)
             names.append(attr.local_name)
             min_occurs.append(attr.restrictions.min_occurs or 0)
             max_occurs.append(attr.restrictions.max_occurs or 0)

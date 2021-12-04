@@ -15,16 +15,13 @@ from xsdata.utils.testing import FactoryTestCase
 
 
 class ClassUtilsTests(FactoryTestCase):
-    @mock.patch.object(ClassUtils, "clean_inner_classes")
-    def test_remove_attribute(self, mock_clean_inner_classes):
+    def test_remove_attribute(self):
 
         target = ClassFactory.elements(1)
         attr = target.attrs[0]
 
         ClassUtils.remove_attribute(target, attr)
         self.assertEqual(0, len(target.attrs))
-
-        mock_clean_inner_classes.assert_called_once_with(target)
 
     @mock.patch.object(ClassUtils, "is_orphan_inner")
     def test_clean_inner_classes(self, mock_is_orphan_inner):

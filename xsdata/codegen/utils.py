@@ -23,11 +23,9 @@ class ClassUtils:
 
     @classmethod
     def remove_attribute(cls, target: Class, attr: Attr):
-        """Remove the given attr from the target class and clean inner
-        classes."""
-        target.attrs.remove(attr)
-
-        cls.clean_inner_classes(target)
+        """Safely remove the given attr from the target class by check obj
+        ids."""
+        target.attrs = [at for at in target.attrs if id(at) != id(attr)]
 
     @classmethod
     def clean_inner_classes(cls, target: Class):

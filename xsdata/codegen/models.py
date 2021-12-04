@@ -31,6 +31,7 @@ xml_type_map = {
 }
 
 SIMPLE_TYPES = (Tag.EXTENSION, Tag.LIST, Tag.SIMPLE_TYPE, Tag.UNION)
+GLOBAL_TYPES = (Tag.ELEMENT, Tag.BINDING_OPERATION, Tag.BINDING_MESSAGE, Tag.MESSAGE)
 
 
 @dataclass
@@ -459,6 +460,10 @@ class Class:
         return namespaces.local_name(self.qname)
 
     @property
+    def ref(self) -> int:
+        return id(self)
+
+    @property
     def target_namespace(self) -> Optional[str]:
         return namespaces.target_uri(self.qname)
 
@@ -485,15 +490,23 @@ class Class:
         return self.tag == Tag.ELEMENT
 
     @property
+    def is_enumeration(self) -> bool:
+        """Return whether all attributes are derived from xs:enumeration."""
+        return len(self.attrs) > 0 and all(attr.is_enumeration for attr in self.attrs)
+
+    @property
+    def is_global_type(self) -> bool:
+        """Return whether this instance is a non abstract element, wsdl binding
+        class or a complex type without simple content."""
+        return (not self.abstract and self.tag in GLOBAL_TYPES) or (
+            self.tag == Tag.COMPLEX_TYPE and not self.is_simple_type
+        )
+
+    @property
     def is_group(self) -> bool:
         """Return whether this attribute is derived from an xs:group or
         xs:attributeGroup."""
         return self.tag in (Tag.ATTRIBUTE_GROUP, Tag.GROUP)
-
-    @property
-    def is_enumeration(self) -> bool:
-        """Return whether all attributes are derived from xs:enumeration."""
-        return len(self.attrs) > 0 and all(attr.is_enumeration for attr in self.attrs)
 
     @property
     def is_nillable(self) -> bool:
@@ -520,15 +533,25 @@ class Class:
         )
 
     @property
-    def should_generate(self) -> bool:
-        """Return whether this instance should be generated."""
-        return (
-            self.tag
-            in (Tag.ELEMENT, Tag.BINDING_OPERATION, Tag.BINDING_MESSAGE, Tag.MESSAGE)
-            or self.tag == Tag.COMPLEX_TYPE
-            and not self.is_simple_type
-            or self.is_enumeration
-        )
+    def references(self) -> Iterator[int]:
+        def all_refs():
+            for ext in self.extensions:
+                yield ext.type.reference
+
+            for attr in self.attrs:
+                for tp in attr.types:
+                    yield tp.reference
+
+                for choice in attr.choices:
+                    for ctp in choice.types:
+                        yield ctp.reference
+
+            for inner in self.inner:
+                yield from inner.references
+
+        for ref in all_refs():
+            if ref:
+                yield ref
 
     @property
     def target_module(self) -> str:
@@ -602,4 +625,3 @@ get_slug = operator.attrgetter("slug")
 get_target_namespace = operator.attrgetter("target_namespace")
 is_enumeration = operator.attrgetter("is_enumeration")
 is_group = operator.attrgetter("is_group")
-should_generate = operator.attrgetter("should_generate")

@@ -42,6 +42,6 @@ class AttributeGroupHandler(RelativeHandlerInterface):
             raise AnalyzerValueError(f"Group attribute not found: `{qname}`")
 
         if source is target:
-            target.attrs.remove(attr)
+            ClassUtils.remove_attribute(target, attr)
         else:
             ClassUtils.copy_group_attributes(source, target, attr)

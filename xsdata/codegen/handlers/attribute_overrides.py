@@ -53,7 +53,12 @@ class AttributeOverridesHandler(RelativeHandlerInterface):
             and bool_eq(attr.restrictions.tokens, source_attr.restrictions.tokens)
             and bool_eq(attr.restrictions.nillable, source_attr.restrictions.nillable)
         ):
-            ClassUtils.remove_attribute(target, attr)
+            cls.remove_attribute(target, attr)
+
+    @classmethod
+    def remove_attribute(cls, target: Class, attr: Attr):
+        ClassUtils.remove_attribute(target, attr)
+        ClassUtils.clean_inner_classes(target)
 
     @classmethod
     def resolve_conflict(cls, attr: Attr, source_attr: Attr):

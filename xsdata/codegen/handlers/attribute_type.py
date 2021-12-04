@@ -143,7 +143,7 @@ class AttributeTypeHandler(RelativeHandlerInterface):
         elif source.is_element and source.abstract:
             # Substitution groups with abstract elements are used like
             # placeholders and shouldn't be added as standalone fields.
-            target.attrs.remove(attr)
+            ClassUtils.remove_attribute(target, attr)
         else:
             if source.nillable:
                 attr.restrictions.nillable = True

@@ -1,3 +1,14 @@
+21.12 (2021-12-05)
+------------------
+- Fixed wsdl generator to use operation name for rpc input messages `#609 <https://github.com/tefra/xsdata/issues/609>`_
+- Fixed wsdl generator to check for qualified elements for message part types `#612 <https://github.com/tefra/xsdata/issues/612>`_
+- Fixed compound field matcher to prefer exact types over derived `#617 <https://github.com/tefra/xsdata/issues/617>`_
+- Added async to the reserved keywords `#600 <https://github.com/tefra/xsdata/issues/600>`_
+- Added generator config for search & replace substitutions `#624 <https://github.com/tefra/xsdata/issues/624>`_
+- Updated code generator to remove abstract elements from class attrs `#627 <https://github.com/tefra/xsdata/issues/627>`_
+- Updated code generator to filter out all unused types `#629 <https://github.com/tefra/xsdata/issues/629>`_
+
+
 21.11 (2021-11-02)
 ------------------
 - Fixed unescaped quotes in regex pattern `#592 <https://github.com/tefra/xsdata/issues/592>`_

@@ -26,7 +26,7 @@ class GeneratorConfigTests(TestCase):
 
         expected = (
             '<?xml version="1.0" encoding="UTF-8"?>\n'
-            '<Config xmlns="http://pypi.org/project/xsdata" version="21.11">\n'
+            '<Config xmlns="http://pypi.org/project/xsdata" version="21.12">\n'
             '  <Output maxLineLength="79">\n'
             "    <Package>generated</Package>\n"
             '    <Format repr="true" eq="true" order="false" unsafeHash="false" frozen="false" slots="false" kwOnly="false">dataclasses</Format>\n'

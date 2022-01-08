@@ -38,6 +38,11 @@ def build_options(obj: Any, parent: str) -> Iterator[Callable[[FC], FC]]:
     for field in fields(obj):
         type_hint = type_hints[field.name]
         doc_hint = doc_hints[field.name]
+        name = field.metadata.get("cli", field.name)
+
+        if not name:
+            continue
+
         qname = f"{parent}.{field.name}".strip(".")
 
         if is_dataclass(type_hint):
@@ -45,19 +50,19 @@ def build_options(obj: Any, parent: str) -> Iterator[Callable[[FC], FC]]:
         else:
             is_flag = False
             opt_type = type_hint
-            if field.name == "value":
+            if name == "output":
                 opt_type = click.Choice(CodeWriter.generators.keys())
                 names = ["-o", "--output"]
             elif type_hint is bool:
                 is_flag = True
                 opt_type = None
-                name = text.kebab_case(field.name)
+                name = text.kebab_case(name)
                 names = [f"--{name}/--no-{name}"]
             else:
                 if issubclass(type_hint, enum.Enum):
                     opt_type = EnumChoice(type_hint)
 
-                parts = text.split_words(field.name)
+                parts = text.split_words(name)
                 name = "-".join(parts)
                 name_short = "".join(part[0] for part in parts)
                 names = [f"--{name}", f"-{name_short}"]

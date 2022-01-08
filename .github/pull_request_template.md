@@ -12,8 +12,8 @@ Resolves #xxxx
 
 ## 💬 Comments
 
-> A place to write any comments to the reviewer. 
-> 
+> A place to write any comments to the reviewer.
+>
 
 ## 🛫 Checklist
 

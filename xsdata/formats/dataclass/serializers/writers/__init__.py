@@ -9,7 +9,6 @@ try:
     def default_writer() -> Type[XmlWriter]:
         return LxmlEventWriter
 
-
 except ImportError:  # pragma: no cover
 
     def default_writer() -> Type[XmlWriter]:

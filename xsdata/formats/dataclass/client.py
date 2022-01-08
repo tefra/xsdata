@@ -36,9 +36,13 @@ class Config(NamedTuple):
     @classmethod
     def from_service(cls, obj: Any, **kwargs: Any) -> "Config":
         """Instantiate from a generated service class."""
-        return cls(
-            **{key: kwargs.get(key) or getattr(obj, key, None) for key in cls._fields}
-        )
+
+        params = {
+            key: kwargs[key] if key in kwargs else getattr(obj, key, None)
+            for key in cls._fields
+        }
+
+        return cls(**params)
 
 
 class TransportTypes:

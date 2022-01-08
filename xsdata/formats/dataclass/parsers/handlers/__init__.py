@@ -9,7 +9,6 @@ try:
     def default_handler() -> Type[XmlHandler]:
         return LxmlEventHandler
 
-
 except ImportError:  # pragma: no cover
 
     def default_handler() -> Type[XmlHandler]:

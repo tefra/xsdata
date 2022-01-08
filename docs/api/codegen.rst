@@ -34,6 +34,7 @@ like naming conventions and substitutions.
     GeneratorSubstitutions
     StructureStyle
     DocstringStyle
+    CompoundFields
     ObjectType
     GeneratorSubstitution
     NameConvention

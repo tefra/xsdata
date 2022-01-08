@@ -187,12 +187,18 @@ class ElementBase:
                 yield value
 
 
+def text_node(**kwargs: Any) -> Any:
+    """Shortcut method for text node fields."""
+    metadata = extract_metadata(kwargs, type=XmlType.TEXT)
+    add_default_value(kwargs, optional=False)
+
+    return field(metadata=metadata, **kwargs)
+
+
 def attribute(optional: bool = True, **kwargs: Any) -> Any:
     """Shortcut method for attribute fields."""
     metadata = extract_metadata(kwargs, type=XmlType.ATTRIBUTE)
-
-    if not has_default(kwargs) and optional:
-        kwargs["default"] = None
+    add_default_value(kwargs, optional=optional)
 
     return field(metadata=metadata, **kwargs)
 
@@ -200,11 +206,17 @@ def attribute(optional: bool = True, **kwargs: Any) -> Any:
 def element(optional: bool = True, **kwargs: Any) -> Any:
     """Shortcut method for element fields."""
     metadata = extract_metadata(kwargs, type=XmlType.ELEMENT)
-
-    if not has_default(kwargs) and optional:
-        kwargs["default"] = None
+    add_default_value(kwargs, optional=optional)
 
     return field(metadata=metadata, **kwargs)
+
+
+def add_default_value(params: Dict, optional: bool):
+    """Add default value to the params if it's missing and its marked as
+    optional."""
+
+    if optional and not ("default" in params or "default_factory" in params):
+        params["default"] = None
 
 
 def array_element(**kwargs: Any) -> Any:
@@ -229,11 +241,6 @@ def extract_metadata(params: Dict, **kwargs: Any) -> Dict:
     }
     metadata.update(kwargs)
     return metadata
-
-
-def has_default(params: Dict) -> bool:
-    """Chek if default value or factory exists in the given params."""
-    return "default" in params or "default_factory" in params
 
 
 FIELD_PARAMS = (

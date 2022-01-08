@@ -18,7 +18,7 @@ class AttributeCompoundChoiceHandlerTests(FactoryTestCase):
         super().setUp()
 
         self.config = GeneratorConfig()
-        self.config.output.compound_fields = True
+        self.config.output.compound_fields.enabled = True
         self.container = ClassContainer(config=self.config)
         self.processor = AttributeCompoundChoiceHandler(container=self.container)
 
@@ -116,6 +116,14 @@ class AttributeCompoundChoiceHandlerTests(FactoryTestCase):
         actual = self.processor.choose_name(target, ["a", "b", "c", "d"])
         self.assertEqual("choice_1", actual)
 
+        self.processor.config.default_name = "ThisOrThat"
+        actual = self.processor.choose_name(target, ["a", "b", "c", "d"])
+        self.assertEqual("ThisOrThat", actual)
+
+        self.processor.config.force_default_name = True
+        actual = self.processor.choose_name(target, ["a", "b", "c"])
+        self.assertEqual("ThisOrThat", actual)
+
     def test_build_attr_choice(self):
         attr = AttrFactory.create(
             name="a", namespace="xsdata", default="123", help="help", fixed=True
@@ -170,7 +178,7 @@ class AttributeCompoundChoiceHandlerTests(FactoryTestCase):
 
         attrs_clone = [attr.clone() for attr in target.attrs]
 
-        self.processor.compound_fields = False
+        self.processor.config.enabled = False
         self.processor.reset_sequential(target, 0)
         self.assertEqual(2, len_sequential(target))
 

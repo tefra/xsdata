@@ -18,15 +18,15 @@ class AttributeCompoundChoiceHandler(RelativeHandlerInterface):
     """Group attributes that belong in the same choice and replace them by
     compound fields."""
 
-    __slots__ = "compound_fields"
+    __slots__ = "config"
 
     def __init__(self, container: ContainerInterface):
         super().__init__(container)
 
-        self.compound_fields = container.config.output.compound_fields
+        self.config = container.config.output.compound_fields
 
     def process(self, target: Class):
-        if self.compound_fields:
+        if self.config.enabled:
             groups = group_by(target.attrs, get_restriction_choice)
             for choice, attrs in groups.items():
                 if choice and len(attrs) > 1 and any(attr.is_list for attr in attrs):
@@ -74,8 +74,12 @@ class AttributeCompoundChoiceHandler(RelativeHandlerInterface):
         reserved = set(map(get_slug, self.base_attrs(target)))
         reserved.update(map(get_slug, target.attrs))
 
-        if len(names) > 3 or len(names) != len(set(names)):
-            name = "choice"
+        if (
+            self.config.force_default_name
+            or len(names) > 3
+            or len(names) != len(set(names))
+        ):
+            name = self.config.default_name
         else:
             name = "_Or_".join(names)
 

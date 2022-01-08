@@ -1,7 +1,6 @@
 import sys
 import warnings
 from dataclasses import dataclass
-from dataclasses import field
 from enum import Enum
 from pathlib import Path
 from typing import Any
@@ -25,6 +24,7 @@ from xsdata.models.enums import Namespace
 from xsdata.models.mixins import array_element
 from xsdata.models.mixins import attribute
 from xsdata.models.mixins import element
+from xsdata.models.mixins import text_node
 from xsdata.utils import objects
 from xsdata.utils import text
 
@@ -165,7 +165,7 @@ class OutputFormat:
     :param kw_only: Enable keyword only arguments, default: false, python>=3.10 Only
     """
 
-    value: str = field(default="dataclasses")
+    value: str = text_node(default="dataclasses", cli="output")
     repr: bool = attribute(default=True)
     eq: bool = attribute(default=True)
     order: bool = attribute(default=False)
@@ -198,6 +198,23 @@ class OutputFormat:
 
 
 @dataclass
+class CompoundFields:
+    """
+    Compound fields options.
+
+    :param enabled: Use compound fields for repeatable elements, default: false
+    :param default_name: Default compound field name, default: choice
+    :param force_default_name: Always use the default compound field, otherwise
+        if the number of elements is less than 4 the generator will try to dynamically
+        create the field name eg. hat_or_dress_or_something.
+    """
+
+    enabled: bool = text_node(default=False, cli="compound-fields")
+    default_name: str = attribute(default="choice", cli=False)
+    force_default_name: bool = attribute(default=False, cli=False)
+
+
+@dataclass
 class GeneratorOutput:
     """
     Main generator output options.
@@ -218,7 +235,7 @@ class GeneratorOutput:
     )
     docstring_style: DocstringStyle = element(default=DocstringStyle.RST)
     relative_imports: bool = element(default=False)
-    compound_fields: bool = element(default=False)
+    compound_fields: CompoundFields = element(default_factory=CompoundFields)
     max_line_length: int = attribute(default=79)
 
     def update(self, **kwargs: Any):
@@ -350,9 +367,11 @@ class GeneratorConfig:
     Generator configuration binding model.
 
     :cvar version: xsdata version number the config was created/updated
-    :param output: output options
-    :param conventions: generator conventions
-    :param aliases: generator aliases
+    :param output: Output options
+    :param conventions: Generator conventions
+    :param aliases: Generator aliases, Deprecated since v21.12, use substitutions
+    :param substitutions: Generator search and replace substitutions for classes,
+        fields, packages and modules names.
     """
 
     class Meta:

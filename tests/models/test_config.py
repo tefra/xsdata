@@ -33,7 +33,7 @@ class GeneratorConfigTests(TestCase):
             "    <Structure>filenames</Structure>\n"
             "    <DocstringStyle>reStructuredText</DocstringStyle>\n"
             "    <RelativeImports>false</RelativeImports>\n"
-            "    <CompoundFields>false</CompoundFields>\n"
+            '    <CompoundFields defaultName="choice" forceDefaultName="false">false</CompoundFields>\n'
             "  </Output>\n"
             "  <Conventions>\n"
             '    <ClassName case="pascalCase" safePrefix="type"/>\n'
@@ -88,7 +88,7 @@ class GeneratorConfigTests(TestCase):
             "    <Structure>filenames</Structure>\n"
             "    <DocstringStyle>reStructuredText</DocstringStyle>\n"
             "    <RelativeImports>false</RelativeImports>\n"
-            "    <CompoundFields>false</CompoundFields>\n"
+            '    <CompoundFields defaultName="choice" forceDefaultName="false">false</CompoundFields>\n'
             "  </Output>\n"
             "  <Conventions>\n"
             '    <ClassName case="pascalCase" safePrefix="type"/>\n'

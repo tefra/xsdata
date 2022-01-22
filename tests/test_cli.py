@@ -149,9 +149,12 @@ class CliTests(TestCase):
         file = hello_path.joinpath("hello.xsd")
         url = "http://www.xsdata/schema.xsd"
 
-        self.assertEqual([file.as_uri()], list(resolve_source(str(file))))
-        self.assertEqual([url], list(resolve_source(url)))
-        self.assertEqual(5, len(list(resolve_source(str(hello_path)))))
+        self.assertEqual([file.as_uri()], list(resolve_source(str(file), False)))
+        self.assertEqual([url], list(resolve_source(url, False)))
+        self.assertEqual(5, len(list(resolve_source(str(hello_path), False))))
 
         def_xml_path = fixtures_dir.joinpath("calculator")
-        self.assertEqual(3, len(list(resolve_source(str(def_xml_path)))))
+        self.assertEqual(3, len(list(resolve_source(str(def_xml_path), False))))
+
+        actual = list(resolve_source(str(fixtures_dir), True))
+        self.assertEqual(32, len(actual))

@@ -1,3 +1,8 @@
+22.1 (2022-01-23)
+-----------------
+- Added recursive glob for cli dir source `#643 <https://github.com/tefra/xsdata/issues/643>`_
+- Added cfg options to change/force compound field names `#639 <https://github.com/tefra/xsdata/issues/639>`_
+
 21.12 (2021-12-05)
 ------------------
 - Fixed wsdl generator to use operation name for rpc input messages `#609 <https://github.com/tefra/xsdata/issues/609>`_

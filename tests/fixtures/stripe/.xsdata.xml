@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Config xmlns="http://pypi.org/project/xsdata" version="21.11">
+<Config xmlns="http://pypi.org/project/xsdata" version="22.1">
   <Output maxLineLength="79">
     <Package>tests.fixtures.stripe.models.balance</Package>
     <Format repr="true" eq="true" order="true" unsafeHash="false" frozen="true" slots="false" kwOnly="false">dataclasses</Format>
     <Structure>single-package</Structure>
     <DocstringStyle>reStructuredText</DocstringStyle>
     <RelativeImports>true</RelativeImports>
-    <CompoundFields>false</CompoundFields>
+    <CompoundFields defaultName="choice" forceDefaultName="false">false</CompoundFields>
   </Output>
   <Conventions>
     <ClassName case="pascalCase" safePrefix="type"/>

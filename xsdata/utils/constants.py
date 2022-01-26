@@ -10,6 +10,7 @@ EMPTY_TUPLE: Tuple = ()
 
 XML_FALSE = sys.intern("false")
 XML_TRUE = sys.intern("true")
+DEFAULT_ATTR_NAME = "value"
 
 
 def return_true(*_: Any) -> bool:

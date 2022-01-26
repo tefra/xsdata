@@ -11,6 +11,7 @@ from xsdata.logger import logger
 from xsdata.models.enums import DataType
 from xsdata.models.enums import NamespaceType
 from xsdata.models.enums import Tag
+from xsdata.utils.constants import DEFAULT_ATTR_NAME
 
 
 class ClassExtensionHandler(RelativeHandlerInterface):
@@ -268,7 +269,7 @@ class ClassExtensionHandler(RelativeHandlerInterface):
         type."""
         if extension.type.datatype != DataType.ANY_TYPE:
             tag = Tag.EXTENSION
-            name = "@value"
+            name = DEFAULT_ATTR_NAME
             namespace = None
         else:
             tag = Tag.ANY

@@ -136,13 +136,6 @@ class ClassUtils:
             clone = inner.clone()
             clone.package = target.package
             clone.module = target.module
-
-            # Simple type, update the name
-            if clone.name == "@value":
-                namespace, _ = namespaces.split_qname(clone.qname)
-                qname = namespaces.build_qname(namespace, attr.name)
-                clone.qname = attr_type.qname = qname
-
             target.inner.append(clone)
 
     @classmethod

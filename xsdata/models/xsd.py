@@ -24,13 +24,12 @@ from xsdata.models.mixins import element
 from xsdata.models.mixins import ElementBase
 from xsdata.utils import text
 from xsdata.utils.collections import unique_sequence
+from xsdata.utils.constants import DEFAULT_ATTR_NAME
 from xsdata.utils.namespaces import clean_uri
 
 docstring_serializer = XmlSerializer(
     config=SerializerConfig(pretty_print=True, xml_declaration=False)
 )
-
-DEFAULT_ATTR_NAME = "@value"
 
 
 @dataclass(frozen=True)

@@ -10,7 +10,7 @@ class ListTests(TestCase):
 
     def test_real_name(self):
         obj = List()
-        self.assertEqual("@value", obj.real_name)
+        self.assertEqual("value", obj.real_name)
 
     def test_real_type(self):
         obj = List()

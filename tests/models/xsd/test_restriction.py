@@ -34,7 +34,7 @@ class RestrictionTests(TestCase):
 
     def test_property_real_name(self):
         obj = Restriction()
-        self.assertEqual("@value", obj.real_name)
+        self.assertEqual("value", obj.real_name)
 
     def test_property_bases(self):
         obj = Restriction()

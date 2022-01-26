@@ -179,23 +179,6 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual(target.module, target.inner[0].module)
         self.assertEqual(inner.qname, target.inner[0].qname)
 
-    def test_copy_inner_class_rename_simple_inner_type(self):
-        source = ClassFactory.create()
-        inner = ClassFactory.create(qname="{a}@value", module="b", package="c")
-        target = ClassFactory.create()
-        attr = AttrFactory.create(name="simple")
-        attr_type = AttrTypeFactory.create(forward=True, qname=inner.qname)
-
-        source.inner.append(inner)
-        ClassUtils.copy_inner_class(source, target, attr, attr_type)
-
-        self.assertEqual(1, len(target.inner))
-        self.assertIsNot(inner, target.inner[0])
-        self.assertEqual(target.package, target.inner[0].package)
-        self.assertEqual(target.module, target.inner[0].module)
-        self.assertEqual("{a}simple", target.inner[0].qname)
-        self.assertEqual("{a}simple", attr_type.qname)
-
     def test_copy_inner_class_skip_non_forward_reference(self):
         source = ClassFactory.create()
         target = ClassFactory.create()

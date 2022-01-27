@@ -93,8 +93,14 @@ class ClassValidatorTests(FactoryTestCase):
         )
 
     def test_merge_global_types(self):
-        one = ClassFactory.create(qname="foo", tag=Tag.ELEMENT, namespace="a", help="b")
-        two = ClassFactory.create(qname="foo", tag=Tag.COMPLEX_TYPE)
+        one = ClassFactory.create(
+            qname="foo",
+            tag=Tag.ELEMENT,
+            namespace="a",
+            help="b",
+            substitutions=["a", "b"],
+        )
+        two = ClassFactory.create(qname="foo", tag=Tag.COMPLEX_TYPE, substitutions=[])
         three = ClassFactory.create(qname="foo", tag=Tag.SIMPLE_TYPE)
 
         classes = [one, two, three]
@@ -128,6 +134,8 @@ class ClassValidatorTests(FactoryTestCase):
         self.assertIn(three, classes)
         self.assertEqual(one.namespace, two.namespace)
         self.assertEqual(one.help, two.help)
+        self.assertEqual(one.substitutions, two.substitutions)
+        self.assertEqual(2, len(one.substitutions))
 
     @mock.patch.object(ClassUtils, "copy_extensions")
     @mock.patch.object(ClassUtils, "copy_attributes")

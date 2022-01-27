@@ -156,4 +156,5 @@ class ClassValidator:
 
         ct.namespace = el.namespace or ct.namespace
         ct.help = el.help or ct.help
+        ct.substitutions = el.substitutions
         classes.remove(el)

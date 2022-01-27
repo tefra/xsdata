@@ -4,6 +4,7 @@ from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import AttributeSubstitutionHandler
 from xsdata.codegen.models import AttrType
 from xsdata.models.config import GeneratorConfig
+from xsdata.models.enums import Tag
 from xsdata.utils.namespaces import build_qname
 from xsdata.utils.testing import AttrFactory
 from xsdata.utils.testing import AttrTypeFactory
@@ -116,7 +117,7 @@ class AttributeSubstitutionHandlerTests(FactoryTestCase):
             name=item.name,
             default=None,
             types=[AttrType(qname=build_qname("foo", "bar"))],
-            tag=item.tag,
+            tag=Tag.ELEMENT,
         )
 
         self.assertEqual(expected, actual)

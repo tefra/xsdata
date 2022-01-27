@@ -9,6 +9,7 @@ from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.codegen.utils import ClassUtils
+from xsdata.models.enums import Tag
 from xsdata.utils import collections
 
 
@@ -82,6 +83,6 @@ class AttributeSubstitutionHandler(RelativeHandlerInterface):
         return Attr(
             name=source.name,
             types=[AttrType(qname=source.qname)],
-            tag=source.tag,
+            tag=Tag.ELEMENT,
             namespace=source.namespace,
         )

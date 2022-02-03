@@ -1,7 +1,8 @@
 import os
+import sys
 
+import pytest
 from click.testing import CliRunner
-from pytest import fail
 
 from tests import fixtures_dir
 from tests import root
@@ -13,6 +14,7 @@ from xsdata.utils.testing import load_class
 os.chdir(root)
 
 
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="PEP563 introduced in 3.7")
 def test_annotations():
     filepath = fixtures_dir.joinpath("annotations")
     schema = filepath.joinpath("model.xsd")
@@ -28,7 +30,7 @@ def test_annotations():
         Measurement = load_class(result.output, "Measurement")
         unit = load_class(result.output, "unit")
     except Exception:
-        fail("Could not load class with member having the same name as type")
+        pytest.fail("Could not load class with member having the same name as type")
 
     filename = str(filepath.joinpath("sample.xml"))
     parser = XmlParser(context=XmlContext())

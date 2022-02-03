@@ -227,7 +227,7 @@ class GeneratorOutput:
     :param compound_fields: Use compound fields for repeatable elements, default: false
     :param max_line_length: Adjust the maximum line length, default: 79
     :param postponed_annotations: Enable postponed evaluation of annotations,
-        default: false
+        default: false, python>=3.7 Only
     """
 
     package: str = element(default="generated")

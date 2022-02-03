@@ -241,6 +241,17 @@ class GeneratorOutput:
     max_line_length: int = attribute(default=79)
     postponed_annotations: bool = element(default=False)
 
+    def __post_init__(self):
+        self.validate()
+
+    def validate(self):
+        if self.postponed_annotations and sys.version_info < (3, 7):
+            self.postponed_annotations = False
+            warnings.warn(
+                "postponed annotations requires python >= 3.7, reverting...",
+                CodeGenerationWarning,
+            )
+
     def update(self, **kwargs: Any):
         objects.update(self, **kwargs)
         self.format.validate()

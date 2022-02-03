@@ -10,6 +10,7 @@ from xsdata.exceptions import ParserError
 from xsdata.models.config import GeneratorAlias
 from xsdata.models.config import GeneratorAliases
 from xsdata.models.config import GeneratorConfig
+from xsdata.models.config import GeneratorOutput
 from xsdata.models.config import ObjectType
 from xsdata.models.config import OutputFormat
 
@@ -153,6 +154,21 @@ class GeneratorConfigTests(TestCase):
 
         else:
             self.assertIsNotNone(OutputFormat(kw_only=True))
+
+    def test_postponed_annotations_requires_37(self):
+        if sys.version_info < (3, 7):
+            with warnings.catch_warnings(record=True) as w:
+                self.assertFalse(
+                    GeneratorOutput(postponed_annotations=True).postponed_annotations
+                )
+                self.assertEqual(
+                    "postponed annotations requires python >= 3.7, reverting...",
+                    str(w[-1].message),
+                )
+
+        # Using an else statement makes pyupgrade want to rewrite the test by
+        # discarding the previous block
+        self.assertIsNotNone(GeneratorOutput(postponed_annotations=True))
 
     def test_init_config_with_aliases(self):
         config = GeneratorConfig(

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema targetNamespace="http://domain.org/schema/model/units"
+	xmlns="http://domain.org/schema/model/units"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:simpleType name="stdUnit">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="m"/>
+			<xs:enumeration value="kg"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="miscUnit">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="%"/>
+			<xs:enumeration value="NA"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="unit">
+		<xs:union memberTypes="stdUnit miscUnit"/>
+	</xs:simpleType>
+</xs:schema>

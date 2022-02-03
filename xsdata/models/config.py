@@ -226,6 +226,8 @@ class GeneratorOutput:
     :param relative_imports: Use relative imports, default: false
     :param compound_fields: Use compound fields for repeatable elements, default: false
     :param max_line_length: Adjust the maximum line length, default: 79
+    :param import_annotations: Import annotations from :obj:`__future__` in generated
+        modules, default: false
     """
 
     package: str = element(default="generated")
@@ -237,6 +239,7 @@ class GeneratorOutput:
     relative_imports: bool = element(default=False)
     compound_fields: CompoundFields = element(default_factory=CompoundFields)
     max_line_length: int = attribute(default=79)
+    import_annotations: bool = element(default=False)
 
     def update(self, **kwargs: Any):
         objects.update(self, **kwargs)

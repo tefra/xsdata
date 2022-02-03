@@ -34,7 +34,7 @@ class GeneratorConfigTests(TestCase):
             "    <DocstringStyle>reStructuredText</DocstringStyle>\n"
             "    <RelativeImports>false</RelativeImports>\n"
             '    <CompoundFields defaultName="choice" forceDefaultName="false">false</CompoundFields>\n'
-            "    <ImportAnnotations>false</ImportAnnotations>\n"
+            "    <PostponedAnnotations>false</PostponedAnnotations>\n"
             "  </Output>\n"
             "  <Conventions>\n"
             '    <ClassName case="pascalCase" safePrefix="type"/>\n'
@@ -90,7 +90,7 @@ class GeneratorConfigTests(TestCase):
             "    <DocstringStyle>reStructuredText</DocstringStyle>\n"
             "    <RelativeImports>false</RelativeImports>\n"
             '    <CompoundFields defaultName="choice" forceDefaultName="false">false</CompoundFields>\n'
-            "    <ImportAnnotations>false</ImportAnnotations>\n"
+            "    <PostponedAnnotations>false</PostponedAnnotations>\n"
             "  </Output>\n"
             "  <Conventions>\n"
             '    <ClassName case="pascalCase" safePrefix="type"/>\n'

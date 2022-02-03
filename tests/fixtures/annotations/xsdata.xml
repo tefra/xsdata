@@ -7,7 +7,7 @@
     <DocstringStyle>reStructuredText</DocstringStyle>
     <RelativeImports>false</RelativeImports>
     <CompoundFields defaultName="choice" forceDefaultName="false">true</CompoundFields>
-    <ImportAnnotations>true</ImportAnnotations>
+    <PostponedAnnotations>true</PostponedAnnotations>
   </Output>
   <Conventions>
     <ClassName case="originalCase" safePrefix="type"/>

@@ -676,7 +676,7 @@ class FiltersTests(FactoryTestCase):
 
     def test_default_imports_with_annotations(self):
         config = GeneratorConfig()
-        config.output.import_annotations = True
+        config.output.postponed_annotations = True
         filters = Filters(config)
 
         expected = "from __future__ import annotations"

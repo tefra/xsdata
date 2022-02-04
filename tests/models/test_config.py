@@ -156,7 +156,12 @@ class GeneratorConfigTests(TestCase):
             self.assertIsNotNone(OutputFormat(kw_only=True))
 
     def test_postponed_annotations_requires_37(self):
-        if sys.version_info < (3, 7):
+        # We need to confuse pyupgrade into not discarding Python version checks,
+        # which are needed to know when the warning is triggered or not
+        # Extracting the version in a local variable before performing the check is
+        # sufficient for that purpose.
+        v = sys.version_info
+        if v < (3, 7):
             with warnings.catch_warnings(record=True) as w:
                 self.assertFalse(
                     GeneratorOutput(postponed_annotations=True).postponed_annotations
@@ -166,9 +171,10 @@ class GeneratorConfigTests(TestCase):
                     str(w[-1].message),
                 )
 
-        # Using an else statement makes pyupgrade want to rewrite the test by
-        # discarding the previous block
-        self.assertIsNotNone(GeneratorOutput(postponed_annotations=True))
+        if v >= (3, 7):
+            self.assertTrue(
+                GeneratorOutput(postponed_annotations=True).postponed_annotations
+            )
 
     def test_init_config_with_aliases(self):
         config = GeneratorConfig(

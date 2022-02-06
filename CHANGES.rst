@@ -1,3 +1,9 @@
+22.2 (2022-02-06)
+-----------------
+- Fixed substitution groups on duplicate global types `#648 <https://github.com/tefra/xsdata/issues/648>`_
+- Added Postponed Annotations config option `#646 <https://github.com/tefra/xsdata/issues/646>`_
+- Added support for subclasses with different namespaces `#654 <https://github.com/tefra/xsdata/issues/654>`_
+
 22.1 (2022-01-23)
 -----------------
 - Added recursive glob for cli dir source `#643 <https://github.com/tefra/xsdata/issues/643>`_

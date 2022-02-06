@@ -173,3 +173,20 @@ class Parent:
     @dataclass
     class Inner:
         pass
+
+
+@dataclass
+class TypeNS2:
+
+    class Meta:
+        namespace = "ns2"
+
+    x1: int = field(metadata=dict(type="Element"))
+
+@dataclass
+class TypeNS1(TypeNS2):
+
+    class Meta:
+        namespace = "ns1"
+
+    x2: int = field(metadata=dict(type="Element"))

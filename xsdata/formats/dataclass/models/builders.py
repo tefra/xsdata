@@ -42,7 +42,7 @@ class XmlMetaBuilder:
         self.element_name_generator = element_name_generator
         self.attribute_name_generator = attribute_name_generator
 
-    def build(self, clazz: Type, parent_ns: Optional[str]) -> XmlMeta:
+    def build(self, clazz: Type, parent_namespace: Optional[str]) -> XmlMeta:
         """Build the binding metadata for a dataclass and its fields."""
 
         self.class_type.verify_model(clazz)
@@ -59,7 +59,7 @@ class XmlMetaBuilder:
         local_name = getattr(meta, "name", None)
         local_name = local_name or element_name_generator(clazz.__name__)
         nillable = getattr(meta, "nillable", False)
-        namespace = getattr(meta, "namespace", parent_ns)
+        namespace = getattr(meta, "namespace", parent_namespace)
         module = sys.modules[clazz.__module__]
         qname = build_qname(namespace, local_name)
 
@@ -113,7 +113,7 @@ class XmlMetaBuilder:
     def build_vars(
         self,
         clazz: Type,
-        parent_ns: Optional[str],
+        namespace: Optional[str],
         element_name_generator: Callable,
         attribute_name_generator: Callable,
     ):
@@ -121,33 +121,40 @@ class XmlMetaBuilder:
         type_hints = get_type_hints(clazz)
         builder = XmlVarBuilder(
             class_type=self.class_type,
-            parent_ns=parent_ns,
             default_xml_type=self.default_xml_type(clazz),
             element_name_generator=element_name_generator,
             attribute_name_generator=attribute_name_generator,
         )
 
         for index, field in enumerate(self.class_type.get_fields(clazz)):
+
+            real_clazz = self.find_declared_class(clazz, field.name)
+            globalns = sys.modules[real_clazz.__module__].__dict__
+            parent_namespace = namespace
+            if real_clazz is not clazz and "Meta" in real_clazz.__dict__:
+                parent_namespace = getattr(real_clazz.Meta, "namespace", namespace)
+
             var = builder.build(
                 index,
                 field.name,
                 type_hints[field.name],
                 field.metadata,
                 field.init,
+                parent_namespace,
                 self.class_type.default_value(field),
-                self.find_globalns(clazz, field.name),
+                globalns,
             )
             if var is not None:
                 yield var
 
     @classmethod
-    def find_globalns(cls, clazz: Type, name: str) -> Optional[Dict]:
+    def find_declared_class(cls, clazz: Type, name: str) -> Type:
         for base in clazz.__mro__:
             ann = base.__dict__.get("__annotations__")
             if ann and name in ann:
-                return sys.modules[base.__module__].__dict__
+                return base
 
-        return None
+        raise XmlContextError(f"Failed to detect the declared class for field {name}")
 
     @classmethod
     def is_inner_class(cls, clazz: Type) -> bool:
@@ -203,7 +210,6 @@ class XmlMetaBuilder:
 class XmlVarBuilder:
 
     __slots__ = (
-        "parent_ns",
         "class_type",
         "default_xml_type",
         "element_name_generator",
@@ -213,12 +219,10 @@ class XmlVarBuilder:
     def __init__(
         self,
         class_type: ClassType,
-        parent_ns: Optional[str],
         default_xml_type: str,
         element_name_generator: Callable = return_input,
         attribute_name_generator: Callable = return_input,
     ):
-        self.parent_ns = parent_ns
         self.class_type = class_type
         self.default_xml_type = default_xml_type
         self.element_name_generator = element_name_generator
@@ -231,6 +235,7 @@ class XmlVarBuilder:
         type_hint: Any,
         metadata: Mapping[str, Any],
         init: bool,
+        parent_namespace: Optional[str],
         default_value: Any,
         globalns: Any,
         factory: Optional[Callable] = None,
@@ -268,13 +273,15 @@ class XmlVarBuilder:
 
         any_type = self.is_any_type(types, xml_type)
         clazz = first(tp for tp in types if self.class_type.is_model(tp))
-        namespaces = self.resolve_namespaces(xml_type, namespace)
+        namespaces = self.resolve_namespaces(xml_type, namespace, parent_namespace)
         default_namespace = self.default_namespace(namespaces)
         qname = build_qname(default_namespace, local_name)
 
         elements = {}
         wildcards = []
-        for choice in self.build_choices(name, choices, origin, globalns):
+        for choice in self.build_choices(
+            name, choices, origin, globalns, parent_namespace
+        ):
             if choice.is_element:
                 elements[choice.qname] = choice
             else:  # choice.is_wildcard:
@@ -304,7 +311,12 @@ class XmlVarBuilder:
         )
 
     def build_choices(
-        self, name: str, choices: List[Dict], factory: Callable, globalns: Any
+        self,
+        name: str,
+        choices: List[Dict],
+        factory: Callable,
+        globalns: Any,
+        parent_namespace: Optional[str],
     ) -> Iterator[XmlVar]:
         """Build the binding metadata for a compound dataclass field."""
         existing_types: Set[type] = set()
@@ -327,6 +339,7 @@ class XmlVarBuilder:
                 type_hint,
                 metadata,
                 True,
+                parent_namespace,
                 default_value,
                 globalns,
                 factory,
@@ -355,10 +368,12 @@ class XmlVarBuilder:
 
         return local_name
 
+    @classmethod
     def resolve_namespaces(
-        self,
+        cls,
         xml_type: Optional[str],
         namespace: Optional[str],
+        parent_namespace: Optional[str],
     ) -> Tuple[str, ...]:
         """
         Resolve the namespace(s) for the given xml type and the parent
@@ -375,7 +390,7 @@ class XmlVarBuilder:
         :param parent_namespace: The parent namespace
         """
         if xml_type in (XmlType.ELEMENT, XmlType.WILDCARD) and namespace is None:
-            namespace = self.parent_ns
+            namespace = parent_namespace
 
         if not namespace:
             return ()
@@ -383,11 +398,11 @@ class XmlVarBuilder:
         result = set()
         for ns in namespace.split():
             if ns == NamespaceType.TARGET_NS:
-                result.add(self.parent_ns or NamespaceType.ANY_NS)
+                result.add(parent_namespace or NamespaceType.ANY_NS)
             elif ns == NamespaceType.LOCAL_NS:
                 result.add("")
             elif ns == NamespaceType.OTHER_NS:
-                result.add(f"!{self.parent_ns or ''}")
+                result.add(f"!{parent_namespace or ''}")
             else:
                 result.add(ns)
 

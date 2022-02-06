@@ -19,6 +19,7 @@ from tests.fixtures.models import ChoiceType
 from tests.fixtures.models import Parent
 from tests.fixtures.models import TypeA
 from tests.fixtures.models import TypeB
+from tests.fixtures.models import TypeNS1
 from tests.fixtures.models import UnionType
 from tests.fixtures.series import Country
 from tests.fixtures.submodels import ChoiceTypeChild
@@ -112,7 +113,13 @@ class XmlMetaBuilderTests(FactoryTestCase):
         actual = self.builder.build(ChoiceTypeChild, None)
         self.assertEqual(1, len(actual.choices))
         self.assertEqual(9, len(actual.choices[0].elements))
-        self.assertIsNone(self.builder.find_globalns(object, "foo"))
+
+        with self.assertRaises(XmlContextError):
+            self.builder.find_declared_class(object, "foo")
+
+    def test_build_locates_parent_namespace_per_field(self):
+        actual = self.builder.build(TypeNS1, None)
+        self.assertEqual(["{ns2}x1", "{ns1}x2"], list(actual.elements.keys()))
 
     def test_build_inner_type_has_no_target_qname(self):
         actual = self.builder.build(Parent.Inner, None)
@@ -248,7 +255,6 @@ class XmlVarBuilderTests(TestCase):
     def setUp(self) -> None:
         self.builder = XmlVarBuilder(
             class_type=class_types.get_type("dataclasses"),
-            parent_ns=None,
             default_xml_type=XmlType.ELEMENT,
             element_name_generator=return_input,
             attribute_name_generator=return_input,
@@ -261,7 +267,6 @@ class XmlVarBuilderTests(TestCase):
         globalns = sys.modules[ChoiceType.__module__].__dict__
         type_hints = get_type_hints(ChoiceType)
         class_field = fields(ChoiceType)[0]
-        self.builder.parent_ns = "bar"
 
         self.maxDiff = None
         actual = self.builder.build(
@@ -270,6 +275,7 @@ class XmlVarBuilderTests(TestCase):
             type_hints["choice"],
             class_field.metadata,
             True,
+            "bar",
             list,
             globalns,
         )
@@ -384,7 +390,7 @@ class XmlVarBuilderTests(TestCase):
     def test_build_validates_result(self):
         with self.assertRaises(XmlContextError) as cm:
             self.builder.build(
-                1, "foo", List[int], {"type": "Attributes"}, True, None, None
+                1, "foo", List[int], {"type": "Attributes"}, True, None, None, None
             )
 
         self.assertEqual(
@@ -394,35 +400,45 @@ class XmlVarBuilderTests(TestCase):
 
     def test_resolve_namespaces(self):
         func = self.builder.resolve_namespaces
-        self.builder.parent_ns = "bar"
 
-        self.assertEqual(("foo",), func(XmlType.ELEMENT, "foo"))
-        self.assertEqual((), func(XmlType.ELEMENT, ""))
-        self.assertEqual(("bar",), func(XmlType.ELEMENT, None))
+        actual = func(XmlType.ELEMENT, "foo", "bar")
+        self.assertEqual(("foo",), actual)
 
-        self.assertEqual((), func(XmlType.ATTRIBUTE, None))
+        actual = func(XmlType.ELEMENT, "", "bar")
+        self.assertEqual((), actual)
 
-        self.assertEqual(("bar",), func(XmlType.WILDCARD, None))
-        self.assertEqual(("##any",), func(XmlType.WILDCARD, "##any"))
+        actual = func(XmlType.ELEMENT, None, "bar")
+        self.assertEqual(("bar",), actual)
 
-        self.builder.parent_ns = ""
-        self.assertEqual(("##any",), func(XmlType.WILDCARD, "##targetNamespace"))
+        actual = func(XmlType.ATTRIBUTE, None, "bar")
+        self.assertEqual((), actual)
 
-        self.builder.parent_ns = None
-        self.assertEqual(("##any",), func(XmlType.WILDCARD, "##targetNamespace"))
+        actual = func(XmlType.WILDCARD, None, "bar")
+        self.assertEqual(("bar",), actual)
 
-        self.builder.parent_ns = "p"
-        self.assertEqual(("p",), func(XmlType.WILDCARD, "##targetNamespace"))
-        self.assertEqual(("",), func(XmlType.WILDCARD, "##local"))
-        self.assertEqual(("!p",), func(XmlType.WILDCARD, "##other"))
-        self.assertEqual(
-            ("", "!p"), tuple(sorted(func(XmlType.WILDCARD, "##other   ##local")))
-        )
+        actual = func(XmlType.WILDCARD, "##any", "bar")
+        self.assertEqual(("##any",), actual)
 
-        self.assertEqual(
-            ("foo", "p"),
-            tuple(sorted(func(XmlType.WILDCARD, "##targetNamespace   foo"))),
-        )
+        actual = func(XmlType.WILDCARD, "##targetNamespace", "")
+        self.assertEqual(("##any",), actual)
+
+        actual = func(XmlType.WILDCARD, "##targetNamespace", None)
+        self.assertEqual(("##any",), actual)
+
+        actual = func(XmlType.WILDCARD, "##targetNamespace", "p")
+        self.assertEqual(("p",), actual)
+
+        actual = func(XmlType.WILDCARD, "##local", "p")
+        self.assertEqual(("",), actual)
+
+        actual = func(XmlType.WILDCARD, "##other", "p")
+        self.assertEqual(("!p",), actual)
+
+        actual = func(XmlType.WILDCARD, "##other   ##local", "p")
+        self.assertEqual(("", "!p"), tuple(sorted(actual)))
+
+        actual = func(XmlType.WILDCARD, "##targetNamespace   foo", "p")
+        self.assertEqual(("foo", "p"), tuple(sorted(actual)))
 
     def test_analyze_types(self):
         actual = self.builder.analyze_types(List[List[Union[str, int]]], None)

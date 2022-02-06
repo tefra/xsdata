@@ -96,7 +96,8 @@ Features
   - Customize behaviour through config
 
 
-Changelog: 22.1 (2022-01-23)
+Changelog: 22.2 (2022-02-06)
 -----------------------------
-- Added recursive glob for cli dir source `#643 <https://github.com/tefra/xsdata/issues/643>`_
-- Added cfg options to change/force compound field names `#639 <https://github.com/tefra/xsdata/issues/639>`_
+- Fixed substitution groups on duplicate global types `#648 <https://github.com/tefra/xsdata/issues/648>`_
+- Added Postponed Annotations config option `#646 <https://github.com/tefra/xsdata/issues/646>`_
+- Added support for subclasses with different namespaces `#654 <https://github.com/tefra/xsdata/issues/654>`_

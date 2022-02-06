@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config xmlns="http://pypi.org/project/xsdata" version="22.1">
+  <Output maxLineLength="79">
+    <Package>tests.fixtures.annotations</Package>
+    <Format repr="true" eq="true" order="false" unsafeHash="false" frozen="false" slots="false" kwOnly="false">dataclasses</Format>
+    <Structure>filenames</Structure>
+    <DocstringStyle>reStructuredText</DocstringStyle>
+    <RelativeImports>false</RelativeImports>
+    <CompoundFields defaultName="choice" forceDefaultName="false">true</CompoundFields>
+    <PostponedAnnotations>true</PostponedAnnotations>
+  </Output>
+  <Conventions>
+    <ClassName case="originalCase" safePrefix="type"/>
+    <FieldName case="originalCase" safePrefix="value"/>
+    <ConstantName case="screamingSnakeCase" safePrefix="value"/>
+    <ModuleName case="snakeCase" safePrefix="mod"/>
+    <PackageName case="originalCase" safePrefix="pkg"/>
+  </Conventions>
+  <Substitutions/>
+</Config>

@@ -50,6 +50,7 @@ class Filters:
         "docstring_style",
         "max_line_length",
         "relative_imports",
+        "postponed_annotations",
         "format",
         "import_patterns",
     )
@@ -72,6 +73,7 @@ class Filters:
         self.docstring_style: DocstringStyle = config.output.docstring_style
         self.max_line_length: int = config.output.max_line_length
         self.relative_imports: bool = config.output.relative_imports
+        self.postponed_annotations: bool = config.output.postponed_annotations
         self.format = config.output.format
 
         # Build things
@@ -676,6 +678,10 @@ class Filters:
     def default_imports(self, output: str) -> str:
         """Generate the default imports for the given package output."""
         result = []
+
+        if self.postponed_annotations:
+            result.append("from __future__ import annotations")
+
         for library, types in self.import_patterns.items():
             names = [
                 name

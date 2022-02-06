@@ -226,6 +226,8 @@ class GeneratorOutput:
     :param relative_imports: Use relative imports, default: false
     :param compound_fields: Use compound fields for repeatable elements, default: false
     :param max_line_length: Adjust the maximum line length, default: 79
+    :param postponed_annotations: Enable postponed evaluation of annotations,
+        default: false, python>=3.7 Only
     """
 
     package: str = element(default="generated")
@@ -237,6 +239,18 @@ class GeneratorOutput:
     relative_imports: bool = element(default=False)
     compound_fields: CompoundFields = element(default_factory=CompoundFields)
     max_line_length: int = attribute(default=79)
+    postponed_annotations: bool = element(default=False)
+
+    def __post_init__(self):
+        self.validate()
+
+    def validate(self):
+        if self.postponed_annotations and sys.version_info < (3, 7):
+            self.postponed_annotations = False
+            warnings.warn(
+                "postponed annotations requires python >= 3.7, reverting...",
+                CodeGenerationWarning,
+            )
 
     def update(self, **kwargs: Any):
         objects.update(self, **kwargs)

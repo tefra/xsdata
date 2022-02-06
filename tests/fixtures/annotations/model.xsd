@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema targetNamespace="http://domain.org/schema/model"
+  xmlns="http://domain.org/schema/model"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:utd="http://domain.org/schema/model/units">
+
+  <xs:import schemaLocation="./units.xsd"/>
+
+  <xs:complexType name="Measurement">
+    <xs:simpleContent>
+      <xs:extension base="xs:double">
+        <xs:attribute name="unit" type="utd:unit"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:element name="Weight" type="Measurement"/>
+</xs:schema>

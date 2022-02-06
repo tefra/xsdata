@@ -10,6 +10,7 @@ from xsdata.exceptions import ParserError
 from xsdata.models.config import GeneratorAlias
 from xsdata.models.config import GeneratorAliases
 from xsdata.models.config import GeneratorConfig
+from xsdata.models.config import GeneratorOutput
 from xsdata.models.config import ObjectType
 from xsdata.models.config import OutputFormat
 
@@ -34,6 +35,7 @@ class GeneratorConfigTests(TestCase):
             "    <DocstringStyle>reStructuredText</DocstringStyle>\n"
             "    <RelativeImports>false</RelativeImports>\n"
             '    <CompoundFields defaultName="choice" forceDefaultName="false">false</CompoundFields>\n'
+            "    <PostponedAnnotations>false</PostponedAnnotations>\n"
             "  </Output>\n"
             "  <Conventions>\n"
             '    <ClassName case="pascalCase" safePrefix="type"/>\n'
@@ -89,6 +91,7 @@ class GeneratorConfigTests(TestCase):
             "    <DocstringStyle>reStructuredText</DocstringStyle>\n"
             "    <RelativeImports>false</RelativeImports>\n"
             '    <CompoundFields defaultName="choice" forceDefaultName="false">false</CompoundFields>\n'
+            "    <PostponedAnnotations>false</PostponedAnnotations>\n"
             "  </Output>\n"
             "  <Conventions>\n"
             '    <ClassName case="pascalCase" safePrefix="type"/>\n'
@@ -151,6 +154,27 @@ class GeneratorConfigTests(TestCase):
 
         else:
             self.assertIsNotNone(OutputFormat(kw_only=True))
+
+    def test_postponed_annotations_requires_37(self):
+        # We need to confuse pyupgrade into not discarding Python version checks,
+        # which are needed to know when the warning is triggered or not
+        # Extracting the version in a local variable before performing the check is
+        # sufficient for that purpose.
+        v = sys.version_info
+        if v < (3, 7):
+            with warnings.catch_warnings(record=True) as w:
+                self.assertFalse(
+                    GeneratorOutput(postponed_annotations=True).postponed_annotations
+                )
+                self.assertEqual(
+                    "postponed annotations requires python >= 3.7, reverting...",
+                    str(w[-1].message),
+                )
+
+        if v >= (3, 7):
+            self.assertTrue(
+                GeneratorOutput(postponed_annotations=True).postponed_annotations
+            )
 
     def test_init_config_with_aliases(self):
         config = GeneratorConfig(

@@ -674,6 +674,14 @@ class FiltersTests(FactoryTestCase):
         expected = "import attrs"
         self.assertEqual(expected, self.filters.default_imports(output))
 
+    def test_default_imports_with_annotations(self):
+        config = GeneratorConfig()
+        config.output.postponed_annotations = True
+        filters = Filters(config)
+
+        expected = "from __future__ import annotations"
+        self.assertEqual(expected, filters.default_imports(""))
+
     def test_format_metadata(self):
         data = dict(
             num=1,

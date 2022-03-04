@@ -258,9 +258,9 @@ marshalling.
 
     <e1 xmlns="xsdata">a</e1>
     <e1 xmlns="xsdata">b</e1>
-    <e2 xmlns="xsdata">1</e1>
+    <e2 xmlns="xsdata">1</e2>
     <e1 xmlns="xsdata">c</e1>
-    <e2 xmlns="xsdata">2</e1>
+    <e2 xmlns="xsdata">2</e2>
    ...
 
 

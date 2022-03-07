@@ -15,8 +15,22 @@ from xsdata.utils.testing import FactoryTestCase
 
 
 class ClassUtilsTests(FactoryTestCase):
-    def test_remove_attribute(self):
+    def test_find_value_attr(self):
+        target = ClassFactory.create()
+        with self.assertRaises(CodeGenerationError) as cm:
+            ClassUtils.find_value_attr(target)
 
+        self.assertEqual("Class has no value attr {xsdata}class_B", str(cm.exception))
+
+        target.attrs.append(AttrFactory.element())
+        with self.assertRaises(CodeGenerationError) as cm:
+            ClassUtils.find_value_attr(target)
+
+        target.attrs.append(AttrFactory.extension())
+        actual = ClassUtils.find_value_attr(target)
+        self.assertEqual(target.attrs[1], actual)
+
+    def test_remove_attribute(self):
         target = ClassFactory.elements(1)
         attr = target.attrs[0]
 

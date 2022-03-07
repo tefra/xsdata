@@ -22,6 +22,19 @@ class ClassUtils:
     """General reusable utils methods that didn't fit anywhere else."""
 
     @classmethod
+    def find_value_attr(cls, target: Class) -> Attr:
+        """
+        Find the text attribute of the class.
+
+        :raise CodeGenerationError: If no text node/attribute exists
+        """
+        for attr in target.attrs:
+            if not attr.xml_type:
+                return attr
+
+        raise CodeGenerationError(f"Class has no value attr {target.qname}")
+
+    @classmethod
     def remove_attribute(cls, target: Class, attr: Attr):
         """Safely remove the given attr from the target class by check obj
         ids."""

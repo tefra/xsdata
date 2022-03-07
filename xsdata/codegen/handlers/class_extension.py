@@ -78,7 +78,7 @@ class ClassExtensionHandler(RelativeHandlerInterface):
             self.merge_enumeration_types(source, target)
         elif len(target.attrs) == 1:
             self.set_default_value(source, target)
-        elif ext:
+        else:
             # We can't subclass and override the value field
             # the target enumeration, mypy doesn't play nicely.
             target.attrs.clear()

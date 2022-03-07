@@ -5,13 +5,14 @@ from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Extension
+from xsdata.codegen.models import Status
 from xsdata.codegen.utils import ClassUtils
-from xsdata.exceptions import CodeGenerationError
 from xsdata.logger import logger
 from xsdata.models.enums import DataType
 from xsdata.models.enums import NamespaceType
 from xsdata.models.enums import Tag
 from xsdata.utils.constants import DEFAULT_ATTR_NAME
+from xsdata.utils.namespaces import build_qname
 
 
 class ClassExtensionHandler(RelativeHandlerInterface):
@@ -69,22 +70,20 @@ class ClassExtensionHandler(RelativeHandlerInterface):
         Extension cases:
             1. Enumeration: copy all attr properties
             2. Simple type: copy value attr properties recursively
-            3. Complex type:
-                3.1 Target has one enumeration member, convert to complex type
-                3.2 Invalid schema.
+            3. Complex type: restrict default value attr with target single enumeration
+            4. Complex type: restrict value attr with target enumeration
         """
-        if ext:
-            target.extensions.remove(ext)
-
         if source.is_enumeration:
             self.merge_enumerations(source, target)
-        elif len(source.attrs) == 1:
+        elif source.is_simple_type:
             self.merge_enumeration_types(source, target)
         elif len(target.attrs) == 1:
-            # We are not an enumeration pal.
-            self.convert_to_complex_type(source, target)
-        else:
-            raise CodeGenerationError("Enumeration class with a complex extension.")
+            self.restrict_default_value(source, target)
+        elif ext:
+            self.restrict_enumeration_value(source, target, ext)
+
+        if ext and target.is_enumeration:
+            target.extensions.remove(ext)
 
     @classmethod
     def merge_enumerations(cls, source: Class, target: Class):
@@ -110,15 +109,34 @@ class ClassExtensionHandler(RelativeHandlerInterface):
                 self.process_enum_extension(base, target, None)
 
     @classmethod
-    def convert_to_complex_type(cls, source: Class, target: Class):
-        default = target.attrs[0].default
-        target.attrs = [attr.clone() for attr in source.attrs]
-        target.extensions = [ext.clone() for ext in source.extensions]
+    def restrict_default_value(cls, source: Class, target: Class):
+        """Restrict the extension source class with the target single
+        enumeration value."""
+        new_attr = ClassUtils.find_value_attr(source).clone()
+        new_attr.types = target.attrs[0].types
+        new_attr.default = target.attrs[0].default
+        new_attr.fixed = True
+        target.attrs = [new_attr]
 
-        for attr in target.attrs:
-            if attr.xml_type is None:
-                attr.default = default
-                attr.fixed = True
+    @classmethod
+    def restrict_enumeration_value(cls, source: Class, target: Class, ext: Extension):
+        """Restrict the extension source class with the target enumeration
+        options."""
+
+        # Clone target, reset status, remove extension
+        # in order to pass it through the processor without
+        # recursive issues.
+        inner = target.clone()
+        inner.status = Status.RAW
+        inner.extensions.remove(ext)
+
+        new_attr = ClassUtils.find_value_attr(source).clone()
+
+        inner.qname = build_qname(inner.target_namespace, new_attr.name)
+        new_attr.types = [AttrType(qname=inner.qname, forward=True)]
+
+        target.attrs = [new_attr]
+        target.inner.append(inner)
 
     @classmethod
     def process_simple_extension(cls, source: Class, target: Class, ext: Extension):

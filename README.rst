@@ -96,8 +96,8 @@ Features
   - Customize behaviour through config
 
 
-Changelog: 22.2 (2022-02-06)
------------------------------
-- Fixed substitution groups on duplicate global types `#648 <https://github.com/tefra/xsdata/issues/648>`_
-- Added Postponed Annotations config option `#646 <https://github.com/tefra/xsdata/issues/646>`_
-- Added support for subclasses with different namespaces `#654 <https://github.com/tefra/xsdata/issues/654>`_
+Changelog: 22.3 (2022-03-20)
+----------------------------
+- Added official support for python 3.11
+- Fixed enumerations restricting complex types `#659 <https://github.com/tefra/xsdata/issues/659>`_
+- Fixed attribute name duplicate check to avoid invalid slugs

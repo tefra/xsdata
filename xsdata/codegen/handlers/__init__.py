@@ -13,6 +13,7 @@ from .class_enumeration import ClassEnumerationHandler
 from .class_extension import ClassExtensionHandler
 from .class_inners import ClassInnersHandler
 from .class_name_conflict import ClassNameConflictHandler
+from .class_unnest import ClassUnnestHandler
 
 __all__ = [
     "AttributeCompoundChoiceHandler",
@@ -30,4 +31,5 @@ __all__ = [
     "ClassEnumerationHandler",
     "ClassExtensionHandler",
     "ClassNameConflictHandler",
+    "ClassUnnestHandler",
 ]

@@ -33,7 +33,7 @@ class DefinitionsMapper:
     """
     Map a definitions instance to message and service classes.
 
-    Currently only SOAP 1.1 bindings with rpc/document style is
+    Currently, only SOAP 1.1 bindings with rpc/document style is
     supported.
     """
 

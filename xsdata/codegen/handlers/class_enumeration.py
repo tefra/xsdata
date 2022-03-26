@@ -2,10 +2,8 @@ from typing import Any
 from typing import List
 
 from xsdata.codegen.mixins import RelativeHandlerInterface
-from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Class
 from xsdata.models.enums import Tag
-from xsdata.utils.namespaces import build_qname
 
 
 class ClassEnumerationHandler(RelativeHandlerInterface):
@@ -20,11 +18,9 @@ class ClassEnumerationHandler(RelativeHandlerInterface):
         Steps:
             1. Filter attrs not derived from xs:enumeration
             2. Flatten attrs derived from xs:union of enumerations
-            3. Promote inner enumeration classes to root classes
         """
         self.filter(target)
         self.flatten(target)
-        self.promote(target)
 
     @classmethod
     def filter(cls, target: Class):
@@ -59,33 +55,3 @@ class ClassEnumerationHandler(RelativeHandlerInterface):
             target.inner.clear()
 
             target.attrs.extend(attr.clone() for enum in enums for attr in enum.attrs)
-
-    def promote(self, target: Class):
-        """
-        Promote inner enumeration classes to root classes.
-
-        Steps:
-            1. Find inner enumerations
-            2. Clone and update their qualified name
-            3. Update attributes types
-        """
-        for inner in list(target.inner):
-            if inner.is_enumeration:
-                target.inner.remove(inner)
-                clone = self.clone_enumeration(inner, target.name)
-                self.container.add(clone)
-                for attr in target.attrs:
-                    self.update_types(attr, inner.qname, clone.qname)
-
-    @classmethod
-    def clone_enumeration(cls, inner: Class, name: str) -> Class:
-        clone = inner.clone()
-        clone.qname = build_qname(clone.target_namespace, f"{name}_{clone.name}")
-        return clone
-
-    @classmethod
-    def update_types(cls, attr: Attr, search: str, replace: str):
-        for attr_type in attr.types:
-            if attr_type.qname == search and attr_type.forward:
-                attr_type.qname = replace
-                attr_type.forward = False

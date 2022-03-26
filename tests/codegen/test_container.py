@@ -47,6 +47,7 @@ class ClassContainerTests(FactoryTestCase):
                 "AttributeGroupHandler",
                 "ClassExtensionHandler",
                 "ClassEnumerationHandler",
+                "ClassUnnestHandler",
                 "AttributeSubstitutionHandler",
                 "AttributeTypeHandler",
                 "AttributeMergeHandler",
@@ -121,7 +122,7 @@ class ClassContainerTests(FactoryTestCase):
 
     def test_process_classes(self):
         target = ClassFactory.create(
-            attrs=[AttrFactory.reference("enumeration")],
+            attrs=[AttrFactory.reference("enumeration", forward=True)],
             inner=[ClassFactory.enumeration(2, qname="enumeration")],
         )
 

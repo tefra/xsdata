@@ -3,7 +3,6 @@ from xsdata.codegen.handlers import ClassEnumerationHandler
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
-from xsdata.utils.namespaces import build_qname
 from xsdata.utils.testing import AttrFactory
 from xsdata.utils.testing import AttrTypeFactory
 from xsdata.utils.testing import ClassFactory
@@ -71,32 +70,3 @@ class ClassEnumerationHandlerTests(FactoryTestCase):
         expected = self.root_enum.attrs + self.inner_enum.attrs
         self.assertEqual(expected, self.target.attrs)
         self.assertEqual(0, len(self.target.inner))
-
-    def test_promote(self):
-        target = ClassFactory.elements(2)
-        inner = ClassFactory.enumeration(3)
-
-        target.inner.append(inner)
-        target.inner.append(ClassFactory.simple_type())  # Irrelevant
-        attr_type = AttrTypeFactory.create(qname=inner.qname, forward=True)
-
-        target.attrs[0].types.append(attr_type.clone())
-        target.attrs[1].types.append(attr_type.clone())
-
-        self.container.add(target)
-        self.assertEqual(3, len(self.container.data))
-
-        self.processor.process(target)
-
-        new_qname = build_qname(inner.target_namespace, f"{target.name}_{inner.name}")
-
-        self.assertEqual(4, len(self.container.data))
-        new_inner = self.container.find(new_qname)
-
-        self.assertEqual(1, len(target.inner))
-        self.assertNotEqual(new_inner.qname, inner.qname)
-        self.assertEqual(new_inner.attrs, inner.attrs)
-        self.assertEqual(new_inner.qname, target.attrs[0].types[1].qname)
-        self.assertEqual(new_inner.qname, target.attrs[1].types[1].qname)
-        self.assertFalse(target.attrs[0].types[1].forward)
-        self.assertFalse(target.attrs[1].types[1].forward)

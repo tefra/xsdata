@@ -228,6 +228,7 @@ class GeneratorOutput:
     :param max_line_length: Adjust the maximum line length, default: 79
     :param postponed_annotations: Enable postponed evaluation of annotations,
         default: false, python>=3.7 Only
+    :param unnest_classes: Move inner classes to upper level, default: false
     """
 
     package: str = element(default="generated")
@@ -240,6 +241,7 @@ class GeneratorOutput:
     compound_fields: CompoundFields = element(default_factory=CompoundFields)
     max_line_length: int = attribute(default=79)
     postponed_annotations: bool = element(default=False)
+    unnest_classes: bool = element(default=False)
 
     def __post_init__(self):
         self.validate()

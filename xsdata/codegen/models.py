@@ -417,6 +417,7 @@ class Class:
     :param mixed:
     :param abstract:
     :param nillable:
+    :param local_type:
     :param status:
     :param container:
     :param package:
@@ -439,6 +440,7 @@ class Class:
     mixed: bool = field(default=False)
     abstract: bool = field(default=False)
     nillable: bool = field(default=False)
+    local_type: bool = field(default=False)
     status: Status = field(default=Status.RAW)
     container: Optional[str] = field(default=None)
     package: Optional[str] = field(default=None)
@@ -496,7 +498,7 @@ class Class:
 
     @property
     def is_global_type(self) -> bool:
-        """Return whether this instance is a non abstract element, wsdl binding
+        """Return whether this instance is a non-abstract element, wsdl binding
         class or a complex type without simple content."""
         return (not self.abstract and self.tag in GLOBAL_TYPES) or (
             self.tag == Tag.COMPLEX_TYPE and not self.is_simple_type

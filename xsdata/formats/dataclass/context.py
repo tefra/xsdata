@@ -85,12 +85,17 @@ class XmlContext:
             return
 
         self.xsi_cache.clear()
-
-        name_generator = self.element_name_generator
+        builder = XmlMetaBuilder(
+            class_type=self.class_type,
+            element_name_generator=self.element_name_generator,
+            attribute_name_generator=self.attribute_name_generator,
+        )
         for clazz in self.get_subclasses(object):
             if self.class_type.is_model(clazz):
-                qname = XmlMetaBuilder.build_target_qname(clazz, name_generator)
-                self.xsi_cache[qname].append(clazz)
+                meta = builder.build_class_meta(clazz, None)
+
+                if meta.target_qname:
+                    self.xsi_cache[meta.target_qname].append(clazz)
 
         self.sys_modules = len(sys.modules)
 

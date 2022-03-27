@@ -732,7 +732,7 @@ class DefinitionsMapperTests(FactoryTestCase):
 
         actual = DefinitionsMapper.build_inner_class(target, "body")
         expected = ClassFactory.create(
-            qname="body",
+            qname="{xsdata}body",
             tag=Tag.BINDING_MESSAGE,
             location=target.location,
             module=None,

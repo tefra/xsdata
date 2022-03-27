@@ -19,6 +19,7 @@ from xsdata.codegen.handlers import ClassEnumerationHandler
 from xsdata.codegen.handlers import ClassExtensionHandler
 from xsdata.codegen.handlers import ClassInnersHandler
 from xsdata.codegen.handlers import ClassNameConflictHandler
+from xsdata.codegen.handlers import ClassUnnestHandler
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import get_qname
@@ -42,7 +43,7 @@ class ClassContainer(ContainerInterface):
 
     def __init__(self, config: GeneratorConfig):
         """Initialize a class container instance with its processors based on
-        the the provided configuration."""
+        the provided configuration."""
         super().__init__(config)
 
         self.data: Dict = {}
@@ -52,6 +53,7 @@ class ClassContainer(ContainerInterface):
                 AttributeGroupHandler(self),
                 ClassExtensionHandler(self),
                 ClassEnumerationHandler(self),
+                ClassUnnestHandler(self),
                 AttributeSubstitutionHandler(self),
                 AttributeTypeHandler(self),
                 AttributeMergeHandler(),
@@ -126,9 +128,6 @@ class ClassContainer(ContainerInterface):
         for obj in self:
             if obj.status < step:
                 self.process_class(obj, step)
-
-        if any(obj.status < step for obj in self):
-            return self.process_classes(step)
 
     def process_class(self, target: Class, step: int):
         target.status = Status(step)

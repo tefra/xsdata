@@ -335,7 +335,7 @@ class JsonParserTests(FactoryTestCase):
         data = {
             "wildcard": {
                 "qname": "b",
-                "type": "TypeB",
+                "type": "{xsdata}TypeB",
                 "value": {
                     "x": "1",
                     "y": "a",
@@ -343,7 +343,9 @@ class JsonParserTests(FactoryTestCase):
             }
         }
         expected = ExtendedType(
-            wildcard=DerivedElement(qname="b", value=TypeB(x=1, y="a"), type="TypeB")
+            wildcard=DerivedElement(
+                qname="b", value=TypeB(x=1, y="a"), type="{xsdata}TypeB"
+            )
         )
         self.assertEqual(expected, self.parser.bind_dataclass(data, ExtendedType))
 

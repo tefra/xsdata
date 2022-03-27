@@ -36,6 +36,7 @@ class GeneratorConfigTests(TestCase):
             "    <RelativeImports>false</RelativeImports>\n"
             '    <CompoundFields defaultName="choice" forceDefaultName="false">false</CompoundFields>\n'
             "    <PostponedAnnotations>false</PostponedAnnotations>\n"
+            "    <UnnestClasses>false</UnnestClasses>\n"
             "  </Output>\n"
             "  <Conventions>\n"
             '    <ClassName case="pascalCase" safePrefix="type"/>\n'
@@ -92,6 +93,7 @@ class GeneratorConfigTests(TestCase):
             "    <RelativeImports>false</RelativeImports>\n"
             '    <CompoundFields defaultName="choice" forceDefaultName="false">false</CompoundFields>\n'
             "    <PostponedAnnotations>false</PostponedAnnotations>\n"
+            "    <UnnestClasses>false</UnnestClasses>\n"
             "  </Output>\n"
             "  <Conventions>\n"
             '    <ClassName case="pascalCase" safePrefix="type"/>\n'

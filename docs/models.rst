@@ -97,6 +97,10 @@ procedures.
      - str
      - Specify the element target namespace for auto type locator, if module namespace
        is not available or the type is not qualified.
+   * - global_type
+     - bool
+     - Specify if the class represents a global discoverable type or that it can be used
+       only as another class dependency, default: True
    * - element_name_generator
      - Callable
      - Element name generator

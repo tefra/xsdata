@@ -125,6 +125,10 @@ class XmlMetaBuilderTests(FactoryTestCase):
         actual = self.builder.build(Parent.Inner, None)
         self.assertIsNone(actual.target_qname)
 
+    def test_build_local_type_has_no_target_qname(self):
+        actual = self.builder.build(Parent, None)
+        self.assertIsNone(actual.target_qname)
+
     def test_target_namespace(self):
         class Meta:
             namespace = "bar"

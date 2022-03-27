@@ -33,7 +33,7 @@ class DefinitionsMapper:
     """
     Map a definitions instance to message and service classes.
 
-    Currently only SOAP 1.1 bindings with rpc/document style is
+    Currently, only SOAP 1.1 bindings with rpc/document style is
     supported.
     """
 
@@ -280,7 +280,7 @@ class DefinitionsMapper:
         inner = collections.first(inner for inner in target.inner if inner.name == name)
         if not inner:
             inner = Class(
-                qname=namespaces.build_qname(name),
+                qname=namespaces.build_qname(target.target_namespace, name),
                 tag=Tag.BINDING_MESSAGE,
                 location=target.location,
                 ns_map=target.ns_map.copy(),
@@ -317,7 +317,7 @@ class DefinitionsMapper:
         cls, definitions: Definitions, message: str, extended: AnyElement, ns_map: Dict
     ) -> Iterator[Attr]:
         """Find a Message instance and map its parts to attributes according to
-        the the extensible element.."""
+        the extensible element.."""
         parts = []
         if "part" in extended.attributes:
             parts.append(extended.attributes["part"])

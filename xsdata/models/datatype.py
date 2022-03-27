@@ -86,7 +86,7 @@ class XmlDate(NamedTuple):
     @classmethod
     def from_string(cls, string: str) -> "XmlDate":
         """Initialize from string with format ``%Y-%m-%dT%z``"""
-        return XmlDate(*parse_date_args(string, DateFormat.DATE))
+        return cls(*parse_date_args(string, DateFormat.DATE))
 
     @classmethod
     def from_date(cls, obj: datetime.date) -> "XmlDate":
@@ -97,12 +97,12 @@ class XmlDate(NamedTuple):
 
             date instances don't have timezone information!
         """
-        return XmlDate(obj.year, obj.month, obj.day)
+        return cls(obj.year, obj.month, obj.day)
 
     @classmethod
     def from_datetime(cls, obj: datetime.datetime) -> "XmlDate":
         """Initialize from :class:`datetime.datetime` instance."""
-        return XmlDate(obj.year, obj.month, obj.day, calculate_offset(obj))
+        return cls(obj.year, obj.month, obj.day, calculate_offset(obj))
 
     @classmethod
     def today(cls) -> "XmlDate":
@@ -194,12 +194,12 @@ class XmlDateTime(NamedTuple):
         validate_date(year, month, day)
         validate_time(hour, minute, second, microsecond)
 
-        return XmlDateTime(year, month, day, hour, minute, second, microsecond, offset)
+        return cls(year, month, day, hour, minute, second, microsecond, offset)
 
     @classmethod
     def from_datetime(cls, obj: datetime.datetime) -> "XmlDateTime":
         """Initialize from :class:`datetime.datetime` instance."""
-        return XmlDateTime(
+        return cls(
             obj.year,
             obj.month,
             obj.day,
@@ -374,12 +374,12 @@ class XmlTime(NamedTuple):
             string, DateFormat.TIME
         )
         validate_time(hour, minute, second, microsecond)
-        return XmlTime(hour, minute, second, microsecond, offset)
+        return cls(hour, minute, second, microsecond, offset)
 
     @classmethod
     def from_time(cls, obj: datetime.time) -> "XmlTime":
         """Initialize from :class:`datetime.time` instance."""
-        return XmlTime(
+        return cls(
             obj.hour, obj.minute, obj.second, obj.microsecond, calculate_offset(obj)
         )
 

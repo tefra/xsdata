@@ -14,9 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {name: PyPy 3.6, python: 'pypy-3.6', os: ubuntu}
           - {name: PyPy 3.7, python: 'pypy-3.7', os: ubuntu}
-          - {name: Python 3.6, python: '3.6', os: ubuntu}
           - {name: Python 3.7, python: '3.7', os: ubuntu}
           - {name: Python 3.8, python: '3.8', os: ubuntu}
           - {name: Python 3.9, python: '3.9', os: ubuntu}

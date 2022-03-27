@@ -1,5 +1,4 @@
 import os
-import sys
 
 import pytest
 from click.testing import CliRunner
@@ -14,7 +13,6 @@ from xsdata.utils.testing import load_class
 os.chdir(root)
 
 
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="PEP563 introduced in 3.7")
 def test_annotations():
     filepath = fixtures_dir.joinpath("annotations")
     schema = filepath.joinpath("model.xsd")

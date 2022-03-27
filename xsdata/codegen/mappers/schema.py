@@ -102,8 +102,8 @@ class SchemaMapper:
         """Build the target class attributes from the given ElementBase
         children."""
 
-        restrictions = Restrictions.from_element(obj)
-        for child, restrictions in cls.element_children(obj, restrictions):
+        base_restrictions = Restrictions.from_element(obj)
+        for child, restrictions in cls.element_children(obj, base_restrictions):
             cls.build_class_attribute(target, child, restrictions)
 
         target.attrs.sort(key=lambda x: x.index)

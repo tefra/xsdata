@@ -9,6 +9,8 @@ from xml.etree.ElementTree import QName
 
 from xsdata.utils.constants import return_true
 
+__NAMESPACE__ = "xsdata"
+
 
 @dataclass
 class TypeA:
@@ -170,6 +172,9 @@ class Paragraph:
 
 @dataclass
 class Parent:
+    class Meta:
+        global_type = False
+
     @dataclass
     class Inner:
         pass

@@ -8,6 +8,7 @@ from typing import get_type_hints
 from typing import Iterator
 from typing import List
 from typing import Mapping
+from typing import NamedTuple
 from typing import Optional
 from typing import Sequence
 from typing import Set
@@ -26,6 +27,16 @@ from xsdata.utils.collections import first
 from xsdata.utils.constants import EMPTY_SEQUENCE
 from xsdata.utils.constants import return_input
 from xsdata.utils.namespaces import build_qname
+
+
+class ClassMeta(NamedTuple):
+    element_name_generator: Callable
+    attribute_name_generator: Callable
+    qname: str
+    local_name: str
+    nillable: bool
+    namespace: Optional[str]
+    target_qname: Optional[str]
 
 
 class XmlMetaBuilder:
@@ -47,33 +58,12 @@ class XmlMetaBuilder:
 
         self.class_type.verify_model(clazz)
 
-        # Fetch the dataclass meta settings and make sure we don't inherit
-        # the parent class meta.
-        meta = clazz.Meta if "Meta" in clazz.__dict__ else None
-        element_name_generator = getattr(
-            meta, "element_name_generator", self.element_name_generator
-        )
-        attribute_name_generator = getattr(
-            meta, "attribute_name_generator", self.attribute_name_generator
-        )
-        local_name = getattr(meta, "name", None)
-        local_name = local_name or element_name_generator(clazz.__name__)
-        nillable = getattr(meta, "nillable", False)
-        namespace = getattr(meta, "namespace", parent_namespace)
-        module = sys.modules[clazz.__module__]
-        qname = build_qname(namespace, local_name)
-
-        if self.is_inner_class(clazz):
-            target_qname = None
-        else:
-            target_namespace = self.target_namespace(module, meta)
-            target_qname = build_qname(target_namespace, local_name)
-
+        meta = self.build_class_meta(clazz, parent_namespace)
         class_vars = self.build_vars(
             clazz,
-            namespace,
-            element_name_generator,
-            attribute_name_generator,
+            meta.namespace,
+            meta.element_name_generator,
+            meta.attribute_name_generator,
         )
 
         attributes = {}
@@ -99,9 +89,9 @@ class XmlMetaBuilder:
 
         return XmlMeta(
             clazz=clazz,
-            qname=qname,
-            target_qname=target_qname,
-            nillable=nillable,
+            qname=meta.qname,
+            target_qname=meta.target_qname,
+            nillable=meta.nillable,
             text=text,
             attributes=attributes,
             elements=elements,
@@ -147,6 +137,45 @@ class XmlMetaBuilder:
             if var is not None:
                 yield var
 
+    def build_class_meta(
+        self, clazz: Type, parent_namespace: Optional[str]
+    ) -> ClassMeta:
+        """
+        Fetch the class meta options and merge defaults.
+
+        Metaclass is not inheritable
+        """
+        meta = clazz.Meta if "Meta" in clazz.__dict__ else None
+        element_name_generator = getattr(
+            meta, "element_name_generator", self.element_name_generator
+        )
+        attribute_name_generator = getattr(
+            meta, "attribute_name_generator", self.attribute_name_generator
+        )
+        global_type = getattr(meta, "global_type", True)
+        local_name = getattr(meta, "name", None)
+        local_name = local_name or element_name_generator(clazz.__name__)
+        nillable = getattr(meta, "nillable", False)
+        namespace = getattr(meta, "namespace", parent_namespace)
+        qname = build_qname(namespace, local_name)
+
+        if self.is_inner_class(clazz) or not global_type:
+            target_qname = None
+        else:
+            module = sys.modules[clazz.__module__]
+            target_namespace = self.target_namespace(module, meta)
+            target_qname = build_qname(target_namespace, local_name)
+
+        return ClassMeta(
+            element_name_generator,
+            attribute_name_generator,
+            qname,
+            local_name,
+            nillable,
+            namespace,
+            target_qname,
+        )
+
     @classmethod
     def find_declared_class(cls, clazz: Type, name: str) -> Type:
         for base in clazz.__mro__:
@@ -160,20 +189,6 @@ class XmlMetaBuilder:
     def is_inner_class(cls, clazz: Type) -> bool:
         """Return whether the given type is nested inside another type."""
         return "." in clazz.__qualname__
-
-    @classmethod
-    def build_target_qname(cls, clazz: Type, element_name_generator: Callable) -> str:
-        """Build the source qualified name of a model based on the module
-        namespace."""
-        meta = clazz.Meta if "Meta" in clazz.__dict__ else None
-        local_name = getattr(meta, "name", None)
-        element_name_generator = getattr(
-            meta, "element_name_generator", element_name_generator
-        )
-        local_name = local_name or element_name_generator(clazz.__name__)
-        module = sys.modules[clazz.__module__]
-        target_namespace = cls.target_namespace(module, meta)
-        return build_qname(target_namespace, local_name)
 
     @classmethod
     def target_namespace(cls, module: Any, meta: Any) -> Optional[str]:

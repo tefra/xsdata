@@ -163,10 +163,14 @@ class AttributeTypeHandlerTests(FactoryTestCase):
 
         target = ClassFactory.simple_type()
         attr = target.attrs[0]
+        attr.restrictions.min_length = 10
+        attr.restrictions.max_length = 12
         attr.types[0] = AttrTypeFactory.create(qname=enumeration.qname)
 
         self.processor.process_dependency_type(target, attr, attr.types[0])
         self.assertEqual("base16", attr.restrictions.format)
+        self.assertIsNone(attr.restrictions.min_length)
+        self.assertIsNone(attr.restrictions.max_length)
 
     @mock.patch.object(AttributeTypeHandler, "set_circular_flag")
     @mock.patch.object(AttributeTypeHandler, "find_dependency")

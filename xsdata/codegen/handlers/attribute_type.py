@@ -136,6 +136,8 @@ class AttributeTypeHandler(RelativeHandlerInterface):
         elif source.is_simple_type:
             self.copy_attribute_properties(source, target, attr, attr_type)
         elif source.is_enumeration:
+            attr.restrictions.min_length = None
+            attr.restrictions.max_length = None
             attr.restrictions.format = collections.first(
                 x.restrictions.format for x in source.attrs if x.restrictions.format
             )

@@ -610,11 +610,13 @@ class Import:
     :param name:
     :param source:
     :param alias:
+    :param reference
     """
 
     name: str
     source: str
     alias: Optional[str] = field(default=None)
+    reference: int = field(default=0, compare=False)
 
 
 # Getters used all over the codegen process

@@ -65,23 +65,7 @@ class DataclassGenerator(AbstractGenerator):
         """Render the source code for the __init__.py with all the imports of
         the generated class names."""
 
-        imports = [
-            Import(name=obj.name, source=obj.target_module)
-            for obj in sorted(classes, key=lambda x: x.name)
-        ]
-
-        for group in group_by(imports, key=lambda x: x.name).values():
-            if len(group) == 1:
-                continue
-
-            for index, cur in enumerate(group):
-                cmp = group[index + 1] if index == 0 else group[index - 1]
-                parts = re.split("[_.]", cur.source)
-                diff = set(parts) - set(re.split("[_.]", cmp.source))
-
-                add = "_".join(part for part in parts if part in diff)
-                cur.alias = f"{add}:{cur.name}"
-
+        imports = self.build_package_imports(classes)
         output = self.env.get_template("package.jinja2").render(
             imports=imports,
             module=module,
@@ -141,6 +125,27 @@ class DataclassGenerator(AbstractGenerator):
     def package_name(self, name: str) -> str:
         """Convert the given package name to safe snake case."""
         return self.filters.package_name(name)
+
+    @classmethod
+    def build_package_imports(cls, classes: List[Class]) -> List[Import]:
+        imports = [
+            Import(name=obj.name, source=obj.target_module, reference=id(obj.ref))
+            for obj in sorted(classes, key=lambda x: x.name)
+        ]
+
+        for group in group_by(imports, key=lambda x: x.name).values():
+            if len(group) == 1:
+                continue
+
+            for index, cur in enumerate(group):
+                cmp = group[index + 1] if index == 0 else group[index - 1]
+                parts = re.split("[_.]", cur.source)
+                diff = set(parts) - set(re.split("[_.]", cmp.source))
+
+                add = "_".join(part for part in parts if part in diff)
+                cur.alias = f"{add}:{cur.name}"
+
+        return imports
 
     @classmethod
     def ensure_packages(cls, package: Path) -> Iterator[GeneratorResult]:

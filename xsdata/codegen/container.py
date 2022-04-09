@@ -4,22 +4,22 @@ from typing import Iterator
 from typing import List
 from typing import Optional
 
-from xsdata.codegen.handlers import AttributeCompoundChoiceHandler
-from xsdata.codegen.handlers import AttributeDefaultValueHandler
-from xsdata.codegen.handlers import AttributeEffectiveChoiceHandler
-from xsdata.codegen.handlers import AttributeGroupHandler
-from xsdata.codegen.handlers import AttributeMergeHandler
-from xsdata.codegen.handlers import AttributeMixedContentHandler
-from xsdata.codegen.handlers import AttributeNameConflictHandler
-from xsdata.codegen.handlers import AttributeOverridesHandler
-from xsdata.codegen.handlers import AttributeSubstitutionHandler
-from xsdata.codegen.handlers import AttributeTypeHandler
-from xsdata.codegen.handlers import ClassDesignateHandler
-from xsdata.codegen.handlers import ClassEnumerationHandler
-from xsdata.codegen.handlers import ClassExtensionHandler
-from xsdata.codegen.handlers import ClassInnersHandler
-from xsdata.codegen.handlers import ClassNameConflictHandler
-from xsdata.codegen.handlers import ClassUnnestHandler
+from xsdata.codegen.handlers import AddAttributeSubstitutions
+from xsdata.codegen.handlers import CreateCompoundFields
+from xsdata.codegen.handlers import DesignateClassPackages
+from xsdata.codegen.handlers import FlattenAttributeGroups
+from xsdata.codegen.handlers import FlattenClassExtensions
+from xsdata.codegen.handlers import MergeAttributes
+from xsdata.codegen.handlers import ProcessAttributeTypes
+from xsdata.codegen.handlers import ProcessMixedContentClass
+from xsdata.codegen.handlers import RenameDuplicateAttributes
+from xsdata.codegen.handlers import RenameDuplicateClasses
+from xsdata.codegen.handlers import SanitizeAttributesDefaultValue
+from xsdata.codegen.handlers import SanitizeEnumerationClass
+from xsdata.codegen.handlers import UnnestInnerClasses
+from xsdata.codegen.handlers import UpdateAttributesEffectiveChoice
+from xsdata.codegen.handlers import VacuumInnerClasses
+from xsdata.codegen.handlers import ValidateAttributesOverrides
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import get_qname
@@ -50,26 +50,26 @@ class ClassContainer(ContainerInterface):
 
         self.processors = {
             Steps.FLATTEN: [
-                AttributeGroupHandler(self),
-                ClassExtensionHandler(self),
-                ClassEnumerationHandler(self),
-                ClassUnnestHandler(self),
-                AttributeSubstitutionHandler(self),
-                AttributeTypeHandler(self),
-                AttributeMergeHandler(),
-                AttributeMixedContentHandler(),
+                FlattenAttributeGroups(self),
+                FlattenClassExtensions(self),
+                SanitizeEnumerationClass(self),
+                UnnestInnerClasses(self),
+                AddAttributeSubstitutions(self),
+                ProcessAttributeTypes(self),
+                MergeAttributes(),
+                ProcessMixedContentClass(),
             ],
             Steps.SANITIZE: [
-                AttributeEffectiveChoiceHandler(),
-                AttributeDefaultValueHandler(self),
+                UpdateAttributesEffectiveChoice(),
+                SanitizeAttributesDefaultValue(self),
             ],
             Steps.RESOLVE: [
-                AttributeOverridesHandler(self),
-                AttributeNameConflictHandler(),
+                ValidateAttributesOverrides(self),
+                RenameDuplicateAttributes(),
             ],
             Steps.FINALIZE: [
-                ClassInnersHandler(),
-                AttributeCompoundChoiceHandler(self),
+                VacuumInnerClasses(),
+                CreateCompoundFields(self),
             ],
         }
 
@@ -142,8 +142,8 @@ class ClassContainer(ContainerInterface):
 
     def designate_classes(self):
         designators = [
-            ClassNameConflictHandler(self),
-            ClassDesignateHandler(self),
+            RenameDuplicateClasses(self),
+            DesignateClassPackages(self),
         ]
 
         for designator in designators:

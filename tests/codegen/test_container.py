@@ -44,24 +44,18 @@ class ClassContainerTests(FactoryTestCase):
 
         expected = {
             10: [
-                "AttributeGroupHandler",
-                "ClassExtensionHandler",
-                "ClassEnumerationHandler",
-                "ClassUnnestHandler",
-                "AttributeSubstitutionHandler",
-                "AttributeTypeHandler",
-                "AttributeMergeHandler",
-                "AttributeMixedContentHandler",
+                "FlattenAttributeGroups",
+                "FlattenClassExtensions",
+                "SanitizeEnumerationClass",
+                "UnnestInnerClasses",
+                "AddAttributeSubstitutions",
+                "ProcessAttributeTypes",
+                "MergeAttributes",
+                "ProcessMixedContentClass",
             ],
-            20: [
-                "AttributeEffectiveChoiceHandler",
-                "AttributeDefaultValueHandler",
-            ],
-            30: [
-                "AttributeOverridesHandler",
-                "AttributeNameConflictHandler",
-            ],
-            40: ["ClassInnersHandler", "AttributeCompoundChoiceHandler"],
+            20: ["UpdateAttributesEffectiveChoice", "SanitizeAttributesDefaultValue"],
+            30: ["ValidateAttributesOverrides", "RenameDuplicateAttributes"],
+            40: ["VacuumInnerClasses", "CreateCompoundFields"],
         }
 
         self.assertEqual(expected, actual)

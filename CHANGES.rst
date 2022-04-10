@@ -1,3 +1,11 @@
+22.4 (2022-04-10)
+-----------------
+- Added config option to unnest classes
+- Added new class meta option global_type, to hide classes from discovery
+- Removed min/max length restrictions for enum type fields
+- Allow builtin xml types to be fully extended `#672 <https://github.com/tefra/xsdata/pull/672>`_
+
+
 22.3 (2022-03-20)
 -----------------
 - Added official support for python 3.11

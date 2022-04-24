@@ -42,9 +42,13 @@ def format_date(year: int, month: int, day: int) -> str:
     return f"{sign}{year:04d}-{month:02d}-{day:02d}"
 
 
-def format_time(hour: int, minute: int, second: int, microsecond: int) -> str:
-    if not microsecond:
+def format_time(hour: int, minute: int, second: int, fractional_second: int) -> str:
+    if not fractional_second:
         return f"{hour:02d}:{minute:02d}:{second:02d}"
+
+    microsecond, nano = divmod(fractional_second, 1000)
+    if nano:
+        return f"{hour:02d}:{minute:02d}:{second:02d}.{fractional_second:09d}"
 
     milli, micro = divmod(microsecond, 1000)
     if micro:
@@ -88,12 +92,12 @@ def validate_date(year: int, month: int, day: int):
         raise ValueError(f"Day must be in 1..{max_days}")
 
 
-def validate_time(hour: int, minute: int, second: int, microsecond: int):
+def validate_time(hour: int, minute: int, second: int, franctional_second: int):
 
     if not 0 <= hour <= 24:
         raise ValueError("Hour must be in 0..24")
 
-    if hour == 24 and (minute != 0 or second != 0 or microsecond != 0):
+    if hour == 24 and (minute != 0 or second != 0 or franctional_second != 0):
         raise ValueError("Day time exceeded")
 
     if not 0 <= minute <= 59:
@@ -102,8 +106,8 @@ def validate_time(hour: int, minute: int, second: int, microsecond: int):
     if not 0 <= second <= 59:
         raise ValueError("Second must be in 0..59")
 
-    if not 0 <= microsecond <= 999999:
-        raise ValueError("Microsecond must be in 0..999999")
+    if not 0 <= franctional_second <= 999999999:
+        raise ValueError("Fractional second must be in 0..999999999")
 
 
 class DateTimeParser:
@@ -165,7 +169,7 @@ class DateTimeParser:
         elif var == "S":
             yield self.parse_digits(2)
 
-            yield self.parse_microsecond()
+            yield self.parse_fractional_second()
         elif var == "z":
             yield self.parse_offset()
         else:
@@ -197,10 +201,10 @@ class DateTimeParser:
 
         return year
 
-    def parse_microsecond(self) -> int:
+    def parse_fractional_second(self) -> int:
         if self.has_more() and self.peek() == ".":
             self.vidx += 1
-            return self.parse_fixed_digits(6)
+            return self.parse_fixed_digits(9)
         else:
             return 0
 

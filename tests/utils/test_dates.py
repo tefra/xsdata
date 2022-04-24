@@ -23,7 +23,14 @@ class DatesUtilsTests(TestCase):
         args = parse_date_args("55.1345", "%S")
 
         self.assertEqual(55, next(args))
-        self.assertEqual(134500, next(args))
+        self.assertEqual(134500000, next(args))
+        self.assertIsNone(next(args, None))
+
+    def test_parse_date_args_nanosecond(self):
+        args = parse_date_args("55.1345678", "%S")
+
+        self.assertEqual(55, next(args))
+        self.assertEqual(134567800, next(args))
         self.assertIsNone(next(args, None))
 
     def test_parse_date_args_year(self):
@@ -117,8 +124,8 @@ class DatesUtilsTests(TestCase):
             (23, 66, 0, 1): "Minute must be in 0..59",
             (23, 59, -1, 1): "Second must be in 0..59",
             (23, 59, 60, 1): "Second must be in 0..59",
-            (23, 59, 59, -1): "Microsecond must be in 0..999999",
-            (23, 59, 59, 9999991): "Microsecond must be in 0..999999",
+            (23, 59, 59, -1): "Fractional second must be in 0..999999999",
+            (23, 59, 59, 1000000000): "Fractional second must be in 0..999999999",
         }
 
         for args, msg in invalid.items():

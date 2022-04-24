@@ -29,7 +29,7 @@ DS_MONTH = 2629743
 DS_DAY = 86400
 DS_HOUR = 3600
 DS_MINUTE = 60
-DS_MICROSECOND = 0.000001
+DS_FRACTIONAL_SECOND = 0.000000001
 DS_OFFSET = -60
 
 
@@ -150,7 +150,7 @@ class XmlDateTime(NamedTuple):
     :param hour: Unsigned integer between 0-24
     :param minute: Unsigned integer between 0-59
     :param second: Unsigned integer between 0-59
-    :param microsecond: Unsigned integer between 0-999999
+    :param fractional_second: Unsigned integer between 0-999999999
     :param offset: Signed integer representing timezone offset in
         minutes
     """
@@ -161,8 +161,12 @@ class XmlDateTime(NamedTuple):
     hour: int
     minute: int
     second: int
-    microsecond: int = 0
+    fractional_second: int = 0
     offset: Optional[int] = None
+
+    @property
+    def microsecond(self) -> int:
+        return self.fractional_second // 1000
 
     @property
     def duration(self) -> float:
@@ -180,7 +184,7 @@ class XmlDateTime(NamedTuple):
             + self.hour * DS_HOUR
             + self.minute * DS_MINUTE
             + self.second
-            + self.microsecond * DS_MICROSECOND
+            + self.fractional_second * DS_FRACTIONAL_SECOND
             + (self.offset or 0) * DS_OFFSET
         )
         return -total if negative else total
@@ -188,13 +192,20 @@ class XmlDateTime(NamedTuple):
     @classmethod
     def from_string(cls, string: str) -> "XmlDateTime":
         """Initialize from string with format ``%Y-%m-%dT%H:%M:%S%z``"""
-        year, month, day, hour, minute, second, microsecond, offset = parse_date_args(
-            string, DateFormat.DATE_TIME
-        )
+        (
+            year,
+            month,
+            day,
+            hour,
+            minute,
+            second,
+            fractional_second,
+            offset,
+        ) = parse_date_args(string, DateFormat.DATE_TIME)
         validate_date(year, month, day)
-        validate_time(hour, minute, second, microsecond)
+        validate_time(hour, minute, second, fractional_second)
 
-        return cls(year, month, day, hour, minute, second, microsecond, offset)
+        return cls(year, month, day, hour, minute, second, fractional_second, offset)
 
     @classmethod
     def from_datetime(cls, obj: datetime.datetime) -> "XmlDateTime":
@@ -206,7 +217,7 @@ class XmlDateTime(NamedTuple):
             obj.hour,
             obj.minute,
             obj.second,
-            obj.microsecond,
+            obj.microsecond * 1000,
             calculate_offset(obj),
         )
 
@@ -241,7 +252,7 @@ class XmlDateTime(NamedTuple):
         hour: Optional[int] = None,
         minute: Optional[int] = None,
         second: Optional[int] = None,
-        microsecond: Optional[int] = None,
+        fractional_second: Optional[int] = None,
         offset: Optional[int] = True,
     ) -> "XmlDateTime":
         """Return a new instance replacing the specified fields with new
@@ -259,12 +270,14 @@ class XmlDateTime(NamedTuple):
             minute = self.minute
         if second is None:
             second = self.second
-        if microsecond is None:
-            microsecond = self.microsecond
+        if fractional_second is None:
+            fractional_second = self.fractional_second
         if offset is True:
             offset = self.offset
 
-        return type(self)(year, month, day, hour, minute, second, microsecond, offset)
+        return type(self)(
+            year, month, day, hour, minute, second, fractional_second, offset
+        )
 
     def __str__(self) -> str:
         """
@@ -280,7 +293,7 @@ class XmlDateTime(NamedTuple):
         """
         return "{}T{}{}".format(
             format_date(self.year, self.month, self.day),
-            format_time(self.hour, self.minute, self.second, self.microsecond),
+            format_time(self.hour, self.minute, self.second, self.fractional_second),
             format_offset(self.offset),
         )
 
@@ -323,15 +336,19 @@ class XmlTime(NamedTuple):
     :param hour: Unsigned integer between 0-24
     :param minute: Unsigned integer between 0-59
     :param second: Unsigned integer between 0-59
-    :param microsecond: Unsigned integer between 0-999999
+    :param fractional_second: Unsigned integer between 0-999999999
     :param offset: Signed integer representing timezone offset in minutes
     """
 
     hour: int
     minute: int
     second: int
-    microsecond: int = 0
+    fractional_second: int = 0
     offset: Optional[int] = None
+
+    @property
+    def microsecond(self) -> int:
+        return self.fractional_second // 1000
 
     @property
     def duration(self) -> float:
@@ -339,7 +356,7 @@ class XmlTime(NamedTuple):
             self.hour * DS_HOUR
             + self.minute * DS_MINUTE
             + self.second
-            + self.microsecond * DS_MICROSECOND
+            + self.fractional_second * DS_FRACTIONAL_SECOND
             + (self.offset or 0) * DS_OFFSET
         )
 
@@ -348,7 +365,7 @@ class XmlTime(NamedTuple):
         hour: Optional[int] = None,
         minute: Optional[int] = None,
         second: Optional[int] = None,
-        microsecond: Optional[int] = None,
+        fractional_second: Optional[int] = None,
         offset: Optional[int] = True,
     ) -> "XmlTime":
         """Return a new instance replacing the specified fields with new
@@ -360,27 +377,31 @@ class XmlTime(NamedTuple):
             minute = self.minute
         if second is None:
             second = self.second
-        if microsecond is None:
-            microsecond = self.microsecond
+        if fractional_second is None:
+            fractional_second = self.fractional_second
         if offset is True:
             offset = self.offset
 
-        return type(self)(hour, minute, second, microsecond, offset)
+        return type(self)(hour, minute, second, fractional_second, offset)
 
     @classmethod
     def from_string(cls, string: str) -> "XmlTime":
         """Initialize from string format ``%H:%M:%S%z``"""
-        hour, minute, second, microsecond, offset = parse_date_args(
+        hour, minute, second, fractional_second, offset = parse_date_args(
             string, DateFormat.TIME
         )
-        validate_time(hour, minute, second, microsecond)
-        return cls(hour, minute, second, microsecond, offset)
+        validate_time(hour, minute, second, fractional_second)
+        return cls(hour, minute, second, fractional_second, offset)
 
     @classmethod
     def from_time(cls, obj: datetime.time) -> "XmlTime":
         """Initialize from :class:`datetime.time` instance."""
         return cls(
-            obj.hour, obj.minute, obj.second, obj.microsecond, calculate_offset(obj)
+            obj.hour,
+            obj.minute,
+            obj.second,
+            obj.microsecond * 1000,
+            calculate_offset(obj),
         )
 
     @classmethod
@@ -415,7 +436,7 @@ class XmlTime(NamedTuple):
             - 21:32:52.126Z
         """
         return "{}{}".format(
-            format_time(self.hour, self.minute, self.second, self.microsecond),
+            format_time(self.hour, self.minute, self.second, self.fractional_second),
             format_offset(self.offset),
         )
 

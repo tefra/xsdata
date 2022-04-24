@@ -127,7 +127,7 @@ whenever possible.
     ...
     >>> obj = Dates(
     ...     date=XmlDate(2020, 1, 6, 120),
-    ...     time=XmlTime(18, 15, 30, 123000, 0),
+    ...     time=XmlTime(18, 15, 30, 123000000, 0),
     ...     datetime=XmlDateTime(2020, 1, 6, 18, 15, 30)
     ... )
     ...

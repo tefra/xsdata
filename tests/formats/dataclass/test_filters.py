@@ -429,6 +429,18 @@ class FiltersTests(FactoryTestCase):
         attr.restrictions.min_occurs = 0
         self.assertEqual("Optional[FooBar]", self.filters.field_type(attr, []))
 
+    def test_field_type_with_optional_value_union_op(self):
+        self.filters.format.union_op = True
+        attr = AttrFactory.create(types=AttrTypeFactory.list(1, qname="foo_bar"))
+
+        self.assertEqual("FooBar | None", self.filters.field_type(attr, []))
+
+        self.filters.format.kw_only = True
+        self.assertEqual("FooBar", self.filters.field_type(attr, []))
+
+        attr.restrictions.min_occurs = 0
+        self.assertEqual("FooBar | None", self.filters.field_type(attr, []))
+
     def test_field_type_with_circular_reference(self):
         attr = AttrFactory.create(
             types=AttrTypeFactory.list(1, qname="foo_bar", circular=True)
@@ -437,6 +449,14 @@ class FiltersTests(FactoryTestCase):
         self.assertEqual(
             'Optional["FooBar"]', self.filters.field_type(attr, ["Parent"])
         )
+
+    def test_field_type_with_circular_reference_union_op(self):
+        self.filters.format.union_op = True
+        attr = AttrFactory.create(
+            types=AttrTypeFactory.list(1, qname="foo_bar", circular=True)
+        )
+
+        self.assertEqual('"FooBar" | None', self.filters.field_type(attr, ["Parent"]))
 
     def test_field_type_with_forward_reference(self):
         attr = AttrFactory.create(
@@ -447,6 +467,16 @@ class FiltersTests(FactoryTestCase):
             self.filters.field_type(attr, ["Parent", "Inner"]),
         )
 
+    def test_field_type_with_forward_reference_union_op(self):
+        self.filters.format.union_op = True
+        attr = AttrFactory.create(
+            types=AttrTypeFactory.list(1, qname="foo_bar", forward=True)
+        )
+        self.assertEqual(
+            '"Parent.Inner.FooBar" | None',
+            self.filters.field_type(attr, ["Parent", "Inner"]),
+        )
+
     def test_field_type_with_forward_and_circular_reference(self):
         attr = AttrFactory.create(
             types=AttrTypeFactory.list(1, qname="foo_bar", forward=True, circular=True)
@@ -454,6 +484,17 @@ class FiltersTests(FactoryTestCase):
 
         self.assertEqual(
             'Optional["Parent.Inner"]',
+            self.filters.field_type(attr, ["Parent", "Inner"]),
+        )
+
+    def test_field_type_with_forward_and_circular_reference_union_op(self):
+        self.filters.format.union_op = True
+        attr = AttrFactory.create(
+            types=AttrTypeFactory.list(1, qname="foo_bar", forward=True, circular=True)
+        )
+
+        self.assertEqual(
+            '"Parent.Inner" | None',
             self.filters.field_type(attr, ["Parent", "Inner"]),
         )
 
@@ -470,6 +511,23 @@ class FiltersTests(FactoryTestCase):
         self.filters.format.frozen = True
         self.assertEqual(
             'Tuple["A.Parent.FooBar", ...]',
+            self.filters.field_type(attr, ["A", "Parent"]),
+        )
+
+    def test_field_type_with_array_type_union_op(self):
+        self.filters.format.union_op = True
+        attr = AttrFactory.create(
+            types=AttrTypeFactory.list(1, qname="foo_bar", forward=True)
+        )
+        attr.restrictions.max_occurs = 2
+        self.assertEqual(
+            'list["A.Parent.FooBar"]',
+            self.filters.field_type(attr, ["A", "Parent"]),
+        )
+
+        self.filters.format.frozen = True
+        self.assertEqual(
+            'tuple["A.Parent.FooBar", ...]',
             self.filters.field_type(attr, ["A", "Parent"]),
         )
 
@@ -492,6 +550,26 @@ class FiltersTests(FactoryTestCase):
             "Tuple[Tuple[FooBar, ...], ...]", self.filters.field_type(attr, [])
         )
 
+    def test_field_type_with_token_attr_union_op(self):
+        self.filters.format.union_op = True
+        attr = AttrFactory.create(
+            types=AttrTypeFactory.list(1, qname="foo_bar"),
+            restrictions=Restrictions(tokens=True),
+        )
+        self.assertEqual("list[FooBar]", self.filters.field_type(attr, []))
+
+        attr.restrictions.max_occurs = 2
+        self.assertEqual("list[list[FooBar]]", self.filters.field_type(attr, []))
+
+        attr.restrictions.max_occurs = 1
+        self.filters.format.frozen = True
+        self.assertEqual("tuple[FooBar, ...]", self.filters.field_type(attr, []))
+
+        attr.restrictions.max_occurs = 2
+        self.assertEqual(
+            "tuple[tuple[FooBar, ...], ...]", self.filters.field_type(attr, [])
+        )
+
     def test_field_type_with_alias(self):
         attr = AttrFactory.create(
             types=AttrTypeFactory.list(
@@ -501,6 +579,19 @@ class FiltersTests(FactoryTestCase):
         attr.restrictions.max_occurs = 2
         self.assertEqual(
             'List["A.Parent.BossLife"]',
+            self.filters.field_type(attr, ["A", "Parent"]),
+        )
+
+    def test_field_type_with_alias_union_op(self):
+        self.filters.format.union_op = True
+        attr = AttrFactory.create(
+            types=AttrTypeFactory.list(
+                1, qname="foo_bar", forward=True, alias="Boss:Life"
+            )
+        )
+        attr.restrictions.max_occurs = 2
+        self.assertEqual(
+            'list["A.Parent.BossLife"]',
             self.filters.field_type(attr, ["A", "Parent"]),
         )
 
@@ -518,10 +609,31 @@ class FiltersTests(FactoryTestCase):
             self.filters.field_type(attr, ["A", "Parent"]),
         )
 
+    def test_field_type_with_multiple_types_union_op(self):
+        self.filters.format.union_op = True
+        attr = AttrFactory.create(
+            types=[
+                AttrTypeFactory.create(qname="life", alias="Boss:Life", forward=True),
+                AttrTypeFactory.native(DataType.INT),
+            ]
+        )
+        attr.restrictions.max_occurs = 2
+
+        self.assertEqual(
+            'list["A.Parent.BossLife" | int]',
+            self.filters.field_type(attr, ["A", "Parent"]),
+        )
+
     def test_field_type_with_any_attribute(self):
         attr = AttrFactory.any_attribute()
 
         self.assertEqual("Dict[str, str]", self.filters.field_type(attr, ["a", "b"]))
+
+    def test_field_type_with_any_attribute_union_op(self):
+        self.filters.format.union_op = True
+        attr = AttrFactory.any_attribute()
+
+        self.assertEqual("dict[str, str]", self.filters.field_type(attr, ["a", "b"]))
 
     def test_field_type_with_native_type(self):
         attr = AttrFactory.create(
@@ -531,6 +643,16 @@ class FiltersTests(FactoryTestCase):
             ]
         )
         self.assertEqual("Optional[int]", self.filters.field_type(attr, ["a", "b"]))
+
+    def test_field_type_with_native_type_union_op(self):
+        self.filters.format.union_op = True
+        attr = AttrFactory.create(
+            types=[
+                AttrTypeFactory.native(DataType.INT),
+                AttrTypeFactory.native(DataType.POSITIVE_INTEGER),
+            ]
+        )
+        self.assertEqual("int | None", self.filters.field_type(attr, ["a", "b"]))
 
     def test_choice_type(self):
         choice = AttrFactory.create(types=[AttrTypeFactory.create("foobar")])
@@ -556,11 +678,24 @@ class FiltersTests(FactoryTestCase):
         actual = self.filters.choice_type(choice, ["a", "b"])
         self.assertEqual("Type[Union[str, bool]]", actual)
 
+    def test_choice_type_with_multiple_types_union_op(self):
+        self.filters.format.union_op = True
+        choice = AttrFactory.create(types=[type_str, type_bool])
+        actual = self.filters.choice_type(choice, ["a", "b"])
+        self.assertEqual("Type[str | bool]", actual)
+
     def test_choice_type_with_list_types_are_ignored(self):
         choice = AttrFactory.create(types=[type_str, type_bool])
         choice.restrictions.max_occurs = 200
         actual = self.filters.choice_type(choice, ["a", "b"])
         self.assertEqual("Type[Union[str, bool]]", actual)
+
+    def test_choice_type_with_list_types_are_ignored_union_op(self):
+        self.filters.format.union_op = True
+        choice = AttrFactory.create(types=[type_str, type_bool])
+        choice.restrictions.max_occurs = 200
+        actual = self.filters.choice_type(choice, ["a", "b"])
+        self.assertEqual("Type[str | bool]", actual)
 
     def test_choice_type_with_restrictions_tokens_true(self):
         choice = AttrFactory.create(types=[type_str, type_bool])
@@ -571,6 +706,17 @@ class FiltersTests(FactoryTestCase):
         self.filters.format.frozen = True
         actual = self.filters.choice_type(choice, ["a", "b"])
         self.assertEqual("Type[Tuple[Union[str, bool], ...]]", actual)
+
+    def test_choice_type_with_restrictions_tokens_true_union_op(self):
+        self.filters.format.union_op = True
+        choice = AttrFactory.create(types=[type_str, type_bool])
+        choice.restrictions.tokens = True
+        actual = self.filters.choice_type(choice, ["a", "b"])
+        self.assertEqual("Type[list[str | bool]]", actual)
+
+        self.filters.format.frozen = True
+        actual = self.filters.choice_type(choice, ["a", "b"])
+        self.assertEqual("Type[tuple[str | bool, ...]]", actual)
 
     def test_default_imports_with_decimal(self):
         expected = "from decimal import Decimal"
@@ -592,6 +738,9 @@ class FiltersTests(FactoryTestCase):
         self.assertIn(expected, self.filters.default_imports("Union[str, QName, int"))
         self.assertIn(expected, self.filters.default_imports("number: QName = "))
         self.assertIn(expected, self.filters.default_imports(" = QName("))
+        self.assertIn(expected, self.filters.default_imports(": QName |"))
+        self.assertIn(expected, self.filters.default_imports("| QName |"))
+        self.assertIn(expected, self.filters.default_imports("| QName ="))
         self.assertNotIn(expected, self.filters.default_imports("class fooQName"))
 
     def test_default_imports_with_enum(self):

@@ -30,7 +30,7 @@ class GeneratorConfigTests(TestCase):
             f'<Config xmlns="http://pypi.org/project/xsdata" version="{__version__}">\n'
             '  <Output maxLineLength="79">\n'
             "    <Package>generated</Package>\n"
-            '    <Format repr="true" eq="true" order="false" unsafeHash="false" frozen="false" slots="false" kwOnly="false">dataclasses</Format>\n'
+            '    <Format repr="true" eq="true" order="false" unsafeHash="false" frozen="false" slots="false" kwOnly="false" unionOp="false">dataclasses</Format>\n'
             "    <Structure>filenames</Structure>\n"
             "    <DocstringStyle>reStructuredText</DocstringStyle>\n"
             "    <RelativeImports>false</RelativeImports>\n"
@@ -87,7 +87,7 @@ class GeneratorConfigTests(TestCase):
             '  <Output maxLineLength="79">\n'
             "    <Package>foo.bar</Package>\n"
             '    <Format repr="true" eq="true" order="false" unsafeHash="false"'
-            ' frozen="false" slots="false" kwOnly="false">dataclasses</Format>\n'
+            ' frozen="false" slots="false" kwOnly="false" unionOp="false">dataclasses</Format>\n'
             "    <Structure>filenames</Structure>\n"
             "    <DocstringStyle>reStructuredText</DocstringStyle>\n"
             "    <RelativeImports>false</RelativeImports>\n"
@@ -152,6 +152,20 @@ class GeneratorConfigTests(TestCase):
 
             self.assertEqual(
                 "kw_only requires python >= 3.10, reverting...", str(w[-1].message)
+            )
+
+        else:
+            self.assertIsNotNone(OutputFormat(kw_only=True))
+
+    def test_format_union_op_requires_310(self):
+        if sys.version_info < (3, 10):
+            self.assertTrue(OutputFormat(union_op=True, value="attrs").union_op)
+
+            with warnings.catch_warnings(record=True) as w:
+                self.assertFalse(OutputFormat(union_op=True).union_op)
+
+            self.assertEqual(
+                "union_op requires python >= 3.10, reverting...", str(w[-1].message)
             )
 
         else:

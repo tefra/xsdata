@@ -163,6 +163,8 @@ class OutputFormat:
     :param frozen: Enable read only properties, default false
     :param slots: Enable __slots__, default: false, python>=3.10 Only
     :param kw_only: Enable keyword only arguments, default: false, python>=3.10 Only
+    :param union_op: Enable union operator and subscriptable types,
+                     default: false, python>=3.10 Only
     """
 
     value: str = text_node(default="dataclasses", cli="output")
@@ -173,6 +175,7 @@ class OutputFormat:
     frozen: bool = attribute(default=False)
     slots: bool = attribute(default=False)
     kw_only: bool = attribute(default=False)
+    union_op: bool = attribute(default=False)
 
     def __post_init__(self):
         self.validate()
@@ -193,6 +196,13 @@ class OutputFormat:
                 self.kw_only = False
                 warnings.warn(
                     "kw_only requires python >= 3.10, reverting...",
+                    CodeGenerationWarning,
+                )
+
+            if self.union_op:
+                self.union_op = False
+                warnings.warn(
+                    "union_op requires python >= 3.10, reverting...",
                     CodeGenerationWarning,
                 )
 

@@ -586,11 +586,17 @@ class Filters:
             self.field_type_name(x, parents) for x in attr.types
         )
 
-        result = ", ".join(type_names)
-        if len(type_names) > 1:
-            result = f"Union[{result}]"
+        if self.format.union_op:
+            result = " | ".join(type_names)
+        else:
+            result = ", ".join(type_names)
+            if len(type_names) > 1:
+                result = f"Union[{result}]"
 
-        iterable = "Tuple[{}, ...]" if self.format.frozen else "List[{}]"
+        if self.format.union_op:
+            iterable = "tuple[{}, ...]" if self.format.frozen else "list[{}]"
+        else:
+            iterable = "Tuple[{}, ...]" if self.format.frozen else "List[{}]"
 
         if attr.is_tokens:
             result = iterable.format(result)
@@ -602,11 +608,15 @@ class Filters:
             return result
 
         if attr.is_dict:
+            if self.format.union_op:
+                return "dict[str, str]"
             return "Dict[str, str]"
 
         if attr.is_nillable or (
             attr.default is None and (attr.is_optional or not self.format.kw_only)
         ):
+            if self.format.union_op:
+                return f"{result} | None"
             return f"Optional[{result}]"
 
         return result
@@ -626,14 +636,22 @@ class Filters:
             self.field_type_name(x, parents) for x in choice.types
         )
 
-        result = ", ".join(type_names)
-        if len(type_names) > 1:
-            result = f"Union[{result}]"
+        if self.format.union_op:
+            result = " | ".join(type_names)
+        else:
+            result = ", ".join(type_names)
+            if len(type_names) > 1:
+                result = f"Union[{result}]"
 
         if choice.is_tokens:
-            result = (
-                f"Tuple[{result}, ...]" if self.format.frozen else f"List[{result}]"
-            )
+            if self.format.union_op:
+                result = (
+                    f"tuple[{result}, ...]" if self.format.frozen else f"list[{result}]"
+                )
+            else:
+                result = (
+                    f"Tuple[{result}, ...]" if self.format.frozen else f"List[{result}]"
+                )
 
         return f"Type[{result}]"
 
@@ -723,4 +741,14 @@ class Filters:
 
     @classmethod
     def build_type_patterns(cls, x: str) -> Tuple:
-        return f": {x} =", f"[{x}]", f"[{x},", f" {x},", f" {x}]", f" {x}("
+        return (
+            f": {x} =",
+            f"[{x}]",
+            f"[{x},",
+            f" {x},",
+            f" {x}]",
+            f" {x}(",
+            f": {x} |",
+            f"| {x} |",
+            f"| {x} =",
+        )

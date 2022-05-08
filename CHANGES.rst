@@ -1,3 +1,8 @@
+22.5 (2022-05-08)
+-----------------
+- Added support for xml date/time nanoseconds `#679 <https://github.com/tefra/xsdata/pull/679>`_
+
+
 22.4 (2022-04-10)
 -----------------
 - Added config option to unnest classes

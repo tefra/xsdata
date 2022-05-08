@@ -96,9 +96,6 @@ Features
   - Customize behaviour through config
 
 
-Changelog: 22.4 (2022-04-10)
+Changelog: 22.5 (2022-05-08)
 ----------------------------
-- Added config option to unnest classes
-- Added new class meta option global_type, to hide classes from discovery
-- Removed min/max length restrictions for enum type fields
-- Allow builtin xml types to be fully extended `#672 <https://github.com/tefra/xsdata/pull/672>`_
+- Added support for xml date/time nanoseconds `#679 <https://github.com/tefra/xsdata/pull/679>`_

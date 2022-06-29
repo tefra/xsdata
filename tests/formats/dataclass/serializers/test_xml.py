@@ -135,9 +135,14 @@ class XmlSerializerTests(TestCase):
             xml_type=XmlType.ELEMENT, qname="a", tokens_factory=list
         )
 
+        expected = [
+            (XmlWriterEvent.START, "a"),
+            (XmlWriterEvent.DATA, []),
+            (XmlWriterEvent.END, "a"),
+        ]
         result = self.serializer.write_value([], var, "xsdata")
         self.assertIsInstance(result, Generator)
-        self.assertEqual(0, len(list(result)))
+        self.assertListEqual(expected, list(result))
 
         expected = [
             (XmlWriterEvent.START, "a"),

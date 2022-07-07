@@ -6,6 +6,7 @@ from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import Optional
+from typing import Tuple
 from typing import Type
 from xml.etree.ElementTree import QName
 
@@ -44,6 +45,10 @@ class Namespace(Enum):
     @classmethod
     def get_enum(cls, uri: Optional[str]) -> Optional["Namespace"]:
         return __STANDARD_NAMESPACES__.get(uri) if uri else None
+
+    @classmethod
+    def common(cls) -> Tuple["Namespace", ...]:
+        return Namespace.XS, Namespace.XSI, Namespace.XML, Namespace.XLINK
 
 
 __STANDARD_NAMESPACES__ = {ns.uri: ns for ns in Namespace}
@@ -191,6 +196,10 @@ class DataType(Enum):
     def from_qname(cls, qname: str) -> Optional["DataType"]:
         return __DataTypeQNameIndex__.get(qname)
 
+    @classmethod
+    def from_code(cls, code: str) -> "DataType":
+        return __DataTypeCodeIndex__.get(code, DataType.STRING)
+
 
 def period_datatype(value: XmlPeriod) -> DataType:
     if value.year is not None:
@@ -238,6 +247,7 @@ __DataTypeInferIndex__: Dict[Type, Callable] = {
     XmlPeriod: period_datatype,
 }
 __DataTypeQNameIndex__ = {str(dt): dt for dt in DataType}
+__DataTypeCodeIndex__ = {dt.code.lower(): dt for dt in DataType}
 
 
 class EventType:

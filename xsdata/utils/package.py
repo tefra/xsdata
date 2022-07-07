@@ -20,4 +20,4 @@ def module_name(source: str) -> str:
 
     module = source.split("/")[-1]
     name, extension = os.path.splitext(module)
-    return name if extension in (".xsd", ".wsdl", ".xml", ".json") else module
+    return name if extension in (".xsd", ".dtd", ".wsdl", ".xml", ".json") else module

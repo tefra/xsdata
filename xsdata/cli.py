@@ -141,7 +141,7 @@ def resolve_source(source: str, recursive: bool) -> Iterator[str]:
         path = Path(source).resolve()
         match = "**/*" if recursive else "*"
         if path.is_dir():
-            for ext in ["wsdl", "xsd", "xml", "json"]:
+            for ext in ["wsdl", "xsd", "dtd", "xml", "json"]:
                 yield from (x.as_uri() for x in path.glob(f"{match}.{ext}"))
         else:  # is file
             yield path.as_uri()

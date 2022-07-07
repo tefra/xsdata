@@ -118,8 +118,8 @@ class DtdMapperTests(FactoryTestCase):
     def test_build_attribute_restrictions_with_default_implied(self):
         attr = AttrFactory.create()
         DtdMapper.build_attribute_restrictions(attr, DtdAttributeDefault.IMPLIED, "")
-        self.assertEqual(0, attr.restrictions.max_occurs)
-        self.assertEqual(1, attr.restrictions.min_occurs)
+        self.assertEqual(1, attr.restrictions.max_occurs)
+        self.assertEqual(0, attr.restrictions.min_occurs)
         self.assertFalse(attr.fixed)
         self.assertIsNone(attr.default)
 

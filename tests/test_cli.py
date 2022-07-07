@@ -157,4 +157,4 @@ class CliTests(TestCase):
         self.assertEqual(3, len(list(resolve_source(str(def_xml_path), False))))
 
         actual = list(resolve_source(str(fixtures_dir), True))
-        self.assertEqual(36, len(actual))
+        self.assertEqual(39, len(actual))

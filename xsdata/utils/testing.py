@@ -23,6 +23,15 @@ from xsdata.codegen.models import Status
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.formats.dataclass.models.elements import XmlVar
+from xsdata.models.dtd import Dtd
+from xsdata.models.dtd import DtdAttribute
+from xsdata.models.dtd import DtdAttributeDefault
+from xsdata.models.dtd import DtdAttributeType
+from xsdata.models.dtd import DtdContent
+from xsdata.models.dtd import DtdContentOccur
+from xsdata.models.dtd import DtdContentType
+from xsdata.models.dtd import DtdElement
+from xsdata.models.dtd import DtdElementType
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
@@ -64,6 +73,10 @@ class FactoryTestCase(unittest.TestCase):
         PackageFactory.reset()
         XmlVarFactory.reset()
         XmlMetaFactory.reset()
+        DtdElementFactory.reset()
+        DtdAttributeFactory.reset()
+        DtdContentFactory.reset()
+        DtdFactory.reset()
 
 
 class Factory(abc.ABC):
@@ -464,3 +477,130 @@ class XmlMetaFactory(Factory):
             attributes=attributes,
             any_attributes=any_attributes,
         )
+
+
+class DtdAttributeFactory(Factory):
+    counter = 65
+
+    @classmethod
+    def create(
+        cls,
+        name: Optional[str] = None,
+        prefix: Optional[str] = None,
+        type: Optional[DtdAttributeType] = None,
+        default: Optional[DtdAttributeDefault] = None,
+        default_value: Optional[str] = None,
+        values: Optional[List[str]] = None,
+        **kwargs: Any,
+    ) -> DtdAttribute:
+
+        if name is None:
+            name = f"attribute_{cls.next_letter()}"
+
+        if type is None:
+            type = DtdAttributeType.CDATA
+
+        if default is None:
+            default = DtdAttributeDefault.NONE
+
+        if values is None:
+            values = []
+
+        return DtdAttribute(
+            name=name,
+            prefix=prefix,
+            type=type,
+            default=default,
+            default_value=default_value,
+            values=values,
+        )
+
+
+class DtdContentFactory(Factory):
+    counter = 65
+
+    @classmethod
+    def create(
+        cls,
+        name: Optional[str] = None,
+        type: Optional[DtdContentType] = None,
+        occur: Optional[DtdContentOccur] = None,
+        left: Optional[DtdContent] = None,
+        right: Optional[DtdContent] = None,
+        **kwargs: Any,
+    ) -> DtdContent:
+        if name is None:
+            name = f"content_{cls.next_letter()}"
+
+        if type is None:
+            type = DtdContentType.ELEMENT
+
+        if occur is None:
+            occur = DtdContentOccur.ONCE
+
+        return DtdContent(
+            name=name,
+            type=type,
+            occur=occur,
+            left=left,
+            right=right,
+        )
+
+
+class DtdElementFactory(Factory):
+    counter = 65
+
+    @classmethod
+    def create(
+        cls,
+        name: Optional[str] = None,
+        prefix: Optional[str] = None,
+        type: Optional[DtdElementType] = None,
+        content: Optional[DtdContent] = None,
+        attributes: Optional[List[DtdAttribute]] = None,
+        ns_map: Optional[Dict] = None,
+        **kwargs: Any,
+    ) -> DtdElement:
+
+        if name is None:
+            name = f"element_{cls.next_letter()}"
+
+        if type is None:
+            type = DtdElementType.ELEMENT
+
+        if attributes is None:
+            attributes = []
+
+        if ns_map is None:
+            ns_map = {}
+
+        return DtdElement(
+            name=name,
+            prefix=prefix,
+            type=type,
+            content=content,
+            attributes=attributes,
+            ns_map=ns_map,
+        )
+
+
+class DtdFactory(Factory):
+    @classmethod
+    def create(
+        cls,
+        elements: Optional[List[DtdElement]] = None,
+        location: Optional[str] = None,
+        **kwargs: Any,
+    ) -> Dtd:
+        if elements is None:
+            elements = []
+
+        if location is None:
+            location = "test.dtd"
+
+        return Dtd(elements=elements, location=location)
+
+    @classmethod
+    def root(cls, number: int, **kwargs: Any) -> Dtd:
+        elements = DtdElementFactory.list(number)
+        return cls.create(elements=elements, **kwargs)

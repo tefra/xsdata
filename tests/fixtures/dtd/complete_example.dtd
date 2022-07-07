@@ -1,0 +1,11 @@
+<!ELEMENT Blog (Post+)>
+<!ELEMENT Post (Title,Body,Tags)>
+<!ELEMENT Title (#PCDATA)>
+<!ELEMENT Body (#PCDATA)>
+<!ELEMENT Tags (Tag*)>
+<!ELEMENT Tag (#PCDATA)>
+
+<!ATTLIST Post status (draft|published) 'draft'>
+<!ATTLIST Post author CDATA #REQUIRED>
+<!ATTLIST Post created_at CDATA #REQUIRED>
+<!ATTLIST Post xml:lang NMTOKEN 'en'>

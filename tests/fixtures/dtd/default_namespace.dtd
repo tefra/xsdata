@@ -1,0 +1,3 @@
+<!ELEMENT root (child1)>
+<!ATTLIST root xmlns CDATA #FIXED "http://www.example.com/">
+<!ELEMENT child1 (#PCDATA)>

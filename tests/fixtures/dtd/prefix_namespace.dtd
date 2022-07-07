@@ -1,0 +1,3 @@
+ <!ELEMENT ns:root (ns:child1)>
+ <!ATTLIST ns:root xmlns:ns CDATA #FIXED "http://www.example.com/">
+ <!ELEMENT ns:child1 (#PCDATA)>

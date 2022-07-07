@@ -148,13 +148,16 @@ class DtdMapperTests(FactoryTestCase):
         self.assertEqual("abc", attr.default)
 
     def test_build_elements_with_mixed_element_type(self):
-        target = ClassFactory.create()
+        target = ClassFactory.create(tag=Tag.ELEMENT)
         element = DtdElementFactory.create(type=DtdElementType.MIXED)
 
         DtdMapper.build_elements(target, element)
         self.assertEqual(0, len(target.attrs))
-        self.assertEqual(0, len(target.extensions))
-        self.assertTrue(target.mixed)
+        self.assertEqual(1, len(target.extensions))
+
+        self.assertEqual(Tag.COMPLEX_TYPE, target.tag)
+        self.assertEqual(str(DataType.STRING), target.extensions[0].type.qname)
+        self.assertTrue(target.extensions[0].type.native)
 
     def test_build_elements_with_any_element_type(self):
         target = ClassFactory.create()

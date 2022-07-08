@@ -11,6 +11,7 @@ Code Generation
     examples/docstrings
     examples/xml-modeling
     examples/json-modeling
+    examples/dtd-modeling
     examples/compound-fields
     examples/dataclasses-features
 

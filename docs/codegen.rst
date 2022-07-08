@@ -27,7 +27,7 @@ Generate Code
 
 
 .. code-block:: console
-    :caption: Scan directory for xsd, wsdl, xml files
+    :caption: Scan directory for xsd, dtd, wsdl, xml or json files
 
     $ xsdata amadeus/schemas --package amadeus.models
 

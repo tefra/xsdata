@@ -1,6 +1,7 @@
 import sys
 from typing import Any
 from typing import Iterator
+from typing import List
 from typing import Optional
 
 from xsdata.codegen.models import Attr
@@ -154,7 +155,7 @@ class DtdMapper:
         target.attrs.append(attr)
 
     @classmethod
-    def build_enumeration(cls, target: Class, name: str, values: list[str]):
+    def build_enumeration(cls, target: Class, name: str, values: List[str]):
         inner = Class(qname=name, tag=Tag.SIMPLE_TYPE, location=target.location)
         attr_type = AttrType(qname=str(DataType.STRING), native=True)
 

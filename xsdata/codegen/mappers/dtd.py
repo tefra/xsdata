@@ -139,7 +139,7 @@ class DtdMapper:
         elif occur == DtdContentOccur.MULT:
             restrictions.min_occurs = 0
             restrictions.max_occurs = sys.maxsize
-        elif occur == DtdContentOccur.PLUS:
+        else:  # occur == DtdContentOccur.PLUS:
             restrictions.min_occurs = 1
             restrictions.max_occurs = sys.maxsize
 

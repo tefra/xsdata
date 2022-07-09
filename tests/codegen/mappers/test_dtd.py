@@ -25,7 +25,7 @@ from xsdata.utils.testing import FactoryTestCase
 
 class DtdMapperTests(FactoryTestCase):
     def test_map(self):
-        dtd = DtdFactory.root(2)
+        dtd = DtdFactory.root(2, location="tests.dtd")
         result = DtdMapper.map(dtd)
 
         self.assertIsInstance(result, Iterator)
@@ -71,7 +71,9 @@ class DtdMapperTests(FactoryTestCase):
 
     def test_build_attribute(self):
         target = ClassFactory.create()
-        attribute = DtdAttributeFactory.create(name="lang", prefix="xml")
+        attribute = DtdAttributeFactory.create(
+            name="lang", prefix="xml", default=DtdAttributeDefault.IMPLIED
+        )
         DtdMapper.build_attribute(target, attribute)
 
         self.assertEqual(1, len(target.attrs))

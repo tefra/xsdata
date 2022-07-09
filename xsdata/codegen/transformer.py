@@ -14,10 +14,12 @@ from xsdata.codegen.analyzer import ClassAnalyzer
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.mappers.definitions import DefinitionsMapper
 from xsdata.codegen.mappers.dict import DictMapper
+from xsdata.codegen.mappers.dtd import DtdMapper
 from xsdata.codegen.mappers.element import ElementMapper
 from xsdata.codegen.mappers.schema import SchemaMapper
 from xsdata.codegen.models import Class
 from xsdata.codegen.parsers.definitions import DefinitionsParser
+from xsdata.codegen.parsers.dtd import DtdParser
 from xsdata.codegen.parsers.schema import SchemaParser
 from xsdata.codegen.utils import ClassUtils
 from xsdata.codegen.writer import CodeWriter
@@ -33,8 +35,9 @@ from xsdata.utils import collections
 TYPE_UNKNOWN = 0
 TYPE_SCHEMA = 1
 TYPE_DEFINITION = 2
-TYPE_XML = 3
-TYPE_JSON = 4
+TYPE_DTD = 3
+TYPE_XML = 4
+TYPE_JSON = 5
 
 
 class SupportedType(NamedTuple):
@@ -56,6 +59,12 @@ supported_types = [
         name="xsd",
         match_uri=lambda x: x.endswith("xsd"),
         match_content=lambda x: x.endswith("schema>"),
+    ),
+    SupportedType(
+        id=TYPE_DTD,
+        name="dtd",
+        match_uri=lambda x: x.endswith("dtd"),
+        match_content=lambda x: "<!ELEMENT" in x,
     ),
     SupportedType(
         id=TYPE_XML,
@@ -98,6 +107,7 @@ class SchemaTransformer:
 
         self.process_definitions(sources[TYPE_DEFINITION])
         self.process_schemas(sources[TYPE_SCHEMA])
+        self.process_dtds(sources[TYPE_DTD])
         self.process_xml_documents(sources[TYPE_XML])
         self.process_json_documents(sources[TYPE_JSON])
         self.process_classes()
@@ -120,6 +130,20 @@ class SchemaTransformer:
         """Process a list of xsd resources."""
         for uri in uris:
             self.process_schema(uri)
+
+    def process_dtds(self, uris: List[str]):
+        """Process a list of dtd resources."""
+        classes: List[Class] = []
+
+        for uri in uris:
+            input_stream = self.load_resource(uri)
+            if input_stream:
+                logger.info("Parsing dtd %s", uri)
+                dtd = DtdParser.parse(input_stream, location=uri)
+
+                classes.extend(DtdMapper.map(dtd))
+
+        self.classes.extend(classes)
 
     def process_schema(self, uri: str, namespace: Optional[str] = None):
         """Parse and convert schema to codegen models."""

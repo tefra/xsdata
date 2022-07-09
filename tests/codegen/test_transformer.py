@@ -6,9 +6,11 @@ from xsdata.codegen.analyzer import ClassAnalyzer
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.mappers.definitions import DefinitionsMapper
 from xsdata.codegen.mappers.dict import DictMapper
+from xsdata.codegen.mappers.dtd import DtdMapper
 from xsdata.codegen.mappers.element import ElementMapper
 from xsdata.codegen.mappers.schema import SchemaMapper
 from xsdata.codegen.parsers import DefinitionsParser
+from xsdata.codegen.parsers.dtd import DtdParser
 from xsdata.codegen.transformer import SchemaTransformer
 from xsdata.codegen.utils import ClassUtils
 from xsdata.codegen.writer import CodeWriter
@@ -24,6 +26,7 @@ from xsdata.models.xsd import Include
 from xsdata.models.xsd import Override
 from xsdata.models.xsd import Schema
 from xsdata.utils.testing import ClassFactory
+from xsdata.utils.testing import DtdFactory
 from xsdata.utils.testing import FactoryTestCase
 
 
@@ -34,6 +37,7 @@ class SchemaTransformerTests(FactoryTestCase):
         super().setUp()
 
     @mock.patch.object(SchemaTransformer, "process_classes")
+    @mock.patch.object(SchemaTransformer, "process_dtds")
     @mock.patch.object(SchemaTransformer, "process_json_documents")
     @mock.patch.object(SchemaTransformer, "process_xml_documents")
     @mock.patch.object(SchemaTransformer, "process_schemas")
@@ -42,8 +46,9 @@ class SchemaTransformerTests(FactoryTestCase):
         self,
         mock_process_definitions,
         mock_process_schemas,
-        process_xml_documents,
-        process_json_documents,
+        mock_process_xml_documents,
+        mock_process_json_documents,
+        mock_process_dtds,
         mock_process_classes,
     ):
         uris = [
@@ -55,13 +60,15 @@ class SchemaTransformerTests(FactoryTestCase):
             "f.xml",
             "g.json",
             "h.json",
+            "i.dtd",
         ]
 
         self.transformer.process(uris)
         mock_process_definitions.assert_called_once_with(uris[:2])
         mock_process_schemas.assert_called_once_with(uris[2:4])
-        process_xml_documents.assert_called_once_with(uris[4:6])
-        process_json_documents.assert_called_once_with(uris[6:])
+        mock_process_xml_documents.assert_called_once_with(uris[4:6])
+        mock_process_json_documents.assert_called_once_with(uris[6:8])
+        mock_process_dtds.assert_called_once_with(uris[8:])
         mock_process_classes.assert_called_once_with()
 
     @mock.patch.object(SchemaTransformer, "convert_schema")
@@ -154,6 +161,38 @@ class SchemaTransformerTests(FactoryTestCase):
             ]
         )
         mock_reduce_classes.assert_called_once_with(classes_a + classes_c)
+
+    @mock.patch.object(DtdMapper, "map")
+    @mock.patch.object(DtdParser, "parse")
+    @mock.patch.object(SchemaTransformer, "load_resource")
+    def test_process_dtds(self, mock_load_resource, mock_parse, mock_map):
+        uris = ["foo/a.dtd", "foo/b.dtd", "foo/c.dtd"]
+        resources = [b"a", None, b"c"]
+        dtds = DtdFactory.list(2)
+
+        classes_a = ClassFactory.list(2)
+        classes_c = ClassFactory.list(3)
+
+        mock_load_resource.side_effect = resources
+        mock_parse.side_effect = dtds
+        mock_map.side_effect = [classes_a, classes_c]
+
+        self.transformer.process_dtds(uris)
+
+        self.assertEqual(5, len(self.transformer.classes))
+
+        mock_parse.assert_has_calls(
+            [
+                mock.call(resources[0], location=uris[0]),
+                mock.call(resources[2], location=uris[2]),
+            ]
+        )
+        mock_map.assert_has_calls(
+            [
+                mock.call(dtds[0]),
+                mock.call(dtds[1]),
+            ]
+        )
 
     @mock.patch("xsdata.codegen.transformer.logger.info")
     @mock.patch.object(CodeWriter, "print")
@@ -350,8 +389,9 @@ class SchemaTransformerTests(FactoryTestCase):
         self.assertEqual(1, self.transformer.classify_resource("a.xsd"))
         self.assertEqual(2, self.transformer.classify_resource("a.wsdl"))
         self.assertEqual(2, self.transformer.classify_resource("a?wsdl"))
-        self.assertEqual(3, self.transformer.classify_resource("a.xml"))
-        self.assertEqual(4, self.transformer.classify_resource("a.json"))
+        self.assertEqual(3, self.transformer.classify_resource("a.dtd"))
+        self.assertEqual(4, self.transformer.classify_resource("a.xml"))
+        self.assertEqual(5, self.transformer.classify_resource("a.json"))
 
         file_path = Path(tempfile.mktemp())
         file_path.write_bytes(b"</xs:schema>  \n")
@@ -361,13 +401,17 @@ class SchemaTransformerTests(FactoryTestCase):
         self.transformer.preloaded.clear()
         self.assertEqual(2, self.transformer.classify_resource(file_path.as_uri()))
 
-        file_path.write_bytes(b"</foobar>  \n")
+        file_path.write_bytes(b"<!ELEMENT Tags ")
         self.transformer.preloaded.clear()
         self.assertEqual(3, self.transformer.classify_resource(file_path.as_uri()))
 
-        file_path.write_bytes(b"\n}  \n")
+        file_path.write_bytes(b"</foobar>  \n")
         self.transformer.preloaded.clear()
         self.assertEqual(4, self.transformer.classify_resource(file_path.as_uri()))
+
+        file_path.write_bytes(b"\n}  \n")
+        self.transformer.preloaded.clear()
+        self.assertEqual(5, self.transformer.classify_resource(file_path.as_uri()))
 
         file_path.write_bytes(b"aaa\n")
         self.transformer.preloaded.clear()

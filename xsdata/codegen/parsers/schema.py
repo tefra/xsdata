@@ -241,9 +241,12 @@ class SchemaParser(UserXmlParser):
                 )
 
             ns_list = obj.ns_map.values()
-            ns_common = (Namespace.XS, Namespace.XSI, Namespace.XML, Namespace.XLINK)
             obj.ns_map.update(
-                {ns.prefix: ns.uri for ns in ns_common if ns.uri not in ns_list}
+                {
+                    ns.prefix: ns.uri
+                    for ns in Namespace.common()
+                    if ns.uri not in ns_list
+                }
             )
 
     @classmethod

@@ -1,3 +1,12 @@
+22.7 (2022-07-22)
+-----------------
+- Fix empty lists do not get serialized `#686 <https://github.com/tefra/xsdata/issues/686>`_
+- Added external DTD code generator `#688 <https://github.com/tefra/xsdata/pull/688>`_
+- Added support for python 3.11
+
+In the next release we will drop python 3.6 support!!!
+
+
 22.5 (2022-05-08)
 -----------------
 - Added support for xml date/time nanoseconds `#679 <https://github.com/tefra/xsdata/pull/679>`_

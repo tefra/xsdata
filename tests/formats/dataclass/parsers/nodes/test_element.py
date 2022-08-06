@@ -266,26 +266,38 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual(expected, params)
 
     def test_prepare_generic_value(self):
-        actual = self.node.prepare_generic_value(None, 1)
+        var = XmlVarFactory.create(
+            index=2,
+            xml_type=XmlType.WILDCARD,
+            qname="a",
+            types=(object,),
+            elements={"known": XmlVarFactory.create()},
+        )
+
+        actual = self.node.prepare_generic_value(None, 1, var)
         self.assertEqual(1, actual)
 
-        actual = self.node.prepare_generic_value("a", 1)
+        actual = self.node.prepare_generic_value("a", 1, var)
         expected = AnyElement(qname="a", text="1")
         self.assertEqual(expected, actual)
 
-        actual = self.node.prepare_generic_value("a", "foo")
+        actual = self.node.prepare_generic_value("a", "foo", var)
         expected = AnyElement(qname="a", text="foo")
         self.assertEqual(expected, actual)
 
         fixture = make_dataclass("Fixture", [("content", str)])
-        actual = self.node.prepare_generic_value("a", fixture("foo"))
+        actual = self.node.prepare_generic_value("a", fixture("foo"), var)
         expected = DerivedElement(qname="a", value=fixture("foo"), type="Fixture")
         self.assertEqual(expected, actual)
 
-        actual = self.node.prepare_generic_value("a", expected)
+        fixture = make_dataclass("Fixture", [("content", str)])
+        actual = self.node.prepare_generic_value("known", fixture("foo"), var)
+        self.assertEqual(fixture("foo"), actual)
+
+        actual = self.node.prepare_generic_value("a", expected, var)
         self.assertIs(expected, actual)
 
-        actual = self.node.prepare_generic_value("Fixture", fixture("foo"))
+        actual = self.node.prepare_generic_value("Fixture", fixture("foo"), var)
         expected = DerivedElement(qname="Fixture", value=fixture("foo"))
         self.assertEqual(expected, actual)
 

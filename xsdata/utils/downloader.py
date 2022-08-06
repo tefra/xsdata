@@ -81,7 +81,7 @@ class Downloader:
             self.base_path = Path(uri).parent
             logger.info("Setting base path to %s", self.base_path)
         else:
-            common_path = os.path.commonpath((self.base_path or "", uri))
+            common_path = os.path.commonpath((str(self.base_path) or "", uri))
 
             if common_path:
                 common_path_path = Path(common_path)

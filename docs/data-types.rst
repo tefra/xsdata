@@ -82,9 +82,9 @@ Use the field metadata to set the target `format` according to the
     ...
     >>> @dataclass
     ... class Dates:
-    ...     date: dt.date = field(metadata=dict(format="%d %B %Y"))
+    ...     date: dt.date = field(metadata=dict(format="%d/%m/%Y"))
     ...     time: dt.time = field(metadata=dict(format="%H:%M"))
-    ...     datetime: dt.datetime = field(metadata=dict(format="%d %B %Y %H:%M"))
+    ...     datetime: dt.datetime = field(metadata=dict(format="%d/%m/%Y %H:%M"))
     ...
     >>> obj = Dates(
     ...     date=dt.date(2020, 1, 6),
@@ -97,9 +97,9 @@ Use the field metadata to set the target `format` according to the
     >>> print(serializer.render(obj))
     <?xml version="1.0" encoding="UTF-8"?>
     <Dates>
-      <date>06 January 2020</date>
+      <date>06/01/2020</date>
       <time>18:15</time>
-      <datetime>06 January 2020 18:15</datetime>
+      <datetime>06/01/2020 18:15</datetime>
     </Dates>
     <BLANKLINE>
 

@@ -13,7 +13,7 @@ T = TypeVar("T")
 
 
 def is_array(value: Any) -> bool:
-    if isinstance(value, (list, tuple)):
+    if isinstance(value, (list, tuple, set)):
         return not hasattr(value, "_fields")
 
     return False

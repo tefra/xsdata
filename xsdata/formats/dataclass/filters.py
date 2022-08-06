@@ -1,4 +1,3 @@
-import math
 import re
 import textwrap
 from collections import defaultdict
@@ -10,8 +9,6 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 from typing import Type
-from xml.etree.ElementTree import QName
-from xml.sax.saxutils import quoteattr
 
 from docformatter import format_code
 from jinja2 import Environment
@@ -27,6 +24,7 @@ from xsdata.models.config import OutputFormat
 from xsdata.utils import collections
 from xsdata.utils import namespaces
 from xsdata.utils import text
+from xsdata.utils.objects import literal_value
 
 
 class Filters:
@@ -383,7 +381,7 @@ class Filters:
         if isinstance(data, str):
             return self.format_string(data, indent, key, 4)
 
-        return self.literal_value(data)
+        return literal_value(data)
 
     def format_dict(self, data: Dict, indent: int) -> str:
         """Return a pretty string representation of a dict."""
@@ -530,7 +528,7 @@ class Filters:
         if attr.default is None:
             return False if self.format.kw_only and not attr.is_optional else None
         if not isinstance(attr.default, str):
-            return self.literal_value(attr.default)
+            return literal_value(attr.default)
         if attr.default.startswith("@enum@"):
             return self.field_default_enum(attr)
 
@@ -539,7 +537,7 @@ class Filters:
         if attr.is_tokens:
             return self.field_default_tokens(attr, types, ns_map)
 
-        return self.literal_value(
+        return literal_value(
             converter.deserialize(
                 attr.default, types, ns_map=ns_map, format=attr.restrictions.format
             )
@@ -661,19 +659,6 @@ class Filters:
             return self.class_name(attr_type.alias)
 
         return self.type_name(attr_type)
-
-    @classmethod
-    def literal_value(cls, value: Any) -> str:
-        if isinstance(value, str):
-            return quoteattr(value)
-
-        if isinstance(value, float):
-            return str(value) if math.isfinite(value) else f'float("{value}")'
-
-        if isinstance(value, QName):
-            return f'QName("{value.text}")'
-
-        return repr(value).replace("'", '"')
 
     def default_imports(self, output: str) -> str:
         """Generate the default imports for the given package output."""

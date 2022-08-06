@@ -214,7 +214,7 @@ class ElementNode(XmlNode):
         generic instance add the current value as a child object.
         """
 
-        value = self.prepare_generic_value(qname, value)
+        value = self.prepare_generic_value(qname, value, var)
 
         if var.list_element:
             items = params.get(var.name)
@@ -240,11 +240,14 @@ class ElementNode(XmlNode):
 
         pos = self.position
         params[var.name] = [
-            self.prepare_generic_value(qname, value) for qname, value in objects[pos:]
+            self.prepare_generic_value(qname, value, var)
+            for qname, value in objects[pos:]
         ]
         del objects[pos:]
 
-    def prepare_generic_value(self, qname: Optional[str], value: Any) -> Any:
+    def prepare_generic_value(
+        self, qname: Optional[str], value: Any, var: XmlVar
+    ) -> Any:
         """Prepare parsed value before binding to a wildcard field."""
 
         if qname:
@@ -253,7 +256,9 @@ class ElementNode(XmlNode):
 
             if not self.context.class_type.is_model(value):
                 value = any_factory(qname=qname, text=converter.serialize(value))
-            elif not isinstance(value, (any_factory, derived_factory)):
+            elif not isinstance(
+                value, (any_factory, derived_factory)
+            ) and not var.find_choice(qname):
                 meta = self.context.fetch(type(value))
                 xsi_type = namespaces.real_xsi_type(qname, meta.target_qname)
                 value = derived_factory(qname=qname, value=value, type=xsi_type)

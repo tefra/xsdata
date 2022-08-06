@@ -1,5 +1,7 @@
-How to work with wildcard fields?
-==================================
+======================
+Working with wildcards
+======================
+
 
 One of the xml schema traits is to support any extensions with wildcards.
 
@@ -38,6 +40,9 @@ The generator will roughly create this class for you.
     ...          }
     ...      )
 
+
+Generics
+========
 
 xsdata comes with two generic models that are used during parsing and you can also use
 to generate any custom xml element.
@@ -86,4 +91,64 @@ to generate any custom xml element.
         <third xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" c="3" xsi:type="MetadataType"/>
       </bar>
     </MetadataType>
+    <BLANKLINE>
+
+
+Mixed content
+=============
+
+For mixed content with known choices you can skip wrapping your instances with a
+generic model. During data binding xsdata will try first to match one of the qualified
+choices.
+
+.. doctest::
+
+    >>> @dataclass
+    ... class Beta:
+    ...     class Meta:
+    ...         name = "beta"
+    ...
+    >>> @dataclass
+    ... class Alpha:
+    ...     class Meta:
+    ...         name = "alpha"
+    ...
+    >>> @dataclass
+    ... class Doc:
+    ...     class Meta:
+    ...         name = "doc"
+    ...
+    ...     content: List[object] = field(
+    ...         default_factory=list,
+    ...         metadata={
+    ...             "type": "Wildcard",
+    ...             "namespace": "##any",
+    ...             "mixed": True,
+    ...             "choices": (
+    ...                 {
+    ...                     "name": "a",
+    ...                     "type": Alpha,
+    ...                     "namespace": "",
+    ...                 },
+    ...                 {
+    ...                     "name": "b",
+    ...                     "type": Beta,
+    ...                     "namespace": "",
+    ...                 },
+    ...             ),
+    ...         }
+    ...     )
+    ...
+    >>> obj = Doc(
+    ...     content=[
+    ...         Alpha(),
+    ...         Beta(),
+    ...     ]
+    ... )
+    ...
+    >>> print(serializer.render(obj))
+    <doc>
+      <a/>
+      <b/>
+    </doc>
     <BLANKLINE>

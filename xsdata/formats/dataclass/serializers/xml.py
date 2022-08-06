@@ -118,11 +118,15 @@ class XmlSerializer(AbstractSerializer):
         yield XmlWriterEvent.END, qname
 
     def write_xsi_type(self, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
-        """Produce an events stream from a dataclass for the given var with
-        with xsi abstract type check for non wildcards."""
+        """Produce an events stream from a dataclass for the given var with xsi
+        abstract type check for non wildcards."""
 
         if var.is_wildcard:
-            yield from self.write_dataclass(value, namespace)
+            choice = var.find_value_choice(value, True)
+            if choice:
+                yield from self.write_value(value, choice, namespace)
+            else:
+                yield from self.write_dataclass(value, namespace)
         else:
             xsi_type = self.xsi_type(var, value, namespace)
             yield from self.write_dataclass(

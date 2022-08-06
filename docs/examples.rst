@@ -11,10 +11,19 @@ Code Generation
     examples/docstrings
     examples/xml-modeling
     examples/json-modeling
-    examples/pycode-serializer
     examples/dtd-modeling
     examples/compound-fields
     examples/dataclasses-features
+
+
+Data Binding
+============
+
+.. toctree::
+    :maxdepth: 1
+
+    examples/pycode-serializer
+    examples/working-with-wildcards
 
 
 Advance Topics

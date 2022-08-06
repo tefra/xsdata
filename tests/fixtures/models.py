@@ -166,7 +166,14 @@ class Paragraph:
 
     content: List[object] = field(
         default_factory=list,
-        metadata=dict(type="Wildcard", namespace="##any", mixed=True),
+        metadata=dict(
+            type="Wildcard",
+            namespace="##any",
+            mixed=True,
+            choices=(
+                dict(name="span", type=Span),
+            ),
+        )
     )
 
 

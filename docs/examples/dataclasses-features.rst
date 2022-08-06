@@ -31,9 +31,10 @@ toggle all of them through the cli flags or a :ref:`generator config <Generator 
         xml_path = fixtures_dir.joinpath("stripe/samples/balance.json")
         parser = JsonParser()
         root = parser.from_path(xml_path, Balance)
-        pprint.pprint(root.pending)
+        print(root.pending[0])
+        print(root.pending[1])
 
     .. testoutput::
 
-        (Pending(amount=835408472, currency='usd', source_types=SourceTypes(bank_account=0, card=835408472)),
-         Pending(amount=-22251, currency='eur', source_types=SourceTypes(bank_account=0, card=-22251)))
+        Pending(amount=835408472, currency='usd', source_types=SourceTypes(bank_account=0, card=835408472))
+        Pending(amount=-22251, currency='eur', source_types=SourceTypes(bank_account=0, card=-22251))

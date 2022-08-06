@@ -2,12 +2,12 @@ exclude: tests/fixtures
 
 repos:
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.37.1
+    rev: v2.37.3
     hooks:
       - id: pyupgrade
         args: [--py37-plus]
   - repo: https://github.com/asottile/reorder_python_imports
-    rev: v3.8.1
+    rev: v3.8.2
     hooks:
       - id: reorder-python-imports
   - repo: https://github.com/ambv/black
@@ -37,16 +37,16 @@ repos:
       - id: docformatter
         args: ["--in-place", "--pre-summary-newline"]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.961
+    rev: v0.971
     hooks:
       - id: mypy
         additional_dependencies: [tokenize-rt, types-requests, types-Jinja2, types-click, types-docutils]
   - repo: https://github.com/asottile/setup-cfg-fmt
-    rev: v1.20.1
+    rev: v2.0.0
     hooks:
       - id: setup-cfg-fmt
-        args: ["--max-py-version=3.11"]
+        args: ["--max-py-version=3.11", "--include-version-classifiers"]
   - repo: https://github.com/PyCQA/doc8
-    rev: 0.11.2
+    rev: v1.0.0
     hooks:
       - id: doc8

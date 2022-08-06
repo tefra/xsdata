@@ -1,4 +1,7 @@
+import math
 from typing import Any
+from xml.etree.ElementTree import QName
+from xml.sax.saxutils import quoteattr
 
 
 def update(obj: Any, **kwargs: Any):
@@ -15,3 +18,16 @@ def attrsetter(obj: Any, attr: str, value: Any):
         obj = getattr(obj, name)
 
     setattr(obj, last, value)
+
+
+def literal_value(value: Any) -> str:
+    if isinstance(value, str):
+        return quoteattr(value)
+
+    if isinstance(value, float):
+        return str(value) if math.isfinite(value) else f'float("{value}")'
+
+    if isinstance(value, QName):
+        return f'QName("{value.text}")'
+
+    return repr(value).replace("'", '"')

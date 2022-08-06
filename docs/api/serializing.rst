@@ -11,6 +11,7 @@ Serializing
 
     XmlSerializer
     JsonSerializer
+    PycodeSerializer
 
 .. currentmodule:: xsdata.formats.dataclass.serializers.config
 

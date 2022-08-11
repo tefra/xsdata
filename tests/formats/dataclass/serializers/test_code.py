@@ -27,8 +27,7 @@ class PycodeSerializerTests(TestCase):
             "            price=44.95,\n"
             "            pub_date=XmlDate(2000, 10, 1),\n"
             '            review="An amazing story of nothing.",\n'
-            '            id="bk001",\n'
-            '            lang="en"\n'
+            '            id="bk001"\n'
             "        ),\n"
             "        BookForm(\n"
             '            author="Nagata, Suanne",\n'
@@ -37,8 +36,7 @@ class PycodeSerializerTests(TestCase):
             "            price=33.95,\n"
             "            pub_date=XmlDate(2001, 1, 10),\n"
             '            review="A masterpiece of the fine art of gossiping.",\n'
-            '            id="bk002",\n'
-            '            lang="en"\n'
+            '            id="bk002"\n'
             "        ),\n"
             "    ]\n"
             ")\n"

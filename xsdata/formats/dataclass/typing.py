@@ -13,7 +13,6 @@ EMPTY_ARGS = ()
 
 
 def get_origin(tp: Any) -> Any:
-
     if tp is Dict:
         return Dict
 

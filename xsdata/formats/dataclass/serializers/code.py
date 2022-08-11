@@ -126,6 +126,9 @@ class PycodeSerializer(AbstractSerializer):
 
         next_level = level + 1
         for index, f in enumerate(self.context.class_type.get_fields(obj)):
+            if not f.init:
+                continue
+
             if index:
                 yield f",\n{spaces * next_level}{f.name}="
             else:

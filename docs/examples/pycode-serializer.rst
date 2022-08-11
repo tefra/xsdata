@@ -32,8 +32,7 @@ python representation code.
                 price=44.95,
                 pub_date=XmlDate(2000, 10, 1),
                 review="An amazing story of nothing.",
-                id="bk001",
-                lang="en"
+                id="bk001"
             ),
             BookForm(
                 author="Nagata, Suanne",
@@ -42,8 +41,7 @@ python representation code.
                 price=33.95,
                 pub_date=XmlDate(2001, 1, 10),
                 review="A masterpiece of the fine art of gossiping.",
-                id="bk002",
-                lang="en"
+                id="bk002"
             ),
         ]
     )

@@ -11,7 +11,6 @@ schema = fixtures_dir.joinpath("docstrings/schema.xsd")
 
 
 def test_generate_restructured_docstrings():
-
     package = "tests.fixtures.docstrings.rst"
     runner = CliRunner()
     runner.invoke(

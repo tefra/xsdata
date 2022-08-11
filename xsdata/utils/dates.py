@@ -93,7 +93,6 @@ def validate_date(year: int, month: int, day: int):
 
 
 def validate_time(hour: int, minute: int, second: int, franctional_second: int):
-
     if not 0 <= hour <= 24:
         raise ValueError("Hour must be in 0..24")
 

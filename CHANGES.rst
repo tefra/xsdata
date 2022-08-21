@@ -1,3 +1,11 @@
+22.8 (2022-08-21)
+-----------------
+- Added pycode serializer `#626 <https://github.com/tefra/xsdata/issues/626>`_
+- Added option to filter out unused global types `#691 <https://github.com/tefra/xsdata/issues/691>`_
+- Avoid using generics for mixed content when possible `#696 <https://github.com/tefra/xsdata/pull/696>`_
+- Removed support for python 3.6 `#671 <https://github.com/tefra/xsdata/pull/671>`_
+
+
 22.7 (2022-07-22)
 -----------------
 - Fix empty lists do not get serialized `#686 <https://github.com/tefra/xsdata/issues/686>`_

@@ -20,6 +20,8 @@ from xsdata.utils.testing import XmlVarFactory
 
 
 class NodeParserTests(TestCase):
+    maxDiff = None
+
     def setUp(self):
         self.parser = NodeParser()
 

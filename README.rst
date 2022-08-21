@@ -91,16 +91,17 @@ Features
 - Data Binding:
 
   - XML and JSON parser, serializer
+  - PyCode serializer
   - Handlers and Writers based on lxml and native xml python
   - Support wildcard elements and attributes
   - Support xinclude statements and unknown properties
   - Customize behaviour through config
 
 
-Changelog: 22.7 (2022-07-22)
-----------------------------
-- Fix empty lists do not get serialized `#686 <https://github.com/tefra/xsdata/issues/686>`_
-- Added external DTD code generator `#688 <https://github.com/tefra/xsdata/pull/688>`_
-- Added support for python 3.11
 
-In the next release we will drop python 3.6 support!!!
+Changelog: 22.8 (2022-08-21)
+----------------------------
+- Added pycode serializer `#626 <https://github.com/tefra/xsdata/issues/626>`_
+- Added option to filter out unused global types `#691 <https://github.com/tefra/xsdata/issues/691>`_
+- Avoid using generics for mixed content when possible `#696 <https://github.com/tefra/xsdata/pull/696>`_
+- Removed support for python 3.6 `#671 <https://github.com/tefra/xsdata/pull/671>`_

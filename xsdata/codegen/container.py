@@ -7,6 +7,7 @@ from typing import Optional
 from xsdata.codegen.handlers import AddAttributeSubstitutions
 from xsdata.codegen.handlers import CreateCompoundFields
 from xsdata.codegen.handlers import DesignateClassPackages
+from xsdata.codegen.handlers import FilterClasses
 from xsdata.codegen.handlers import FlattenAttributeGroups
 from xsdata.codegen.handlers import FlattenClassExtensions
 from xsdata.codegen.handlers import MergeAttributes
@@ -22,7 +23,6 @@ from xsdata.codegen.handlers import VacuumInnerClasses
 from xsdata.codegen.handlers import ValidateAttributesOverrides
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.models import Class
-from xsdata.codegen.models import get_qname
 from xsdata.codegen.models import Status
 from xsdata.codegen.utils import ClassUtils
 from xsdata.models.config import GeneratorConfig
@@ -150,25 +150,8 @@ class ClassContainer(ContainerInterface):
             designator.run()
 
     def filter_classes(self):
-        """
-        Filter classes to be generated.
-
-        1. If there are no global elements generate them all
-        2. Generate all global types and the referred types
-        """
-
-        # No global elements, generate them all!!!
-        if not any(obj.is_global_type for obj in self):
-            return
-
-        occurs = {}
-        for obj in self:
-            if obj.is_global_type:
-                occurs[obj.ref] = None
-                occurs.update({ref: None for ref in obj.references})
-
-        candidates = [obj for obj in self if obj.ref in occurs]
-        self.data = collections.group_by(candidates, key=get_qname)
+        """Filter the classes to be generated."""
+        FilterClasses(self).run()
 
     def add(self, item: Class):
         """Add class item to the container."""
@@ -177,6 +160,10 @@ class ClassContainer(ContainerInterface):
     def reset(self, item: Class, qname: str):
         self.data[qname].remove(item)
         self.add(item)
+
+    def set(self, items: List[Class]):
+        self.data.clear()
+        self.extend(items)
 
     def extend(self, items: List[Class]):
         """Add a list of classes the container."""

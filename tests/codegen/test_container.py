@@ -7,7 +7,6 @@ from xsdata.codegen.models import Status
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import Tag
 from xsdata.utils.testing import AttrFactory
-from xsdata.utils.testing import AttrTypeFactory
 from xsdata.utils.testing import ClassFactory
 from xsdata.utils.testing import FactoryTestCase
 
@@ -144,11 +143,3 @@ class ClassContainerTests(FactoryTestCase):
         expected = [complex_type, enum_1]
         container.filter_classes()
         self.assertEqual(expected, list(container))
-
-    def test_filter_classes_with_only_simple_types(self):
-        classes = [ClassFactory.enumeration(2), ClassFactory.simple_type()]
-        container = ClassContainer(config=GeneratorConfig())
-        container.extend(classes)
-        container.filter_classes()
-
-        self.assertEqual(classes, list(container))

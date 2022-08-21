@@ -1,6 +1,7 @@
 from .add_attribute_substitutions import AddAttributeSubstitutions
 from .create_compound_fields import CreateCompoundFields
 from .designate_class_packages import DesignateClassPackages
+from .filter_classes import FilterClasses
 from .flatten_attribute_groups import FlattenAttributeGroups
 from .flatten_class_extensions import FlattenClassExtensions
 from .merge_attributes import MergeAttributes
@@ -19,6 +20,7 @@ __all__ = [
     "AddAttributeSubstitutions",
     "CreateCompoundFields",
     "DesignateClassPackages",
+    "FilterClasses",
     "FlattenAttributeGroups",
     "FlattenClassExtensions",
     "MergeAttributes",

@@ -44,11 +44,15 @@ class ContainerInterface(abc.ABC):
 
     @abc.abstractmethod
     def extend(self, items: List[Class]):
-        """Add a list of classes the container."""
+        """Add a list of classes to the container."""
 
     @abc.abstractmethod
     def reset(self, item: Class, qname: str):
         """Update the given class qualified name."""
+
+    @abc.abstractmethod
+    def set(self, items: List[Class]):
+        """Set the list of classes to the container."""
 
 
 class HandlerInterface(abc.ABC):
@@ -62,7 +66,7 @@ class HandlerInterface(abc.ABC):
 
 
 class RelativeHandlerInterface(HandlerInterface, metaclass=ABCMeta):
-    """Class handler interface with access to the complete classes
+    """Class handler interface with access to the complete classes'
     container."""
 
     __slots__ = "container"

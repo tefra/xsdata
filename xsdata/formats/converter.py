@@ -474,6 +474,10 @@ class DateTimeBase(Converter, metaclass=abc.ABCMeta):
         except Exception as e:
             raise ConverterError(e)
 
+    @abc.abstractmethod
+    def deserialize(self, value: Any, **kwargs: Any) -> Any:
+        """Parse string literal value into python."""
+
 
 class TimeConverter(DateTimeBase):
     def deserialize(self, value: Any, **kwargs: Any) -> time:

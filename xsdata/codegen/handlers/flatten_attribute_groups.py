@@ -1,13 +1,12 @@
 from xsdata.codegen.mixins import RelativeHandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Class
-from xsdata.codegen.models import is_group
 from xsdata.codegen.utils import ClassUtils
 from xsdata.exceptions import AnalyzerValueError
 
 
 class FlattenAttributeGroups(RelativeHandlerInterface):
-    """Replace attribute groups with the source class attributes."""
+    """Replace groups and attGroups with the source class attributes."""
 
     __slots__ = ()
 
@@ -36,7 +35,7 @@ class FlattenAttributeGroups(RelativeHandlerInterface):
         :raises AnalyzerValueError: if source class is not found.
         """
         qname = attr.types[0].qname  # group attributes have one type only.
-        source = self.container.find(qname, condition=is_group)
+        source = self.container.find(qname, condition=lambda x: x.tag == attr.tag)
 
         if not source:
             raise AnalyzerValueError(f"Group attribute not found: `{qname}`")

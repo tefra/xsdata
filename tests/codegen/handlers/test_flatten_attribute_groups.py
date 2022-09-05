@@ -47,7 +47,7 @@ class FlattenAttributeGroupsTests(FactoryTestCase):
     @mock.patch.object(ClassUtils, "copy_group_attributes")
     def test_process_attribute_with_group(self, mock_copy_group_attributes):
         complex_bar = ClassFactory.create(qname="bar", tag=Tag.COMPLEX_TYPE)
-        group_bar = ClassFactory.create(qname="bar", tag=Tag.GROUP)
+        group_bar = ClassFactory.create(qname="bar", tag=Tag.ATTRIBUTE_GROUP)
         group_attr = AttrFactory.attribute_group(name="bar")
         target = ClassFactory.create()
         target.attrs.append(group_attr)
@@ -80,7 +80,7 @@ class FlattenAttributeGroupsTests(FactoryTestCase):
 
     def test_process_attribute_with_circular_reference(self):
         group_attr = AttrFactory.attribute_group(name="bar")
-        target = ClassFactory.create(qname="bar", tag=Tag.GROUP)
+        target = ClassFactory.create(qname="bar", tag=Tag.ATTRIBUTE_GROUP)
         target.attrs.append(group_attr)
 
         target.status = Status.FLATTENING

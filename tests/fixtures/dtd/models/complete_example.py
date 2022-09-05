@@ -50,6 +50,20 @@ class Post:
             "required": True,
         }
     )
+    origin: Optional[str] = field(
+        default=None,
+        metadata={
+            "name": "Origin",
+            "type": "Element",
+        }
+    )
+    source: Optional[str] = field(
+        default=None,
+        metadata={
+            "name": "Source",
+            "type": "Element",
+        }
+    )
     title: Optional[str] = field(
         default=None,
         metadata={

@@ -224,6 +224,8 @@ class DtdMapperTests(FactoryTestCase):
         target = ClassFactory.create()
         DtdMapper.build_content(target, content, nillable=True)
         self.assertEqual(2, len(target.attrs))
+        self.assertTrue(target.attrs[0].restrictions.nillable)
+        self.assertTrue(target.attrs[1].restrictions.nillable)
 
     def test_build_content_type_or(self):
         content = DtdContentFactory.create(
@@ -236,6 +238,20 @@ class DtdMapperTests(FactoryTestCase):
         self.assertEqual(2, len(target.attrs))
         for attr in target.attrs:
             self.assertEqual(str(id(content)), attr.restrictions.choice)
+            self.assertEqual(0, attr.restrictions.min_occurs)
+
+    def test_build_content_type_or_nested(self):
+        content = DtdContentFactory.create(
+            type=DtdContentType.OR,
+            left=DtdContentFactory.create(type=DtdContentType.ELEMENT),
+            right=DtdContentFactory.create(type=DtdContentType.ELEMENT),
+        )
+        target = ClassFactory.create()
+        DtdMapper.build_content(target, content, min_occurs=1, choice="abc")
+        self.assertEqual(2, len(target.attrs))
+        for attr in target.attrs:
+            self.assertEqual("abc", attr.restrictions.choice)
+            self.assertEqual(1, attr.restrictions.min_occurs)
 
     def test_build_content_type_pcdata(self):
         content = DtdContentFactory.create(
@@ -284,6 +300,9 @@ class DtdMapperTests(FactoryTestCase):
         self.assertEqual(1, result.min_occurs)
         self.assertEqual(sys.maxsize, result.max_occurs)
         self.assertTrue(result.nillable)
+
+        result = DtdMapper.build_restrictions(DtdContentOccur.PLUS, min_occurs=0)
+        self.assertEqual(0, result.min_occurs)
 
     def test_build_element(self):
         target = ClassFactory.create()

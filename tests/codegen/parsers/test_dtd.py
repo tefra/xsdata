@@ -29,7 +29,7 @@ class DtdParserTests(TestCase):
 
     def test_build_element(self):
         dtd = self.parse("dtd/complete_example.dtd")
-        self.assertEqual(6, len(dtd.elements))
+        self.assertEqual(8, len(dtd.elements))
 
         element = dtd.elements[1]
         self.assertEqual(4, len(element.attributes))
@@ -57,35 +57,59 @@ class DtdParserTests(TestCase):
 
         actual = asdict(post.content)
         expected = {
-            "name": None,
-            "occur": DtdContentOccur.ONCE,
-            "type": DtdContentType.SEQ,
             "left": {
-                "left": None,
-                "name": "Title",
-                "occur": DtdContentOccur.ONCE,
-                "right": None,
-                "type": DtdContentType.ELEMENT,
-            },
-            "right": {
                 "left": {
                     "left": None,
-                    "name": "Body",
+                    "name": "Origin",
                     "occur": DtdContentOccur.ONCE,
                     "right": None,
                     "type": DtdContentType.ELEMENT,
                 },
                 "name": None,
                 "occur": DtdContentOccur.ONCE,
-                "type": DtdContentType.SEQ,
                 "right": {
                     "left": None,
-                    "name": "Tags",
+                    "name": "Source",
                     "occur": DtdContentOccur.ONCE,
                     "right": None,
                     "type": DtdContentType.ELEMENT,
                 },
+                "type": DtdContentType.OR,
             },
+            "name": None,
+            "occur": DtdContentOccur.ONCE,
+            "right": {
+                "left": {
+                    "left": None,
+                    "name": "Title",
+                    "occur": DtdContentOccur.ONCE,
+                    "right": None,
+                    "type": DtdContentType.ELEMENT,
+                },
+                "name": None,
+                "occur": DtdContentOccur.ONCE,
+                "right": {
+                    "left": {
+                        "left": None,
+                        "name": "Body",
+                        "occur": DtdContentOccur.ONCE,
+                        "right": None,
+                        "type": DtdContentType.ELEMENT,
+                    },
+                    "name": None,
+                    "occur": DtdContentOccur.ONCE,
+                    "right": {
+                        "left": None,
+                        "name": "Tags",
+                        "occur": DtdContentOccur.ONCE,
+                        "right": None,
+                        "type": DtdContentType.ELEMENT,
+                    },
+                    "type": DtdContentType.SEQ,
+                },
+                "type": DtdContentType.SEQ,
+            },
+            "type": DtdContentType.SEQ,
         }
         self.assertEqual(expected, actual)
 

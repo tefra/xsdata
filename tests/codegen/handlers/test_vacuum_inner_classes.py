@@ -14,6 +14,26 @@ class VacuumInnerClassesTests(FactoryTestCase):
         super().setUp()
         self.processor = VacuumInnerClasses()
 
+    def test_remove_duplicate_inners(self):
+        target = ClassFactory.elements(3)
+
+        inner_1 = ClassFactory.elements(2)
+        inner_2 = inner_1.clone()
+
+        target.inner.extend([inner_1, inner_2])
+
+        target.attrs[1].types[0].qname = inner_1.qname
+        target.attrs[1].types[0].forward = True
+        target.attrs[1].types[0].reference = 4
+
+        target.attrs[2].types[0].qname = inner_2.qname
+        target.attrs[2].types[0].forward = True
+        target.attrs[2].types[0].circular = True
+        target.attrs[2].types[0].reference = 5
+
+        self.processor.process(target)
+        self.assertEqual(1, len(target.inner))
+
     def test_remove_inner(self):
         target = ClassFactory.elements(3)
 

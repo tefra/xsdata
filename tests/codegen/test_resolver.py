@@ -127,11 +127,16 @@ class DependenciesResolverTest(FactoryTestCase):
         self.assertIsNone(obj.inner[0].attrs[0].types[0].alias)
         self.assertEqual("IamD", obj.inner[0].attrs[1].types[0].alias)
 
-    @mock.patch.object(DependenciesResolver, "add_import")
+    @mock.patch.object(DependenciesResolver, "set_aliases")
+    @mock.patch.object(DependenciesResolver, "resolve_conflicts")
     @mock.patch.object(DependenciesResolver, "find_package")
     @mock.patch.object(DependenciesResolver, "import_classes")
     def test_resolve_imports(
-        self, mock_import_classes, mock_find_package, mock_add_import
+        self,
+        mock_import_classes,
+        mock_find_package,
+        mock_resolve_conflicts,
+        mock_set_aliases,
     ):
         class_life = ClassFactory.create(qname="life")
         import_names = [
@@ -146,33 +151,35 @@ class DependenciesResolverTest(FactoryTestCase):
         mock_find_package.side_effect = ["first", "second", "third", "forth", "fifth"]
 
         self.resolver.resolve_imports()
-        mock_add_import.assert_has_calls(
-            [
-                mock.call(qname=import_names[0], package="first", exists=False),
-                mock.call(qname=import_names[1], package="second", exists=False),
-                mock.call(qname=import_names[2], package="third", exists=True),
-                mock.call(qname=import_names[3], package="forth", exists=True),
-                mock.call(qname=import_names[4], package="fifth", exists=False),
-            ]
+        mock_resolve_conflicts.assert_called_once_with(
+            self.resolver.imports, {class_life.slug}
         )
+        mock_set_aliases.assert_called_once_with()
 
-    def test_add_import(self):
-        self.assertEqual(0, len(self.resolver.imports))
+    def test_resolve_conflicts(self):
+        imports = [
+            PackageFactory.create(qname="{a}a", source="models.aa"),
+            PackageFactory.create(qname="{b}a", source="models.ba"),
+            PackageFactory.create(qname="{c}root", source="models.common"),
+            PackageFactory.create(qname="{c}penalty", source="models.common"),
+        ]
 
-        package = "here.there"
-        foo_qname = "foo"
-        bar_qname = "bar"
+        protected = {"penalty"}
+        self.resolver.resolve_conflicts(imports, protected)
 
-        self.resolver.add_import(foo_qname, package, False)
-        self.resolver.add_import(bar_qname, package, True)
+        self.assertEqual("aa:a", imports[0].alias)
+        self.assertEqual("ba:a", imports[1].alias)
+        self.assertEqual(None, imports[2].alias)
+        self.assertEqual("common:penalty", imports[3].alias)
 
-        first = PackageFactory.create(name="foo", source=package, alias=None)
-        second = PackageFactory.create(name="bar", source=package, alias="there:bar")
-
-        self.assertEqual(2, len(self.resolver.imports))
-        self.assertEqual(first, self.resolver.imports[0])
-        self.assertEqual(second, self.resolver.imports[1])
-        self.assertEqual({bar_qname: "there:bar"}, self.resolver.aliases)
+    def test_set_aliases(self):
+        self.resolver.imports = [
+            PackageFactory.create(qname="{a}a", alias="aa"),
+            PackageFactory.create(qname="{b}a", alias="ba"),
+            PackageFactory.create(qname="{c}a"),
+        ]
+        self.resolver.set_aliases()
+        self.assertEqual({"{a}a": "aa", "{b}a": "ba"}, self.resolver.aliases)
 
     def test_find_package(self):
         class_a = ClassFactory.create()

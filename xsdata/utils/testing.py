@@ -347,12 +347,12 @@ class PackageFactory(Factory):
     @classmethod
     def create(
         cls,
-        name: str = "package",
-        source: str = "target",
+        qname: str = "{xsdata}Root",
+        source: str = "generated.models",
         alias: Optional[str] = None,
         **kwargs: Any,
     ) -> Import:
-        return Import(name=name, source=source, alias=alias)
+        return Import(qname=qname, source=source, alias=alias)
 
 
 class XmlVarFactory(Factory):

@@ -4,6 +4,7 @@ from xsdata.codegen.mixins import HandlerInterface
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.models.enums import DataType
+from xsdata.utils import collections
 from xsdata.utils.namespaces import build_qname
 
 
@@ -15,16 +16,18 @@ class VacuumInnerClasses(HandlerInterface):
     rename inner classes that have the same name as the outer/parent class.
 
     Cases:
-        1. Removing identical overriding fields can some times leave a class
+        1. Filter duplicate inner classes
+        2. Removing identical overriding fields can some times leave a class
            bare with just an extension. For inner classes we can safely
            replace the forward reference with the inner extension reference.
-        2. Empty nested complexContent with no restrictions or extensions,
+        3. Empty nested complexContent with no restrictions or extensions,
            we can replace these references with xs:anySimpleType
     """
 
     __slots__ = ()
 
     def process(self, target: Class):
+        target.inner = collections.unique_sequence(target.inner, key="qname")
         for inner in list(target.inner):
             if not inner.attrs and len(inner.extensions) < 2:
                 self.remove_inner(target, inner)

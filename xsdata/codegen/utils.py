@@ -11,6 +11,7 @@ from xsdata.codegen.models import Extension
 from xsdata.codegen.models import get_qname
 from xsdata.codegen.models import get_slug
 from xsdata.codegen.models import Restrictions
+from xsdata.codegen.models import Status
 from xsdata.exceptions import CodeGenerationError
 from xsdata.models.enums import DataType
 from xsdata.utils import collections
@@ -140,15 +141,15 @@ class ClassUtils:
         if not attr_type.forward:
             return
 
-        # This will fail if no inner class is found, too strict???
         inner = ClassUtils.find_inner(source, attr_type.qname)
-
         if inner is target:
             attr_type.circular = True
         else:
+            # In extreme cases this adds duplicate inner classes
             clone = inner.clone()
             clone.package = target.package
             clone.module = target.module
+            clone.status = Status.RAW
             target.inner.append(clone)
 
     @classmethod

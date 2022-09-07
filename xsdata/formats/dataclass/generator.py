@@ -1,4 +1,3 @@
-import re
 from pathlib import Path
 from typing import Iterator
 from typing import List
@@ -14,7 +13,6 @@ from xsdata.formats.dataclass.filters import Filters
 from xsdata.formats.mixins import AbstractGenerator
 from xsdata.formats.mixins import GeneratorResult
 from xsdata.models.config import GeneratorConfig
-from xsdata.utils.collections import group_by
 
 
 class DataclassGenerator(AbstractGenerator):
@@ -35,7 +33,7 @@ class DataclassGenerator(AbstractGenerator):
 
     def render(self, classes: List[Class]) -> Iterator[GeneratorResult]:
         """
-        Return a iterator of the generated results.
+        Return an iterator of the generated results.
 
         Group classes into modules and yield an output per module and
         per path __init__.py file.
@@ -64,23 +62,11 @@ class DataclassGenerator(AbstractGenerator):
     def render_package(self, classes: List[Class], module: str) -> str:
         """Render the source code for the __init__.py with all the imports of
         the generated class names."""
-
         imports = [
-            Import(name=obj.name, source=obj.target_module)
+            Import(qname=obj.qname, source=obj.target_module)
             for obj in sorted(classes, key=lambda x: x.name)
         ]
-
-        for group in group_by(imports, key=lambda x: x.name).values():
-            if len(group) == 1:
-                continue
-
-            for index, cur in enumerate(group):
-                cmp = group[index + 1] if index == 0 else group[index - 1]
-                parts = re.split("[_.]", cur.source)
-                diff = set(parts) - set(re.split("[_.]", cmp.source))
-
-                add = "_".join(part for part in parts if part in diff)
-                cur.alias = f"{add}:{cur.name}"
+        DependenciesResolver.resolve_conflicts(imports, set())
 
         output = self.env.get_template("package.jinja2").render(
             imports=imports,

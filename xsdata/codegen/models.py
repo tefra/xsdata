@@ -462,6 +462,10 @@ class Class:
         return namespaces.local_name(self.qname)
 
     @property
+    def slug(self) -> str:
+        return text.alnum(self.name)
+
+    @property
     def ref(self) -> int:
         return id(self)
 
@@ -607,14 +611,23 @@ class Import:
     """
     Model representation of a python import statement.
 
-    :param name:
+    :param qname:
     :param source:
     :param alias:
     """
 
-    name: str
+    qname: str
     source: str
     alias: Optional[str] = field(default=None)
+
+    @property
+    def name(self) -> str:
+        """Shortcut for qname local name."""
+        return namespaces.local_name(self.qname)
+
+    @property
+    def slug(self) -> str:
+        return text.alnum(self.name)
 
 
 # Getters used all over the codegen process

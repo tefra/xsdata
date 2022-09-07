@@ -1,15 +1,15 @@
 import logging
+import re
 from typing import Dict
 from typing import List
 
 from toposort import toposort_flatten
 
 from xsdata.codegen.models import Class
+from xsdata.codegen.models import get_slug
 from xsdata.codegen.models import Import
 from xsdata.exceptions import ResolverValueError
 from xsdata.utils import collections
-from xsdata.utils.namespaces import local_name
-from xsdata.utils.text import alnum
 
 logger = logging.getLogger(__name__)
 
@@ -75,25 +75,34 @@ class DependenciesResolver:
     def resolve_imports(self):
         """Walk the import qualified names, check for naming collisions and add
         the necessary code generator import instance."""
-        existing = {alnum(local_name(qname)) for qname in self.class_map.keys()}
-        for qname in self.import_classes():
-            package = self.find_package(qname)
-            name = alnum(local_name(qname))
-            exists = name in existing
-            existing.add(name)
-            self.add_import(qname=qname, package=package, exists=exists)
+        self.imports = [
+            Import(qname=qname, source=self.find_package(qname))
+            for qname in self.import_classes()
+        ]
+        protected = {obj.slug for obj in self.class_map.values()}
+        self.resolve_conflicts(self.imports, protected)
+        self.set_aliases()
 
-    def add_import(self, qname: str, package: str, exists: bool = False):
-        """Append an import package to the list of imports with any if
-        necessary aliases if the import name exists in the local module."""
-        alias = None
-        name = local_name(qname)
-        if exists:
-            module = package.split(".")[-1]
-            alias = f"{module}:{name}"
-            self.aliases[qname] = alias
+    def set_aliases(self):
+        self.aliases = {imp.qname: imp.alias for imp in self.imports if imp.alias}
 
-        self.imports.append(Import(name=name, source=package, alias=alias))
+    @classmethod
+    def resolve_conflicts(cls, imports: List[Import], protected: set):
+        for slug, group in collections.group_by(imports, key=get_slug).items():
+            if len(group) == 1:
+                if slug in protected:
+                    imp = group[0]
+                    module = imp.source.split(".")[-1]
+                    imp.alias = f"{module}:{imp.name}"
+                continue
+
+            for index, cur in enumerate(group):
+                cmp = group[index + 1] if index == 0 else group[index - 1]
+                parts = re.split("[_.]", cur.source)
+                diff = set(parts) - set(re.split("[_.]", cmp.source))
+
+                add = "_".join(part for part in parts if part in diff)
+                cur.alias = f"{add}:{cur.name}"
 
     def find_package(self, qname: str) -> str:
         """

@@ -380,9 +380,7 @@ class SchemaTransformerTests(FactoryTestCase):
 
         result = self.transformer.load_resource(path)
         self.assertIsNone(result)
-        mock_debug.assert_called_once_with(
-            "Skipping already processed: %s", "test_transformer.py"
-        )
+        mock_debug.assert_called_once_with("Skipping already processed: %s", path)
 
     def test_classify_resource(self):
         self.assertEqual(0, self.transformer.classify_resource("file://notexists"))

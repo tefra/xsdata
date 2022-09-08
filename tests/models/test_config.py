@@ -50,6 +50,7 @@ class GeneratorConfigTests(TestCase):
             '    <Substitution type="package" search="http://www.w3.org/2001/XMLSchema" replace="xs"/>\n'
             '    <Substitution type="package" search="http://www.w3.org/XML/1998/namespace" replace="xml"/>\n'
             '    <Substitution type="package" search="http://www.w3.org/2001/XMLSchema-instance" replace="xsi"/>\n'
+            '    <Substitution type="package" search="http://www.w3.org/1998/Math/MathML" replace="mathml3"/>\n'
             '    <Substitution type="package" search="http://www.w3.org/1999/xlink" replace="xlink"/>\n'
             '    <Substitution type="package" search="http://www.w3.org/1999/xhtml" replace="xhtml"/>\n'
             '    <Substitution type="package" search="http://schemas.xmlsoap.org/wsdl/soap/" replace="soap"/>\n'

@@ -129,7 +129,8 @@ def generate(**kwargs: Any):
     config.output.update(**params)
 
     transformer = SchemaTransformer(config=config, print=stdout)
-    transformer.process(list(resolve_source(source, recursive=recursive)))
+    uris = sorted(resolve_source(source, recursive=recursive))
+    transformer.process(uris)
 
     handler.emit_warnings()
 

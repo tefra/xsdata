@@ -422,6 +422,7 @@ class XmlVarFactory(Factory):
             namespaces=namespaces,
             elements=elements,
             wildcards=wildcards,
+            wrapper=None
         )
 
 
@@ -476,6 +477,7 @@ class XmlMetaFactory(Factory):
             wildcards=wildcards,
             attributes=attributes,
             any_attributes=any_attributes,
+            wrappers={}
         )
 
 

@@ -169,6 +169,7 @@ class XmlMetaTests(TestCase):
             "wildcards=[], "
             "attributes={}, "
             "any_attributes=[], "
+            "wrappers={}, "
             "namespace=None, "
             "mixed_content=False)"
         )

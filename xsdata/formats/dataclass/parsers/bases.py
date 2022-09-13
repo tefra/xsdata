@@ -82,9 +82,14 @@ class NodeParser(PushParser):
         :param attrs: Attribute key-value map
         :param ns_map: Namespace prefix-URI map
         """
+        from xsdata.formats.dataclass.parsers.nodes import ElementNode, WrapperNode
+
         try:
             item = queue[-1]
-            child = item.child(qname, attrs, ns_map, len(objects))
+            if isinstance(item, ElementNode) and qname in item.meta.wrappers:
+                child = WrapperNode(parent=item)
+            else:
+                child = item.child(qname, attrs, ns_map, len(objects))
         except IndexError:
             xsi_type = ParserUtils.xsi_type(attrs, ns_map)
 
@@ -107,8 +112,6 @@ class NodeParser(PushParser):
                 derived_factory = self.context.class_type.derived_element
 
             xsi_nil = ParserUtils.xsi_nil(attrs)
-
-            from xsdata.formats.dataclass.parsers.nodes import ElementNode
 
             child = ElementNode(
                 position=0,

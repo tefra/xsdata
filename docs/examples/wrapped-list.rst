@@ -2,10 +2,12 @@
 Wrapped List
 ============
 
-XML data structures commonly wrap element and primitive collections. For instance, a library may have several books
-and and other stuff as well. In terms of `OpenAPI 3 <https://swagger.io/specification/#xml-object>`_, these data
-structures are `wrapped`. Hence, xsdata has the field parameter `wrapper`, which wraps any element/primitive
-collection into a custom xml element without the need of a dedicated wrapper class.
+XML data structures commonly wrap element and primitive collections.
+For instance, a library may have several books and and other stuff as well.
+In terms of `OpenAPI 3 <https://swagger.io/specification/#xml-object>`_,
+these data structures are `wrapped`. Hence, xsdata has the field parameter `wrapper`,
+which wraps any element/primitive collection into a custom xml element without the
+need of a dedicated wrapper class.
 
 .. doctest::
 

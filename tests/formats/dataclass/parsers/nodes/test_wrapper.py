@@ -1,4 +1,5 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from dataclasses import field
 from typing import List
 from unittest import TestCase
 
@@ -17,9 +18,10 @@ class WrapperTests(TestCase):
                     "wrapper": "Items",
                     "type": "Element",
                     "name": "item",
-                    "namespace": "ns"
+                    "namespace": "ns",
                 }
             )
+
         xml = '<NamespaceWrapper xmlns:foo="ns"><foo:Items><foo:item>a</foo:item><foo:item>b</foo:item></foo:Items></NamespaceWrapper>'
         obj = self.parser.from_string(xml, clazz=NamespaceWrapper)
         self.assertIsInstance(obj, NamespaceWrapper)
@@ -35,9 +37,10 @@ class WrapperTests(TestCase):
                 metadata={
                     "wrapper": "PrimitiveList",
                     "type": "Element",
-                    "name": "Value"
+                    "name": "Value",
                 }
             )
+
         xml = r"<PrimitiveWrapper><PrimitiveList><Value>Value 1</Value><Value>Value 2</Value></PrimitiveList></PrimitiveWrapper>"
         obj = self.parser.from_string(xml, clazz=PrimitiveWrapper)
         self.assertTrue(hasattr(obj, "primitive_list"))
@@ -49,21 +52,14 @@ class WrapperTests(TestCase):
     def test_element(self):
         @dataclass
         class ElementObject:
-            content: str = field(
-                metadata={
-                    "type": "Element"
-                }
-            )
+            content: str = field(metadata={"type": "Element"})
 
         @dataclass
         class ElementWrapper:
             elements: List[ElementObject] = field(
-                metadata={
-                    "wrapper": "Elements",
-                    "type": "Element",
-                    "name": "Object"
-                }
+                metadata={"wrapper": "Elements", "type": "Element", "name": "Object"}
             )
+
         xml = "<ElementWrapper><Elements><Object><content>Hello</content></Object><Object><content>World</content></Object></Elements></ElementWrapper>"
         obj = self.parser.from_string(xml, clazz=ElementWrapper)
         self.assertTrue(hasattr(obj, "elements"))

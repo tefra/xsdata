@@ -3,6 +3,7 @@ import warnings
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
+from typing import cast
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -87,7 +88,7 @@ class NodeParser(PushParser):
         try:
             item = queue[-1]
             if isinstance(item, ElementNode) and qname in item.meta.wrappers:
-                child = WrapperNode(parent=item)
+                child = cast(XmlNode, WrapperNode(parent=item))
             else:
                 child = item.child(qname, attrs, ns_map, len(objects))
         except IndexError:

@@ -283,11 +283,12 @@ class XmlVarBuilder:
             )
 
         if wrapper is not None:
-            if not isinstance(origin, type) or not issubclass(origin, (list, set, tuple)):
+            if not isinstance(origin, type) or not issubclass(
+                origin, (list, set, tuple)
+            ):
                 raise XmlContextError(
                     f"a wrapper requires a collection type on attribute {name}"
                 )
-
 
         local_name = self.build_local_name(xml_type, local_name, name)
 
@@ -337,7 +338,7 @@ class XmlVarBuilder:
             namespaces=namespaces,
             xml_type=xml_type,
             derived=False,
-            wrapper=wrapper
+            wrapper=wrapper,
         )
 
     def build_choices(

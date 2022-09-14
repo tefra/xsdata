@@ -11,10 +11,13 @@ class WrapperNode(XmlNode):
 
     :param parent: The parent node
     """
+
     def __init__(self, parent: XmlNode):
         self.parent = parent
 
-    def bind(self, qname: str, text: Optional[str], tail: Optional[str], objects: List) -> bool:
+    def bind(
+        self, qname: str, text: Optional[str], tail: Optional[str], objects: List
+    ) -> bool:
         return False
 
     def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:

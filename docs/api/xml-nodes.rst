@@ -17,3 +17,4 @@ for models and their fields.
     UnionNode
     PrimitiveNode
     StandardNode
+    WrapperNode

@@ -9,7 +9,8 @@ collection into a custom xml element without the need of a dedicated wrapper cla
 
 .. doctest::
 
-    >>> from dataclasses import dataclass
+    >>> from dataclasses import dataclass, field
+    >>> from typing import List
     >>> from xsdata.formats.dataclass.serializers import XmlSerializer
     >>> from xsdata.formats.dataclass.serializers.config import SerializerConfig
     >>>
@@ -17,7 +18,7 @@ collection into a custom xml element without the need of a dedicated wrapper cla
     >>> serializer = XmlSerializer(config=config)
     >>>
     >>> @dataclass
-    >>> class Library:
+    ... class Library:
     ...     books: List[str] = field(
     ...         metadata={
     ...             "wrapper": "Books",
@@ -32,7 +33,7 @@ collection into a custom xml element without the need of a dedicated wrapper cla
     ...         "beautiful xml",
     ...     ]
     ... )
-    ...
+    >>>
     >>> print(serializer.render(obj))
     <Library>
       <Books>
@@ -40,3 +41,4 @@ collection into a custom xml element without the need of a dedicated wrapper cla
         <Title>beautiful xml</Title>
       </Books>
     </Library>
+    <BLANKLINE>

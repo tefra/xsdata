@@ -86,6 +86,10 @@ class RelativeHandlerInterface(HandlerInterface, metaclass=ABCMeta):
 
         return attrs
 
+    @abc.abstractmethod
+    def process(self, target: Class):
+        """Process class."""
+
 
 class ContainerHandlerInterface(abc.ABC):
     """Class container."""

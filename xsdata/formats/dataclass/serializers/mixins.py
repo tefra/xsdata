@@ -1,4 +1,3 @@
-import abc
 from typing import Any
 from typing import Dict
 from typing import Generator
@@ -30,7 +29,7 @@ class XmlWriterEvent:
     END = "end"
 
 
-class XmlWriter(abc.ABC):
+class XmlWriter:
     """
     A consistency wrapper for sax content handlers.
 

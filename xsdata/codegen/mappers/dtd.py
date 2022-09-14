@@ -1,5 +1,6 @@
 import sys
 from typing import Any
+from typing import Dict
 from typing import Iterator
 from typing import List
 from typing import Optional
@@ -115,9 +116,11 @@ class DtdMapper:
             restrictions = cls.build_restrictions(content.occur, **kwargs)
             cls.build_element(target, content.name, restrictions)
         elif content_type == DtdContentType.SEQ:
-            cls.build_content_tree(target, content)
+            cls.build_content_tree(target, content, **kwargs)
         elif content_type == DtdContentType.OR:
-            cls.build_content_tree(target, content, choice=str(id(content)))
+            params = {"min_occurs": 0, "choice": str(id(content))}
+            params.update(kwargs)
+            cls.build_content_tree(target, content, **params)
 
     @classmethod
     def build_content_tree(cls, target: Class, content: DtdContent, **kwargs: Any):
@@ -129,21 +132,26 @@ class DtdMapper:
 
     @classmethod
     def build_restrictions(cls, occur: DtdContentOccur, **kwargs: Any) -> Restrictions:
-        restrictions = Restrictions(**kwargs)
         if occur == DtdContentOccur.ONCE:
-            restrictions.min_occurs = 1
-            restrictions.max_occurs = 1
+            min_occurs = 1
+            max_occurs = 1
         elif occur == DtdContentOccur.OPT:
-            restrictions.min_occurs = 0
-            restrictions.max_occurs = 1
+            min_occurs = 0
+            max_occurs = 1
         elif occur == DtdContentOccur.MULT:
-            restrictions.min_occurs = 0
-            restrictions.max_occurs = sys.maxsize
+            min_occurs = 0
+            max_occurs = sys.maxsize
         else:  # occur == DtdContentOccur.PLUS:
-            restrictions.min_occurs = 1
-            restrictions.max_occurs = sys.maxsize
+            min_occurs = 1
+            max_occurs = sys.maxsize
 
-        return restrictions
+        params: Dict[str, Any] = {
+            "min_occurs": min_occurs,
+            "max_occurs": max_occurs,
+        }
+        params.update(kwargs)
+
+        return Restrictions(**params)
 
     @classmethod
     def build_element(cls, target: Class, name: str, restrictions: Restrictions):

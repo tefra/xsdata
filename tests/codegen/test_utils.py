@@ -3,6 +3,7 @@ from typing import Generator
 from unittest import mock
 
 from xsdata.codegen.models import Restrictions
+from xsdata.codegen.models import Status
 from xsdata.codegen.utils import ClassUtils
 from xsdata.exceptions import CodeGenerationError
 from xsdata.models.enums import DataType
@@ -179,7 +180,9 @@ class ClassUtilsTests(FactoryTestCase):
 
     def test_copy_inner_class(self):
         source = ClassFactory.create()
-        inner = ClassFactory.create(qname="a", module="b", package="c")
+        inner = ClassFactory.create(
+            qname="a", module="b", package="c", status=Status.FLATTENED
+        )
         target = ClassFactory.create()
         attr = AttrFactory.create()
         attr_type = AttrTypeFactory.create(forward=True, qname=inner.qname)
@@ -192,16 +195,8 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual(target.package, target.inner[0].package)
         self.assertEqual(target.module, target.inner[0].module)
         self.assertEqual(inner.qname, target.inner[0].qname)
-
-    def test_copy_inner_class_skip_non_forward_reference(self):
-        source = ClassFactory.create()
-        target = ClassFactory.create()
-        attr = AttrFactory.create()
-        attr_type = AttrTypeFactory.create()
-        ClassUtils.copy_inner_class(source, target, attr, attr_type)
-
-        self.assertFalse(attr_type.circular)
-        self.assertEqual(0, len(target.inner))
+        self.assertIs(Status.RAW, target.inner[0].status)
+        self.assertIs(Status.FLATTENED, inner.status)
 
     def test_copy_inner_class_check_circular_reference(self):
         source = ClassFactory.create()

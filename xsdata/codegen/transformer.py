@@ -160,7 +160,7 @@ class SchemaTransformer:
         for uri in uris:
             input_stream = self.load_resource(uri)
             if input_stream:
-                logger.info("Parsing document %s", os.path.basename(uri))
+                logger.info("Parsing document %s", uri)
                 any_element: AnyElement = parser.from_bytes(input_stream)
                 classes.extend(ElementMapper.map(any_element, location))
 
@@ -177,7 +177,7 @@ class SchemaTransformer:
             input_stream = self.load_resource(uri)
             if input_stream:
                 data = json.load(io.BytesIO(input_stream))
-                logger.info("Parsing document %s", os.path.basename(uri))
+                logger.info("Parsing document %s", uri)
                 if isinstance(data, dict):
                     data = [data]
 
@@ -223,9 +223,9 @@ class SchemaTransformer:
         self.classes.extend(DefinitionsMapper.map(definitions))
 
     def generate_classes(self, schema: Schema) -> List[Class]:
-        """Convert and return the given schema tree to classes."""
+        """Convert the given schema tree to a list of classes."""
         uri = schema.location
-        logger.info("Compiling schema %s", "..." if not uri else os.path.basename(uri))
+        logger.info("Compiling schema %s", "..." if not uri else uri)
         classes = SchemaMapper.map(schema)
 
         class_num, inner_num = self.count_classes(classes)
@@ -241,15 +241,15 @@ class SchemaTransformer:
         if input_stream is None:
             return None
 
-        logger.info("Parsing schema %s", os.path.basename(uri))
+        logger.info("Parsing schema %s", uri)
         parser = SchemaParser(target_namespace=namespace, location=uri)
         return parser.from_bytes(input_stream, Schema)
 
     def parse_definitions(
         self, uri: str, namespace: Optional[str]
     ) -> Optional[Definitions]:
-        """Parse recursively the given wsdl uri and return the definitions tree
-        object."""
+        """Parse recursively the given wsdl uri and return the definitions'
+        tree object."""
 
         input_stream = self.load_resource(uri)
         if input_stream is None:
@@ -281,7 +281,7 @@ class SchemaTransformer:
             except OSError:
                 logger.warning("Resource not found %s", uri)
         else:
-            logger.debug("Skipping already processed: %s", os.path.basename(uri))
+            logger.debug("Skipping already processed: %s", uri)
 
         return None
 

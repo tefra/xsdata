@@ -27,6 +27,7 @@ class Namespace(Enum):
     XS = ("http://www.w3.org/2001/XMLSchema", "xs")
     XML = ("http://www.w3.org/XML/1998/namespace", "xml")
     XSI = ("http://www.w3.org/2001/XMLSchema-instance", "xsi")
+    MATHML = ("http://www.w3.org/1998/Math/MathML", "mathml3")
     XLINK = ("http://www.w3.org/1999/xlink", "xlink")
     XHTML = ("http://www.w3.org/1999/xhtml", "xhtml")
     SOAP11 = ("http://schemas.xmlsoap.org/wsdl/soap/", "soap")

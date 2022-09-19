@@ -133,13 +133,21 @@ class XmlContext:
         :param field_names: A unique list of field names
         """
 
-        self.build_xsi_cache()
-        for types in self.xsi_cache.values():
-            for clazz in types:
-                if self.local_names_match(field_names, clazz):
-                    return clazz
+        def get_field_diff(clazz: Type) -> int:
+            meta = self.cache[clazz]
+            local_names = {var.local_name for var in meta.get_all_vars()}
+            return len(local_names - field_names)
 
-        return None
+        self.build_xsi_cache()
+        choices = [
+            [clazz, get_field_diff(clazz)]
+            for types in self.xsi_cache.values()
+            for clazz in types
+            if self.local_names_match(field_names, clazz)
+        ]
+
+        choices.sort(key=lambda x: (x[1], x[0].__name__))
+        return choices[0][0] if len(choices) > 0 else None
 
     def find_subclass(self, clazz: Type, qname: str) -> Optional[Type]:
         """

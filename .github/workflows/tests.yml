@@ -38,6 +38,11 @@ jobs:
       - name: Test
         run: |
           tox -e py -- --cov=./xsdata --cov-branch --doctest-glob="docs/*.rst"
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
   w3c-tests:
     name: W3C ${{ matrix.mode }} tests
     runs-on: ubuntu-latest

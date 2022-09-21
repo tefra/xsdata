@@ -140,7 +140,7 @@ class XmlContext:
 
         self.build_xsi_cache()
         choices = [
-            [clazz, get_field_diff(clazz)]
+            (clazz, get_field_diff(clazz))
             for types in self.xsi_cache.values()
             for clazz in types
             if self.local_names_match(field_names, clazz)

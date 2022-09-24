@@ -99,9 +99,11 @@ Features
 
 
 
-Changelog: 22.8 (2022-08-21)
+Changelog: 22.9 (2022-08-24)
 ----------------------------
-- Added pycode serializer `#626 <https://github.com/tefra/xsdata/issues/626>`_
-- Added option to filter out unused global types `#691 <https://github.com/tefra/xsdata/issues/691>`_
-- Avoid using generics for mixed content when possible `#696 <https://github.com/tefra/xsdata/pull/696>`_
-- Removed support for python 3.6 `#671 <https://github.com/tefra/xsdata/pull/671>`_
+- Fixed code generation inconsistencies in different operating systems.
+- Fixed circular imports error `#706 <https://github.com/tefra/xsdata/pull/706>`_
+- Fixed naming conflicts in imports `#706 <https://github.com/tefra/xsdata/pull/706>`_
+- Fixed issue with wrong occurrences in DTD code generation  `#705 <https://github.com/tefra/xsdata/pull/705>`_
+- Fixed xs:group and xs:attrGroup name conflicts `#702 <https://github.com/tefra/xsdata/pull/702>`_
+- Added mathml3 in standard schemas

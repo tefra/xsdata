@@ -3,6 +3,7 @@ from typing import List
 from typing import Optional
 
 from xsdata.formats.dataclass.parsers.mixins import XmlNode
+from xsdata.formats.dataclass.parsers.nodes.element import ElementNode
 
 
 class WrapperNode(XmlNode):
@@ -12,8 +13,9 @@ class WrapperNode(XmlNode):
     :param parent: The parent node
     """
 
-    def __init__(self, parent: XmlNode):
+    def __init__(self, parent: ElementNode):
         self.parent = parent
+        self.ns_map = parent.ns_map
 
     def bind(
         self, qname: str, text: Optional[str], tail: Optional[str], objects: List

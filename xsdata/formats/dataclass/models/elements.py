@@ -417,10 +417,6 @@ class XmlMeta(MetaMixin):
         return None
 
     def find_children(self, qname: str) -> Iterator[XmlVar]:
-        elements = self.wrappers.get(qname)
-        if elements:
-            yield from elements
-
         elements = self.elements.get(qname)
         if elements:
             yield from elements

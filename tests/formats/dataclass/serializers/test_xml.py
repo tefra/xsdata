@@ -1,5 +1,9 @@
+import re
+from dataclasses import dataclass
+from dataclasses import field
 from dataclasses import make_dataclass
 from typing import Generator
+from typing import List
 from unittest import TestCase
 from xml.etree.ElementTree import QName
 
@@ -24,6 +28,58 @@ from xsdata.utils.testing import XmlVarFactory
 class XmlSerializerTests(TestCase):
     def setUp(self) -> None:
         self.serializer = XmlSerializer()
+
+    def test_wrapper_primitive(self):
+        @dataclass
+        class PrimitiveWrapper:
+            primitive_list: List[str] = field(
+                metadata={
+                    "wrapper": "PrimitiveList",
+                    "type": "Element",
+                    "name": "Value",
+                }
+            )
+
+        obj = PrimitiveWrapper(primitive_list=["Value 1", "Value 2"])
+        xml = self.serializer.render(obj)
+        expected = r"<PrimitiveWrapper><PrimitiveList><Value>Value 1</Value><Value>Value 2</Value></PrimitiveList></PrimitiveWrapper>"
+        self.assertIsNotNone(re.search(expected, xml))
+
+    def test_wrapper_element(self):
+        @dataclass
+        class ElementObject:
+            content: str = field(metadata={"type": "Element"})
+
+        @dataclass
+        class ElementWrapper:
+            elements: List[ElementObject] = field(
+                metadata={"wrapper": "Elements", "type": "Element", "name": "Object"}
+            )
+
+        obj = ElementWrapper(
+            elements=[ElementObject(content="Hello"), ElementObject(content="World")]
+        )
+        xml = self.serializer.render(obj)
+        expected = "<ElementWrapper><Elements><Object><content>Hello</content></Object><Object><content>World</content></Object></Elements></ElementWrapper>"
+        self.assertIsNotNone(re.search(expected, xml))
+
+    def test_wrapper_namespace(self):
+        @dataclass
+        class NamespaceWrapper:
+            items: List[str] = field(
+                metadata={
+                    "wrapper": "Items",
+                    "type": "Element",
+                    "name": "item",
+                    "namespace": "ns",
+                }
+            )
+
+        ns_map = {"foo": "ns"}
+        obj = NamespaceWrapper(items=["a", "b"])
+        xml = self.serializer.render(obj, ns_map=ns_map)
+        expected = '<NamespaceWrapper xmlns:foo="ns"><foo:Items><foo:item>a</foo:item><foo:item>b</foo:item></foo:Items></NamespaceWrapper>'
+        self.assertIsNotNone(re.search(expected, xml))
 
     def test_write_object_with_derived_element(self):
         book = BookForm(id="123")

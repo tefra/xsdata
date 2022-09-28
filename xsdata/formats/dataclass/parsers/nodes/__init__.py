@@ -4,6 +4,7 @@ from xsdata.formats.dataclass.parsers.nodes.skip import SkipNode
 from xsdata.formats.dataclass.parsers.nodes.standard import StandardNode
 from xsdata.formats.dataclass.parsers.nodes.union import UnionNode
 from xsdata.formats.dataclass.parsers.nodes.wildcard import WildcardNode
+from xsdata.formats.dataclass.parsers.nodes.wrapper import WrapperNode
 
 __all__ = [
     "ElementNode",
@@ -12,4 +13,5 @@ __all__ = [
     "StandardNode",
     "UnionNode",
     "WildcardNode",
+    "WrapperNode",
 ]

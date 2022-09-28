@@ -8,6 +8,7 @@ from typing import Dict
 from typing import get_type_hints
 from typing import Iterator
 from typing import List
+from typing import Tuple
 from typing import Union
 from unittest import mock
 from unittest import TestCase
@@ -27,6 +28,7 @@ from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.compat import class_types
 from xsdata.formats.dataclass.models.builders import XmlMetaBuilder
 from xsdata.formats.dataclass.models.builders import XmlVarBuilder
+from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.models.datatype import XmlDate
 from xsdata.utils import text
@@ -102,6 +104,43 @@ class XmlMetaBuilderTests(FactoryTestCase):
 
         result = self.builder.build(Thug, None)
         self.assertEqual("thug", result.qname)
+
+    def test_wrapper(self):
+        @dataclass
+        class PrimitiveType:
+            attr: str = field(metadata={"wrapper": "Items"})
+
+        @dataclass
+        class UnionType:
+            attr: Union[str, int] = field(metadata={"wrapper": "Items"})
+
+        @dataclass
+        class UnionCollection:
+            union_collection: List[Union[str, int]] = field(
+                metadata={"wrapper": "Items"}
+            )
+
+        @dataclass
+        class ListType:
+            attr: List[str] = field(metadata={"wrapper": "Items"})
+
+        @dataclass
+        class TupleType:
+            attr: Tuple[str, ...] = field(metadata={"wrapper": "Items"})
+
+        # @dataclass
+        # class SetType:
+        #     attr: Set[str] = field(metadata={"wrapper": "Items"})
+
+        with self.assertRaises(XmlContextError):
+            self.builder.build(PrimitiveType, None)
+        with self.assertRaises(XmlContextError):
+            self.builder.build(UnionType, None)
+
+        self.assertIsInstance(self.builder.build(ListType, None), XmlMeta)
+        self.assertIsInstance(self.builder.build(TupleType, None), XmlMeta)
+        # not supported by analyze_types
+        # self.assertIsInstance(self.builder.build(SetType, None), XmlMeta)
 
     def test_build_with_no_dataclass_raises_exception(self, *args):
         with self.assertRaises(XmlContextError) as cm:

@@ -74,6 +74,7 @@ class XmlVar(MetaMixin):
     :param namespaces: List of the supported namespaces
     :param elements: Mapping of qname-repeatable elements
     :param wildcards: List of repeatable wildcards
+    :param wrapper: A name for the wrapper. Applies for list types only.
     """
 
     __slots__ = (
@@ -96,6 +97,7 @@ class XmlVar(MetaMixin):
         "namespaces",
         "elements",
         "wildcards",
+        "wrapper",
         # Calculated
         "tokens",
         "list_element",
@@ -132,6 +134,7 @@ class XmlVar(MetaMixin):
         namespaces: Sequence[str],
         elements: Mapping[str, "XmlVar"],
         wildcards: Sequence["XmlVar"],
+        wrapper: Optional[str] = None,
         **kwargs: Any,
     ):
         self.index = index
@@ -153,6 +156,7 @@ class XmlVar(MetaMixin):
         self.namespaces = namespaces
         self.elements = elements
         self.wildcards = wildcards
+        self.wrapper = wrapper
 
         self.factory = factory
         self.tokens_factory = tokens_factory
@@ -316,6 +320,7 @@ class XmlMeta(MetaMixin):
         "wildcards",
         "attributes",
         "any_attributes",
+        "wrappers",
         # Calculated
         "namespace",
         "mixed_content",
@@ -333,6 +338,7 @@ class XmlMeta(MetaMixin):
         wildcards: Sequence[XmlVar],
         attributes: Mapping[str, XmlVar],
         any_attributes: Sequence[XmlVar],
+        wrappers: Mapping[str, Sequence[XmlVar]],
         **kwargs: Any,
     ):
         self.clazz = clazz
@@ -347,6 +353,7 @@ class XmlMeta(MetaMixin):
         self.attributes = attributes
         self.any_attributes = any_attributes
         self.mixed_content = any(wildcard.mixed for wildcard in self.wildcards)
+        self.wrappers = wrappers
 
     @property
     def element_types(self) -> Set[Type]:

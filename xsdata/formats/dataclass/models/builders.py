@@ -71,9 +71,12 @@ class XmlMetaBuilder:
         choices = []
         any_attributes = []
         wildcards = []
+        wrappers: Dict[str, List[XmlVar]] = defaultdict(list)
         text = None
 
         for var in class_vars:
+            if var.wrapper is not None:
+                wrappers[var.wrapper].append(var)
             if var.is_attribute:
                 attributes[var.qname] = var
             elif var.is_element:
@@ -98,6 +101,7 @@ class XmlMetaBuilder:
             choices=choices,
             any_attributes=any_attributes,
             wildcards=wildcards,
+            wrappers=wrappers,
         )
 
     def build_vars(
@@ -269,6 +273,7 @@ class XmlVarBuilder:
         nillable = metadata.get("nillable", False)
         format_str = metadata.get("format", None)
         sequential = metadata.get("sequential", False)
+        wrapper = metadata.get("wrapper", None)
 
         origin, sub_origin, types = self.analyze_types(type_hint, globalns)
 
@@ -276,6 +281,14 @@ class XmlVarBuilder:
             raise XmlContextError(
                 f"Xml type '{xml_type}' does not support typing: {type_hint}"
             )
+
+        if wrapper is not None:
+            if not isinstance(origin, type) or not issubclass(
+                origin, (list, set, tuple)
+            ):
+                raise XmlContextError(
+                    f"a wrapper requires a collection type on attribute {name}"
+                )
 
         local_name = self.build_local_name(xml_type, local_name, name)
 
@@ -291,6 +304,8 @@ class XmlVarBuilder:
         namespaces = self.resolve_namespaces(xml_type, namespace, parent_namespace)
         default_namespace = self.default_namespace(namespaces)
         qname = build_qname(default_namespace, local_name)
+        if wrapper is not None:
+            wrapper = build_qname(default_namespace, wrapper)
 
         elements = {}
         wildcards = []
@@ -323,6 +338,7 @@ class XmlVarBuilder:
             namespaces=namespaces,
             xml_type=xml_type,
             derived=False,
+            wrapper=wrapper,
         )
 
     def build_choices(

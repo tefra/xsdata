@@ -304,6 +304,10 @@ marshalling.
    * - default_factory
      - Any
      - Default value factory
+   * - wrapper
+     - str
+     - The element name to wrap a collection of elements or primitives
+
 
 .. warning::
 

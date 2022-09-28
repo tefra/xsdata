@@ -158,8 +158,14 @@ class XmlSerializer(AbstractSerializer):
         self, values: Iterable, var: XmlVar, namespace: NoneStr
     ) -> Generator:
         """Produce an events stream for the given list of values."""
-        for value in values:
-            yield from self.write_value(value, var, namespace)
+        if var.wrapper is not None:
+            yield XmlWriterEvent.START, var.wrapper
+            for value in values:
+                yield from self.write_value(value, var, namespace)
+            yield XmlWriterEvent.END, var.wrapper
+        else:
+            for value in values:
+                yield from self.write_value(value, var, namespace)
 
     def write_tokens(self, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
         """Produce an events stream for the given tokens list or list of tokens

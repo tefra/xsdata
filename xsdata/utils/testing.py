@@ -48,7 +48,7 @@ DEFAULT_NS_MAP = {
 }
 
 
-def load_class(output: str, clazz_name: str) -> T:
+def load_class(output: str, clazz_name: str) -> Any:
     search = "Generating package: "
     start = len(search)
     packages = [line[start:] for line in output.splitlines() if line.startswith(search)]

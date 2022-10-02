@@ -1,4 +1,3 @@
-from typing import Iterator
 from unittest import TestCase
 
 from xsdata.models.xsd import Extension

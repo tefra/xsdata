@@ -273,7 +273,7 @@ class JsonParser(AbstractParser):
 
         return self.bind_dataclass(data, var.clazz)
 
-    def bind_derived_value(self, meta: XmlMeta, var: XmlVar, data: Dict) -> T:
+    def bind_derived_value(self, meta: XmlMeta, var: XmlVar, data: Dict) -> Any:
         """Bind derived element entry point."""
 
         qname = data["qname"]

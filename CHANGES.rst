@@ -1,4 +1,8 @@
-22.9 (2022-08-24)
+22.11 (2022-11-06)
+------------------
+- Added list wrapper for elements and primitive nodes `#710 <https://github.com/tefra/xsdata/pull/710>`_
+
+22.9 (2022-09-24)
 -----------------
 - Fixed code generation inconsistencies in different operating systems.
 - Fixed circular imports error `#706 <https://github.com/tefra/xsdata/pull/706>`_

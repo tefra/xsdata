@@ -99,11 +99,6 @@ Features
 
 
 
-Changelog: 22.9 (2022-08-24)
-----------------------------
-- Fixed code generation inconsistencies in different operating systems.
-- Fixed circular imports error `#706 <https://github.com/tefra/xsdata/pull/706>`_
-- Fixed naming conflicts in imports `#706 <https://github.com/tefra/xsdata/pull/706>`_
-- Fixed issue with wrong occurrences in DTD code generation  `#705 <https://github.com/tefra/xsdata/pull/705>`_
-- Fixed xs:group and xs:attrGroup name conflicts `#702 <https://github.com/tefra/xsdata/pull/702>`_
-- Added mathml3 in standard schemas
+Changelog: 22.11 (2022-11-06)
+-----------------------------
+- Added list wrapper for elements and primitive nodes `#710 <https://github.com/tefra/xsdata/pull/710>`_

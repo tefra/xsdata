@@ -1,3 +1,5 @@
+from typing import Callable
+from typing import Dict
 from typing import Optional
 
 
@@ -16,6 +18,8 @@ class SerializerConfig:
     :param schema_location: xsi:schemaLocation attribute value
     :param no_namespace_schema_location: xsi:noNamespaceSchemaLocation
         attribute value
+    :param globalns: Dictionary containing global variables to extend
+        or overwrite for typing
     """
 
     __slots__ = (
@@ -26,6 +30,7 @@ class SerializerConfig:
         "ignore_default_attributes",
         "schema_location",
         "no_namespace_schema_location",
+        "globalns",
     )
 
     def __init__(
@@ -37,6 +42,7 @@ class SerializerConfig:
         ignore_default_attributes: bool = False,
         schema_location: Optional[str] = None,
         no_namespace_schema_location: Optional[str] = None,
+        globalns: Optional[Dict[str, Callable]] = None,
     ):
         self.encoding = encoding
         self.xml_version = xml_version
@@ -45,3 +51,4 @@ class SerializerConfig:
         self.ignore_default_attributes = ignore_default_attributes
         self.schema_location = schema_location
         self.no_namespace_schema_location = no_namespace_schema_location
+        self.globalns = globalns

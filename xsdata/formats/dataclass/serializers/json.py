@@ -96,7 +96,9 @@ class JsonSerializer(AbstractSerializer):
     def next_value(self, obj: Any) -> Iterator[Tuple[str, Any]]:
         ignore_optionals = self.config.ignore_default_attributes
 
-        for var in self.context.build(obj.__class__).get_all_vars():
+        for var in self.context.build(
+            obj.__class__, globalns=self.config.globalns
+        ).get_all_vars():
             value = getattr(obj, var.name)
             if var.is_attribute and ignore_optionals and var.is_optional(value):
                 continue

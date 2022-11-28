@@ -40,18 +40,25 @@ class ClassMeta(NamedTuple):
 
 
 class XmlMetaBuilder:
-    __slots__ = "class_type", "element_name_generator", "attribute_name_generator"
+    __slots__ = (
+        "class_type",
+        "element_name_generator",
+        "attribute_name_generator",
+        "globalns",
+    )
 
     def __init__(
         self,
         class_type: ClassType,
         element_name_generator: Callable,
         attribute_name_generator: Callable,
+        globalns: Optional[Dict[str, Callable]] = None,
     ):
 
         self.class_type = class_type
         self.element_name_generator = element_name_generator
         self.attribute_name_generator = attribute_name_generator
+        self.globalns = globalns
 
     def build(self, clazz: Type, parent_namespace: Optional[str]) -> XmlMeta:
         """Build the binding metadata for a dataclass and its fields."""
@@ -112,7 +119,7 @@ class XmlMetaBuilder:
         attribute_name_generator: Callable,
     ):
         """Build the binding metadata for the given dataclass fields."""
-        type_hints = get_type_hints(clazz)
+        type_hints = get_type_hints(clazz, globalns=self.globalns)
         builder = XmlVarBuilder(
             class_type=self.class_type,
             default_xml_type=self.default_xml_type(clazz),

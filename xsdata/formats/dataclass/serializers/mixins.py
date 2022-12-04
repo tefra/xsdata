@@ -267,7 +267,7 @@ class XmlWriter:
         current pending tag.
         """
 
-        prefixes = []
+        prefixes: List[str] = []
         self.pending_prefixes.append(prefixes)
 
         try:
@@ -283,7 +283,7 @@ class XmlWriter:
     def reset_default_namespace(self):
         """Reset the default namespace if exists and the current pending tag is
         not qualified."""
-        if not self.pending_tag[0] and None in self.ns_map:
+        if self.pending_tag and not self.pending_tag[0] and None in self.ns_map:
             self.ns_map[None] = ""
 
     @classmethod

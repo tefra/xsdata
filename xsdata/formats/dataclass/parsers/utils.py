@@ -46,9 +46,9 @@ class ParserUtils:
         cls,
         value: Any,
         types: Sequence[Type],
-        default: Any = None,
+        default: Optional[Any] = None,
         ns_map: Optional[Dict] = None,
-        tokens_factory: Callable = None,
+        tokens_factory: Optional[Callable] = None,
         format: Optional[str] = None,
     ) -> Any:
         """Convert xml string values to s python primitive type."""

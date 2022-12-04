@@ -50,7 +50,7 @@ class AbstractGenerator(abc.ABC):
 
     @abc.abstractmethod
     def render(self, classes: List[Class]) -> Iterator[GeneratorResult]:
-        """Return a iterator of the generated results."""
+        """Return an iterator of the generated results."""
 
     @classmethod
     def group_by_package(cls, classes: List[Class]) -> Dict[Path, List[Class]]:

@@ -3,6 +3,7 @@ from typing import Any
 from typing import Dict
 from typing import Iterator
 from typing import List
+from typing import Optional
 from typing import Tuple
 from typing import Type
 from typing import TypeVar
@@ -49,7 +50,9 @@ def get_args(tp: Any) -> Tuple:
     return getattr(tp, "__args__", EMPTY_ARGS) or EMPTY_ARGS
 
 
-def evaluate(tp: Any, globalns: Any = None, localns: Any = None) -> Tuple[Type, ...]:
+def evaluate(
+    tp: Any, globalns: Optional[Any] = None, localns: Optional[Any] = None
+) -> Tuple[Type, ...]:
     return tuple(_evaluate(_eval_type(tp, globalns, localns)))
 
 

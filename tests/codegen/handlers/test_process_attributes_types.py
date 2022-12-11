@@ -54,6 +54,15 @@ class ProcessAttributeTypesTests(FactoryTestCase):
 
         self.assertEqual(types[:-1], attr.types)
 
+    def test_process_types_with_ignore_patterns(self):
+        target = ClassFactory.create()
+        attr = AttrFactory.native(DataType.DECIMAL)
+        attr.restrictions.pattern = r"\d{2}.\d{2}"
+
+        self.processor.container.config.output.ignore_patterns = True
+        self.processor.process_types(target, attr)
+        self.assertEqual(DataType.DECIMAL, attr.types[0].datatype)
+
     def test_cascade_properties(self):
         target = ClassFactory.create(default="2", fixed=True, nillable=True)
         attr = AttrFactory.native(DataType.STRING, tag=Tag.EXTENSION)

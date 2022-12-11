@@ -245,6 +245,7 @@ class GeneratorOutput:
     :param postponed_annotations: Enable postponed evaluation of annotations,
         default: false, python>=3.7 Only
     :param unnest_classes: Move inner classes to upper level, default: false
+    :param ignore_patterns: Ignore pattern restrictions, default: false
     """
 
     package: str = element(default="generated")
@@ -261,6 +262,7 @@ class GeneratorOutput:
     max_line_length: int = attribute(default=79)
     postponed_annotations: bool = element(default=False)
     unnest_classes: bool = element(default=False)
+    ignore_patterns: bool = element(default=False)
 
     def update(self, **kwargs: Any):
         objects.update(self, **kwargs)

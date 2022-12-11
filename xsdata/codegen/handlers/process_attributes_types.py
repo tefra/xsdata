@@ -34,6 +34,9 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
 
     def process_types(self, target: Class, attr: Attr):
         """Process every attr type and filter out duplicates."""
+        if self.container.config.output.ignore_patterns:
+            attr.restrictions.pattern = None
+
         for attr_type in list(attr.types):
             self.process_type(target, attr, attr_type)
 

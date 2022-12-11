@@ -38,6 +38,7 @@ class GeneratorConfigTests(TestCase):
             '    <CompoundFields defaultName="choice" forceDefaultName="false">false</CompoundFields>\n'
             "    <PostponedAnnotations>false</PostponedAnnotations>\n"
             "    <UnnestClasses>false</UnnestClasses>\n"
+            "    <IgnorePatterns>false</IgnorePatterns>\n"
             "  </Output>\n"
             "  <Conventions>\n"
             '    <ClassName case="pascalCase" safePrefix="type"/>\n'
@@ -97,6 +98,7 @@ class GeneratorConfigTests(TestCase):
             '    <CompoundFields defaultName="choice" forceDefaultName="false">false</CompoundFields>\n'
             "    <PostponedAnnotations>false</PostponedAnnotations>\n"
             "    <UnnestClasses>false</UnnestClasses>\n"
+            "    <IgnorePatterns>false</IgnorePatterns>\n"
             "  </Output>\n"
             "  <Conventions>\n"
             '    <ClassName case="pascalCase" safePrefix="type"/>\n'

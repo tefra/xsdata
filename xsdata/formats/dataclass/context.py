@@ -174,7 +174,12 @@ class XmlContext:
 
         return None
 
-    def build(self, clazz: Type, parent_ns: Optional[str] = None) -> XmlMeta:
+    def build(
+        self,
+        clazz: Type,
+        parent_ns: Optional[str] = None,
+        globalns: Optional[Dict[str, Callable]] = None,
+    ) -> XmlMeta:
         """
         Fetch from cache or build the binding metadata for the given class and
         parent namespace.
@@ -188,6 +193,7 @@ class XmlContext:
                 class_type=self.class_type,
                 element_name_generator=self.element_name_generator,
                 attribute_name_generator=self.attribute_name_generator,
+                globalns=globalns,
             )
             self.cache[clazz] = builder.build(clazz, parent_ns)
         return self.cache[clazz]

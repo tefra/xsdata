@@ -35,6 +35,7 @@ Advance Topics
     examples/custom-property-names
     examples/custom-class-factory
     examples/wrapped-list
+    examples/custom-type-mapping
 
 
 Test Suites

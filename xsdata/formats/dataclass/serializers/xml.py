@@ -78,7 +78,9 @@ class XmlSerializer(AbstractSerializer):
         """Produce an events stream from a dataclass or a derived element."""
         qname = xsi_type = None
         if isinstance(obj, self.context.class_type.derived_element):
-            meta = self.context.build(obj.value.__class__)
+            meta = self.context.build(
+                obj.value.__class__, globalns=self.config.globalns
+            )
             qname = obj.qname
             obj = obj.value
             xsi_type = namespaces.real_xsi_type(qname, meta.target_qname)
@@ -99,8 +101,9 @@ class XmlSerializer(AbstractSerializer):
         Optionally override the qualified name and the xsi properties
         type and nil.
         """
-
-        meta = self.context.build(obj.__class__, namespace)
+        meta = self.context.build(
+            obj.__class__, namespace, globalns=self.config.globalns
+        )
         qname = qname or meta.qname
         nillable = nillable or meta.nillable
         namespace, tag = namespaces.split_qname(qname)

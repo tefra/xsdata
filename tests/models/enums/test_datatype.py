@@ -35,7 +35,6 @@ class DataTypeTests(TestCase):
         self.assertEqual(DataType.DOUBLE, DataType.from_value(3.402823467e38))
 
     def test_from_value_period(self):
-
         g_day = XmlPeriod("---20-02:44")
         self.assertEqual(DataType.G_DAY, DataType.from_value(g_day))
 

@@ -4,7 +4,6 @@ from xsdata.utils.testing import FactoryTestCase
 
 class AttrTypeTests(FactoryTestCase):
     def test_property_is_dependency(self):
-
         attr_type = AttrTypeFactory.create(forward=True, native=True, circular=True)
         self.assertFalse(attr_type.is_dependency(False))
 

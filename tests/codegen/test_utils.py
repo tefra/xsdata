@@ -52,7 +52,6 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual(survivor, target.inner[0])
 
     def test_is_orphan_inner(self):
-
         inner = ClassFactory.create(qname="thug")
         target = ClassFactory.create(
             attrs=[

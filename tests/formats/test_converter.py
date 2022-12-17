@@ -1,3 +1,4 @@
+import sys
 import warnings
 from datetime import date
 from datetime import datetime
@@ -7,6 +8,8 @@ from enum import Enum
 from typing import Any
 from unittest import TestCase
 from xml.etree.ElementTree import QName
+
+import pytest
 
 from tests.fixtures.datatypes import Telephone
 from xsdata.exceptions import ConverterError
@@ -212,7 +215,6 @@ class BytesConverterTests(TestCase):
         self.assertEqual("MS0yLTM=", output)
 
     def test_serialize_raises_exception(self):
-
         with self.assertRaises(ConverterError) as cm:
             self.converter.deserialize(1, format="foo")
 
@@ -359,6 +361,10 @@ class EnumConverterTests(TestCase):
     def setUp(self):
         self.converter = converter.type_converter(Enum)
 
+    @pytest.mark.skipif(
+        sys.version_info == (3, 11, 1, "final", 0),
+        reason="https://github.com/python/cpython/issues/100098",
+    )
     def test_deserialize(self):
         convert = self.converter.deserialize
         self.assertEqual(EnumA.C, convert("2.1", data_type=EnumA))

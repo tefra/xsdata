@@ -128,7 +128,6 @@ class GeneratorConfigTests(TestCase):
             GeneratorConfig.read(file_path)
 
     def test_format_with_invalid_state(self):
-
         with self.assertRaises(GeneratorConfigError) as cm:
             OutputFormat(eq=False, order=True)
 

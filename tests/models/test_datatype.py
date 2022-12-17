@@ -417,7 +417,6 @@ class XmlDurationTests(TestCase):
         self.assertFalse(duration.negative)
 
     def test_init_valid(self):
-
         fixtures = {
             "P2Y6M5DT12H35M30.5S": {
                 "days": 5,
@@ -497,7 +496,6 @@ class XmlPeriodTests(TestCase):
         self.assertEqual(-164, period.offset)
 
     def test_init_valid(self):
-
         fixtures = {
             "--05---05:00": {"month": 5, "offset": -300},
             "---01 ": {"day": 1},

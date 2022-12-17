@@ -725,7 +725,6 @@ class DefinitionsMapperTests(FactoryTestCase):
         self.assertEqual(expected, actual)
 
     def test_get_or_create_inner_class(self):
-
         target = ClassFactory.create(
             location="foo", package=None, ns_map={"foo": "bar"}
         )
@@ -775,7 +774,6 @@ class DefinitionsMapperTests(FactoryTestCase):
         self.assertEqual([expected], list(actual))
 
     def test_operation_namespace(self):
-
         self.assertIsNone(DefinitionsMapper.operation_namespace({}))
         self.assertIsNone(DefinitionsMapper.operation_namespace({"transport": "foo"}))
         self.assertEqual(

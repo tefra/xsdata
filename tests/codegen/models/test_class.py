@@ -187,7 +187,6 @@ class ClassTests(FactoryTestCase):
         self.assertEqual(list(range(1, 7)), list(obj.references))
 
     def test_property_target_module(self):
-
         obj = ClassFactory.create(module=None, package=None)
         with self.assertRaises(CodeGenerationError) as cm:
             obj.target_module

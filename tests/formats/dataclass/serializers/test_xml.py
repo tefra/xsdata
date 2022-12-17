@@ -626,7 +626,6 @@ class XmlSerializerTests(TestCase):
         self.assertEqual(expected, list(actual))
 
     def test_render_mixed_content(self):
-
         obj = Paragraph()
         obj.content.append(AnyElement(qname="b", text="Mr."))
         obj.content.append(Span("chris"))

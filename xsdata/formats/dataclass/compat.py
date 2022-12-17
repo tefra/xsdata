@@ -16,7 +16,6 @@ from xsdata.utils.hooks import load_entry_points
 
 
 class ClassType(abc.ABC):
-
     __slots__ = ()
 
     @property
@@ -106,7 +105,6 @@ class ClassTypes:
 
 
 class Dataclasses(ClassType):
-
     __slots__ = ()
 
     @property

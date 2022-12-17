@@ -13,7 +13,6 @@ from xsdata.models.enums import QNames
 
 
 class XmlWriterImpl(XmlWriter):
-
     __slots__ = ()
 
     def __init__(self, config: SerializerConfig, output: TextIO, ns_map: Dict):

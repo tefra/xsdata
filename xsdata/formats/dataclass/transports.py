@@ -6,7 +6,6 @@ import requests
 
 
 class Transport(abc.ABC):
-
     __slots__ = ()
 
     @abc.abstractmethod

@@ -326,7 +326,6 @@ class JsonParserTests(FactoryTestCase):
         )
 
     def test_bind_wildcard_dataclass(self):
-
         data = {"a": None, "wildcard": {"x": 1}}
         expected = ExtendedType(wildcard=TypeA(x=1))
         self.assertEqual(expected, self.parser.bind_dataclass(data, ExtendedType))

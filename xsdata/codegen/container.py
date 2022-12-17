@@ -38,7 +38,6 @@ class Steps:
 
 
 class ClassContainer(ContainerInterface):
-
     __slots__ = ("data", "processors")
 
     def __init__(self, config: GeneratorConfig):

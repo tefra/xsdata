@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 
 
 class DependenciesResolver:
-
     __slots__ = "packages", "aliases", "imports", "class_list", "class_map", "package"
 
     def __init__(self, packages: Dict[str, str]):

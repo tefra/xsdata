@@ -270,7 +270,6 @@ class Union(AnnotationBase):
 
     @property
     def attr_types(self) -> Iterator[str]:
-
         for simple_type in self.simple_types:
             yield from simple_type.attr_types
 

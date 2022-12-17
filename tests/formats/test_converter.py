@@ -215,7 +215,6 @@ class BytesConverterTests(TestCase):
         self.assertEqual("MS0yLTM=", output)
 
     def test_serialize_raises_exception(self):
-
         with self.assertRaises(ConverterError) as cm:
             self.converter.deserialize(1, format="foo")
 

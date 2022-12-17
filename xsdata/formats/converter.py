@@ -495,7 +495,6 @@ class DateTimeConverter(DateTimeBase):
 
 
 class ProxyConverter(Converter):
-
     __slots__ = ("factory",)
 
     def __init__(self, factory: Callable):

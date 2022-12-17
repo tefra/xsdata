@@ -24,7 +24,6 @@ class ValidateAttributesOverrides(RelativeHandlerInterface):
     __slots__ = ()
 
     def process(self, target: Class):
-
         base_attrs_map = self.base_attrs_map(target)
         for attr in list(target.attrs):
             base_attrs = base_attrs_map.get(attr.slug)

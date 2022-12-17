@@ -30,7 +30,6 @@ class EventsHandlerTests(TestCase):
         self.assertEqual({"brk": "urn:books"}, self.parser.ns_map)
 
     def test_parse_with_unhandled_event(self):
-
         with self.assertRaises(XmlHandlerError) as cm:
             self.parser.parse([("reverse", "")], Books)
 

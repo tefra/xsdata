@@ -99,6 +99,8 @@ Features
 
 
 
-Changelog: 22.11 (2022-11-06)
+Changelog: 22.12 (2022-12-17)
 -----------------------------
-- Added list wrapper for elements and primitive nodes `#710 <https://github.com/tefra/xsdata/pull/710>`_
+- Added option to ignore xml pattern restrictions `#727 <https://github.com/tefra/xsdata/pull/727>`_
+- Added globalns support via SerializerConfig `#724 <https://github.com/tefra/xsdata/pull/724>`_
+- Pinned docformatter version to v1.5.0 `#729 <https://github.com/tefra/xsdata/pull/729>`_

@@ -234,7 +234,6 @@ class XmlMetaBuilder:
 
 
 class XmlVarBuilder:
-
     __slots__ = (
         "class_type",
         "default_xml_type",

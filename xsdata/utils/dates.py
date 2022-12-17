@@ -231,7 +231,6 @@ class DateTimeParser:
         return int(self.value[start : self.vidx].ljust(just, "0"))
 
     def parse_offset(self) -> Optional[int]:
-
         if not self.has_more():
             return None
 

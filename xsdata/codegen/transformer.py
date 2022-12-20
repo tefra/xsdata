@@ -173,16 +173,20 @@ class SchemaTransformer:
         name = self.config.output.package.split(".")[-1]
         dirname = os.path.dirname(uris[0]) if uris else ""
 
-        for uri in uris:
-            input_stream = self.load_resource(uri)
-            if input_stream:
-                data = json.load(io.BytesIO(input_stream))
-                logger.info("Parsing document %s", uri)
-                if isinstance(data, dict):
-                    data = [data]
+        try:
+            for uri in uris:
+                input_stream = self.load_resource(uri)
+                if input_stream:
+                    data = json.load(io.BytesIO(input_stream))
+                    logger.info("Parsing document %s", uri)
+                    if isinstance(data, dict):
+                        data = [data]
 
-                for obj in data:
-                    classes.extend(DictMapper.map(obj, name, dirname))
+                    for obj in data:
+                        classes.extend(DictMapper.map(obj, name, dirname))
+        except json.decoder.JSONDecodeError as err:
+            raise IOError(f"JSON load failure: {uri}") from err
+
 
         self.classes.extend(ClassUtils.reduce_classes(classes))
 

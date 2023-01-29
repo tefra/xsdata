@@ -35,7 +35,7 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: debug-statements
-  - repo: https://github.com/myint/docformatter
+  - repo: https://github.com/PyCQA/docformatter
     rev: v1.5.1
     hooks:
       - id: docformatter
@@ -59,6 +59,6 @@ repos:
       - id: setup-cfg-fmt
         args: [ "--min-py3-version=3.7", "--max-py-version=3.11", "--include-version-classifiers" ]
   - repo: https://github.com/PyCQA/doc8
-    rev: v1.0.0
+    rev: v1.1.1
     hooks:
       - id: doc8

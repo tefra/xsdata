@@ -62,7 +62,6 @@ class XmlMetaBuilder:
 
     def build(self, clazz: Type, parent_namespace: Optional[str]) -> XmlMeta:
         """Build the binding metadata for a dataclass and its fields."""
-
         self.class_type.verify_model(clazz)
 
         meta = self.build_class_meta(clazz, parent_namespace)
@@ -278,7 +277,7 @@ class XmlVarBuilder:
         required = metadata.get("required", False)
         nillable = metadata.get("nillable", False)
         format_str = metadata.get("format", None)
-        sequential = metadata.get("sequential", False)
+        sequence = metadata.get("sequence", None)
         wrapper = metadata.get("wrapper", None)
 
         origin, sub_origin, types = self.analyze_types(type_hint, globalns)
@@ -334,7 +333,7 @@ class XmlVarBuilder:
             any_type=any_type,
             required=required,
             nillable=nillable,
-            sequential=sequential,
+            sequence=sequence,
             factory=origin,
             tokens_factory=sub_origin,
             default=default_value,

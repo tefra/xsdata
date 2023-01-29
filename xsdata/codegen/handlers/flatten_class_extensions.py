@@ -165,7 +165,6 @@ class FlattenClassExtensions(RelativeHandlerInterface):
 
         Search priority: xs:SimpleType >  xs:ComplexType
         """
-
         conditions = (
             lambda x: x.tag == Tag.SIMPLE_TYPE,
             lambda x: x.tag == Tag.COMPLEX_TYPE,
@@ -207,16 +206,15 @@ class FlattenClassExtensions(RelativeHandlerInterface):
             2. Source class is a simple type
             3. Source class has a suffix attr and target has its own attrs
             4. Target class has a suffix attr
-            5. Target restrictions parent attrs in different sequential order
+            5. Target restrictions parent attrs in different sequence order
             6. Target restricts parent attr with a not matching type.
         """
-
         if not source.extensions and (
             source.is_simple_type
             or target.has_suffix_attr
             or (source.has_suffix_attr and target.attrs)
             or not cls.validate_type_overrides(source, target)
-            or not cls.validate_sequential_order(source, target)
+            or not cls.validate_sequence_order(source, target)
         ):
             return True
 
@@ -234,17 +232,18 @@ class FlattenClassExtensions(RelativeHandlerInterface):
         return True
 
     @classmethod
-    def validate_sequential_order(cls, source: Class, target: Class) -> bool:
+    def validate_sequence_order(cls, source: Class, target: Class) -> bool:
         """
-        Validate sequential attributes are in the same order in the parent
-        class.
+        Validate sequence attributes are in the same order in the parent class.
 
         Dataclasses fields ordering follows the python mro pattern, the
         parent fields are always first and they are updated if the
         subclass is overriding any of them but the overall ordering
         doesn't change!
         """
-        sequence = [attr.name for attr in target.attrs if attr.restrictions.sequential]
+        sequence = [
+            attr.name for attr in target.attrs if attr.restrictions.sequence is not None
+        ]
         if len(sequence) > 1:
             compare = [attr.name for attr in source.attrs if attr.name in sequence]
             if compare and compare != sequence:

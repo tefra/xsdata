@@ -213,7 +213,6 @@ class ElementNode(XmlNode):
         generic AnyElement instance. If the previous value is already a
         generic instance add the current value as a child object.
         """
-
         value = self.prepare_generic_value(qname, value, var)
 
         if var.list_element:
@@ -272,7 +271,6 @@ class ElementNode(XmlNode):
 
         Return if any data was bound.
         """
-
         var = self.meta.text
 
         if not var or (text is None and not self.xsi_nil):

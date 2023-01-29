@@ -61,7 +61,6 @@ class JsonSerializer(AbstractSerializer):
         :param out: The output stream
         :param obj: The input dataclass instance
         """
-
         indent: Optional[int] = None
         if self.indent:
             warnings.warn(

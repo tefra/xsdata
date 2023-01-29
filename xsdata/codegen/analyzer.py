@@ -13,7 +13,6 @@ class ClassAnalyzer:
     @classmethod
     def process(cls, container: ClassContainer) -> List[Class]:
         """Run all the processes."""
-
         # Run validation checks for duplicate, invalid and redefined types.
         ClassValidator(container).process()
 

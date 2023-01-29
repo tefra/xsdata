@@ -86,7 +86,6 @@ class UserXmlParser(NodeParser):
         :param name: Element qualified name
         :param kwargs: Event keyword arguments
         """
-
         key = (event, name)
         if key not in self.emit_cache:
             method_name = f"{event}_{snake_case(local_name(name))}"

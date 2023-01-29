@@ -33,11 +33,10 @@ class CreateCompoundFields(RelativeHandlerInterface):
                     self.group_fields(target, attrs)
 
         for index in range(len(target.attrs)):
-            self.reset_sequential(target, index)
+            self.reset_sequence(target, index)
 
     def group_fields(self, target: Class, attrs: List[Attr]):
         """Group attributes into a new compound field."""
-
         pos = target.attrs.index(attrs[0])
         choice = attrs[0].restrictions.choice
         sum_occurs = choice and choice.startswith("effective_")
@@ -96,7 +95,7 @@ class CreateCompoundFields(RelativeHandlerInterface):
         restrictions = attr.restrictions.clone()
         restrictions.min_occurs = None
         restrictions.max_occurs = None
-        restrictions.sequential = None
+        restrictions.sequence = None
 
         return Attr(
             name=attr.local_name,
@@ -109,22 +108,22 @@ class CreateCompoundFields(RelativeHandlerInterface):
         )
 
     @classmethod
-    def reset_sequential(cls, target: Class, index: int):
+    def reset_sequence(cls, target: Class, index: int):
         """Reset the attribute at the given index if it has no siblings with
-        the sequential restriction."""
+        the sequence restriction."""
 
         attr = target.attrs[index]
         before = target.attrs[index - 1] if index - 1 >= 0 else None
         after = target.attrs[index + 1] if index + 1 < len(target.attrs) else None
 
         if not attr.is_list:
-            attr.restrictions.sequential = False
+            attr.restrictions.sequence = None
 
         if (
-            not attr.restrictions.sequential
-            or (before and before.restrictions.sequential)
-            or (after and after.restrictions.sequential and after.is_list)
+            attr.restrictions.sequence is None
+            or (before and before.restrictions.sequence is not None)
+            or (after and after.restrictions.sequence is not None and after.is_list)
         ):
             return
 
-        attr.restrictions.sequential = False
+        attr.restrictions.sequence = None

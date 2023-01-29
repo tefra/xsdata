@@ -467,7 +467,7 @@ class Sequence(AnnotationBase):
         max_occurs = sys.maxsize if self.max_occurs == "unbounded" else self.max_occurs
 
         return {
-            "sequential": True,
+            "sequence": self.index,
             "min_occurs": self.min_occurs,
             "max_occurs": max_occurs,
         }

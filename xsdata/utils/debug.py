@@ -9,7 +9,6 @@ def dump(obj: Any):
 
     For internal troubleshooting purposes only!!!
     """
-
     with Path.cwd().joinpath("xsdata_dump.json").open("w+") as f:
         json.dump(convert(obj), f, indent=4)
 

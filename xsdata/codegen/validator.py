@@ -106,7 +106,6 @@ class ClassValidator:
         Classes that were extracted from in xs:override/xs:redefined
         containers have priority, otherwise pick the last in the list.
         """
-
         for index, item in enumerate(candidates):
             if item.container in (Tag.OVERRIDE, Tag.REDEFINE):
                 return index
@@ -140,7 +139,6 @@ class ClassValidator:
             3. The xs:element is a subclass of the xs:complexType
             4. The xs:element has no attributes (This can't happen in a valid schema)
         """
-
         el = collections.first(x for x in classes if x.tag == Tag.ELEMENT)
         ct = collections.first(x for x in classes if x.tag == Tag.COMPLEX_TYPE)
 

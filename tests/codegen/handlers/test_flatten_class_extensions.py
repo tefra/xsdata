@@ -394,7 +394,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
         self.assertFalse(self.processor.should_flatten_extension(source, target))
 
         for attr in target.attrs:
-            attr.restrictions.sequential = True
+            attr.restrictions.sequence = 1
 
         self.assertFalse(self.processor.should_flatten_extension(source, target))
 

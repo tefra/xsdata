@@ -14,7 +14,7 @@ class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
     Cases:
         1. Ignore enumerations.
         2. List fields can not have a default value
-        3. Optional choice/sequential fields can not have a default value
+        3. Optional choice/sequence fields can not have a default value
         4. xsi:type fields are ignored, mark them as optional
         5. Convert string literal default value for enum fields.
     """
@@ -106,10 +106,9 @@ class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
         from the generator filters.
 
         Placeholder examples:
-            Single -> @enum@qname::member_name
-            Multiple -> @enum@qname::first_member@second_member
+        Single -> @enum@qname::member_name
+        Multiple -> @enum@qname::first_member@second_member
         """
-
         assert attr.default is not None
 
         value_members = {x.default: x.name for x in source.attrs}
@@ -192,7 +191,7 @@ class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
             or (
                 attr.is_optional
                 and (
-                    attr.restrictions.sequential is True
+                    attr.restrictions.sequence is not None
                     or attr.restrictions.choice is not None
                 )
             )

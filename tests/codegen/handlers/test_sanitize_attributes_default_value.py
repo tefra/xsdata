@@ -134,11 +134,11 @@ class SanitizeAttributesDefaultValueTests(FactoryTestCase):
         )
         self.assertFalse(self.processor.should_reset_default(attr))
 
-        attr.restrictions.sequential = True
+        attr.restrictions.sequence = 1
         self.assertTrue(self.processor.should_reset_default(attr))
 
         attr.restrictions.choice = "foo"
-        attr.restrictions.sequential = False
+        attr.restrictions.sequence = None
         self.assertTrue(self.processor.should_reset_default(attr))
 
     @mock.patch(

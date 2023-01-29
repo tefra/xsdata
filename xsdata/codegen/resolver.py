@@ -125,7 +125,6 @@ class DependenciesResolver:
     @staticmethod
     def create_class_map(classes: List[Class]) -> Dict[str, Class]:
         """Index the list of classes by name."""
-
         result: Dict[str, Class] = {}
         for obj in classes:
             if obj.qname in result:

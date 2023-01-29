@@ -34,7 +34,6 @@ class LxmlEventHandler(XmlHandler):
         When config process_xinclude is enabled the handler will parse
         the whole document and then walk down the element tree.
         """
-
         if isinstance(source, (etree._ElementTree, etree._Element)):
             ctx = etree.iterwalk(source, EVENTS)
         elif self.parser.config.process_xinclude:

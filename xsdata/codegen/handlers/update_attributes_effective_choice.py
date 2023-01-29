@@ -6,7 +6,7 @@ from xsdata.codegen.models import Class
 
 
 class UpdateAttributesEffectiveChoice(HandlerInterface):
-    """Look for sequential lists and non list elements and set effective choice
+    """Look for sequence lists and non list elements and set effective choice
     group for compound fields."""
 
     __slots__ = ()
@@ -14,8 +14,8 @@ class UpdateAttributesEffectiveChoice(HandlerInterface):
     def process(self, target: Class):
         groups: List[List[Attr]] = [[]]
         for attr in target.attrs:
-            # If attr is sequential and is list or the group is not empty
-            if attr.restrictions.sequential and (attr.is_list or groups[-1]):
+            # If attr is sequence and is list or the group is not empty
+            if attr.restrictions.sequence is not None and (attr.is_list or groups[-1]):
                 groups[-1].append(attr)
             elif groups[-1]:
                 groups.append([])

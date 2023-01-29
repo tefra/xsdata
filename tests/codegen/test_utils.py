@@ -300,16 +300,16 @@ class ClassUtilsTests(FactoryTestCase):
 
         self.assertEqual(0, a.restrictions.min_occurs)
         self.assertEqual(1, a.restrictions.max_occurs)
-        self.assertFalse(a.restrictions.sequential)
+        self.assertIsNone(a.restrictions.sequence)
 
         c.restrictions.min_occurs = 2
-        a.restrictions.sequential = True
+        a.restrictions.sequence = 1
         a.restrictions.max_occurs = 4
 
         ClassUtils.merge_attributes(c, a)
         self.assertEqual(0, c.restrictions.min_occurs)
         self.assertEqual(4, c.restrictions.max_occurs)
-        self.assertTrue(c.restrictions.sequential)
+        self.assertEqual(1, c.restrictions.sequence)
 
     def test_rename_attribute_by_preference(self):
         one = AttrFactory.create(name="a", tag=Tag.ELEMENT)

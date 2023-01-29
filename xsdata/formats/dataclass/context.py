@@ -80,7 +80,6 @@ class XmlContext:
 
     def build_xsi_cache(self):
         """Index all imported dataclasses by their xsi:type qualified name."""
-
         if len(sys.modules) == self.sys_modules:
             return
 
@@ -158,7 +157,6 @@ class XmlContext:
         :param clazz: The search dataclass type
         :param qname: Qualified name
         """
-
         types: List[Type] = self.find_types(qname)
         for tp in types:
 
@@ -225,7 +223,6 @@ class XmlContext:
         :param obj: A dataclass instance
         :param clazz: A dataclass type
         """
-
         if obj is None:
             return False
 

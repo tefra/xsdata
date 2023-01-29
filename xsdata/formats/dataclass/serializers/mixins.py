@@ -157,7 +157,6 @@ class XmlWriter:
         :param check_pending: Raise exception if not no element is
             pending start
         """
-
         if not self.pending_tag and check_pending:
             raise XmlWriterError("Empty pending tag.")
 
@@ -241,7 +240,6 @@ class XmlWriter:
         :param is_nil: If true add ``xsi:nil="true"`` to the element
             attributes
         """
-
         if self.pending_tag:
 
             if not is_nil:
@@ -266,7 +264,6 @@ class XmlWriter:
         Save the list of prefixes to be removed at the end of the
         current pending tag.
         """
-
         prefixes: List[str] = []
         self.pending_prefixes.append(prefixes)
 
@@ -295,7 +292,6 @@ class XmlWriter:
         :param key: Attribute name
         :param value: Attribute value
         """
-
         if isinstance(value, str) and value.startswith("{"):
             return key == QNames.XSI_TYPE or DataType.from_qname(value) is not None
 

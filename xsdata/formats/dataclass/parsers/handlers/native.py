@@ -41,7 +41,6 @@ class XmlEventHandler(XmlHandler):
         When config process_xinclude is enabled the handler will parse
         the whole document and then walk down the element tree.
         """
-
         if isinstance(source, etree.ElementTree):
             source = source.getroot()
 

@@ -6,7 +6,6 @@ from xml.sax.saxutils import quoteattr
 
 def update(obj: Any, **kwargs: Any):
     """Update an object from keyword arguments with dotted keys."""
-
     for key, value in kwargs.items():
         attrsetter(obj, key, value)
 

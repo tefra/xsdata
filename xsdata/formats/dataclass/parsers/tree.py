@@ -54,7 +54,7 @@ class TreeParser(NodeParser):
                 any_type=False,
                 required=False,
                 nillable=False,
-                sequential=False,
+                sequence=None,
                 default=None,
                 namespaces=(),
                 elements={},

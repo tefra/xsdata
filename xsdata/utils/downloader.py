@@ -30,7 +30,6 @@ class Downloader:
 
     def wget(self, uri: str, location: Optional[str] = None):
         """Download handler for any uri input with circular protection."""
-
         if not (uri in self.downloaded or (location and location in self.downloaded)):
             self.downloaded[uri] = None
             self.downloaded[location] = None

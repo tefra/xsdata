@@ -16,7 +16,6 @@ class DictMapper:
     @classmethod
     def map(cls, data: Dict, name: str, location: str) -> List[Class]:
         """Convert a dictionary to a list of codegen classes."""
-
         target = cls.build_class(data, name)
         return list(ClassUtils.flatten(target, f"{location}/{name}"))
 

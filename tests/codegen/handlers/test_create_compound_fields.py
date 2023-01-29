@@ -146,12 +146,12 @@ class CreateCompoundFieldsTests(FactoryTestCase):
             explicit_timezone="+1",
             nillable=True,
             choice="abc",
-            sequential=True,
+            sequence=1,
         )
         expected_res = attr.restrictions.clone()
         expected_res.min_occurs = None
         expected_res.max_occurs = None
-        expected_res.sequential = None
+        expected_res.sequence = None
 
         actual = self.processor.build_attr_choice(attr)
 
@@ -164,11 +164,11 @@ class CreateCompoundFieldsTests(FactoryTestCase):
         self.assertEqual(attr.help, actual.help)
         self.assertFalse(actual.fixed)
 
-    def test_reset_sequential(self):
-        def len_sequential(target: Class):
-            return len([attr for attr in target.attrs if attr.restrictions.sequential])
+    def test_reset_sequence(self):
+        def len_sequence(target: Class):
+            return len([attr for attr in target.attrs if attr.restrictions.sequence])
 
-        restrictions = Restrictions(max_occurs=2, sequential=True)
+        restrictions = Restrictions(max_occurs=2, sequence=1)
         target = ClassFactory.create(
             attrs=[
                 AttrFactory.create(restrictions=restrictions.clone()),
@@ -179,23 +179,23 @@ class CreateCompoundFieldsTests(FactoryTestCase):
         attrs_clone = [attr.clone() for attr in target.attrs]
 
         self.processor.config.enabled = False
-        self.processor.reset_sequential(target, 0)
-        self.assertEqual(2, len_sequential(target))
+        self.processor.reset_sequence(target, 0)
+        self.assertEqual(2, len_sequence(target))
 
-        target.attrs[0].restrictions.sequential = False
-        self.processor.reset_sequential(target, 0)
-        self.assertEqual(1, len_sequential(target))
+        target.attrs[0].restrictions.sequence = None
+        self.processor.reset_sequence(target, 0)
+        self.assertEqual(1, len_sequence(target))
 
-        self.processor.reset_sequential(target, 1)
-        self.assertEqual(0, len_sequential(target))
+        self.processor.reset_sequence(target, 1)
+        self.assertEqual(0, len_sequence(target))
 
         target.attrs = attrs_clone
-        target.attrs[1].restrictions.sequential = False
-        self.processor.reset_sequential(target, 0)
-        self.assertEqual(0, len_sequential(target))
+        target.attrs[1].restrictions.sequence = None
+        self.processor.reset_sequence(target, 0)
+        self.assertEqual(0, len_sequence(target))
 
-        target.attrs[0].restrictions.sequential = True
+        target.attrs[0].restrictions.sequence = 1
         target.attrs[0].restrictions.max_occurs = 0
-        target.attrs[1].restrictions.sequential = True
-        self.processor.reset_sequential(target, 0)
-        self.assertEqual(1, len_sequential(target))
+        target.attrs[1].restrictions.sequence = 1
+        self.processor.reset_sequence(target, 0)
+        self.assertEqual(1, len_sequence(target))

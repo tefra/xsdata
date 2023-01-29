@@ -25,7 +25,6 @@ class ElementMapper:
     @classmethod
     def map(cls, element: AnyElement, location: str) -> List[Class]:
         """Map schema children elements to classes."""
-
         assert element.qname is not None
 
         uri, name = split_qname(element.qname)
@@ -68,7 +67,7 @@ class ElementMapper:
     def build_elements(
         cls, target: Class, element: AnyElement, namespace: Optional[str]
     ):
-        sequential_set = cls.sequential_names(element)
+        sequential_set = cls.sequence_names(element)
         for child in element.children:
             if isinstance(child, AnyElement) and child.qname:
                 if child.tail:
@@ -81,7 +80,7 @@ class ElementMapper:
                 else:
                     attr_type = cls.build_attribute_type(child.qname, child.text)
 
-                sequential = child.qname in sequential_set
+                sequence = 1 if child.qname in sequential_set else None
 
                 cls.build_attribute(
                     target,
@@ -89,7 +88,7 @@ class ElementMapper:
                     attr_type,
                     namespace,
                     Tag.ELEMENT,
-                    sequential,
+                    sequence,
                 )
 
     @classmethod
@@ -130,7 +129,7 @@ class ElementMapper:
         attr_type: AttrType,
         parent_namespace: Optional[str] = None,
         tag: str = Tag.ELEMENT,
-        sequential: bool = False,
+        sequence: Optional[int] = None,
     ):
 
         namespace, name = split_qname(qname)
@@ -139,7 +138,7 @@ class ElementMapper:
 
         attr = Attr(index=index, name=name, tag=tag, namespace=namespace)
         attr.types.append(attr_type)
-        attr.restrictions.sequential = sequential or None
+        attr.restrictions.sequence = sequence
         attr.restrictions.min_occurs = 0
         attr.restrictions.max_occurs = 1
         cls.add_attribute(target, attr)
@@ -153,8 +152,8 @@ class ElementMapper:
             existing.restrictions.max_occurs = sys.maxsize
             existing.types.extend(attr.types)
 
-            if attr.restrictions.sequential:
-                existing.restrictions.sequential = True
+            if attr.restrictions.sequence is not None:
+                existing.restrictions.sequence = attr.restrictions.sequence
         else:
             target.attrs.append(attr)
 
@@ -174,7 +173,7 @@ class ElementMapper:
         return namespace
 
     @classmethod
-    def sequential_names(cls, element: AnyElement) -> Set[str]:
+    def sequence_names(cls, element: AnyElement) -> Set[str]:
         mapping = defaultdict(list)
         names = [
             child.qname

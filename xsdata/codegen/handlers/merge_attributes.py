@@ -41,7 +41,10 @@ class MergeAttributes(HandlerInterface):
 
                 e_res.min_occurs = min(min_occurs, attr_min_occurs)
                 e_res.max_occurs = max_occurs + attr_max_occurs
-                e_res.sequential = a_res.sequential or e_res.sequential
+
+                if a_res.sequence is not None:
+                    e_res.sequence = a_res.sequence
+
                 existing.fixed = False
                 existing.types.extend(attr.types)
 

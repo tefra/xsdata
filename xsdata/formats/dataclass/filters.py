@@ -11,7 +11,8 @@ from typing import Optional
 from typing import Tuple
 from typing import Type
 
-from docformatter import configuration, format
+from docformatter import configuration
+from docformatter import format
 from jinja2 import Environment
 
 from xsdata.codegen.models import Attr
@@ -504,11 +505,15 @@ class Filters:
         content += ' """' if content.endswith('"') else '"""'
 
         max_length = self.max_line_length - level * 4
-        configurator = configuration.Configurater([
-            "--wrap-summaries", str(max_length),
-            "--wrap-descriptions", str(max_length - 7),
-            "--make-summary-multi-line",
-        ])
+        configurator = configuration.Configurater(
+            [
+                "--wrap-summaries",
+                str(max_length),
+                "--wrap-descriptions",
+                str(max_length - 7),
+                "--make-summary-multi-line",
+            ]
+        )
         configurator.do_parse_arguments()
         formatter = format.Formatter(
             configurator.args,

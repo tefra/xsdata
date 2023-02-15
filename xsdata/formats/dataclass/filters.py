@@ -508,7 +508,7 @@ class Filters:
         configurator = configuration.Configurater(
             [
                 "--wrap-summaries",
-                str(max_length),
+                str(max_length - 3),
                 "--wrap-descriptions",
                 str(max_length - 7),
                 "--make-summary-multi-line",

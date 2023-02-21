@@ -116,7 +116,6 @@ def _evaluate_tuple(tp: Any) -> Iterator[Type]:
 
     args = get_args(tp)
     for arg in args:
-
         if arg is Ellipsis:
             continue
 

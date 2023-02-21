@@ -54,7 +54,6 @@ class XmlMetaBuilder:
         attribute_name_generator: Callable,
         globalns: Optional[Dict[str, Callable]] = None,
     ):
-
         self.class_type = class_type
         self.element_name_generator = element_name_generator
         self.attribute_name_generator = attribute_name_generator

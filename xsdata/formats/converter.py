@@ -423,7 +423,6 @@ class EnumConverter(Converter):
     def match(
         cls, value: Any, values: Sequence, length: int, real: Any, **kwargs: Any
     ) -> bool:
-
         if isinstance(value, str) and isinstance(real, str):
             return value == real or " ".join(values) == real
 

@@ -62,7 +62,6 @@ class SanitizeAttributesDefaultValueTests(FactoryTestCase):
     def test_process_attribute(
         self, mock_should_reset_required, mock_should_reset_default, mock_process_types
     ):
-
         target = ClassFactory.create()
         mock_should_reset_required.side_effect = [
             True,

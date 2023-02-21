@@ -86,7 +86,6 @@ class UnionNode(XmlNode):
         max_score = -1.0
         parent_namespace = target_uri(qname)
         for clazz in self.var.types:
-
             if self.context.class_type.is_model(clazz):
                 self.context.build(clazz, parent_ns=parent_namespace)
                 candidate = self.parse_class(clazz)

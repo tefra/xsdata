@@ -135,7 +135,6 @@ class JsonParserTests(FactoryTestCase):
         ]
 
         for json_string, clazz, exc_msg in invalid_cases:
-
             with self.assertRaises(ParserError) as cm:
                 self.parser.from_string(json_string, clazz=clazz)
 

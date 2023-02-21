@@ -80,7 +80,6 @@ class ElementNode(XmlNode):
     def bind(
         self, qname: str, text: Optional[str], tail: Optional[str], objects: List
     ) -> bool:
-
         obj: Any = None
         if not self.xsi_nil or self.meta.nillable:
             params: Dict = {}
@@ -423,7 +422,6 @@ class ElementNode(XmlNode):
         xsi_type: Optional[str] = None,
         xsi_nil: Optional[bool] = None,
     ) -> Optional[XmlNode]:
-
         meta = self.context.fetch(clazz, self.meta.namespace, xsi_type)
 
         if not meta or (meta.nillable and xsi_nil is False):

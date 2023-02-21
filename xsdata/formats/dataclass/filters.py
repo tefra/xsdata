@@ -323,7 +323,6 @@ class Filters:
 
         result = []
         for choice in attr.choices:
-
             types = choice.native_types
             restrictions = choice.restrictions.asdict(types)
             namespace = (

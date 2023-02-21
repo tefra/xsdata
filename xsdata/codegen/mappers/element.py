@@ -56,7 +56,6 @@ class ElementMapper:
         cls, target: Class, element: AnyElement, namespace: Optional[str]
     ):
         for key, value in element.attributes.items():
-
             if key == QNames.XSI_NIL:
                 target.nillable = value.strip() in ("true", "1")
             else:
@@ -131,7 +130,6 @@ class ElementMapper:
         tag: str = Tag.ELEMENT,
         sequence: Optional[int] = None,
     ):
-
         namespace, name = split_qname(qname)
         namespace = cls.select_namespace(namespace, parent_namespace, tag)
         index = len(target.attrs)

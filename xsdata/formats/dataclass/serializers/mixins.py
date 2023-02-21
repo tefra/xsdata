@@ -241,7 +241,6 @@ class XmlWriter:
             attributes
         """
         if self.pending_tag:
-
             if not is_nil:
                 self.attrs.pop(XSI_NIL, None)
 

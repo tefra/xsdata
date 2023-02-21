@@ -54,7 +54,6 @@ class ParserUtils:
         """Convert xml string values to s python primitive type."""
 
         if value is None:
-
             if callable(default):
                 return default() if tokens_factory else None
 

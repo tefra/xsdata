@@ -161,7 +161,6 @@ class JsonParser(AbstractParser):
         keys = set(data.keys())
         max_score = -1.0
         for clazz in classes:
-
             if not self.context.class_type.is_model(clazz):
                 continue
 

@@ -32,7 +32,6 @@ class ClassValidator:
             3. Merge dummy types
         """
         for classes in self.container.data.values():
-
             if len(classes) > 1:
                 self.remove_invalid_classes(classes)
 

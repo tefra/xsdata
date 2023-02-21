@@ -136,7 +136,6 @@ def is_ncname(name: Optional[str]) -> bool:
         return False
 
     for char in name[1:]:
-
         if char.isalpha() or char.isdigit() or char in NCNAME_PUNCTUATION:
             continue
         else:

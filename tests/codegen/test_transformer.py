@@ -133,14 +133,15 @@ class SchemaTransformerTests(FactoryTestCase):
         mock_map.assert_has_calls([mock.call(x, "foo") for x in elements])
         mock_reduce_classes.assert_called_once_with(classes_a + classes_c)
 
+    @mock.patch("xsdata.codegen.transformer.logger.warning")
     @mock.patch.object(ClassUtils, "reduce_classes")
     @mock.patch.object(DictMapper, "map")
     @mock.patch.object(SchemaTransformer, "load_resource")
     def test_process_json_documents(
-        self, mock_load_resource, mock_map, mock_reduce_classes
+        self, mock_load_resource, mock_map, mock_reduce_classes, mock_warning
     ):
-        uris = ["foo/a.json", "foo/b.json", "foo/c.json"]
-        resources = [b'{"foo": 1}', None, b'[{"foo": true}]']
+        uris = ["foo/a.json", "foo/b.json", "foo/c.json", "bar.json"]
+        resources = [b'{"foo": 1}', None, b'[{"foo": true}]', b"notjson"]
 
         classes_a = ClassFactory.list(2)
         classes_c = ClassFactory.list(3)
@@ -161,6 +162,9 @@ class SchemaTransformerTests(FactoryTestCase):
             ]
         )
         mock_reduce_classes.assert_called_once_with(classes_a + classes_c)
+        mock_warning.assert_called_once_with(
+            "JSON load failed for file: %s", uris[3], exc_info=mock.ANY
+        )
 
     @mock.patch.object(DtdMapper, "map")
     @mock.patch.object(DtdParser, "parse")

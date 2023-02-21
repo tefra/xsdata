@@ -174,13 +174,16 @@ class SchemaTransformer:
         for uri in uris:
             input_stream = self.load_resource(uri)
             if input_stream:
-                data = json.load(io.BytesIO(input_stream))
-                logger.info("Parsing document %s", uri)
-                if isinstance(data, dict):
-                    data = [data]
+                try:
+                    data = json.load(io.BytesIO(input_stream))
+                    logger.info("Parsing document %s", uri)
+                    if isinstance(data, dict):
+                        data = [data]
 
-                for obj in data:
-                    classes.extend(DictMapper.map(obj, name, dirname))
+                    for obj in data:
+                        classes.extend(DictMapper.map(obj, name, dirname))
+                except ValueError as exc:
+                    logger.warning("JSON load failed for file: %s", uri, exc_info=exc)
 
         self.classes.extend(ClassUtils.reduce_classes(classes))
 

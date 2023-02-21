@@ -151,15 +151,38 @@ class DtdMapperTests(FactoryTestCase):
 
     def test_build_elements_with_mixed_element_type(self):
         target = ClassFactory.create(tag=Tag.ELEMENT)
-        element = DtdElementFactory.create(type=DtdElementType.MIXED)
+        element = DtdElementFactory.create(
+            type=DtdElementType.MIXED,
+            content=DtdContentFactory.create(
+                type=DtdContentType.OR,
+                left=DtdContentFactory.create(
+                    type=DtdContentType.PCDATA, occur=DtdContentOccur.ONCE
+                ),
+                right=DtdContentFactory.create(
+                    name="rad", type=DtdContentType.ELEMENT, occur=DtdContentOccur.ONCE
+                ),
+            ),
+        )
 
         DtdMapper.build_elements(target, element)
-        self.assertEqual(0, len(target.attrs))
-        self.assertEqual(1, len(target.extensions))
+        expected = [
+            AttrFactory.create(
+                tag=Tag.EXTENSION,
+                name="value",
+                index=0,
+                types=[AttrTypeFactory.native(DataType.STRING)],
+            ),
+            AttrFactory.create(
+                tag=Tag.ELEMENT,
+                name="rad",
+                index=1,
+                types=[AttrTypeFactory.create(qname="rad")],
+            ),
+        ]
 
+        self.assertEqual(expected, target.attrs)
+        self.assertEqual(2, len(target.attrs))
         self.assertEqual(Tag.COMPLEX_TYPE, target.tag)
-        self.assertEqual(str(DataType.STRING), target.extensions[0].type.qname)
-        self.assertTrue(target.extensions[0].type.native)
 
     def test_build_elements_with_any_element_type(self):
         target = ClassFactory.create()
@@ -259,7 +282,16 @@ class DtdMapperTests(FactoryTestCase):
         )
         target = ClassFactory.create()
         DtdMapper.build_content(target, content)
-        self.assertEqual(0, len(target.attrs))
+
+        expected = [
+            AttrFactory.create(
+                tag=Tag.EXTENSION,
+                name="value",
+                index=0,
+                types=[AttrTypeFactory.native(DataType.STRING)],
+            )
+        ]
+        self.assertEqual(expected, target.attrs)
 
     @mock.patch.object(DtdMapper, "build_content")
     def test_build_content_tree(self, mock_build_content):

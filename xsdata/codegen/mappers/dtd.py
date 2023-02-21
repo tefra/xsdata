@@ -21,6 +21,7 @@ from xsdata.models.dtd import DtdElement
 from xsdata.models.dtd import DtdElementType
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
+from xsdata.utils.constants import DEFAULT_ATTR_NAME
 
 
 class DtdMapper:
@@ -97,9 +98,9 @@ class DtdMapper:
         # "undefined", "empty", "any", "mixed", or "element";
         if element.type == DtdElementType.ELEMENT and element.content:
             cls.build_content(target, element.content)
-        elif element.type == DtdElementType.MIXED:
+        elif element.type == DtdElementType.MIXED and element.content:
             target.tag = Tag.COMPLEX_TYPE
-            cls.build_extension(target, DataType.STRING)
+            cls.build_content(target, element.content)
         elif element.type == DtdElementType.ANY:
             cls.build_extension(target, DataType.ANY_TYPE)
 
@@ -121,6 +122,9 @@ class DtdMapper:
             params = {"min_occurs": 0, "choice": str(id(content))}
             params.update(kwargs)
             cls.build_content_tree(target, content, **params)
+        else:  # content_type == DtdContentType.PCDATA:
+            restrictions = cls.build_restrictions(content.occur, **kwargs)
+            cls.build_value(target, restrictions)
 
     @classmethod
     def build_content_tree(cls, target: Class, content: DtdContent, **kwargs: Any):
@@ -158,6 +162,18 @@ class DtdMapper:
         types = AttrType(qname=name, native=False)
         attr = Attr(
             name=name, tag=Tag.ELEMENT, types=[types], restrictions=restrictions.clone()
+        )
+        attr.index = len(target.attrs)
+        target.attrs.append(attr)
+
+    @classmethod
+    def build_value(cls, target: Class, restrictions: Restrictions):
+        types = AttrType(qname=str(DataType.STRING), native=True)
+        attr = Attr(
+            name=DEFAULT_ATTR_NAME,
+            tag=Tag.EXTENSION,
+            types=[types],
+            restrictions=restrictions.clone(),
         )
         attr.index = len(target.attrs)
         target.attrs.append(attr)

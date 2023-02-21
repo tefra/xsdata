@@ -111,7 +111,6 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
 
         Ignore inner circular references.
         """
-
         if attr_type.circular:
             return
 
@@ -130,7 +129,6 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
             3. Copy format restriction from an enumeration
             4. Set circular flag for the rest
         """
-
         source = self.find_dependency(attr_type, attr.tag)
         if not source:
             logger.warning("Reset absent type: %s", attr_type.name)

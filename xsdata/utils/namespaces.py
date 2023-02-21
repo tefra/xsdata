@@ -95,7 +95,6 @@ def real_xsi_type(qname: str, target_qname: Optional[str]) -> Optional[str]:
 @functools.lru_cache(maxsize=50)
 def build_qname(tag_or_uri: Optional[str], tag: Optional[str] = None) -> str:
     """Create namespace qualified strings."""
-
     if not tag_or_uri:
         if not tag:
             raise ValueError("Invalid input both uri and tag are empty.")
@@ -137,7 +136,6 @@ def is_ncname(name: Optional[str]) -> bool:
         return False
 
     for char in name[1:]:
-
         if char.isalpha() or char.isdigit() or char in NCNAME_PUNCTUATION:
             continue
         else:
@@ -148,14 +146,12 @@ def is_ncname(name: Optional[str]) -> bool:
 
 def is_uri(uri: Optional[str]) -> bool:
     """Verify given string is a valid uri."""
-
     return bool(URI_REGEX.search(uri)) if uri else False
 
 
 @functools.lru_cache(maxsize=50)
 def to_package_name(uri: Optional[str]) -> str:
     """Util method to convert a namespace to a dot style package name."""
-
     if not uri:
         return ""
 

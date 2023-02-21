@@ -96,6 +96,7 @@ class ClassUtils:
 
         for source_attr in source.attrs:
             clone = cls.clone_attribute(source_attr, attr.restrictions)
+            clone.restrictions.group = id(attr)
             target.attrs.insert(index, clone)
             index += 1
 
@@ -237,20 +238,24 @@ class ClassUtils:
             source.restrictions.max_occurs or 1,
         )
 
-        if source.restrictions.sequential:
-            target.restrictions.sequential = True
+        if source.restrictions.sequence is not None:
+            target.restrictions.sequence = source.restrictions.sequence
 
     @classmethod
     def rename_attribute_by_preference(cls, a: Attr, b: Attr):
         """
         Decide and rename one of the two given attributes.
 
-        When both attributes are derived from the same xs:tag and one of the two fields
-        has a specific namespace prepend it to the name. Preferable rename the second
+        When both attributes are derived from the same xs:tag and one of
+        the two fields
+        has a specific namespace prepend it to the name. Preferable
+        rename the second
         attribute.
 
-        Otherwise append the derived from tag to the name of one of the two attributes.
-        Preferably rename the second field or the field derived from xs:attribute.
+        Otherwise append the derived from tag to the name of one of the
+        two attributes.
+        Preferably rename the second field or the field derived from
+        xs:attribute.
         """
         if a.tag == b.tag and (a.namespace or b.namespace):
             change = b if b.namespace else a

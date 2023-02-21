@@ -80,7 +80,6 @@ class ElementNode(XmlNode):
     def bind(
         self, qname: str, text: Optional[str], tail: Optional[str], objects: List
     ) -> bool:
-
         obj: Any = None
         if not self.xsi_nil or self.meta.nillable:
             params: Dict = {}
@@ -213,7 +212,6 @@ class ElementNode(XmlNode):
         generic AnyElement instance. If the previous value is already a
         generic instance add the current value as a child object.
         """
-
         value = self.prepare_generic_value(qname, value, var)
 
         if var.list_element:
@@ -272,7 +270,6 @@ class ElementNode(XmlNode):
 
         Return if any data was bound.
         """
-
         var = self.meta.text
 
         if not var or (text is None and not self.xsi_nil):
@@ -425,7 +422,6 @@ class ElementNode(XmlNode):
         xsi_type: Optional[str] = None,
         xsi_nil: Optional[bool] = None,
     ) -> Optional[XmlNode]:
-
         meta = self.context.fetch(clazz, self.meta.namespace, xsi_type)
 
         if not meta or (meta.nillable and xsi_nil is False):

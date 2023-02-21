@@ -28,7 +28,7 @@ class CreateCompoundFieldsTests(FactoryTestCase):
         # First group repeating
         target.attrs[0].restrictions.choice = "1"
         target.attrs[1].restrictions.choice = "1"
-        target.attrs[1].restrictions.max_occurs = 2
+        target.attrs[1].restrictions.max_occurs = 1
         # Second group repeating
         target.attrs[2].restrictions.choice = "2"
         target.attrs[3].restrictions.choice = "2"
@@ -46,16 +46,22 @@ class CreateCompoundFieldsTests(FactoryTestCase):
         )
 
     def test_group_fields(self):
-        target = ClassFactory.create(attrs=AttrFactory.list(2))
+        target = ClassFactory.create(attrs=AttrFactory.list(4))
         target.attrs[0].restrictions.choice = "1"
         target.attrs[1].restrictions.choice = "1"
         target.attrs[0].restrictions.min_occurs = 10
         target.attrs[0].restrictions.max_occurs = 15
         target.attrs[1].restrictions.min_occurs = 5
         target.attrs[1].restrictions.max_occurs = 20
+        target.attrs[2].restrictions.min_occurs = 2
+        target.attrs[2].restrictions.max_occurs = 4
+        target.attrs[3].restrictions.min_occurs = 1
+        target.attrs[3].restrictions.max_occurs = 3
+        target.attrs[2].restrictions.group = 1
+        target.attrs[3].restrictions.group = 1
 
         expected = AttrFactory.create(
-            name="attr_B_Or_attr_C",
+            name="choice",
             tag="Choice",
             index=0,
             types=[AttrTypeFactory.native(DataType.ANY_TYPE)],
@@ -70,9 +76,19 @@ class CreateCompoundFieldsTests(FactoryTestCase):
                     name="attr_C",
                     types=target.attrs[1].types,
                 ),
+                AttrFactory.create(
+                    tag=target.attrs[2].tag,
+                    name="attr_D",
+                    types=target.attrs[2].types,
+                ),
+                AttrFactory.create(
+                    tag=target.attrs[3].tag,
+                    name="attr_E",
+                    types=target.attrs[3].types,
+                ),
             ],
         )
-        expected_res = Restrictions(min_occurs=5, max_occurs=20)
+        expected_res = Restrictions(min_occurs=3, max_occurs=20)
 
         self.processor.group_fields(target, list(target.attrs))
         self.assertEqual(1, len(target.attrs))
@@ -146,12 +162,12 @@ class CreateCompoundFieldsTests(FactoryTestCase):
             explicit_timezone="+1",
             nillable=True,
             choice="abc",
-            sequential=True,
+            sequence=1,
         )
         expected_res = attr.restrictions.clone()
         expected_res.min_occurs = None
         expected_res.max_occurs = None
-        expected_res.sequential = None
+        expected_res.sequence = None
 
         actual = self.processor.build_attr_choice(attr)
 
@@ -164,11 +180,21 @@ class CreateCompoundFieldsTests(FactoryTestCase):
         self.assertEqual(attr.help, actual.help)
         self.assertFalse(actual.fixed)
 
-    def test_reset_sequential(self):
-        def len_sequential(target: Class):
-            return len([attr for attr in target.attrs if attr.restrictions.sequential])
+    def test_attr_group_key(self):
+        attr = AttrFactory.create()
+        self.assertEqual(id(attr), self.processor.attr_group_key(attr))
 
-        restrictions = Restrictions(max_occurs=2, sequential=True)
+        attr.restrictions.sequence = 1
+        self.assertEqual(1, self.processor.attr_group_key(attr))
+
+        attr.restrictions.group = 2
+        self.assertEqual(2, self.processor.attr_group_key(attr))
+
+    def test_reset_sequence(self):
+        def len_sequence(target: Class):
+            return len([attr for attr in target.attrs if attr.restrictions.sequence])
+
+        restrictions = Restrictions(max_occurs=2, sequence=1)
         target = ClassFactory.create(
             attrs=[
                 AttrFactory.create(restrictions=restrictions.clone()),
@@ -179,23 +205,23 @@ class CreateCompoundFieldsTests(FactoryTestCase):
         attrs_clone = [attr.clone() for attr in target.attrs]
 
         self.processor.config.enabled = False
-        self.processor.reset_sequential(target, 0)
-        self.assertEqual(2, len_sequential(target))
+        self.processor.reset_sequence(target, 0)
+        self.assertEqual(2, len_sequence(target))
 
-        target.attrs[0].restrictions.sequential = False
-        self.processor.reset_sequential(target, 0)
-        self.assertEqual(1, len_sequential(target))
+        target.attrs[0].restrictions.sequence = None
+        self.processor.reset_sequence(target, 0)
+        self.assertEqual(1, len_sequence(target))
 
-        self.processor.reset_sequential(target, 1)
-        self.assertEqual(0, len_sequential(target))
+        self.processor.reset_sequence(target, 1)
+        self.assertEqual(0, len_sequence(target))
 
         target.attrs = attrs_clone
-        target.attrs[1].restrictions.sequential = False
-        self.processor.reset_sequential(target, 0)
-        self.assertEqual(0, len_sequential(target))
+        target.attrs[1].restrictions.sequence = None
+        self.processor.reset_sequence(target, 0)
+        self.assertEqual(0, len_sequence(target))
 
-        target.attrs[0].restrictions.sequential = True
+        target.attrs[0].restrictions.sequence = 1
         target.attrs[0].restrictions.max_occurs = 0
-        target.attrs[1].restrictions.sequential = True
-        self.processor.reset_sequential(target, 0)
-        self.assertEqual(1, len_sequential(target))
+        target.attrs[1].restrictions.sequence = 1
+        self.processor.reset_sequence(target, 0)
+        self.assertEqual(1, len_sequence(target))

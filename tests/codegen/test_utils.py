@@ -114,12 +114,16 @@ class ClassUtilsTests(FactoryTestCase):
         target = ClassFactory.elements(3)
         attrs = list(target.attrs)
         attrs[1].name = "bar"
+        attr = target.attrs[1]
 
-        ClassUtils.copy_group_attributes(source, target, target.attrs[1])
+        ClassUtils.copy_group_attributes(source, target, attr)
 
         self.assertEqual(4, len(target.attrs))
         self.assertEqual(source.attrs[0], target.attrs[1])
         self.assertEqual(source.attrs[1], target.attrs[2])
+
+        self.assertEqual(target.attrs[1].restrictions.group, id(attr))
+        self.assertEqual(target.attrs[2].restrictions.group, id(attr))
         mock_copy_inner_classes.assert_has_calls(
             [
                 mock.call(source, target, source.attrs[0]),
@@ -300,16 +304,16 @@ class ClassUtilsTests(FactoryTestCase):
 
         self.assertEqual(0, a.restrictions.min_occurs)
         self.assertEqual(1, a.restrictions.max_occurs)
-        self.assertFalse(a.restrictions.sequential)
+        self.assertIsNone(a.restrictions.sequence)
 
         c.restrictions.min_occurs = 2
-        a.restrictions.sequential = True
+        a.restrictions.sequence = 1
         a.restrictions.max_occurs = 4
 
         ClassUtils.merge_attributes(c, a)
         self.assertEqual(0, c.restrictions.min_occurs)
         self.assertEqual(4, c.restrictions.max_occurs)
-        self.assertTrue(c.restrictions.sequential)
+        self.assertEqual(1, c.restrictions.sequence)
 
     def test_rename_attribute_by_preference(self):
         one = AttrFactory.create(name="a", tag=Tag.ELEMENT)

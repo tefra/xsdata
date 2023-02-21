@@ -62,7 +62,6 @@ class SanitizeAttributesDefaultValueTests(FactoryTestCase):
     def test_process_attribute(
         self, mock_should_reset_required, mock_should_reset_default, mock_process_types
     ):
-
         target = ClassFactory.create()
         mock_should_reset_required.side_effect = [
             True,
@@ -134,11 +133,11 @@ class SanitizeAttributesDefaultValueTests(FactoryTestCase):
         )
         self.assertFalse(self.processor.should_reset_default(attr))
 
-        attr.restrictions.sequential = True
+        attr.restrictions.sequence = 1
         self.assertTrue(self.processor.should_reset_default(attr))
 
         attr.restrictions.choice = "foo"
-        attr.restrictions.sequential = False
+        attr.restrictions.sequence = None
         self.assertTrue(self.processor.should_reset_default(attr))
 
     @mock.patch(

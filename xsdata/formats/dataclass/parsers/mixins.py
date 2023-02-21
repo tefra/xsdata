@@ -58,7 +58,6 @@ class PushParser(AbstractParser):
         :param prefix: Namespace prefix
         :param uri: Namespace uri
         """
-
         if prefix not in self.ns_map:
             self.ns_map[prefix] = uri
 
@@ -136,7 +135,6 @@ class XmlHandler:
 
         :param ns_map: Namespace prefix-URI map
         """
-
         if self.queue:
             parent_ns_map = self.queue[-1].ns_map
 
@@ -166,7 +164,6 @@ class EventsHandler(XmlHandler):
 
     def parse(self, source: List[Tuple]) -> Any:
         """Forward the pre-recorded events to the main parser."""
-
         for event, *args in source:
             if event == EventType.START:
                 qname, attrs, ns_map = args

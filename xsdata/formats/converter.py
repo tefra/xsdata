@@ -158,7 +158,6 @@ class ConverterFactory:
         converters, fall back to str and issue a warning if there are
         not matches.
         """
-
         try:
             # Quick in and out, without checking the whole mro.
             return self.registry[datatype]
@@ -424,7 +423,6 @@ class EnumConverter(Converter):
     def match(
         cls, value: Any, values: Sequence, length: int, real: Any, **kwargs: Any
     ) -> bool:
-
         if isinstance(value, str) and isinstance(real, str):
             return value == real or " ".join(values) == real
 

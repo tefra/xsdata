@@ -29,7 +29,6 @@ class AddAttributeSubstitutions(RelativeHandlerInterface):
 
         Build the substitutions map if it's not initialized yet.
         """
-
         if self.substitutions is None:
             self.create_substitutions()
 

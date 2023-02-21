@@ -32,7 +32,6 @@ class SchemaMapper:
     @classmethod
     def map(cls, schema: Schema) -> List[Class]:
         """Map schema children elements to classes."""
-
         assert schema.location is not None
 
         location = schema.location

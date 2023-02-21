@@ -61,7 +61,6 @@ class JsonSerializer(AbstractSerializer):
         :param out: The output stream
         :param obj: The input dataclass instance
         """
-
         indent: Optional[int] = None
         if self.indent:
             warnings.warn(
@@ -76,7 +75,6 @@ class JsonSerializer(AbstractSerializer):
 
     def convert(self, obj: Any, var: Optional[XmlVar] = None) -> Any:
         if var is None or self.context.class_type.is_model(obj):
-
             if collections.is_array(obj):
                 return [self.convert(o) for o in obj]
 

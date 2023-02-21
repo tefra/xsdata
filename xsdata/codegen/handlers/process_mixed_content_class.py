@@ -35,7 +35,7 @@ class ProcessMixedContentClass(HandlerInterface):
                 choice = attr.clone()
                 choice.restrictions.min_occurs = None
                 choice.restrictions.max_occurs = None
-                choice.restrictions.sequential = None
+                choice.restrictions.sequence = None
                 choices.append(choice)
 
         wildcard = Attr(

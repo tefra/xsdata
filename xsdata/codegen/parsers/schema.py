@@ -234,7 +234,6 @@ class SchemaParser(UserXmlParser):
     def set_namespace_map(cls, obj: Any, ns_map: Optional[Dict]):
         """Add common namespaces like xml, xsi, xlink if they are missing."""
         if hasattr(obj, "ns_map"):
-
             if ns_map:
                 obj.ns_map.update(
                     {prefix: uri for prefix, uri in ns_map.items() if uri}

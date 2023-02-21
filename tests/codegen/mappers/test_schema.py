@@ -199,7 +199,9 @@ class SchemaMapperTests(FactoryTestCase):
 
     def test_element_children(self):
         sequence_one = Sequence(elements=[Element(), Element()])
+        sequence_one.index = 1
         sequence_two = Sequence(max_occurs=2, elements=[Element(), Element()])
+        sequence_two.index = 2
         restriction = Restriction(
             enumerations=[Enumeration(value=x) for x in "abc"], sequence=sequence_two
         )
@@ -230,12 +232,13 @@ class SchemaMapperTests(FactoryTestCase):
         complex_type = ComplexType(
             sequence=Sequence(choices=[choice], min_occurs=0, max_occurs=3)
         )
+        complex_type.sequence.index = 2
         parent_restrictions = Restrictions.from_element(complex_type)
         children = SchemaMapper.element_children(complex_type, parent_restrictions)
 
         child, restrictions = next(children)
         expected = Restrictions(
-            min_occurs=0, max_occurs=3, sequential=True, choice=str(id(choice))
+            min_occurs=0, max_occurs=3, sequence=2, choice=str(id(choice))
         )
         self.assertEqual(expected, restrictions)
 

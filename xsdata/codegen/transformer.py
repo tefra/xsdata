@@ -153,7 +153,6 @@ class SchemaTransformer:
 
     def process_xml_documents(self, uris: List[str]):
         """Process a list of xml resources."""
-
         classes = []
         parser = TreeParser()
         location = os.path.dirname(uris[0]) if uris else ""
@@ -168,7 +167,6 @@ class SchemaTransformer:
 
     def process_json_documents(self, uris: List[str]):
         """Process a list of json resources."""
-
         classes = []
         name = self.config.output.package.split(".")[-1]
         dirname = os.path.dirname(uris[0]) if uris else ""
@@ -236,7 +234,6 @@ class SchemaTransformer:
 
     def parse_schema(self, uri: str, namespace: Optional[str]) -> Optional[Schema]:
         """Parse the given schema uri and return the schema tree object."""
-
         input_stream = self.load_resource(uri)
         if input_stream is None:
             return None

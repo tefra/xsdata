@@ -17,15 +17,15 @@ class UpdateAttributesEffectiveChoiceTests(FactoryTestCase):
             AttrFactory.any(),
             AttrFactory.any(),
             # first group
-            AttrFactory.any(restrictions=Restrictions(sequential=True)),
-            AttrFactory.any(restrictions=Restrictions(sequential=True, max_occurs=2)),
-            AttrFactory.any(restrictions=Restrictions(sequential=True, max_occurs=2)),
+            AttrFactory.any(restrictions=Restrictions(sequence=1)),
+            AttrFactory.any(restrictions=Restrictions(sequence=1, max_occurs=2)),
+            AttrFactory.any(restrictions=Restrictions(sequence=1, max_occurs=2)),
             # break attr
             AttrFactory.any(),
             # second group
-            AttrFactory.any(restrictions=Restrictions(sequential=True, max_occurs=2)),
-            AttrFactory.any(restrictions=Restrictions(sequential=True, max_occurs=1)),
-            AttrFactory.any(restrictions=Restrictions(sequential=True, max_occurs=2)),
+            AttrFactory.any(restrictions=Restrictions(sequence=1, max_occurs=2)),
+            AttrFactory.any(restrictions=Restrictions(sequence=1, max_occurs=1)),
+            AttrFactory.any(restrictions=Restrictions(sequence=1, max_occurs=2)),
         ]
         target.attrs.extend(attrs)
 

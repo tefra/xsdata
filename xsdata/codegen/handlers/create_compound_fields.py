@@ -1,3 +1,5 @@
+from collections import defaultdict
+from typing import Dict
 from typing import List
 
 from xsdata.codegen.mixins import ContainerInterface
@@ -29,31 +31,35 @@ class CreateCompoundFields(RelativeHandlerInterface):
         if self.config.enabled:
             groups = group_by(target.attrs, get_restriction_choice)
             for choice, attrs in groups.items():
-                if choice and len(attrs) > 1 and any(attr.is_list for attr in attrs):
+                if choice and len(attrs) > 1:
                     self.group_fields(target, attrs)
 
         for index in range(len(target.attrs)):
-            self.reset_sequential(target, index)
+            self.reset_sequence(target, index)
 
     def group_fields(self, target: Class, attrs: List[Attr]):
         """Group attributes into a new compound field."""
-
         pos = target.attrs.index(attrs[0])
         choice = attrs[0].restrictions.choice
         sum_occurs = choice and choice.startswith("effective_")
 
         names = []
         choices = []
-        min_occurs = []
-        max_occurs = []
+        min_occurs_groups: Dict[int, int] = defaultdict(int)
+        max_occurs_groups: Dict[int, int] = defaultdict(int)
         for attr in attrs:
             ClassUtils.remove_attribute(target, attr)
             names.append(attr.local_name)
-            min_occurs.append(attr.restrictions.min_occurs or 0)
-            max_occurs.append(attr.restrictions.max_occurs or 0)
+
+            key = self.attr_group_key(attr)
+            min_occurs_groups[key] += attr.restrictions.min_occurs or 0
+            max_occurs_groups[key] += attr.restrictions.max_occurs or 0
+
             choices.append(self.build_attr_choice(attr))
 
         name = self.choose_name(target, names)
+        min_occurs = min_occurs_groups.values()
+        max_occurs = max_occurs_groups.values()
 
         target.attrs.insert(
             pos,
@@ -96,7 +102,7 @@ class CreateCompoundFields(RelativeHandlerInterface):
         restrictions = attr.restrictions.clone()
         restrictions.min_occurs = None
         restrictions.max_occurs = None
-        restrictions.sequential = None
+        restrictions.sequence = None
 
         return Attr(
             name=attr.local_name,
@@ -109,22 +115,26 @@ class CreateCompoundFields(RelativeHandlerInterface):
         )
 
     @classmethod
-    def reset_sequential(cls, target: Class, index: int):
+    def attr_group_key(cls, attr: Attr) -> int:
+        return attr.restrictions.group or attr.restrictions.sequence or id(attr)
+
+    @classmethod
+    def reset_sequence(cls, target: Class, index: int):
         """Reset the attribute at the given index if it has no siblings with
-        the sequential restriction."""
+        the sequence restriction."""
 
         attr = target.attrs[index]
         before = target.attrs[index - 1] if index - 1 >= 0 else None
         after = target.attrs[index + 1] if index + 1 < len(target.attrs) else None
 
         if not attr.is_list:
-            attr.restrictions.sequential = False
+            attr.restrictions.sequence = None
 
         if (
-            not attr.restrictions.sequential
-            or (before and before.restrictions.sequential)
-            or (after and after.restrictions.sequential and after.is_list)
+            attr.restrictions.sequence is None
+            or (before and before.restrictions.sequence is not None)
+            or (after and after.restrictions.sequence is not None and after.is_list)
         ):
             return
 
-        attr.restrictions.sequential = False
+        attr.restrictions.sequence = None

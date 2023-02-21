@@ -147,10 +147,10 @@ binding procedures.
    * - mixed
      - bool
      - Specifies whether the field supports mixed content. [#M1]_
-   * - sequential
-     - bool
-     - Specifies whether the field value(s) must appear in sequence with other
-       sequential sibling fields. eg ``<a /><b /><a /><b />``
+   * - sequence
+     - int
+     - Specifies the sequence identifier of sibling fields
+       eg ``<a /><b /><a /><b />``
    * - tokens
      - bool
      - Map the field value to a python sequence, [#M2]_

@@ -108,7 +108,6 @@ class JsonParser(AbstractParser):
 
     def bind_dataclass(self, data: Dict, clazz: Type[T]) -> T:
         """Recursively build the given model from the input dict data."""
-
         if set(data.keys()) == self.context.class_type.derived_keys:
             return self.bind_derived_dataclass(data, clazz)
 
@@ -162,7 +161,6 @@ class JsonParser(AbstractParser):
         keys = set(data.keys())
         max_score = -1.0
         for clazz in classes:
-
             if not self.context.class_type.is_model(clazz):
                 continue
 
@@ -223,7 +221,6 @@ class JsonParser(AbstractParser):
 
     def bind_text(self, meta: XmlMeta, var: XmlVar, value: Any) -> Any:
         """Bind text/tokens value entrypoint."""
-
         if var.is_elements:
             # Compound field we need to match the value to one of the choice elements
             check_subclass = self.context.class_type.is_model(value)
@@ -252,7 +249,6 @@ class JsonParser(AbstractParser):
 
     def bind_complex_type(self, meta: XmlMeta, var: XmlVar, data: Dict) -> Any:
         """Bind data to a user defined dataclass."""
-
         if var.is_clazz_union:
             # Union of dataclasses
             return self.bind_best_dataclass(data, var.types)
@@ -275,7 +271,6 @@ class JsonParser(AbstractParser):
 
     def bind_derived_value(self, meta: XmlMeta, var: XmlVar, data: Dict) -> Any:
         """Bind derived element entry point."""
-
         qname = data["qname"]
         xsi_type = data["type"]
         params = data["value"]

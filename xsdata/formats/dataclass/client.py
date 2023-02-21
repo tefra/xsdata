@@ -36,7 +36,6 @@ class Config(NamedTuple):
     @classmethod
     def from_service(cls, obj: Any, **kwargs: Any) -> "Config":
         """Instantiate from a generated service class."""
-
         params = {
             key: kwargs[key] if key in kwargs else getattr(obj, key, None)
             for key in cls._fields

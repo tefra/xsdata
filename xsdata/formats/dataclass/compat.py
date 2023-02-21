@@ -72,7 +72,6 @@ class ClassType(abc.ABC):
             2. str: 1
             3. *: 1.5
         """
-
         if not obj:
             return -1.0
 

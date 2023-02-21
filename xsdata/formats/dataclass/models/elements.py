@@ -67,7 +67,7 @@ class XmlVar(MetaMixin):
     :param any_type: Field supports dynamic value types
     :param required: Field is mandatory
     :param nillable: Field supports nillable content
-    :param sequential: Render values in sequential mode
+    :param sequence: Render values in sequential mode
     :param list_element: Field is a list of elements
     :param default: Field default value or factory
     :param xml_Type: Field xml type
@@ -92,7 +92,7 @@ class XmlVar(MetaMixin):
         "any_type",
         "required",
         "nillable",
-        "sequential",
+        "sequence",
         "default",
         "namespaces",
         "elements",
@@ -128,7 +128,7 @@ class XmlVar(MetaMixin):
         any_type: bool,
         required: bool,
         nillable: bool,
-        sequential: bool,
+        sequence: Optional[int],
         default: Any,
         xml_type: str,
         namespaces: Sequence[str],
@@ -150,7 +150,7 @@ class XmlVar(MetaMixin):
         self.any_type = any_type
         self.required = required
         self.nillable = nillable
-        self.sequential = sequential
+        self.sequence = sequence
         self.list_element = factory in (list, tuple)
         self.default = default
         self.namespaces = namespaces
@@ -261,7 +261,6 @@ class XmlVar(MetaMixin):
 
     def match_namespace(self, qname: str) -> bool:
         """Match the given qname to the wildcard allowed namespaces."""
-
         if self.namespace_matches is None:
             self.namespace_matches = {}
 

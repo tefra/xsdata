@@ -215,12 +215,12 @@ class ElementMapperTests(FactoryTestCase):
         self.assertEqual(2, len(target.attrs))
         self.assertEqual(sys.maxsize, target.attrs[0].restrictions.max_occurs)
         self.assertEqual(2, len(target.attrs[0].types))
-        self.assertFalse(target.attrs[0].restrictions.sequential)
+        self.assertIsNone(target.attrs[0].restrictions.sequence)
 
         attr = target.attrs[1].clone()
-        attr.restrictions.sequential = True
+        attr.restrictions.sequence = 1
         ElementMapper.add_attribute(target, attr)
-        self.assertTrue(target.attrs[1].restrictions.sequential)
+        self.assertEqual(1, target.attrs[1].restrictions.sequence)
 
         attr = AttrFactory.create()
         ElementMapper.add_attribute(target, attr)
@@ -235,7 +235,7 @@ class ElementMapperTests(FactoryTestCase):
         self.assertEqual("b", ElementMapper.select_namespace("b", "a", Tag.ATTRIBUTE))
         self.assertIsNone(ElementMapper.select_namespace(None, "a", Tag.ATTRIBUTE))
 
-    def test_sequential_names(self):
+    def test_sequence_names(self):
         a = AnyElement(qname="a")
         b = AnyElement(qname="b")
         c = AnyElement(qname="c")
@@ -243,17 +243,17 @@ class ElementMapperTests(FactoryTestCase):
         e = AnyElement(qname="e")
 
         p = AnyElement(children=[a, b])
-        actual = ElementMapper.sequential_names(p)
+        actual = ElementMapper.sequence_names(p)
         self.assertEqual(0, len(actual))
 
         p = AnyElement(children=[a, b, a])
-        actual = ElementMapper.sequential_names(p)
+        actual = ElementMapper.sequence_names(p)
         self.assertEqual({"a", "b"}, actual)
 
         p = AnyElement(children=[a, b, a, c])
-        actual = ElementMapper.sequential_names(p)
+        actual = ElementMapper.sequence_names(p)
         self.assertEqual({"a", "b"}, actual)
 
         p = AnyElement(children=[a, b, a, c, d, e, d])
-        actual = ElementMapper.sequential_names(p)
+        actual = ElementMapper.sequence_names(p)
         self.assertEqual({"a", "b", "d", "e"}, actual)

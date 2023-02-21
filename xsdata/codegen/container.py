@@ -115,7 +115,6 @@ class ClassContainer(ContainerInterface):
             5. Replace repeatable elements with compound fields
             6. Designate packages and modules
         """
-
         self.process_classes(Steps.FLATTEN)
         self.filter_classes()
         self.process_classes(Steps.SANITIZE)

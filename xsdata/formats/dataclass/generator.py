@@ -105,7 +105,6 @@ class DataclassGenerator(AbstractGenerator):
 
         def render_class(obj: Class) -> str:
             """Render class or enumeration."""
-
             if obj.is_enumeration:
                 template = load("enum.jinja2")
             elif obj.is_service:

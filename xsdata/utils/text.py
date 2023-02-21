@@ -176,7 +176,6 @@ class StringType:
 
 def classify(character: str) -> int:
     """String classifier."""
-
     code_point = ord(character)
     if 64 < code_point < 91:
         return StringType.UPPER

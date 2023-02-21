@@ -141,13 +141,13 @@ class SequentialType:
     )
     x0: Optional[int] = field(default=None)
     x1: List[int] = field(
-        default_factory=list, metadata=dict(type="Element", sequential=True)
+        default_factory=list, metadata=dict(type="Element", sequence=1)
     )
     x2: List[int] = field(
-        default_factory=list, metadata=dict(type="Element", sequential=True)
+        default_factory=list, metadata=dict(type="Element", sequence=1)
     )
     x3: List[int] = field(
-        default_factory=list, metadata=dict(type="Element", sequential=True)
+        default_factory=list, metadata=dict(type="Element", sequence=1)
     )
 
 

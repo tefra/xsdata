@@ -146,7 +146,6 @@ class DefinitionsMapper:
             )
 
         for suffix, binding_message, port_type_message, operation_name in messages:
-
             if style == "rpc":
                 yield cls.build_message_class(definitions, port_type_message)
 

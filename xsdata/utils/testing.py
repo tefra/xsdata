@@ -375,7 +375,7 @@ class XmlVarFactory(Factory):
         any_type: bool = False,
         required: bool = False,
         nillable: bool = False,
-        sequential: bool = False,
+        sequence: Optional[int] = None,
         list_element: bool = False,
         default: Optional[Any] = None,
         xml_type: str = XmlType.ELEMENT,
@@ -385,7 +385,6 @@ class XmlVarFactory(Factory):
         prefix: str = "field_",
         **kwargs: Any,
     ) -> XmlVar:
-
         name = name or f"{prefix}{cls.next_letter()}"
 
         if qname is None:
@@ -415,7 +414,7 @@ class XmlVarFactory(Factory):
             any_type=any_type,
             required=required,
             nillable=nillable,
-            sequential=sequential,
+            sequence=sequence,
             list_element=list_element,
             default=default,
             xml_type=xml_type,
@@ -444,7 +443,6 @@ class XmlMetaFactory(Factory):
         any_attributes: Optional[Sequence[XmlVar]] = None,
         **kwargs: Any,
     ) -> XmlMeta:
-
         if qname is None:
             qname = clazz.__name__
 
@@ -495,7 +493,6 @@ class DtdAttributeFactory(Factory):
         values: Optional[List[str]] = None,
         **kwargs: Any,
     ) -> DtdAttribute:
-
         if name is None:
             name = f"attribute_{cls.next_letter()}"
 
@@ -563,7 +560,6 @@ class DtdElementFactory(Factory):
         ns_map: Optional[Dict] = None,
         **kwargs: Any,
     ) -> DtdElement:
-
         if name is None:
             name = f"element_{cls.next_letter()}"
 

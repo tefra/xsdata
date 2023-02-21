@@ -17,7 +17,6 @@ class FlattenAttributeGroups(RelativeHandlerInterface):
         Group attributes can refer to attributes or other group
         attributes, repeat until there is no group attribute left.
         """
-
         repeat = False
         for attr in list(target.attrs):
             if attr.is_group:

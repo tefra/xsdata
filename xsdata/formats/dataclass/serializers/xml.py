@@ -333,7 +333,7 @@ class XmlSerializer(AbstractSerializer):
         while index < stop:
             var = attrs[index]
 
-            if not var.sequential:
+            if var.sequence is None:
                 value = getattr(obj, var.name)
                 if value is not None or var.nillable:
                     yield var, value
@@ -341,7 +341,7 @@ class XmlSerializer(AbstractSerializer):
                 continue
 
             indices = range(index + 1, stop)
-            end = next((i for i in indices if not attrs[i].sequential), stop)
+            end = next((i for i in indices if attrs[i].sequence is None), stop)
             sequence = attrs[index:end]
             index = end
             j = 0

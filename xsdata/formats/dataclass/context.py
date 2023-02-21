@@ -41,7 +41,6 @@ class XmlContext:
         attribute_name_generator: Callable = return_input,
         class_type: str = "dataclasses",
     ):
-
         self.element_name_generator = element_name_generator
         self.attribute_name_generator = attribute_name_generator
         self.class_type = class_types.get_type(class_type)
@@ -80,7 +79,6 @@ class XmlContext:
 
     def build_xsi_cache(self):
         """Index all imported dataclasses by their xsi:type qualified name."""
-
         if len(sys.modules) == self.sys_modules:
             return
 
@@ -158,10 +156,8 @@ class XmlContext:
         :param clazz: The search dataclass type
         :param qname: Qualified name
         """
-
         types: List[Type] = self.find_types(qname)
         for tp in types:
-
             # Why would an xml node with have an xsi:type that points
             # to parent class is beyond me but it happens, let's protect
             # against that scenario <node xsi:type="nodeAbstract" />
@@ -225,7 +221,6 @@ class XmlContext:
         :param obj: A dataclass instance
         :param clazz: A dataclass type
         """
-
         if obj is None:
             return False
 

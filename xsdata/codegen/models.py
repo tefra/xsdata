@@ -54,7 +54,7 @@ class Restrictions:
     :param pattern:
     :param explicit_timezone:
     :param nillable:
-    :param sequential:
+    :param sequence:
     :param tokens:
     :param format:
     :param choice:
@@ -75,10 +75,11 @@ class Restrictions:
     pattern: Optional[str] = field(default=None)
     explicit_timezone: Optional[str] = field(default=None)
     nillable: Optional[bool] = field(default=None)
-    sequential: Optional[bool] = field(default=None)
+    sequence: Optional[int] = field(default=None)
     tokens: Optional[bool] = field(default=None)
     format: Optional[str] = field(default=None)
     choice: Optional[str] = field(default=None)
+    group: Optional[int] = field(default=None)
 
     @property
     def is_list(self) -> bool:
@@ -96,21 +97,21 @@ class Restrictions:
 
     def merge(self, source: "Restrictions"):
         """Update properties from another instance."""
-
         self.update(source)
 
         min_occurs = source.min_occurs
         max_occurs = source.max_occurs
         is_list = max_occurs is not None and max_occurs > 1
 
-        # Update the sequential flag if new value is true and restrictions indicate
+        # Update the sequence number if new value is valid and restrictions indicate
         # the field was and still is a list.
-        if source.sequential and (is_list or not self.is_list):
-            self.sequential = source.sequential
+        if source.sequence is not None and (is_list or not self.is_list):
+            self.sequence = source.sequence
 
         self.choice = source.choice or self.choice
         self.tokens = source.tokens or self.tokens
         self.format = source.format or self.format
+        self.group = source.group or self.group
 
         # Update min occurs if current value is None or the new value is more than one.
         if self.min_occurs is None or (min_occurs is not None and min_occurs != 1):
@@ -148,7 +149,6 @@ class Restrictions:
         Skip None or implied values, and optionally use the parent
         attribute types to convert relevant options.
         """
-
         result = {}
         sorted_types = converter.sort_types(types) if types else []
 
@@ -161,7 +161,7 @@ class Restrictions:
             result["required"] = True
 
         for key, value in asdict(self).items():
-            if value is None or key in ("choice", "min_occurs", "max_occurs"):
+            if value is None or key in ("choice", "group", "min_occurs", "max_occurs"):
                 continue
 
             if key.endswith("clusive") and types:
@@ -591,7 +591,6 @@ class Class:
             * Ignore inner class references
             * Ignore native types.
         """
-
         types = {ext.type for ext in self.extensions}
 
         for attr in self.attrs:

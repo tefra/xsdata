@@ -13,7 +13,6 @@ def strongly_connected_components(edges: Dict[str, List[str]]) -> Iterator[Set[s
 
     :param edges: Mapping of vertex-edges values
     """
-
     identified: Set[str] = set()
     stack: List[str] = []
     index: Dict[str, int] = {}

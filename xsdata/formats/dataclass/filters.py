@@ -323,7 +323,6 @@ class Filters:
 
         result = []
         for choice in attr.choices:
-
             types = choice.native_types
             restrictions = choice.restrictions.asdict(types)
             namespace = (
@@ -372,7 +371,6 @@ class Filters:
 
     def format_metadata(self, data: Any, indent: int = 0, key: str = "") -> str:
         """Prettify field metadata for code generation."""
-
         if isinstance(data, dict):
             return self.format_dict(data, indent)
 
@@ -491,7 +489,6 @@ class Filters:
 
     def format_docstring(self, doc_string: str, level: int) -> str:
         """Format doc strings."""
-
         sep_pos = doc_string.rfind('"""')
         if sep_pos == -1:
             return ""
@@ -591,7 +588,6 @@ class Filters:
 
     def field_type(self, attr: Attr, parents: List[str]) -> str:
         """Generate type hints for the given attribute."""
-
         type_names = collections.unique_sequence(
             self.field_type_name(x, parents) for x in attr.types
         )

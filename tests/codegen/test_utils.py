@@ -114,12 +114,16 @@ class ClassUtilsTests(FactoryTestCase):
         target = ClassFactory.elements(3)
         attrs = list(target.attrs)
         attrs[1].name = "bar"
+        attr = target.attrs[1]
 
-        ClassUtils.copy_group_attributes(source, target, target.attrs[1])
+        ClassUtils.copy_group_attributes(source, target, attr)
 
         self.assertEqual(4, len(target.attrs))
         self.assertEqual(source.attrs[0], target.attrs[1])
         self.assertEqual(source.attrs[1], target.attrs[2])
+
+        self.assertEqual(target.attrs[1].restrictions.group, id(attr))
+        self.assertEqual(target.attrs[2].restrictions.group, id(attr))
         mock_copy_inner_classes.assert_has_calls(
             [
                 mock.call(source, target, source.attrs[0]),

@@ -79,6 +79,7 @@ class Restrictions:
     tokens: Optional[bool] = field(default=None)
     format: Optional[str] = field(default=None)
     choice: Optional[str] = field(default=None)
+    group: Optional[int] = field(default=None)
 
     @property
     def is_list(self) -> bool:
@@ -110,6 +111,7 @@ class Restrictions:
         self.choice = source.choice or self.choice
         self.tokens = source.tokens or self.tokens
         self.format = source.format or self.format
+        self.group = source.group or self.group
 
         # Update min occurs if current value is None or the new value is more than one.
         if self.min_occurs is None or (min_occurs is not None and min_occurs != 1):
@@ -159,7 +161,7 @@ class Restrictions:
             result["required"] = True
 
         for key, value in asdict(self).items():
-            if value is None or key in ("choice", "min_occurs", "max_occurs"):
+            if value is None or key in ("choice", "group", "min_occurs", "max_occurs"):
                 continue
 
             if key.endswith("clusive") and types:

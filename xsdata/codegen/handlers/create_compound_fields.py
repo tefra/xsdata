@@ -1,3 +1,5 @@
+from collections import defaultdict
+from typing import Dict
 from typing import List
 
 from xsdata.codegen.mixins import ContainerInterface
@@ -29,7 +31,7 @@ class CreateCompoundFields(RelativeHandlerInterface):
         if self.config.enabled:
             groups = group_by(target.attrs, get_restriction_choice)
             for choice, attrs in groups.items():
-                if choice and len(attrs) > 1 and any(attr.is_list for attr in attrs):
+                if choice and len(attrs) > 1:
                     self.group_fields(target, attrs)
 
         for index in range(len(target.attrs)):
@@ -43,16 +45,21 @@ class CreateCompoundFields(RelativeHandlerInterface):
 
         names = []
         choices = []
-        min_occurs = []
-        max_occurs = []
+        min_occurs_groups: Dict[int, int] = defaultdict(int)
+        max_occurs_groups: Dict[int, int] = defaultdict(int)
         for attr in attrs:
             ClassUtils.remove_attribute(target, attr)
             names.append(attr.local_name)
-            min_occurs.append(attr.restrictions.min_occurs or 0)
-            max_occurs.append(attr.restrictions.max_occurs or 0)
+
+            key = self.attr_group_key(attr)
+            min_occurs_groups[key] += attr.restrictions.min_occurs or 0
+            max_occurs_groups[key] += attr.restrictions.max_occurs or 0
+
             choices.append(self.build_attr_choice(attr))
 
         name = self.choose_name(target, names)
+        min_occurs = min_occurs_groups.values()
+        max_occurs = max_occurs_groups.values()
 
         target.attrs.insert(
             pos,
@@ -106,6 +113,10 @@ class CreateCompoundFields(RelativeHandlerInterface):
             help=attr.help,
             restrictions=restrictions,
         )
+
+    @classmethod
+    def attr_group_key(cls, attr: Attr) -> int:
+        return attr.restrictions.group or attr.restrictions.sequence or id(attr)
 
     @classmethod
     def reset_sequence(cls, target: Class, index: int):

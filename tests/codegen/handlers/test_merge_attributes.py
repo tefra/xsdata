@@ -30,6 +30,7 @@ class MergeAttributesTests(FactoryTestCase):
         five.types = [AttrTypeFactory.native(DataType.INT)]
         five_clone = five.clone()
         five_clone_two = five.clone()
+        five_clone_two.restrictions.sequence = 1
         five_clone_two.types.append(AttrTypeFactory.native(DataType.FLOAT))
 
         target = ClassFactory.create(
@@ -63,6 +64,7 @@ class MergeAttributesTests(FactoryTestCase):
         self.assertIsNone(three.restrictions.max_occurs)
         self.assertIsNone(four.restrictions.min_occurs)
         self.assertIsNone(four.restrictions.max_occurs)
+        self.assertEqual(1, five.restrictions.sequence)
         self.assertEqual(0, five.restrictions.min_occurs)
         self.assertEqual(3, five.restrictions.max_occurs)
         self.assertEqual(["int", "float"], [x.name for x in five.types])

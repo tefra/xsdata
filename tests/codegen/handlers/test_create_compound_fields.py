@@ -28,7 +28,7 @@ class CreateCompoundFieldsTests(FactoryTestCase):
         # First group repeating
         target.attrs[0].restrictions.choice = "1"
         target.attrs[1].restrictions.choice = "1"
-        target.attrs[1].restrictions.max_occurs = 2
+        target.attrs[1].restrictions.max_occurs = 1
         # Second group repeating
         target.attrs[2].restrictions.choice = "2"
         target.attrs[3].restrictions.choice = "2"
@@ -46,16 +46,22 @@ class CreateCompoundFieldsTests(FactoryTestCase):
         )
 
     def test_group_fields(self):
-        target = ClassFactory.create(attrs=AttrFactory.list(2))
+        target = ClassFactory.create(attrs=AttrFactory.list(4))
         target.attrs[0].restrictions.choice = "1"
         target.attrs[1].restrictions.choice = "1"
         target.attrs[0].restrictions.min_occurs = 10
         target.attrs[0].restrictions.max_occurs = 15
         target.attrs[1].restrictions.min_occurs = 5
         target.attrs[1].restrictions.max_occurs = 20
+        target.attrs[2].restrictions.min_occurs = 2
+        target.attrs[2].restrictions.max_occurs = 4
+        target.attrs[3].restrictions.min_occurs = 1
+        target.attrs[3].restrictions.max_occurs = 3
+        target.attrs[2].restrictions.group = 1
+        target.attrs[3].restrictions.group = 1
 
         expected = AttrFactory.create(
-            name="attr_B_Or_attr_C",
+            name="choice",
             tag="Choice",
             index=0,
             types=[AttrTypeFactory.native(DataType.ANY_TYPE)],
@@ -70,9 +76,19 @@ class CreateCompoundFieldsTests(FactoryTestCase):
                     name="attr_C",
                     types=target.attrs[1].types,
                 ),
+                AttrFactory.create(
+                    tag=target.attrs[2].tag,
+                    name="attr_D",
+                    types=target.attrs[2].types,
+                ),
+                AttrFactory.create(
+                    tag=target.attrs[3].tag,
+                    name="attr_E",
+                    types=target.attrs[3].types,
+                ),
             ],
         )
-        expected_res = Restrictions(min_occurs=5, max_occurs=20)
+        expected_res = Restrictions(min_occurs=3, max_occurs=20)
 
         self.processor.group_fields(target, list(target.attrs))
         self.assertEqual(1, len(target.attrs))
@@ -163,6 +179,16 @@ class CreateCompoundFieldsTests(FactoryTestCase):
         self.assertEqual(expected_res, actual.restrictions)
         self.assertEqual(attr.help, actual.help)
         self.assertFalse(actual.fixed)
+
+    def test_attr_group_key(self):
+        attr = AttrFactory.create()
+        self.assertEqual(id(attr), self.processor.attr_group_key(attr))
+
+        attr.restrictions.sequence = 1
+        self.assertEqual(1, self.processor.attr_group_key(attr))
+
+        attr.restrictions.group = 2
+        self.assertEqual(2, self.processor.attr_group_key(attr))
 
     def test_reset_sequence(self):
         def len_sequence(target: Class):

@@ -126,8 +126,7 @@ class XmlMetaBuilder:
             attribute_name_generator=attribute_name_generator,
         )
 
-        for index, field in enumerate(self.class_type.get_fields(clazz)):
-
+        for field in self.class_type.get_fields(clazz):
             real_clazz = self.find_declared_class(clazz, field.name)
             globalns = sys.modules[real_clazz.__module__].__dict__
             parent_namespace = namespace
@@ -135,7 +134,6 @@ class XmlMetaBuilder:
                 parent_namespace = getattr(real_clazz.Meta, "namespace", namespace)
 
             var = builder.build(
-                index,
                 field.name,
                 type_hints[field.name],
                 field.metadata,
@@ -234,6 +232,7 @@ class XmlMetaBuilder:
 
 class XmlVarBuilder:
     __slots__ = (
+        "index",
         "class_type",
         "default_xml_type",
         "element_name_generator",
@@ -247,6 +246,7 @@ class XmlVarBuilder:
         element_name_generator: Callable = return_input,
         attribute_name_generator: Callable = return_input,
     ):
+        self.index = 0
         self.class_type = class_type
         self.default_xml_type = default_xml_type
         self.element_name_generator = element_name_generator
@@ -254,7 +254,6 @@ class XmlVarBuilder:
 
     def build(
         self,
-        index: int,
         name: str,
         type_hint: Any,
         metadata: Mapping[str, Any],
@@ -314,6 +313,8 @@ class XmlVarBuilder:
 
         elements = {}
         wildcards = []
+        self.index += 1
+        cur_index = self.index
         for choice in self.build_choices(
             name, choices, origin, globalns, parent_namespace
         ):
@@ -323,7 +324,7 @@ class XmlVarBuilder:
                 wildcards.append(choice)
 
         return XmlVar(
-            index=index + 1,
+            index=cur_index,
             name=name,
             qname=qname,
             init=init,
@@ -357,7 +358,7 @@ class XmlVarBuilder:
         """Build the binding metadata for a compound dataclass field."""
         existing_types: Set[type] = set()
 
-        for index, choice in enumerate(choices):
+        for choice in choices:
             default_value = self.class_type.default_choice_value(choice)
 
             metadata = choice.copy()
@@ -370,7 +371,6 @@ class XmlVarBuilder:
                 metadata["type"] = XmlType.ELEMENT
 
             var = self.build(
-                index,
                 name,
                 type_hint,
                 metadata,

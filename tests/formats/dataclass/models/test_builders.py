@@ -313,7 +313,6 @@ class XmlVarBuilderTests(TestCase):
 
         self.maxDiff = None
         actual = self.builder.build(
-            66,
             "choice",
             type_hints["choice"],
             class_field.metadata,
@@ -323,7 +322,7 @@ class XmlVarBuilderTests(TestCase):
             globalns,
         )
         expected = XmlVarFactory.create(
-            index=67,
+            index=1,
             name="choice",
             types=(object,),
             factory=list,
@@ -332,7 +331,7 @@ class XmlVarBuilderTests(TestCase):
             xml_type=XmlType.ELEMENTS,
             elements={
                 "{bar}a": XmlVarFactory.create(
-                    index=1,
+                    index=2,
                     name="choice",
                     qname="{bar}a",
                     types=(TypeA,),
@@ -341,7 +340,7 @@ class XmlVarBuilderTests(TestCase):
                     namespaces=("bar",),
                 ),
                 "{bar}b": XmlVarFactory.create(
-                    index=2,
+                    index=3,
                     name="choice",
                     qname="{bar}b",
                     types=(TypeB,),
@@ -350,7 +349,7 @@ class XmlVarBuilderTests(TestCase):
                     namespaces=("bar",),
                 ),
                 "{bar}int": XmlVarFactory.create(
-                    index=3,
+                    index=4,
                     name="choice",
                     qname="{bar}int",
                     types=(int,),
@@ -358,7 +357,7 @@ class XmlVarBuilderTests(TestCase):
                     namespaces=("bar",),
                 ),
                 "{bar}int2": XmlVarFactory.create(
-                    index=4,
+                    index=5,
                     name="choice",
                     qname="{bar}int2",
                     types=(int,),
@@ -368,7 +367,7 @@ class XmlVarBuilderTests(TestCase):
                     namespaces=("bar",),
                 ),
                 "{bar}float": XmlVarFactory.create(
-                    index=5,
+                    index=6,
                     name="choice",
                     qname="{bar}float",
                     types=(float,),
@@ -376,7 +375,7 @@ class XmlVarBuilderTests(TestCase):
                     namespaces=("bar",),
                 ),
                 "{bar}qname": XmlVarFactory.create(
-                    index=6,
+                    index=7,
                     name="choice",
                     qname="{bar}qname",
                     types=(QName,),
@@ -384,7 +383,7 @@ class XmlVarBuilderTests(TestCase):
                     namespaces=("bar",),
                 ),
                 "{bar}tokens": XmlVarFactory.create(
-                    index=7,
+                    index=8,
                     name="choice",
                     qname="{bar}tokens",
                     types=(int,),
@@ -395,7 +394,7 @@ class XmlVarBuilderTests(TestCase):
                     namespaces=("bar",),
                 ),
                 "{foo}union": XmlVarFactory.create(
-                    index=8,
+                    index=9,
                     name="choice",
                     qname="{foo}union",
                     types=(UnionType,),
@@ -404,7 +403,7 @@ class XmlVarBuilderTests(TestCase):
                     namespaces=("foo",),
                 ),
                 "{bar}p": XmlVarFactory.create(
-                    index=9,
+                    index=10,
                     name="choice",
                     qname="{bar}p",
                     types=(float,),
@@ -416,7 +415,7 @@ class XmlVarBuilderTests(TestCase):
             },
             wildcards=[
                 XmlVarFactory.create(
-                    index=10,
+                    index=11,
                     name="choice",
                     xml_type=XmlType.WILDCARD,
                     qname="{http://www.w3.org/1999/xhtml}any",
@@ -428,12 +427,13 @@ class XmlVarBuilderTests(TestCase):
             ],
         )
 
+        self.maxDiff = None
         self.assertEqual(expected, actual)
 
     def test_build_validates_result(self):
         with self.assertRaises(XmlContextError) as cm:
             self.builder.build(
-                1, "foo", List[int], {"type": "Attributes"}, True, None, None, None
+                "foo", List[int], {"type": "Attributes"}, True, None, None, None
             )
 
         self.assertEqual(

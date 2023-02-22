@@ -16,21 +16,20 @@ from xsdata.utils.testing import FactoryTestCase
 
 
 class NoneGenerator(AbstractGenerator):
-    def __init__(self):
-        pass
-
     def render(self, classes: List[Class]) -> Iterator[GeneratorResult]:
         pass
 
 
 class CodeWriterTests(FactoryTestCase):
     def setUp(self):
-        generator = NoneGenerator()
+        config = GeneratorConfig()
+        generator = NoneGenerator(config)
         self.writer = CodeWriter(generator)
 
+    @mock.patch.object(NoneGenerator, "render_header")
     @mock.patch.object(NoneGenerator, "render")
     @mock.patch.object(NoneGenerator, "normalize_packages")
-    def test_write(self, mock_normalize_packages, mock_render):
+    def test_write(self, mock_normalize_packages, mock_render, mock_render_header):
         classes = ClassFactory.list(2)
         with TemporaryDirectory() as tmpdir:
             mock_render.return_value = [
@@ -38,10 +37,11 @@ class CodeWriterTests(FactoryTestCase):
                 GeneratorResult(Path(f"{tmpdir}/bar/b.py"), "file", "bBb"),
                 GeneratorResult(Path(f"{tmpdir}/c.py"), "file", " "),
             ]
+            mock_render_header.return_value = "// Head\n"
             self.writer.write(classes)
 
-            self.assertEqual("aAa", Path(f"{tmpdir}/foo/a.py").read_text())
-            self.assertEqual("bBb", Path(f"{tmpdir}/bar/b.py").read_text())
+            self.assertEqual("// Head\naAa", Path(f"{tmpdir}/foo/a.py").read_text())
+            self.assertEqual("// Head\nbBb", Path(f"{tmpdir}/bar/b.py").read_text())
             self.assertFalse(Path(f"{tmpdir}/c.py").exists())
             mock_normalize_packages.assert_called_once_with(classes)
 

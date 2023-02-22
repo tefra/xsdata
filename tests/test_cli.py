@@ -1,3 +1,5 @@
+import platform
+import sys
 import tempfile
 from pathlib import Path
 from unittest import mock
@@ -6,6 +8,7 @@ from unittest import TestCase
 from click.testing import CliRunner
 
 from tests import fixtures_dir
+from xsdata import __version__
 from xsdata.cli import cli
 from xsdata.cli import resolve_source
 from xsdata.codegen.transformer import SchemaTransformer
@@ -91,8 +94,16 @@ class CliTests(TestCase):
 
         self.assertIsNone(result.exception)
         self.assertEqual(GeneratorConfig.create(), GeneratorConfig.read(output_path))
-        mock_info.assert_called_once_with(
-            "Initializing configuration file %s", str(output_path)
+        mock_info.assert_has_calls(
+            [
+                mock.call(
+                    "========= xsdata v%s / Python %s / Platform %s =========\n",
+                    __version__,
+                    platform.python_version(),
+                    sys.platform,
+                ),
+                mock.call("Initializing configuration file %s", str(output_path)),
+            ]
         )
         output_path.unlink()
 
@@ -111,8 +122,16 @@ class CliTests(TestCase):
 
         self.assertIsNone(result.exception)
         self.assertNotEqual("20.8", GeneratorConfig.read(output_path))
-        mock_info.assert_called_once_with(
-            "Updating configuration file %s", str(output_path)
+        mock_info.assert_has_calls(
+            [
+                mock.call(
+                    "========= xsdata v%s / Python %s / Platform %s =========\n",
+                    __version__,
+                    platform.python_version(),
+                    sys.platform,
+                ),
+                mock.call("Updating configuration file %s", str(output_path)),
+            ]
         )
         output_path.unlink()
 

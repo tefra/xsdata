@@ -1,4 +1,5 @@
 import logging
+import platform
 import sys
 import warnings
 from pathlib import Path
@@ -45,6 +46,12 @@ def cli(ctx: click.Context, **kwargs: Any):
     """xsdata command line interface."""
     logger.setLevel(logging.INFO)
     formatwarning_orig = warnings.formatwarning
+    logger.info(
+        "========= xsdata v%s / Python %s / Platform %s =========\n",
+        __version__,
+        platform.python_version(),
+        sys.platform,
+    )
 
     def format_warning(message: Any, category: Any, *args: Any) -> str:
         return (

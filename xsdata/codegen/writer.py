@@ -32,12 +32,14 @@ class CodeWriter:
         necessary directories and files."""
 
         self.generator.normalize_packages(classes)
+        header = self.generator.render_header()
+
         for result in self.generator.render(classes):
             if result.source.strip():
                 logger.info("Generating package: %s", result.title)
-
+                src_code = header + result.source
                 result.path.parent.mkdir(parents=True, exist_ok=True)
-                result.path.write_text(result.source, encoding="utf-8")
+                result.path.write_text(src_code, encoding="utf-8")
 
     def print(self, classes: List[Class]):
         """Iterate over the designated generator outputs and print them to the

@@ -246,6 +246,8 @@ class GeneratorOutput:
         default: false, python>=3.7 Only
     :param unnest_classes: Move inner classes to upper level, default: false
     :param ignore_patterns: Ignore pattern restrictions, default: false
+    :param include_header: Include a header with codegen information in the output,
+        default: false
     """
 
     package: str = element(default="generated")
@@ -263,6 +265,7 @@ class GeneratorOutput:
     postponed_annotations: bool = element(default=False)
     unnest_classes: bool = element(default=False)
     ignore_patterns: bool = element(default=False)
+    include_header: bool = element(default=False)
 
     def update(self, **kwargs: Any):
         objects.update(self, **kwargs)

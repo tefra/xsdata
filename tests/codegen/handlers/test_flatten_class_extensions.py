@@ -401,22 +401,6 @@ class FlattenClassExtensionsTests(FactoryTestCase):
         target.attrs = [target.attrs[1], target.attrs[0], target.attrs[2]]
         self.assertTrue(self.processor.should_flatten_extension(source, target))
 
-        # Types violation
-        target = source.clone()
-        target.attrs[1].types = [
-            AttrTypeFactory.native(DataType.INT),
-            AttrTypeFactory.native(DataType.FLOAT),
-        ]
-
-        source.attrs[1].types = [
-            AttrTypeFactory.native(DataType.INT),
-            AttrTypeFactory.native(DataType.FLOAT),
-            AttrTypeFactory.native(DataType.DECIMAL),
-        ]
-        self.assertFalse(self.processor.should_flatten_extension(source, target))
-        target.attrs[1].types.append(AttrTypeFactory.native(DataType.QNAME))
-        self.assertTrue(self.processor.should_flatten_extension(source, target))
-
     def test_replace_attributes_type(self):
         extension = ExtensionFactory.create()
         target = ClassFactory.elements(2)

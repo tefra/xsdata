@@ -213,23 +213,11 @@ class FlattenClassExtensions(RelativeHandlerInterface):
             source.is_simple_type
             or target.has_suffix_attr
             or (source.has_suffix_attr and target.attrs)
-            or not cls.validate_type_overrides(source, target)
             or not cls.validate_sequence_order(source, target)
         ):
             return True
 
         return False
-
-    @classmethod
-    def validate_type_overrides(cls, source: Class, target: Class) -> bool:
-        """Validate every override is using a subset of the parent attr
-        types."""
-        for attr in target.attrs:
-            src_attr = ClassUtils.find_attr(source, attr.name)
-            if src_attr and any(tp not in src_attr.types for tp in attr.types):
-                return False
-
-        return True
 
     @classmethod
     def validate_sequence_order(cls, source: Class, target: Class) -> bool:

@@ -6,6 +6,7 @@ from xsdata.codegen.models import Class
 from xsdata.codegen.models import Restrictions
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import DataType
+from xsdata.models.enums import Tag
 from xsdata.utils.testing import AttrFactory
 from xsdata.utils.testing import AttrTypeFactory
 from xsdata.utils.testing import ClassFactory
@@ -123,12 +124,6 @@ class CreateCompoundFieldsTests(FactoryTestCase):
         actual = self.processor.choose_name(target, ["a", "b", "c", "d"])
         self.assertEqual("choice_1", actual)
 
-        base = ClassFactory.create()
-        base.attrs.append(AttrFactory.create(name="Choice!"))
-        target.extensions.append(ExtensionFactory.reference(base.qname))
-        self.container.extend((target, base))
-
-        target.attrs.clear()
         actual = self.processor.choose_name(target, ["a", "b", "c", "d"])
         self.assertEqual("choice_1", actual)
 
@@ -139,6 +134,39 @@ class CreateCompoundFieldsTests(FactoryTestCase):
         self.processor.config.force_default_name = True
         actual = self.processor.choose_name(target, ["a", "b", "c"])
         self.assertEqual("ThisOrThat", actual)
+
+    def test_build_reserved_names(self):
+        base = ClassFactory.create(
+            attrs=[
+                AttrFactory.create("standalone"),
+                AttrFactory.create(
+                    name="first",
+                    tag=Tag.CHOICE,
+                    choices=[
+                        AttrFactory.create(name="a"),
+                        AttrFactory.create(name="b"),
+                        AttrFactory.create(name="c"),
+                    ],
+                ),
+                AttrFactory.create(
+                    name="second",
+                    tag=Tag.CHOICE,
+                    choices=[
+                        AttrFactory.create(name="b"),
+                        AttrFactory.create(name="c"),
+                    ],
+                ),
+            ]
+        )
+
+        target = ClassFactory.create()
+        target.extensions.append(ExtensionFactory.reference(qname=base.qname))
+        self.processor.container.extend([base, target])
+
+        actual = self.processor.build_reserved_names(target, names=["b", "c"])
+        expected = {"standalone", "first"}
+
+        self.assertEqual(expected, actual)
 
     def test_build_attr_choice(self):
         attr = AttrFactory.create(

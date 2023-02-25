@@ -45,6 +45,9 @@ class ValidateAttributesOverrides(RelativeHandlerInterface):
 
     @classmethod
     def validate_override(cls, target: Class, attr: Attr, source_attr: Attr):
+        if source_attr.is_any_type and not attr.is_any_type:
+            return
+
         if attr.is_list and not source_attr.is_list:
             # Hack much??? idk but Optional[str] can't override List[str]
             source_attr.restrictions.max_occurs = sys.maxsize

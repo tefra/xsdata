@@ -443,7 +443,9 @@ class GeneratorConfig:
             )
 
         obj.substitutions.substitution.append(
-            GeneratorSubstitution(type=ObjectType.CLASS, search="Class", replace="Type")
+            GeneratorSubstitution(
+                type=ObjectType.CLASS, search="(.*)Class$", replace="\\1Type"
+            )
         )
 
         return obj

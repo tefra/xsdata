@@ -1,6 +1,8 @@
+from collections import Counter
 from collections import defaultdict
 from typing import Dict
 from typing import List
+from typing import Set
 
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.mixins import RelativeHandlerInterface
@@ -8,9 +10,9 @@ from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import get_restriction_choice
-from xsdata.codegen.models import get_slug
 from xsdata.codegen.models import Restrictions
 from xsdata.codegen.utils import ClassUtils
+from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
 from xsdata.utils.collections import group_by
@@ -77,9 +79,6 @@ class CreateCompoundFields(RelativeHandlerInterface):
         )
 
     def choose_name(self, target: Class, names: List[str]) -> str:
-        reserved = set(map(get_slug, self.base_attrs(target)))
-        reserved.update(map(get_slug, target.attrs))
-
         if (
             self.config.force_default_name
             or len(names) > 3
@@ -89,7 +88,20 @@ class CreateCompoundFields(RelativeHandlerInterface):
         else:
             name = "_Or_".join(names)
 
+        reserved = self.build_reserved_names(target, names)
         return ClassUtils.unique_name(name, reserved)
+
+    def build_reserved_names(self, target: Class, names: List[str]) -> Set[str]:
+        names_counter = Counter(names)
+        all_attrs = self.base_attrs(target)
+        all_attrs.extend(target.attrs)
+
+        return {
+            attr.slug
+            for attr in all_attrs
+            if attr.xml_type != XmlType.ELEMENTS
+            or Counter([x.local_name for x in attr.choices]) != names_counter
+        }
 
     @classmethod
     def build_attr_choice(cls, attr: Attr) -> Attr:

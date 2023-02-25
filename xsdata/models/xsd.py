@@ -329,6 +329,11 @@ class Attribute(AnnotationBase):
         elif self.ref:
             yield self.ref
 
+    @property
+    def default_type(self) -> str:
+        datatype = DataType.STRING if self.fixed else DataType.ANY_SIMPLE_TYPE
+        return datatype.prefixed(self.xs_prefix)
+
     def get_restrictions(self) -> Dict[str, Anything]:
         if self.use == UseType.REQUIRED:
             restrictions = {"min_occurs": 1, "max_occurs": 1}

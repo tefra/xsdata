@@ -67,3 +67,14 @@ class AttributeTests(TestCase):
         obj.type = "foo"
         obj.simple_type = None
         self.assertEqual(["foo"], list(obj.bases))
+
+    def test_property_default_type(self):
+        obj = Attribute()
+        self.assertEqual("anySimpleType", obj.default_type)
+
+        obj = Attribute()
+        obj.ns_map["foo"] = Namespace.XS.uri
+        self.assertEqual("foo:anySimpleType", obj.default_type)
+
+        obj.fixed = "aa"
+        self.assertEqual("foo:string", obj.default_type)

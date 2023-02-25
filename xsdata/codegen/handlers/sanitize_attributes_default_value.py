@@ -171,10 +171,14 @@ class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
         """
         Return whether the min occurrences for the attr needs to be reset.
 
-        Cases:
-            1. xs:any(Simple)Type, with no default value that's not a list already!
+        @Todo figure out if wildcards are supposed to be optional!
         """
-        return attr.default is None and object in attr.native_types and not attr.is_list
+        return (
+            not attr.is_attribute
+            and attr.default is None
+            and object in attr.native_types
+            and not attr.is_list
+        )
 
     @classmethod
     def should_reset_default(cls, attr: Attr) -> bool:

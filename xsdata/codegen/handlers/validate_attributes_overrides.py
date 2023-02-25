@@ -30,10 +30,14 @@ class ValidateAttributesOverrides(RelativeHandlerInterface):
 
             if base_attrs:
                 base_attr = base_attrs[0]
-                if attr.tag == base_attr.tag:
+                if self.overrides(attr, base_attr):
                     self.validate_override(target, attr, base_attr)
                 else:
                     self.resolve_conflict(attr, base_attr)
+
+    @classmethod
+    def overrides(cls, a: Attr, b: Attr) -> bool:
+        return a.xml_type == b.xml_type and a.namespace == b.namespace
 
     def base_attrs_map(self, target: Class) -> Dict[str, List[Attr]]:
         base_attrs = self.base_attrs(target)

@@ -50,6 +50,18 @@ class ValidateAttributesOverridesTests(FactoryTestCase):
             class_a.attrs[1], class_c.attrs[1]
         )
 
+    def test_overrides(self):
+        a = AttrFactory.create(tag=Tag.SIMPLE_TYPE)
+        b = a.clone()
+
+        self.assertTrue(self.processor.overrides(a, b))
+
+        b.tag = Tag.EXTENSION
+        self.assertTrue(self.processor.overrides(a, b))
+
+        b.namespace = "foo"
+        self.assertFalse(self.processor.overrides(a, b))
+
     def test_validate_override(self):
         attr_a = AttrFactory.create()
         attr_b = attr_a.clone()

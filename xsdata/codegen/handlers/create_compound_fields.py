@@ -2,6 +2,7 @@ from collections import Counter
 from collections import defaultdict
 from typing import Dict
 from typing import List
+from typing import Set
 
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.mixins import RelativeHandlerInterface
@@ -90,7 +91,7 @@ class CreateCompoundFields(RelativeHandlerInterface):
         reserved = self.build_reserved_names(target, names)
         return ClassUtils.unique_name(name, reserved)
 
-    def build_reserved_names(self, target: Class, names: List[str]) -> set[str]:
+    def build_reserved_names(self, target: Class, names: List[str]) -> Set[str]:
         names_counter = Counter(names)
         all_attrs = self.base_attrs(target)
         all_attrs.extend(target.attrs)

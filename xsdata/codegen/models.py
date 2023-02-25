@@ -337,15 +337,13 @@ class Attr:
         return self.tag in (Tag.ANY_ATTRIBUTE, Tag.ANY)
 
     @property
+    def is_any_type(self) -> bool:
+        return any(tp is object for tp in self.get_native_types())
+
+    @property
     def native_types(self) -> List[Type]:
         """Return a list of all builtin data types."""
-        result = set()
-        for tp in self.types:
-            datatype = tp.datatype
-            if datatype:
-                result.add(datatype.type)
-
-        return list(result)
+        return list(set(self.get_native_types()))
 
     @property
     def user_types(self) -> Iterator[AttrType]:
@@ -370,6 +368,12 @@ class Attr:
             types=[x.clone() for x in self.types],
             restrictions=self.restrictions.clone(),
         )
+
+    def get_native_types(self) -> Iterator[Type]:
+        for tp in self.types:
+            datatype = tp.datatype
+            if datatype:
+                yield datatype.type
 
 
 @dataclass(unsafe_hash=True)

@@ -95,6 +95,18 @@ class AttrTests(FactoryTestCase):
         self.assertFalse(AttrFactory.create(tag=Tag.ATTRIBUTE).is_nameless)
         self.assertTrue(AttrFactory.create(tag=Tag.ANY).is_nameless)
 
+    def test_property_is_any_type(self):
+        attr = AttrFactory.create(
+            types=[
+                AttrTypeFactory.create(qname="foo"),
+                AttrTypeFactory.native(DataType.FLOAT),
+            ]
+        )
+        self.assertFalse(attr.is_any_type)
+
+        attr.types.append(AttrTypeFactory.native(DataType.ANY_SIMPLE_TYPE))
+        self.assertTrue(attr.is_any_type)
+
     def test_property_native_types(self):
         attr = AttrFactory.create(
             types=[

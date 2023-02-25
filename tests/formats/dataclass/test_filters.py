@@ -111,6 +111,12 @@ class FiltersTests(FactoryTestCase):
         attr = AttrFactory.create(types=[AttrTypeFactory.create(alias="alias")])
         self.assertEqual("Alias", self.filters.constant_value(attr))
 
+    def test_apply_substitutions_with_regexes(self):
+        self.filters.substitutions[ObjectType.CLASS]["(.*)Class"] = "\\1Type"
+
+        actual = self.filters.apply_substitutions("FooClass", ObjectType.CLASS)
+        self.assertEqual("FooType", actual)
+
     @mock.patch.object(Filters, "field_default_value")
     def test_field_definition(self, mock_field_default_value):
         mock_field_default_value.side_effect = [1, False]

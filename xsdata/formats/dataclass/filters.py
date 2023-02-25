@@ -147,7 +147,7 @@ class Filters:
 
     def apply_substitutions(self, name: str, obj_type: ObjectType) -> str:
         for search, replace in self.substitutions[obj_type].items():
-            name = re.sub(search, replace, name)
+            name = re.sub(rf"{search}", rf"{replace}", name)
 
         return name
 

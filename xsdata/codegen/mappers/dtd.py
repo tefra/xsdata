@@ -119,8 +119,14 @@ class DtdMapper:
         elif content_type == DtdContentType.SEQ:
             cls.build_content_tree(target, content, **kwargs)
         elif content_type == DtdContentType.OR:
-            params = {"min_occurs": 0, "choice": str(id(content))}
-            params.update(kwargs)
+            params = cls.build_occurs(content.occur)
+            params.update(
+                {
+                    "choice": str(id(content)),
+                    "min_occurs": 0,
+                }
+            )
+            params.update(**kwargs)
             cls.build_content_tree(target, content, **params)
         else:  # content_type == DtdContentType.PCDATA:
             restrictions = cls.build_restrictions(content.occur, **kwargs)
@@ -135,7 +141,7 @@ class DtdMapper:
             cls.build_content(target, content.right, **kwargs)
 
     @classmethod
-    def build_restrictions(cls, occur: DtdContentOccur, **kwargs: Any) -> Restrictions:
+    def build_occurs(cls, occur: DtdContentOccur) -> Dict:
         if occur == DtdContentOccur.ONCE:
             min_occurs = 1
             max_occurs = 1
@@ -149,10 +155,14 @@ class DtdMapper:
             min_occurs = 1
             max_occurs = sys.maxsize
 
-        params: Dict[str, Any] = {
+        return {
             "min_occurs": min_occurs,
             "max_occurs": max_occurs,
         }
+
+    @classmethod
+    def build_restrictions(cls, occur: DtdContentOccur, **kwargs: Any) -> Restrictions:
+        params = cls.build_occurs(occur)
         params.update(kwargs)
 
         return Restrictions(**params)

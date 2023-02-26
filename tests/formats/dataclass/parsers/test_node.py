@@ -122,7 +122,7 @@ class NodeParserTests(TestCase):
 
         attrs = {QNames.XSI_TYPE: "bk:books"}
         ns_map = {"bk": "urn:books", "xsi": Namespace.XSI.uri}
-        parser.start(None, queue, objects, "doc", attrs, ns_map)
+        parser.start(None, queue, objects, "whatever", attrs, ns_map)
         actual = queue[0]
 
         self.assertEqual(1, len(queue))

@@ -198,29 +198,48 @@ class ClassUtils:
 
     @classmethod
     def reduce_attributes(cls, classes: List[Class]) -> List[Attr]:
+        result = []
+        for attr in cls.sorted_attrs(classes):
+            added = False
+            optional = False
+            for obj in classes:
+                pos = collections.find(obj.attrs, attr)
+                if pos == -1:
+                    optional = True
+                elif not added:
+                    added = True
+                    result.append(obj.attrs.pop(pos))
+                else:
+                    cls.merge_attributes(result[-1], obj.attrs.pop(pos))
+
+            if optional:
+                result[-1].restrictions.min_occurs = 0
+
+        return result
+
+    @classmethod
+    def sorted_attrs(cls, classes: List[Class]) -> List[Attr]:
         attrs: List[Attr] = []
         classes.sort(key=lambda x: len(x.attrs), reverse=True)
 
         for obj in classes:
             i = 0
-            while obj.attrs:
-                pos = collections.find(attrs, obj.attrs[i])
+            obj_attrs = obj.attrs.copy()
+
+            while obj_attrs:
+                pos = collections.find(attrs, obj_attrs[i])
                 i += 1
 
                 if pos > -1:
-                    insert = obj.attrs[:i]
-                    del obj.attrs[:i]
-
-                    merge = insert.pop()
-                    cls.merge_attributes(attrs[pos], merge)
+                    insert = obj_attrs[: i - 1]
+                    del obj_attrs[:i]
                     while insert:
                         attrs.insert(pos, insert.pop())
 
                     i = 0
-                else:
-                    if i == len(obj.attrs):
-                        attrs.extend(obj.attrs)
-                        obj.attrs.clear()
+                elif i == len(obj_attrs):
+                    attrs.extend(obj_attrs)
+                    obj_attrs.clear()
 
         return attrs
 

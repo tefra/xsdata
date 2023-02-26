@@ -137,7 +137,7 @@ class ElementMapper:
         attr = Attr(index=index, name=name, tag=tag, namespace=namespace)
         attr.types.append(attr_type)
         attr.restrictions.sequence = sequence
-        attr.restrictions.min_occurs = 0
+        attr.restrictions.min_occurs = 1
         attr.restrictions.max_occurs = 1
         cls.add_attribute(target, attr)
 

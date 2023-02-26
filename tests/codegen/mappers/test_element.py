@@ -72,6 +72,9 @@ class ElementMapperTests(FactoryTestCase):
             ],
         )
         self.assertEqual(expected, actual)
+        for attr in actual.attrs:
+            self.assertEqual(1, attr.restrictions.min_occurs)
+            self.assertEqual(1, attr.restrictions.max_occurs)
 
     def test_build_class_complex_type(self):
         element = AnyElement(

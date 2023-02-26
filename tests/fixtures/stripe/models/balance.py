@@ -11,12 +11,14 @@ class ConnectReserved:
         default=None,
         metadata={
             "type": "Element",
+            "required": True,
         }
     )
     currency: Optional[str] = field(
         default=None,
         metadata={
             "type": "Element",
+            "required": True,
         }
     )
 
@@ -30,12 +32,14 @@ class SourceTypes:
         default=None,
         metadata={
             "type": "Element",
+            "required": True,
         }
     )
     card: Optional[int] = field(
         default=None,
         metadata={
             "type": "Element",
+            "required": True,
         }
     )
 
@@ -49,18 +53,21 @@ class Available:
         default=None,
         metadata={
             "type": "Element",
+            "required": True,
         }
     )
     currency: Optional[str] = field(
         default=None,
         metadata={
             "type": "Element",
+            "required": True,
         }
     )
     source_types: Optional[SourceTypes] = field(
         default=None,
         metadata={
             "type": "Element",
+            "required": True,
         }
     )
 
@@ -74,18 +81,21 @@ class Pending:
         default=None,
         metadata={
             "type": "Element",
+            "required": True,
         }
     )
     currency: Optional[str] = field(
         default=None,
         metadata={
             "type": "Element",
+            "required": True,
         }
     )
     source_types: Optional[SourceTypes] = field(
         default=None,
         metadata={
             "type": "Element",
+            "required": True,
         }
     )
 
@@ -100,29 +110,34 @@ class Balance:
         metadata={
             "name": "object",
             "type": "Element",
+            "required": True,
         }
     )
     available: Tuple[Available, ...] = field(
         default_factory=tuple,
         metadata={
             "type": "Element",
+            "min_occurs": 1,
         }
     )
     connect_reserved: Tuple[ConnectReserved, ...] = field(
         default_factory=tuple,
         metadata={
             "type": "Element",
+            "min_occurs": 1,
         }
     )
     livemode: Optional[bool] = field(
         default=None,
         metadata={
             "type": "Element",
+            "required": True,
         }
     )
     pending: Tuple[Pending, ...] = field(
         default_factory=tuple,
         metadata={
             "type": "Element",
+            "min_occurs": 1,
         }
     )

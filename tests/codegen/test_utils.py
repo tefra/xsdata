@@ -277,23 +277,23 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual(["attr_E", "attr_F"], [x.name for x in result[1].attrs])
 
     def test_reduce_attributes(self):
-        attrs = AttrFactory.list(5, prefix="")
+        restrictions = Restrictions(min_occurs=1, max_occurs=1)
+        attr_a = AttrFactory.create(name="a", restrictions=restrictions.clone())
+        attr_b = AttrFactory.create(name="b", restrictions=restrictions.clone())
+        attr_c = AttrFactory.create(name="c", restrictions=restrictions.clone())
+        attr_d = AttrFactory.create(name="d", restrictions=restrictions.clone())
 
-        class_a = ClassFactory.create()
-        class_a.attrs = [x.clone() for x in attrs[:2]]
+        first = ClassFactory.create(qname="alphabet", attrs=[attr_b, attr_c, attr_d])
+        second = ClassFactory.create(qname="alphabet", attrs=[attr_a, attr_b])
 
-        class_b = ClassFactory.create()
-        class_b.attrs = [x.clone() for x in attrs[2:4]]
+        result = ClassUtils.reduce_attributes([first, second])
+        expected_names = ["a", "b", "c", "d"]
+        self.assertEqual(expected_names, [x.name for x in result])
 
-        class_c = ClassFactory.create()
-        class_c.attrs = [x.clone() for x in attrs[3:]]
-
-        class_d = ClassFactory.create()
-        class_d.attrs.append(attrs[0].clone())
-        class_d.attrs.append(attrs[4].clone())
-
-        result = ClassUtils.reduce_attributes([class_a, class_b, class_c, class_d])
-        self.assertEqual(["B", "C", "D", "E", "F"], [x.name for x in result])
+        self.assertEqual(0, result[0].restrictions.min_occurs)
+        self.assertEqual(1, result[1].restrictions.min_occurs)
+        self.assertEqual(0, result[2].restrictions.min_occurs)
+        self.assertEqual(0, result[3].restrictions.min_occurs)
 
     def test_merge_attributes(self):
         a = AttrFactory.native(DataType.INT, name="a")

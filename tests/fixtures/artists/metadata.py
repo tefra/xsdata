@@ -22,6 +22,7 @@ class Alias:
         metadata={
             "name": "sort-name",
             "type": "Attribute",
+            "required": True,
         }
     )
     type: Optional[str] = field(
@@ -44,7 +45,10 @@ class Alias:
         }
     )
     value: str = field(
-        default=""
+        default="",
+        metadata={
+            "required": True,
+        }
     )
 
 
@@ -58,12 +62,14 @@ class BeginArea:
         default=None,
         metadata={
             "type": "Attribute",
+            "required": True,
         }
     )
     name: Optional[str] = field(
         default=None,
         metadata={
             "type": "Element",
+            "required": True,
         }
     )
     sort_name: Optional[str] = field(
@@ -71,6 +77,7 @@ class BeginArea:
         metadata={
             "name": "sort-name",
             "type": "Element",
+            "required": True,
         }
     )
 
@@ -85,10 +92,14 @@ class Gender:
         default=None,
         metadata={
             "type": "Attribute",
+            "required": True,
         }
     )
     value: str = field(
-        default=""
+        default="",
+        metadata={
+            "required": True,
+        }
     )
 
 
@@ -102,6 +113,7 @@ class IpiList:
         default_factory=list,
         metadata={
             "type": "Element",
+            "min_occurs": 1,
         }
     )
 
@@ -116,6 +128,7 @@ class IsniList:
         default_factory=list,
         metadata={
             "type": "Element",
+            "min_occurs": 1,
         }
     )
 
@@ -131,6 +144,7 @@ class Iso31661CodeList:
         metadata={
             "name": "iso-3166-1-code",
             "type": "Element",
+            "required": True,
         }
     )
 
@@ -146,6 +160,7 @@ class Iso31662CodeList:
         metadata={
             "name": "iso-3166-2-code",
             "type": "Element",
+            "required": True,
         }
     )
 
@@ -160,6 +175,7 @@ class LifeSpan:
         default=None,
         metadata={
             "type": "Element",
+            "required": True,
         }
     )
     end: Optional[XmlDate] = field(
@@ -186,12 +202,14 @@ class AliasList:
         default=None,
         metadata={
             "type": "Attribute",
+            "required": True,
         }
     )
     alias: List[Alias] = field(
         default_factory=list,
         metadata={
             "type": "Element",
+            "min_occurs": 1,
         }
     )
 
@@ -206,12 +224,14 @@ class Area:
         default=None,
         metadata={
             "type": "Attribute",
+            "required": True,
         }
     )
     name: Optional[str] = field(
         default=None,
         metadata={
             "type": "Element",
+            "required": True,
         }
     )
     sort_name: Optional[str] = field(
@@ -219,6 +239,7 @@ class Area:
         metadata={
             "name": "sort-name",
             "type": "Element",
+            "required": True,
         }
     )
     iso_3166_1_code_list: Optional[Iso31661CodeList] = field(
@@ -226,6 +247,7 @@ class Area:
         metadata={
             "name": "iso-3166-1-code-list",
             "type": "Element",
+            "required": True,
         }
     )
 
@@ -240,12 +262,14 @@ class EndArea:
         default=None,
         metadata={
             "type": "Attribute",
+            "required": True,
         }
     )
     name: Optional[str] = field(
         default=None,
         metadata={
             "type": "Element",
+            "required": True,
         }
     )
     sort_name: Optional[str] = field(
@@ -253,6 +277,7 @@ class EndArea:
         metadata={
             "name": "sort-name",
             "type": "Element",
+            "required": True,
         }
     )
     iso_3166_2_code_list: Optional[Iso31662CodeList] = field(
@@ -260,6 +285,7 @@ class EndArea:
         metadata={
             "name": "iso-3166-2-code-list",
             "type": "Element",
+            "required": True,
         }
     )
 
@@ -274,12 +300,14 @@ class Artist:
         default=None,
         metadata={
             "type": "Attribute",
+            "required": True,
         }
     )
     type: Optional[str] = field(
         default=None,
         metadata={
             "type": "Attribute",
+            "required": True,
         }
     )
     type_id: Optional[str] = field(
@@ -287,12 +315,14 @@ class Artist:
         metadata={
             "name": "type-id",
             "type": "Attribute",
+            "required": True,
         }
     )
     name: Optional[str] = field(
         default=None,
         metadata={
             "type": "Element",
+            "required": True,
         }
     )
     sort_name: Optional[str] = field(
@@ -300,6 +330,7 @@ class Artist:
         metadata={
             "name": "sort-name",
             "type": "Element",
+            "required": True,
         }
     )
     disambiguation: Optional[str] = field(
@@ -326,6 +357,7 @@ class Artist:
         metadata={
             "name": "isni-list",
             "type": "Element",
+            "required": True,
         }
     )
     gender: Optional[Gender] = field(
@@ -338,12 +370,14 @@ class Artist:
         default=None,
         metadata={
             "type": "Element",
+            "required": True,
         }
     )
     area: Optional[Area] = field(
         default=None,
         metadata={
             "type": "Element",
+            "required": True,
         }
     )
     begin_area: Optional[BeginArea] = field(
@@ -351,6 +385,7 @@ class Artist:
         metadata={
             "name": "begin-area",
             "type": "Element",
+            "required": True,
         }
     )
     end_area: Optional[EndArea] = field(
@@ -365,6 +400,7 @@ class Artist:
         metadata={
             "name": "life-span",
             "type": "Element",
+            "required": True,
         }
     )
     alias_list: Optional[AliasList] = field(
@@ -372,6 +408,7 @@ class Artist:
         metadata={
             "name": "alias-list",
             "type": "Element",
+            "required": True,
         }
     )
 
@@ -386,5 +423,6 @@ class Metadata:
         default=None,
         metadata={
             "type": "Element",
+            "required": True,
         }
     )

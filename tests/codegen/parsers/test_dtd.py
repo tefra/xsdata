@@ -66,7 +66,7 @@ class DtdParserTests(TestCase):
                     "type": DtdContentType.ELEMENT,
                 },
                 "name": None,
-                "occur": DtdContentOccur.ONCE,
+                "occur": DtdContentOccur.MULT,
                 "right": {
                     "left": None,
                     "name": "Source",

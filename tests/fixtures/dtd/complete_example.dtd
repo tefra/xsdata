@@ -1,5 +1,5 @@
 <!ELEMENT Blog (Post+)>
-<!ELEMENT Post ((Origin|Source),Title,Body,Tags)>
+<!ELEMENT Post ((Origin|Source)*,Title,Body,Tags)>
 <!ELEMENT Origin (#PCDATA)>
 <!ELEMENT Source (#PCDATA)>
 <!ELEMENT Title (#PCDATA)>

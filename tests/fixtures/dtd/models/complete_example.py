@@ -50,15 +50,15 @@ class Post:
             "required": True,
         }
     )
-    origin: Optional[str] = field(
-        default=None,
+    origin: List[str] = field(
+        default_factory=list,
         metadata={
             "name": "Origin",
             "type": "Element",
         }
     )
-    source: Optional[str] = field(
-        default=None,
+    source: List[str] = field(
+        default_factory=list,
         metadata={
             "name": "Source",
             "type": "Element",

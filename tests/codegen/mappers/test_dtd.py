@@ -253,6 +253,7 @@ class DtdMapperTests(FactoryTestCase):
     def test_build_content_type_or(self):
         content = DtdContentFactory.create(
             type=DtdContentType.OR,
+            occur=DtdContentOccur.MULT,
             left=DtdContentFactory.create(type=DtdContentType.ELEMENT),
             right=DtdContentFactory.create(type=DtdContentType.ELEMENT),
         )
@@ -262,6 +263,7 @@ class DtdMapperTests(FactoryTestCase):
         for attr in target.attrs:
             self.assertEqual(str(id(content)), attr.restrictions.choice)
             self.assertEqual(0, attr.restrictions.min_occurs)
+            self.assertEqual(sys.maxsize, attr.restrictions.max_occurs)
 
     def test_build_content_type_or_nested(self):
         content = DtdContentFactory.create(

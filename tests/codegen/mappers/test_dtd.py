@@ -151,16 +151,49 @@ class DtdMapperTests(FactoryTestCase):
 
     def test_build_elements_with_mixed_element_type(self):
         target = ClassFactory.create(tag=Tag.ELEMENT)
+        left = DtdContentFactory.create(
+            type=DtdContentType.PCDATA, occur=DtdContentOccur.ONCE
+        )
+        right = DtdContentFactory.create(
+            name="rad", type=DtdContentType.ELEMENT, occur=DtdContentOccur.ONCE
+        )
         element = DtdElementFactory.create(
             type=DtdElementType.MIXED,
             content=DtdContentFactory.create(
-                type=DtdContentType.OR,
-                left=DtdContentFactory.create(
-                    type=DtdContentType.PCDATA, occur=DtdContentOccur.ONCE
-                ),
-                right=DtdContentFactory.create(
-                    name="rad", type=DtdContentType.ELEMENT, occur=DtdContentOccur.ONCE
-                ),
+                type=DtdContentType.OR, left=left, right=right
+            ),
+        )
+
+        DtdMapper.build_elements(target, element)
+        expected = [
+            AttrFactory.create(
+                tag=Tag.ELEMENT,
+                name="rad",
+                index=1,
+                types=[AttrTypeFactory.create(qname="rad")],
+            ),
+        ]
+
+        self.assertTrue(target.mixed)
+        self.assertEqual(expected, target.attrs)
+        self.assertEqual(Tag.COMPLEX_TYPE, target.tag)
+
+        element.content.left = right
+        element.content.right = left
+
+        target.attrs.clear()
+        target.mixed = False
+        DtdMapper.build_elements(target, element)
+        self.assertTrue(target.mixed)
+        self.assertEqual(expected, target.attrs)
+        self.assertEqual(Tag.COMPLEX_TYPE, target.tag)
+
+    def test_build_elements_with_mixed_element_type_with_no_content(self):
+        target = ClassFactory.create(tag=Tag.ELEMENT)
+        element = DtdElementFactory.create(
+            type=DtdElementType.MIXED,
+            content=DtdContentFactory.create(
+                type=DtdContentType.PCDATA,
             ),
         )
 
@@ -172,16 +205,10 @@ class DtdMapperTests(FactoryTestCase):
                 index=0,
                 types=[AttrTypeFactory.native(DataType.STRING)],
             ),
-            AttrFactory.create(
-                tag=Tag.ELEMENT,
-                name="rad",
-                index=1,
-                types=[AttrTypeFactory.create(qname="rad")],
-            ),
         ]
 
+        self.assertFalse(target.mixed)
         self.assertEqual(expected, target.attrs)
-        self.assertEqual(2, len(target.attrs))
         self.assertEqual(Tag.COMPLEX_TYPE, target.tag)
 
     def test_build_elements_with_any_element_type(self):

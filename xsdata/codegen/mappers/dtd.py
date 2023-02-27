@@ -99,10 +99,21 @@ class DtdMapper:
         if element.type == DtdElementType.ELEMENT and element.content:
             cls.build_content(target, element.content)
         elif element.type == DtdElementType.MIXED and element.content:
-            target.tag = Tag.COMPLEX_TYPE
-            cls.build_content(target, element.content)
+            cls.build_mixed_content(target, element.content)
         elif element.type == DtdElementType.ANY:
             cls.build_extension(target, DataType.ANY_TYPE)
+
+    @classmethod
+    def build_mixed_content(cls, target: Class, content: DtdContent):
+        if content.left and content.left.type == DtdContentType.PCDATA:
+            target.mixed = True
+            content.left = None
+        elif content.right and content.right.type == DtdContentType.PCDATA:
+            target.mixed = True
+            content.right = None
+
+        target.tag = Tag.COMPLEX_TYPE
+        cls.build_content(target, content)
 
     @classmethod
     def build_extension(cls, target: Class, data_type: DataType):

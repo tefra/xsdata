@@ -17,7 +17,7 @@ class PrimitiveNodeTests(TestCase):
             xml_type=XmlType.TEXT, name="foo", qname="foo", types=(int,), format="Nope"
         )
         ns_map = {"foo": "bar"}
-        node = PrimitiveNode(var, ns_map, DerivedElement)
+        node = PrimitiveNode(var, ns_map, False, DerivedElement)
         objects = []
 
         self.assertTrue(node.bind("foo", "13", "Impossible", objects))
@@ -37,7 +37,7 @@ class PrimitiveNodeTests(TestCase):
             xml_type=XmlType.TEXT, name="foo", qname="foo", types=(int,), derived=True
         )
         ns_map = {"foo": "bar"}
-        node = PrimitiveNode(var, ns_map, DerivedElement)
+        node = PrimitiveNode(var, ns_map, False, DerivedElement)
         objects = []
 
         self.assertTrue(node.bind("foo", "13", "Impossible", objects))
@@ -48,7 +48,7 @@ class PrimitiveNodeTests(TestCase):
             xml_type=XmlType.TEXT, name="foo", qname="foo", types=(str,), nillable=False
         )
         ns_map = {"foo": "bar"}
-        node = PrimitiveNode(var, ns_map, DerivedElement)
+        node = PrimitiveNode(var, ns_map, False, DerivedElement)
         objects = []
 
         self.assertTrue(node.bind("foo", None, None, objects))
@@ -58,9 +58,20 @@ class PrimitiveNodeTests(TestCase):
         self.assertTrue(node.bind("foo", None, None, objects))
         self.assertIsNone(objects[-1][1])
 
+    def test_bind_with_tail_content(self):
+        var = XmlVarFactory.create(
+            xml_type=XmlType.TEXT, name="foo", types=(int,), derived=True
+        )
+        node = PrimitiveNode(var, {}, True, DerivedElement)
+        objects = []
+
+        self.assertTrue(node.bind("foo", "13", "tail", objects))
+        self.assertEqual((None, "tail"), objects[-1])
+        self.assertEqual(DerivedElement("foo", 13), objects[-2][1])
+
     def test_child(self):
         var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo", qname="foo")
-        node = PrimitiveNode(var, {}, DerivedElement)
+        node = PrimitiveNode(var, {}, False, DerivedElement)
 
         with self.assertRaises(XmlContextError):
             node.child("foo", {}, {}, 0)

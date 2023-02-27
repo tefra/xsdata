@@ -508,3 +508,4 @@ class ElementNodeTests(FactoryTestCase):
         self.assertIsInstance(actual, PrimitiveNode)
         self.assertEqual(ns_map, actual.ns_map)
         self.assertEqual(var, actual.var)
+        self.assertEqual(self.node.meta.mixed_content, actual.mixed)

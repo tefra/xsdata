@@ -38,13 +38,14 @@ class Steps:
 
 
 class ClassContainer(ContainerInterface):
-    __slots__ = ("data", "processors")
+    __slots__ = ("data", "processors", "step")
 
     def __init__(self, config: GeneratorConfig):
         """Initialize a class container instance with its processors based on
         the provided configuration."""
         super().__init__(config)
 
+        self.step: int = 0
         self.data: Dict = {}
 
         self.processors = {
@@ -82,8 +83,8 @@ class ClassContainer(ContainerInterface):
         condition callable."""
         for row in self.data.get(qname, []):
             if condition(row):
-                if row.status == Status.RAW:
-                    self.process_class(row, Steps.FLATTEN)
+                if row.status < self.step:
+                    self.process_class(row, self.step)
                     return self.find(qname, condition)
 
                 return row
@@ -91,8 +92,8 @@ class ClassContainer(ContainerInterface):
 
     def find_inner(self, source: Class, qname: str) -> Class:
         inner = ClassUtils.find_inner(source, qname)
-        if inner.status == Status.RAW:
-            self.process_class(inner, Steps.FLATTEN)
+        if inner.status < self.step:
+            self.process_class(inner, self.step)
 
         return inner
 
@@ -123,6 +124,7 @@ class ClassContainer(ContainerInterface):
         self.designate_classes()
 
     def process_classes(self, step: int) -> None:
+        self.step = step
         for obj in self:
             if obj.status < step:
                 self.process_class(obj, step)

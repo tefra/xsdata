@@ -69,6 +69,7 @@ class ClassContainerTests(FactoryTestCase):
         class_c = ClassFactory.enumeration(2, qname="b", status=Status.FLATTENING)
         mock_process_class.side_effect = process_class
         self.container.extend([class_a, class_b, class_c])
+        self.container.step = Steps.FLATTEN
 
         self.assertIsNone(self.container.find("nope"))
         self.assertEqual(class_a, self.container.find(class_a.qname))
@@ -89,6 +90,7 @@ class ClassContainerTests(FactoryTestCase):
             x.status = Status.FLATTENED
 
         mock_process_class.side_effect = process_class
+        self.container.step = Steps.FLATTEN
 
         self.assertEqual(first, self.container.find_inner(obj, "{a}a"))
         self.assertEqual(second, self.container.find_inner(obj, "{a}b"))

@@ -9,6 +9,7 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 from typing import Type
+from collections.abc import Mapping
 
 from xsdata.exceptions import ConverterWarning
 from xsdata.exceptions import ParserError
@@ -105,6 +106,14 @@ class NodeParser(PushParser):
             # Exit if we still have no binding model
             if clazz is None:
                 raise ParserError(f"No class found matching root: {qname}")
+
+            if not isinstance(clazz, type):
+                # did not specify a class
+                # maybe a lookup function or a mapping
+                if callable(clazz):
+                    clazz = clazz(qname, attrs=attrs, ns_map=ns_map)
+                elif isinstance(clazz, Mapping):
+                    clazz = clazz[qname]
 
             meta = self.context.fetch(clazz, xsi_type=xsi_type)
             if xsi_type is None or meta.qname == qname:

@@ -111,7 +111,8 @@ class NodeParser(PushParser):
                 # did not specify a class
                 # maybe a lookup function or a mapping
                 if callable(clazz):
-                    clazz = clazz(qname, attrs=attrs, ns_map=ns_map)
+                    clazz = clazz(qname, attrs=attrs, ns_map=ns_map,
+                                  parser=self)
                 elif isinstance(clazz, Mapping):
                     clazz = clazz[qname]
 

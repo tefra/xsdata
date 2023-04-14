@@ -27,11 +27,6 @@ class ClassContainerTests(FactoryTestCase):
         container = ClassContainer(config)
         container.extend(classes)
 
-        expected = {
-            "{xsdata}foo": classes[:2],
-            "{xsdata}foobar": classes[2:],
-        }
-
         self.assertEqual(2, len(container.data))
         self.assertEqual(3, len(list(container)))
         self.assertEqual(classes, list(container))
@@ -44,6 +39,8 @@ class ClassContainerTests(FactoryTestCase):
         expected = {
             10: [
                 "FlattenAttributeGroups",
+            ],
+            20: [
                 "FlattenClassExtensions",
                 "SanitizeEnumerationClass",
                 "UnnestInnerClasses",
@@ -52,9 +49,9 @@ class ClassContainerTests(FactoryTestCase):
                 "MergeAttributes",
                 "ProcessMixedContentClass",
             ],
-            20: ["UpdateAttributesEffectiveChoice", "SanitizeAttributesDefaultValue"],
-            30: ["ValidateAttributesOverrides", "RenameDuplicateAttributes"],
-            40: ["VacuumInnerClasses", "CreateCompoundFields"],
+            30: ["UpdateAttributesEffectiveChoice", "SanitizeAttributesDefaultValue"],
+            40: ["ValidateAttributesOverrides", "RenameDuplicateAttributes"],
+            50: ["VacuumInnerClasses", "CreateCompoundFields"],
         }
 
         self.assertEqual(expected, actual)
@@ -145,3 +142,14 @@ class ClassContainerTests(FactoryTestCase):
         expected = [complex_type, enum_1]
         container.filter_classes()
         self.assertEqual(expected, list(container))
+
+    def test_remove_groups(self):
+        classes = [
+            ClassFactory.create(tag=Tag.ATTRIBUTE_GROUP),
+            ClassFactory.create(tag=Tag.GROUP),
+            ClassFactory.create(tag=Tag.ELEMENT),
+        ]
+
+        self.container.extend(classes)
+        self.container.remove_groups()
+        self.assertEqual(1, len(list(self.container)))

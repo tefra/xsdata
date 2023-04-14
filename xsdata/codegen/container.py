@@ -31,10 +31,11 @@ from xsdata.utils.constants import return_true
 
 
 class Steps:
-    FLATTEN = 10
-    SANITIZE = 20
-    RESOLVE = 30
-    FINALIZE = 40
+    UNGROUP = 10
+    FLATTEN = 20
+    SANITIZE = 30
+    RESOLVE = 40
+    FINALIZE = 50
 
 
 class ClassContainer(ContainerInterface):
@@ -48,9 +49,11 @@ class ClassContainer(ContainerInterface):
         self.step: int = 0
         self.data: Dict = {}
 
-        self.processors = {
-            Steps.FLATTEN: [
+        self.processors: Dict[int, List] = {
+            Steps.UNGROUP: [
                 FlattenAttributeGroups(self),
+            ],
+            Steps.FLATTEN: [
                 FlattenClassExtensions(self),
                 SanitizeEnumerationClass(self),
                 UnnestInnerClasses(self),
@@ -105,17 +108,9 @@ class ClassContainer(ContainerInterface):
         return classes[0]
 
     def process(self):
-        """
-        Run all the process handlers.
-
-        Steps
-            1. Flatten extensions, attribute types
-            2. Filter classes to be actually generated
-            3. Sanitize attributes and extensions
-            4. Resolve attributes conflicts
-            5. Replace repeatable elements with compound fields
-            6. Designate packages and modules
-        """
+        """The hidden naive recipe of processing xsd models."""
+        self.process_classes(Steps.UNGROUP)
+        self.remove_groups()
         self.process_classes(Steps.FLATTEN)
         self.filter_classes()
         self.process_classes(Steps.SANITIZE)
@@ -152,6 +147,9 @@ class ClassContainer(ContainerInterface):
     def filter_classes(self):
         """Filter the classes to be generated."""
         FilterClasses(self).run()
+
+    def remove_groups(self):
+        self.set([x for x in iter(self) if not x.is_group])
 
     def add(self, item: Class):
         """Add class item to the container."""

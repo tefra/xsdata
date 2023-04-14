@@ -399,14 +399,16 @@ class Extension:
 
 class Status(IntEnum):
     RAW = 0
-    FLATTENING = 10
-    FLATTENED = 11
-    SANITIZING = 20
-    SANITIZED = 21
-    RESOLVING = 30
-    RESOLVED = 31
-    FINALIZING = 40
-    FINALIZED = 41
+    UNGROUPING = 10
+    UNGROUPED = 11
+    FLATTENING = 20
+    FLATTENED = 21
+    SANITIZING = 30
+    SANITIZED = 31
+    RESOLVING = 40
+    RESOLVED = 41
+    FINALIZING = 50
+    FINALIZED = 51
 
 
 @dataclass

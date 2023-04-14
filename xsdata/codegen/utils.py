@@ -266,15 +266,12 @@ class ClassUtils:
         Decide and rename one of the two given attributes.
 
         When both attributes are derived from the same xs:tag and one of
-        the two fields
-        has a specific namespace prepend it to the name. Preferable
-        rename the second
-        attribute.
+        the two fields has a specific namespace prepend it to the name.
+        Preferable rename the second attribute.
 
         Otherwise append the derived from tag to the name of one of the
-        two attributes.
-        Preferably rename the second field or the field derived from
-        xs:attribute.
+        two attributes. Preferably rename the second field or the field
+        derived from xs:attribute.
         """
         if a.tag == b.tag and (a.namespace or b.namespace):
             change = b if b.namespace else a

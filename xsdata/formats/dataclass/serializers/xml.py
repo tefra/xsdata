@@ -410,8 +410,8 @@ class XmlSerializer(AbstractSerializer):
         QName(s) so they also get a special treatment.
 
         We can't do all the conversions in the writer because we would
-        need to carry the xml vars inside the writer. Instead of that
-        we do the easy encoding here and leave the qualified names for
+        need to carry the xml vars inside the writer. Instead of that we
+        do the easy encoding here and leave the qualified names for
         later.
         """
         if isinstance(value, (str, QName)) or var is None:

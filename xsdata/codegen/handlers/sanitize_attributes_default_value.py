@@ -102,11 +102,10 @@ class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
         Convert string literal default values to enumeration members
         placeholders and return result.
 
-        The placeholders will be converted to proper references
-        from the generator filters.
+        The placeholders will be converted to proper references from the
+        generator filters.
 
-        Placeholder examples:
-        Single -> @enum@qname::member_name
+        Placeholder examples: Single -> @enum@qname::member_name
         Multiple -> @enum@qname::first_member@second_member
         """
         assert attr.default is not None

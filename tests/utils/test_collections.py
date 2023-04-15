@@ -30,3 +30,4 @@ class CollectionsTests(TestCase):
         self.assertFalse(collections.is_array(fixture(1, 2)))
         self.assertTrue(collections.is_array([]))
         self.assertTrue(collections.is_array(tuple()))
+        self.assertTrue(collections.is_array(frozenset()))

@@ -149,6 +149,9 @@ class SequentialType:
     x3: List[int] = field(
         default_factory=list, metadata=dict(type="Element", sequence=1)
     )
+    x4: Optional[int]  = field(
+        default=None, metadata=dict(type="Element", sequence=1)
+    )
 
 
 @dataclass

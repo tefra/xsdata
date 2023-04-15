@@ -340,10 +340,10 @@ class XmlSerializer(AbstractSerializer):
                 index += 1
                 continue
 
-            indices = range(index + 1, stop)
-            end = next((i for i in indices if attrs[i].sequence is None), stop)
-            sequence = attrs[index:end]
-            index = end
+            indices = range(index, stop)
+            end = next(i for i in indices[::-1] if attrs[i].sequence == var.sequence)
+            sequence = attrs[index : end + 1]
+            index = end + 1
             j = 0
 
             rolling = True
@@ -351,12 +351,17 @@ class XmlSerializer(AbstractSerializer):
                 rolling = False
                 for var in sequence:
                     values = getattr(obj, var.name)
-                    if j < len(values):
+                    if collections.is_array(values):
+                        if j < len(values):
+                            rolling = True
+                            value = values[j]
+                            if value is not None or var.nillable:
+                                yield var, value
+                    elif j == 0:
                         rolling = True
-                        value = values[j]
+                        if values is not None or var.nillable:
+                            yield var, values
 
-                        if value is not None or var.nillable:
-                            yield var, value
                 j += 1
 
     @classmethod

@@ -570,12 +570,13 @@ class XmlSerializerTests(TestCase):
         self.assertEqual(expected, list(result))
 
     def test_next_value(self):
-        obj = SequentialType(x0=1, x1=[2, 3, 4, None], x2=[6, 7], x3=[9])
+        obj = SequentialType(x0=1, x1=[2, 3, 4, None], x2=[6, 7], x3=[9], x4=10)
         meta = self.serializer.context.build(SequentialType)
         x0 = meta.text
         x1 = next(meta.find_children("x1"))
         x2 = next(meta.find_children("x2"))
         x3 = next(meta.find_children("x3"))
+        x4 = next(meta.find_children("x4"))
 
         actual = self.serializer.next_value(obj, meta)
         expected = [
@@ -583,6 +584,7 @@ class XmlSerializerTests(TestCase):
             (x1, 2),
             (x2, 6),
             (x3, 9),
+            (x4, 10),
             (x1, 3),
             (x2, 7),
             (x1, 4),

@@ -1,7 +1,11 @@
+import hashlib
 import io
 import json
 import os
+import pickle
+import tempfile
 from collections import defaultdict
+from pathlib import Path
 from typing import Callable
 from typing import Dict
 from typing import List
@@ -99,7 +103,19 @@ class SchemaTransformer:
         self.processed: List[str] = []
         self.preloaded: Dict = {}
 
-    def process(self, uris: List[str]):
+    def process(self, uris: List[str], cache: bool = False):
+        cache_file = self.get_cache_file(uris) if cache else None
+        if cache_file and cache_file.exists():
+            self.classes = pickle.loads(cache_file.read_bytes())
+        else:
+            self.process_sources(uris)
+
+        if cache_file and not cache_file.exists():
+            cache_file.write_bytes(pickle.dumps(self.classes))
+
+        self.process_classes()
+
+    def process_sources(self, uris: List[str]):
         sources = defaultdict(list)
         for uri in uris:
             tp = self.classify_resource(uri)
@@ -110,7 +126,6 @@ class SchemaTransformer:
         self.process_dtds(sources[TYPE_DTD])
         self.process_xml_documents(sources[TYPE_XML])
         self.process_json_documents(sources[TYPE_JSON])
-        self.process_classes()
 
     def process_definitions(self, uris: List[str]):
         """Process a list of wsdl resources."""
@@ -322,3 +337,9 @@ class SchemaTransformer:
             inner += sum(self.count_classes(cls.inner))
 
         return main, inner
+
+    @classmethod
+    def get_cache_file(cls, uris: List[str]) -> Path:
+        key = hashlib.md5("".join(uris).encode()).hexdigest()
+        tempdir = tempfile.gettempdir()
+        return Path(tempdir).joinpath(f"{key}.cache")

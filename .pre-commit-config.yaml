@@ -11,11 +11,11 @@ repos:
     hooks:
       - id: reorder-python-imports
   - repo: https://github.com/ambv/black
-    rev: 23.1.0
+    rev: 23.3.0
     hooks:
       - id: black
   - repo: https://github.com/PyCQA/autoflake
-    rev: v2.0.1
+    rev: v2.1.0
     hooks:
       - id: autoflake
   - repo: https://github.com/PyCQA/flake8
@@ -41,7 +41,7 @@ repos:
       - id: docformatter
         args: [ "--in-place", "--pre-summary-newline" ]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.0.1
+    rev: v1.2.0
     hooks:
       - id: mypy
         files: ^(xsdata/)

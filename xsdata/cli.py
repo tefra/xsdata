@@ -116,6 +116,7 @@ def download(source: str, output: str):
 )
 @click.option("-c", "--config", default=".xsdata.xml", help="Project configuration")
 @click.option("-pp", "--print", is_flag=True, default=False, help="Print output")
+@click.option("--cache", is_flag=True, default=False, help="Cache sources loading")
 @model_options(GeneratorOutput)
 def generate(**kwargs: Any):
     """
@@ -127,6 +128,7 @@ def generate(**kwargs: Any):
     """
     source = kwargs.pop("source")
     stdout = kwargs.pop("print")
+    cache = kwargs.pop("cache")
     recursive = kwargs.pop("recursive")
     config_file = Path(kwargs.pop("config")).resolve()
 
@@ -136,7 +138,7 @@ def generate(**kwargs: Any):
 
     transformer = SchemaTransformer(config=config, print=stdout)
     uris = sorted(resolve_source(source, recursive=recursive))
-    transformer.process(uris)
+    transformer.process(uris, cache=cache)
 
     handler.emit_warnings()
 

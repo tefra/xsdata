@@ -1,3 +1,4 @@
+import pickle
 import tempfile
 from pathlib import Path
 from unittest import mock
@@ -70,6 +71,45 @@ class SchemaTransformerTests(FactoryTestCase):
         mock_process_json_documents.assert_called_once_with(uris[6:8])
         mock_process_dtds.assert_called_once_with(uris[8:])
         mock_process_classes.assert_called_once_with()
+
+    @mock.patch.object(SchemaTransformer, "process_classes")
+    @mock.patch.object(SchemaTransformer, "process_sources")
+    @mock.patch.object(SchemaTransformer, "get_cache_file")
+    def test_process_from_cache(
+        self, mock_get_cache_file, mock_process_sources, mock_process_classes
+    ):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cache = Path(tmpdir).joinpath("foo.cache")
+            classes = ClassFactory.list(2)
+            cache.write_bytes(pickle.dumps(classes))
+
+            mock_get_cache_file.return_value = cache
+            uris = ["a.xml", "b.xml"]
+
+            self.transformer.process(uris, cache=True)
+
+            self.assertEqual(classes, self.transformer.classes)
+            self.assertEqual(0, mock_process_sources.call_count)
+            mock_process_classes.assert_called_once_with()
+
+    @mock.patch.object(SchemaTransformer, "process_classes")
+    @mock.patch.object(SchemaTransformer, "process_sources")
+    @mock.patch.object(SchemaTransformer, "get_cache_file")
+    def test_process_with_cache(
+        self, mock_get_cache_file, mock_process_sources, mock_process_classes
+    ):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cache = Path(tmpdir).joinpath("foo.cache")
+            classes = ClassFactory.list(2)
+            self.transformer.classes = classes
+            mock_get_cache_file.return_value = cache
+            uris = ["a.xml", "b.xml"]
+
+            self.transformer.process(uris, cache=True)
+            self.assertEqual(1, mock_process_sources.call_count)
+
+            self.assertEqual(classes, pickle.loads(cache.read_bytes()))
+            mock_process_classes.assert_called_once_with()
 
     @mock.patch.object(SchemaTransformer, "convert_schema")
     @mock.patch.object(SchemaTransformer, "convert_definitions")
@@ -449,3 +489,11 @@ class SchemaTransformerTests(FactoryTestCase):
         self.assertIsInstance(actual, ClassContainer)
         self.assertEqual(2, len(actual.data))
         self.assertEqual(self.transformer.config, actual.config)
+
+    def test_get_cache_file(self):
+        uris = ["a.xml", "b.json"]
+        actual = self.transformer.get_cache_file(uris)
+        tempdir = Path(tempfile.gettempdir())
+        expected = tempdir.joinpath("ae1bed744d3d3611e698a2d2ef5335d2.cache")
+
+        self.assertEqual(expected, actual)

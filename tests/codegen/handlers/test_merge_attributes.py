@@ -12,7 +12,19 @@ class MergeAttributesTests(FactoryTestCase):
         super().setUp()
         self.processor = MergeAttributes
 
-    def test_process(self):
+    def test_process_with_enumeration(self):
+        target = ClassFactory.create()
+        target.attrs = [
+            AttrFactory.enumeration(default=1),
+            AttrFactory.enumeration(default=1),
+            AttrFactory.enumeration(default=2),
+            AttrFactory.enumeration(default=2),
+        ]
+
+        self.processor.process(target)
+        self.assertEqual([1, 2], [x.default for x in target.attrs])
+
+    def test_process_with_non_enumeration(self):
         one = AttrFactory.attribute(fixed=True)
         one_clone = one.clone()
         restrictions = Restrictions(min_occurs=10, max_occurs=15)

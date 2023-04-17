@@ -15,12 +15,23 @@ class MergeAttributes(HandlerInterface):
     @classmethod
     def process(cls, target: Class):
         """
-        Detect same type attributes in order to merge them together with their
-        restrictions.
+        Detect and process duplicate attributes.
 
-        Two attributes are considered equal if they have the same name,
-        tag and namespace.
+        - Remove duplicates for enumerations.
+        - Merge duplicates with restrictions and types.
         """
+        if target.is_enumeration:
+            cls.filter_duplicate_attrs(target)
+        else:
+            cls.merge_duplicate_attrs(target)
+
+    @classmethod
+    def filter_duplicate_attrs(cls, target: Class):
+        attrs = collections.unique_sequence(target.attrs, key="default")
+        target.attrs = attrs
+
+    @classmethod
+    def merge_duplicate_attrs(self, target: Class):
         result: List[Attr] = []
         for attr in target.attrs:
             pos = collections.find(result, attr)

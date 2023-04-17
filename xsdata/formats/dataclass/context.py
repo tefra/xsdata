@@ -89,6 +89,10 @@ class XmlContext:
             attribute_name_generator=self.attribute_name_generator,
         )
         for clazz in self.get_subclasses(object):
+            # This is new!
+            if clazz.__module__.startswith("_pytest"):
+                continue
+
             if self.class_type.is_model(clazz):
                 meta = builder.build_class_meta(clazz, None)
 

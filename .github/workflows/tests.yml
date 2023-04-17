@@ -34,10 +34,10 @@ jobs:
           sudo apt-get install libxml2-dev libxslt-dev
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip setuptools tox codecov
+          python -m pip install --upgrade pip setuptools tox
       - name: Test
         run: |
-          tox -e py -- --cov=./xsdata --cov-branch --doctest-glob="docs/*.rst"
+          tox -e py -- --cov=./xsdata --cov-report=xml --cov-branch --doctest-glob="docs/*.rst"
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:

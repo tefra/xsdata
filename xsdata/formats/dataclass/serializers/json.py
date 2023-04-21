@@ -11,6 +11,7 @@ from typing import Iterator
 from typing import Optional
 from typing import TextIO
 from typing import Tuple
+from typing import Union
 
 from xsdata.formats.bindings import AbstractSerializer
 from xsdata.formats.converter import converter
@@ -61,7 +62,7 @@ class JsonSerializer(AbstractSerializer):
         :param out: The output stream
         :param obj: The input dataclass instance
         """
-        indent: Optional[int] = None
+        indent: Optional[Union[int, str]] = None
         if self.indent:
             warnings.warn(
                 "JsonSerializer indent property is deprecated, use SerializerConfig",
@@ -69,7 +70,7 @@ class JsonSerializer(AbstractSerializer):
             )
             indent = self.indent
         elif self.config.pretty_print:
-            indent = 2
+            indent = self.config.pretty_print_indent or 2
 
         self.dump_factory(self.convert(obj), out, indent=indent)
 

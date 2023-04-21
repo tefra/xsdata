@@ -51,3 +51,12 @@ class XmlEventWriterTests(TestCase):
         _, actual = actual.split("\n", 1)
         _, expected = expected.split("\n", 1)
         self.assertEqual(expected.replace("  ", "").replace("\n", ""), actual)
+
+    def test_pretty_print_indent(self):
+        self.serializer.config.pretty_print_indent = "    "
+        actual = self.serializer.render(books)
+        expected = fixtures_dir.joinpath("books/books_auto_ns.xml").read_text()
+
+        _, actual = actual.split("\n", 1)
+        _, expected = expected.split("\n", 1)
+        self.assertEqual(expected.replace("  ", "    "), actual)

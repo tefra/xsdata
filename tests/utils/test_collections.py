@@ -1,4 +1,5 @@
 from collections import namedtuple
+from typing import Iterator
 from unittest import TestCase
 
 from xsdata.utils import collections
@@ -31,3 +32,10 @@ class CollectionsTests(TestCase):
         self.assertTrue(collections.is_array([]))
         self.assertTrue(collections.is_array(tuple()))
         self.assertTrue(collections.is_array(frozenset()))
+
+    def test_connected_components(self):
+        lists = [[1, 2, 3], [4], [3, 4], [6]]
+        actual = collections.connected_components(lists)
+
+        self.assertIsInstance(actual, Iterator)
+        self.assertEqual([[1, 2, 3, 4], [6]], list(actual))

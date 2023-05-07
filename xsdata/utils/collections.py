@@ -7,6 +7,7 @@ from typing import Iterator
 from typing import List
 from typing import Optional
 from typing import Sequence
+from typing import Set
 from typing import TypeVar
 
 T = TypeVar("T")
@@ -77,3 +78,29 @@ def first(items: Iterator[T]) -> Optional[T]:
 def prepend(target: List, *args: Any):
     """Prepend items to the target list."""
     target[:0] = args
+
+
+def connected_components(lists: List[List[Any]]) -> Iterator[List[Any]]:
+    """
+    Merge lists of lists that share common elements.
+
+    https://stackoverflow.com/questions/4842613/merge-lists-that-share-
+    common-elements
+    """
+    neighbors = defaultdict(set)
+    for each in lists:
+        for item in each:
+            neighbors[item].update(each)
+
+    def component(node: Any, neigh: Dict[Any, Set], see: Set[Any]):
+        nodes = {node}
+        while nodes:
+            next_node = nodes.pop()
+            see.add(next_node)
+            nodes |= neigh[next_node] - see
+            yield next_node
+
+    seen: Set[Any] = set()
+    for item in neighbors:
+        if item not in seen:
+            yield sorted(component(item, neighbors, seen))

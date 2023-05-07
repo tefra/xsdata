@@ -122,8 +122,6 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual(source.attrs[0], target.attrs[1])
         self.assertEqual(source.attrs[1], target.attrs[2])
 
-        self.assertEqual(target.attrs[1].restrictions.group, id(attr))
-        self.assertEqual(target.attrs[2].restrictions.group, id(attr))
         mock_copy_inner_classes.assert_has_calls(
             [
                 mock.call(source, target, source.attrs[0]),

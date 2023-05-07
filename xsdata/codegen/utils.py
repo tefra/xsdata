@@ -96,7 +96,6 @@ class ClassUtils:
 
         for source_attr in source.attrs:
             clone = cls.clone_attribute(source_attr, attr.restrictions)
-            clone.restrictions.group = id(attr)
             target.attrs.insert(index, clone)
             index += 1
 

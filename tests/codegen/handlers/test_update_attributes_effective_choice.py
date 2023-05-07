@@ -1,3 +1,4 @@
+import xsdata.codegen.models
 from xsdata.codegen.handlers import UpdateAttributesEffectiveChoice
 from xsdata.codegen.models import Restrictions
 from xsdata.utils.testing import AttrFactory
@@ -12,38 +13,111 @@ class UpdateAttributesEffectiveChoiceTests(FactoryTestCase):
         self.processor = UpdateAttributesEffectiveChoice()
 
     def test_process(self):
-        target = ClassFactory.create()
-        attrs = [
-            AttrFactory.any(),
-            AttrFactory.any(),
-            # first group
-            AttrFactory.any(restrictions=Restrictions(sequence=1)),
-            AttrFactory.any(restrictions=Restrictions(sequence=1, max_occurs=2)),
-            AttrFactory.any(restrictions=Restrictions(sequence=1, max_occurs=2)),
-            # break attr
-            AttrFactory.any(),
-            # second group
-            AttrFactory.any(restrictions=Restrictions(sequence=1, max_occurs=2)),
-            AttrFactory.any(restrictions=Restrictions(sequence=1, max_occurs=1)),
-            AttrFactory.any(restrictions=Restrictions(sequence=1, max_occurs=2)),
-        ]
-        target.attrs.extend(attrs)
+        target = ClassFactory.create(
+            attrs=[
+                AttrFactory.attribute(
+                    name="i",
+                    namespace="b",
+                    restrictions=Restrictions(min_occurs=1, max_occurs=1),
+                ),
+                AttrFactory.element(
+                    name="a",
+                    namespace="b",
+                    restrictions=Restrictions(min_occurs=1, max_occurs=1),
+                ),
+                AttrFactory.element(
+                    name="b",
+                    namespace="b",
+                    restrictions=Restrictions(min_occurs=1, max_occurs=1),
+                ),
+                AttrFactory.element(
+                    name="a",
+                    namespace="b",
+                    restrictions=Restrictions(min_occurs=1, max_occurs=1),
+                ),
+                AttrFactory.element(
+                    name="b",
+                    namespace="b",
+                    restrictions=Restrictions(min_occurs=1, max_occurs=1),
+                ),
+                AttrFactory.element(
+                    name="a",
+                    namespace="b",
+                    restrictions=Restrictions(min_occurs=1, max_occurs=1),
+                ),
+            ]
+        )
 
         self.processor.process(target)
 
-        self.assertIsNone(attrs[0].restrictions.choice)
-        self.assertIsNone(attrs[1].restrictions.choice)
+        self.assertEqual(3, len(target.attrs))
 
-        # Part of the group but precedes list siblings
-        self.assertIsNone(attrs[2].restrictions.choice)
-        # Part of the group but both are lists
-        self.assertIsNone(attrs[3].restrictions.choice)
-        self.assertIsNone(attrs[4].restrictions.choice)
+        actual = [
+            (
+                x.name,
+                x.restrictions.choice,
+                x.restrictions.min_occurs,
+                x.restrictions.max_occurs,
+            )
+            for x in target.attrs
+        ]
+        expected = [("i", None, 1, 1), ("a", -1, 3, 3), ("b", -1, 2, 2)]
+        self.assertEqual(expected, actual)
 
-        # break attr
-        self.assertIsNone(attrs[5].restrictions.choice)
+    def test_process_symmetrical_sequence(self):
+        restrictions = Restrictions(
+            sequence=1,
+            min_occurs=1,
+            max_occurs=1,
+            path=[("g", 0, 1, 1), ("s", 1, 1, 1)],
+        )
+        target = ClassFactory.create(
+            attrs=[
+                AttrFactory.element(
+                    name="a", namespace="b", restrictions=restrictions.clone()
+                ),
+                AttrFactory.element(
+                    name="b", namespace="b", restrictions=restrictions.clone()
+                ),
+                AttrFactory.element(
+                    name="a", namespace="b", restrictions=restrictions.clone()
+                ),
+                AttrFactory.element(
+                    name="b", namespace="b", restrictions=restrictions.clone()
+                ),
+            ]
+        )
 
-        # Second group, mixed list non list sequential elements
-        self.assertEqual("effective_1", attrs[6].restrictions.choice)
-        self.assertEqual("effective_1", attrs[7].restrictions.choice)
-        self.assertEqual("effective_1", attrs[8].restrictions.choice)
+        self.processor.process(target)
+
+        self.assertEqual(2, len(target.attrs))
+
+        actual = [
+            (
+                x.name,
+                x.restrictions.choice,
+                x.restrictions.sequence,
+                x.restrictions.min_occurs,
+                x.restrictions.max_occurs,
+                x.restrictions.path,
+            )
+            for x in target.attrs
+        ]
+        expected = [
+            ("a", None, 1, 2, 2, [("g", 0, 1, 1), ("s", 1, 1, 2)]),
+            ("b", None, 1, 2, 2, [("g", 0, 1, 1), ("s", 1, 1, 2)]),
+        ]
+        self.assertEqual(expected, actual)
+
+    def test_process_enumeration(self):
+        target = ClassFactory.create(
+            attrs=[
+                AttrFactory.enumeration(name="a"),
+                AttrFactory.enumeration(name="a"),
+                AttrFactory.enumeration(name="a"),
+            ]
+        )
+
+        self.processor.process(target)
+
+        self.assertEqual(3, len(target.attrs))

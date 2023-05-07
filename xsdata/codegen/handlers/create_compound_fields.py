@@ -1,8 +1,8 @@
 from collections import Counter
-from collections import defaultdict
 from typing import Dict
 from typing import List
 from typing import Set
+from typing import Tuple
 
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.mixins import RelativeHandlerInterface
@@ -36,32 +36,42 @@ class CreateCompoundFields(RelativeHandlerInterface):
                 if choice and len(attrs) > 1:
                     self.group_fields(target, attrs)
 
-        for index in range(len(target.attrs)):
-            self.reset_sequence(target, index)
+    @classmethod
+    def update_counters(cls, attr: Attr, counters: Dict):
+        started = False
+        choice = attr.restrictions.choice
+        for path in attr.restrictions.path:
+            if not started and path[0] != "c" and path[1] != choice:
+                continue
+
+            started = True
+            if path not in counters:
+                counters[path] = {"min": [], "max": []}
+            counters = counters[path]
+
+        counters["min"].append(attr.restrictions.min_occurs)
+        counters["max"].append(attr.restrictions.max_occurs)
 
     def group_fields(self, target: Class, attrs: List[Attr]):
         """Group attributes into a new compound field."""
         pos = target.attrs.index(attrs[0])
         choice = attrs[0].restrictions.choice
-        sum_occurs = choice and choice.startswith("effective_")
+
+        assert choice is not None
 
         names = []
         choices = []
-        min_occurs_groups: Dict[int, int] = defaultdict(int)
-        max_occurs_groups: Dict[int, int] = defaultdict(int)
+        counters: Dict = {"min": [], "max": []}
+
         for attr in attrs:
             ClassUtils.remove_attribute(target, attr)
             names.append(attr.local_name)
-
-            key = self.attr_group_key(attr)
-            min_occurs_groups[key] += attr.restrictions.min_occurs or 0
-            max_occurs_groups[key] += attr.restrictions.max_occurs or 0
-
             choices.append(self.build_attr_choice(attr))
 
+            self.update_counters(attr, counters)
+
+        min_occurs, max_occurs = self.sum_counters(counters)
         name = self.choose_name(target, names)
-        min_occurs = min_occurs_groups.values()
-        max_occurs = max_occurs_groups.values()
 
         target.attrs.insert(
             pos,
@@ -71,12 +81,28 @@ class CreateCompoundFields(RelativeHandlerInterface):
                 types=[AttrType(qname=str(DataType.ANY_TYPE), native=True)],
                 tag=Tag.CHOICE,
                 restrictions=Restrictions(
-                    min_occurs=sum(min_occurs) if sum_occurs else min(min_occurs),
-                    max_occurs=sum(max_occurs) if sum_occurs else max(max_occurs),
+                    min_occurs=sum(min_occurs),
+                    max_occurs=max(max_occurs) if choice > 0 else sum(max_occurs),
                 ),
                 choices=choices,
             ),
         )
+
+    def sum_counters(self, counters: Dict) -> Tuple[List[int], List[int]]:
+        min_occurs = counters.pop("min", [])
+        max_occurs = counters.pop("max", [])
+
+        for path, counter in counters.items():
+            mi, ma = self.sum_counters(counter)
+
+            if path[0] == "c":
+                min_occurs.append(min(mi))
+                max_occurs.append(max(ma))
+            else:
+                min_occurs.append(sum(mi))
+                max_occurs.append(sum(ma))
+
+        return min_occurs, max_occurs
 
     def choose_name(self, target: Class, names: List[str]) -> str:
         if (
@@ -119,34 +145,8 @@ class CreateCompoundFields(RelativeHandlerInterface):
         return Attr(
             name=attr.local_name,
             namespace=attr.namespace,
-            default=attr.default,
             types=attr.types,
             tag=attr.tag,
             help=attr.help,
             restrictions=restrictions,
         )
-
-    @classmethod
-    def attr_group_key(cls, attr: Attr) -> int:
-        return attr.restrictions.group or attr.restrictions.sequence or id(attr)
-
-    @classmethod
-    def reset_sequence(cls, target: Class, index: int):
-        """Reset the attribute at the given index if it has no siblings with
-        the sequence restriction."""
-
-        attr = target.attrs[index]
-        before = target.attrs[index - 1] if index - 1 >= 0 else None
-        after = target.attrs[index + 1] if index + 1 < len(target.attrs) else None
-
-        if not attr.is_list:
-            attr.restrictions.sequence = None
-
-        if (
-            attr.restrictions.sequence is None
-            or (before and before.restrictions.sequence is not None)
-            or (after and after.restrictions.sequence is not None and after.is_list)
-        ):
-            return
-
-        attr.restrictions.sequence = None

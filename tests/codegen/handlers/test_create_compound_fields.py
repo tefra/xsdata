@@ -48,8 +48,8 @@ class CreateCompoundFieldsTests(FactoryTestCase):
 
     def test_group_fields(self):
         target = ClassFactory.create(attrs=AttrFactory.list(4))
-        target.attrs[0].restrictions.choice = "1"
-        target.attrs[1].restrictions.choice = "1"
+        target.attrs[0].restrictions.choice = 1
+        target.attrs[1].restrictions.choice = 1
         target.attrs[0].restrictions.min_occurs = 10
         target.attrs[0].restrictions.max_occurs = 15
         target.attrs[1].restrictions.min_occurs = 5
@@ -58,8 +58,11 @@ class CreateCompoundFieldsTests(FactoryTestCase):
         target.attrs[2].restrictions.max_occurs = 4
         target.attrs[3].restrictions.min_occurs = 1
         target.attrs[3].restrictions.max_occurs = 3
-        target.attrs[2].restrictions.group = 1
-        target.attrs[3].restrictions.group = 1
+
+        target.attrs[0].restrictions.path = [("g", 0, 1, 1), ("c", 1, 1, 1)]
+        target.attrs[1].restrictions.path = [("g", 0, 1, 1), ("c", 1, 1, 1)]
+        target.attrs[2].restrictions.path = [("g", 0, 1, 1), ("c", 1, 1, 1)]
+        target.attrs[3].restrictions.path = [("g", 0, 1, 1), ("c", 1, 1, 1)]
 
         expected = AttrFactory.create(
             name="choice",
@@ -89,7 +92,7 @@ class CreateCompoundFieldsTests(FactoryTestCase):
                 ),
             ],
         )
-        expected_res = Restrictions(min_occurs=3, max_occurs=20)
+        expected_res = Restrictions(min_occurs=1, max_occurs=20)
 
         self.processor.group_fields(target, list(target.attrs))
         self.assertEqual(1, len(target.attrs))
@@ -98,8 +101,8 @@ class CreateCompoundFieldsTests(FactoryTestCase):
 
     def test_group_fields_with_effective_choices_sums_occurs(self):
         target = ClassFactory.create(attrs=AttrFactory.list(2))
-        target.attrs[0].restrictions.choice = "effective_1"
-        target.attrs[1].restrictions.choice = "effective_1"
+        target.attrs[0].restrictions.choice = -1
+        target.attrs[1].restrictions.choice = -1
         target.attrs[0].restrictions.min_occurs = 1
         target.attrs[0].restrictions.max_occurs = 2
         target.attrs[1].restrictions.min_occurs = 3
@@ -201,55 +204,41 @@ class CreateCompoundFieldsTests(FactoryTestCase):
 
         self.assertEqual(attr.local_name, actual.name)
         self.assertEqual(attr.namespace, actual.namespace)
-        self.assertEqual(attr.default, actual.default)
+        self.assertIsNone(actual.default)
         self.assertEqual(attr.tag, actual.tag)
         self.assertEqual(attr.types, actual.types)
         self.assertEqual(expected_res, actual.restrictions)
         self.assertEqual(attr.help, actual.help)
         self.assertFalse(actual.fixed)
 
-    def test_attr_group_key(self):
-        attr = AttrFactory.create()
-        self.assertEqual(id(attr), self.processor.attr_group_key(attr))
+    def test_sum_counters(self):
+        counters = {
+            ("g", 184, 1, 1): {
+                "min": [],
+                "max": [],
+                ("s", 183, 1, 1): {
+                    "min": [],
+                    "max": [],
+                    ("g", 185, 1, 1): {
+                        "min": [],
+                        "max": [],
+                        ("s", 188, 1, 1): {
+                            "min": [],
+                            "max": [],
+                            ("c", 192, 1, 1): {
+                                "min": [0],
+                                "max": [1],
+                                ("s", 193, 1, 1): {
+                                    "min": [0, 0],
+                                    "max": [1, 1],
+                                    ("c", 200, 1, 1): {"min": [0, 0], "max": [1, 1]},
+                                },
+                            },
+                        },
+                    },
+                },
+            }
+        }
 
-        attr.restrictions.sequence = 1
-        self.assertEqual(1, self.processor.attr_group_key(attr))
-
-        attr.restrictions.group = 2
-        self.assertEqual(2, self.processor.attr_group_key(attr))
-
-    def test_reset_sequence(self):
-        def len_sequence(target: Class):
-            return len([attr for attr in target.attrs if attr.restrictions.sequence])
-
-        restrictions = Restrictions(max_occurs=2, sequence=1)
-        target = ClassFactory.create(
-            attrs=[
-                AttrFactory.create(restrictions=restrictions.clone()),
-                AttrFactory.create(restrictions=restrictions.clone()),
-            ]
-        )
-
-        attrs_clone = [attr.clone() for attr in target.attrs]
-
-        self.processor.config.enabled = False
-        self.processor.reset_sequence(target, 0)
-        self.assertEqual(2, len_sequence(target))
-
-        target.attrs[0].restrictions.sequence = None
-        self.processor.reset_sequence(target, 0)
-        self.assertEqual(1, len_sequence(target))
-
-        self.processor.reset_sequence(target, 1)
-        self.assertEqual(0, len_sequence(target))
-
-        target.attrs = attrs_clone
-        target.attrs[1].restrictions.sequence = None
-        self.processor.reset_sequence(target, 0)
-        self.assertEqual(0, len_sequence(target))
-
-        target.attrs[0].restrictions.sequence = 1
-        target.attrs[0].restrictions.max_occurs = 0
-        target.attrs[1].restrictions.sequence = 1
-        self.processor.reset_sequence(target, 0)
-        self.assertEqual(1, len_sequence(target))
+        result = self.processor.sum_counters(counters)
+        self.assertEqual((0, 3), (sum(result[0]), sum(result[1])))

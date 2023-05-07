@@ -23,5 +23,4 @@ class AlternativeTests(TestCase):
 
     def test_get_restrictions(self):
         obj = Alternative()
-        expected = {"min_occurs": 0, "choice": str(id(obj))}
-        self.assertEqual(expected, obj.get_restrictions())
+        self.assertEqual({"path": [("alt", 0, 0, 1)]}, obj.get_restrictions())

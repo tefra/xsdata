@@ -28,7 +28,7 @@ class SchemaParser(UserXmlParser):
     A simple parser to convert an xsd schema to an easy to handle data
     structure based on dataclasses.
 
-    The parser is a dummy as possible but it will try to normalize
+    The parser is as a dummy as possible, but it will try to normalize
     certain things like apply parent properties to children.
 
     :param location:

@@ -43,7 +43,7 @@ logging.captureWarnings(True)
 @click.pass_context
 @click.version_option(__version__)
 def cli(ctx: click.Context, **kwargs: Any):
-    """xsdata command line interface."""
+    """Xsdata command line interface."""
     logger.setLevel(logging.INFO)
     formatwarning_orig = warnings.formatwarning
     logger.info(

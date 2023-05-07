@@ -9,7 +9,6 @@ from xsdata.utils.testing import FactoryTestCase
 class UpdateAttributesEffectiveChoiceTests(FactoryTestCase):
     def setUp(self):
         super().setUp()
-
         self.processor = UpdateAttributesEffectiveChoice()
 
     def test_process(self):

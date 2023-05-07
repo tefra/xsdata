@@ -191,13 +191,7 @@ class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
         return attr.default is not None and (
             attr.is_xsi_type
             or attr.is_list
-            or (
-                attr.is_optional
-                and (
-                    attr.restrictions.sequence is not None
-                    or attr.restrictions.choice is not None
-                )
-            )
+            or (not attr.is_attribute and attr.is_optional)
         )
 
     @classmethod

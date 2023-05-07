@@ -33,7 +33,10 @@ class UpdateAttributesEffectiveChoice(HandlerInterface):
     @classmethod
     def reset_symmetrical_choices(cls, target: Class):
         groups = collections.group_by(target.attrs, get_restriction_choice)
-        for attrs in groups.values():
+        for choice, attrs in groups.items():
+            if choice is None or choice > 0:
+                continue
+
             min_occurs = set()
             max_occurs = set()
             sequences = set()
@@ -108,9 +111,8 @@ class UpdateAttributesEffectiveChoice(HandlerInterface):
     def group_repeating_attrs(cls, target: Class) -> List[List[int]]:
         counters = defaultdict(list)
         for index, attr in enumerate(target.attrs):
-            if attr.is_attribute:
-                continue
-            counters[attr.key].append(index)
+            if not attr.is_attribute:
+                counters[attr.key].append(index)
 
         groups = []
         for x in counters.values():

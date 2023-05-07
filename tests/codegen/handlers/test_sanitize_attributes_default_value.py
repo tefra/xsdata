@@ -6,6 +6,7 @@ from xsdata.codegen.models import Restrictions
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
+from xsdata.models.enums import Tag
 from xsdata.utils.testing import AttrFactory
 from xsdata.utils.testing import AttrTypeFactory
 from xsdata.utils.testing import ClassFactory
@@ -128,16 +129,19 @@ class SanitizeAttributesDefaultValueTests(FactoryTestCase):
         attr.default = "abc"
         self.assertTrue(self.processor.should_reset_default(attr))
 
-        attr = AttrFactory.create(
+        attr = AttrFactory.element(
+            default="abc", restrictions=Restrictions(min_occurs=1)
+        )
+        self.assertFalse(self.processor.should_reset_default(attr))
+        attr.restrictions.max_occurs = 2
+        self.assertTrue(self.processor.should_reset_default(attr))
+
+        attr = AttrFactory.attribute(
             default="abc", restrictions=Restrictions(min_occurs=0)
         )
         self.assertFalse(self.processor.should_reset_default(attr))
 
-        attr.restrictions.sequence = 1
-        self.assertTrue(self.processor.should_reset_default(attr))
-
-        attr.restrictions.choice = "foo"
-        attr.restrictions.sequence = None
+        attr.tag = Tag.ELEMENT
         self.assertTrue(self.processor.should_reset_default(attr))
 
     @mock.patch(

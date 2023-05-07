@@ -56,7 +56,10 @@ class AddAttributeSubstitutions(RelativeHandlerInterface):
             attr_type.substituted = True
             for substitution in self.substitutions.get(attr_type.qname, []):
                 attr.restrictions.min_occurs = 0
+
                 clone = ClassUtils.clone_attribute(substitution, attr.restrictions)
+                clone.restrictions.min_occurs = 0
+                clone.restrictions.max_occurs = attr.restrictions.max_occurs
 
                 pos = collections.find(target.attrs, clone)
                 index = pos + 1 if pos > -1 else index

@@ -133,7 +133,7 @@ class DtdMapper:
             params = cls.build_occurs(content.occur)
             params.update(
                 {
-                    "choice": str(id(content)),
+                    "choice": id(content),
                     "min_occurs": 0,
                 }
             )

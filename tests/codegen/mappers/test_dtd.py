@@ -288,7 +288,7 @@ class DtdMapperTests(FactoryTestCase):
         DtdMapper.build_content(target, content, nillable=True)
         self.assertEqual(2, len(target.attrs))
         for attr in target.attrs:
-            self.assertEqual(str(id(content)), attr.restrictions.choice)
+            self.assertEqual(id(content), attr.restrictions.choice)
             self.assertEqual(0, attr.restrictions.min_occurs)
             self.assertEqual(sys.maxsize, attr.restrictions.max_occurs)
 

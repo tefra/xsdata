@@ -41,15 +41,17 @@ class ClassContainerTests(FactoryTestCase):
                 "FlattenAttributeGroups",
             ],
             20: [
+                "CalculateAttributePaths",
                 "FlattenClassExtensions",
                 "SanitizeEnumerationClass",
+                "UpdateAttributesEffectiveChoice",
                 "UnnestInnerClasses",
                 "AddAttributeSubstitutions",
                 "ProcessAttributeTypes",
                 "MergeAttributes",
                 "ProcessMixedContentClass",
             ],
-            30: ["UpdateAttributesEffectiveChoice", "SanitizeAttributesDefaultValue"],
+            30: ["ResetAttributeSequences", "SanitizeAttributesDefaultValue"],
             40: ["ValidateAttributesOverrides", "RenameDuplicateAttributes"],
             50: ["VacuumInnerClasses", "CreateCompoundFields"],
         }

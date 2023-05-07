@@ -5,6 +5,7 @@ from typing import List
 from typing import Optional
 
 from xsdata.codegen.handlers import AddAttributeSubstitutions
+from xsdata.codegen.handlers import CalculateAttributePaths
 from xsdata.codegen.handlers import CreateCompoundFields
 from xsdata.codegen.handlers import DesignateClassPackages
 from xsdata.codegen.handlers import FilterClasses
@@ -15,6 +16,7 @@ from xsdata.codegen.handlers import ProcessAttributeTypes
 from xsdata.codegen.handlers import ProcessMixedContentClass
 from xsdata.codegen.handlers import RenameDuplicateAttributes
 from xsdata.codegen.handlers import RenameDuplicateClasses
+from xsdata.codegen.handlers import ResetAttributeSequences
 from xsdata.codegen.handlers import SanitizeAttributesDefaultValue
 from xsdata.codegen.handlers import SanitizeEnumerationClass
 from xsdata.codegen.handlers import UnnestInnerClasses
@@ -54,8 +56,10 @@ class ClassContainer(ContainerInterface):
                 FlattenAttributeGroups(self),
             ],
             Steps.FLATTEN: [
+                CalculateAttributePaths(),
                 FlattenClassExtensions(self),
                 SanitizeEnumerationClass(self),
+                UpdateAttributesEffectiveChoice(),
                 UnnestInnerClasses(self),
                 AddAttributeSubstitutions(self),
                 ProcessAttributeTypes(self),
@@ -63,7 +67,7 @@ class ClassContainer(ContainerInterface):
                 ProcessMixedContentClass(),
             ],
             Steps.SANITIZE: [
-                UpdateAttributesEffectiveChoice(),
+                ResetAttributeSequences(),
                 SanitizeAttributesDefaultValue(self),
             ],
             Steps.RESOLVE: [

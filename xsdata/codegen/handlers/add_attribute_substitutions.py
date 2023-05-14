@@ -57,6 +57,10 @@ class AddAttributeSubstitutions(RelativeHandlerInterface):
             for substitution in self.substitutions.get(attr_type.qname, []):
                 attr.restrictions.min_occurs = 0
 
+                if not attr.restrictions.choice:
+                    attr.restrictions.choice = id(attr)
+                    attr.restrictions.path.append(("c", id(attr), 1, 1))
+
                 clone = ClassUtils.clone_attribute(substitution, attr.restrictions)
                 clone.restrictions.min_occurs = 0
                 clone.restrictions.max_occurs = attr.restrictions.max_occurs

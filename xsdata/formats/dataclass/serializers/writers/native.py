@@ -42,7 +42,9 @@ class XmlEventWriter(XmlWriter):
         if self.config.pretty_print:
             if self.current_level:
                 self.handler.ignorableWhitespace("\n")
-                self.handler.ignorableWhitespace("  " * self.current_level)
+                self.handler.ignorableWhitespace(
+                    (self.config.pretty_print_indent or "  ") * self.current_level
+                )
 
             self.current_level += 1
             self.pending_end_element = False
@@ -55,7 +57,9 @@ class XmlEventWriter(XmlWriter):
         self.current_level -= 1
         if self.pending_end_element:
             self.handler.ignorableWhitespace("\n")
-            self.handler.ignorableWhitespace("  " * self.current_level)
+            self.handler.ignorableWhitespace(
+                (self.config.pretty_print_indent or "  ") * self.current_level
+            )
 
         super().end_tag(qname)
 

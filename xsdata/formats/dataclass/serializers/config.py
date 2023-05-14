@@ -13,6 +13,7 @@ class SerializerConfig:
     :param xml_version: XML Version number (1.0|1.1)
     :param xml_declaration: Generate XML declaration
     :param pretty_print: Enable pretty output
+    :param pretty_print_indent: Indentation string for each indent level
     :param ignore_default_attributes: Ignore optional attributes with
         default values
     :param schema_location: xsi:schemaLocation attribute value
@@ -27,6 +28,7 @@ class SerializerConfig:
         "xml_version",
         "xml_declaration",
         "pretty_print",
+        "pretty_print_indent",
         "ignore_default_attributes",
         "schema_location",
         "no_namespace_schema_location",
@@ -39,6 +41,7 @@ class SerializerConfig:
         xml_version: str = "1.0",
         xml_declaration: bool = True,
         pretty_print: bool = False,
+        pretty_print_indent: Optional[str] = None,
         ignore_default_attributes: bool = False,
         schema_location: Optional[str] = None,
         no_namespace_schema_location: Optional[str] = None,
@@ -48,6 +51,7 @@ class SerializerConfig:
         self.xml_version = xml_version
         self.xml_declaration = xml_declaration
         self.pretty_print = pretty_print
+        self.pretty_print_indent = pretty_print_indent
         self.ignore_default_attributes = ignore_default_attributes
         self.schema_location = schema_location
         self.no_namespace_schema_location = no_namespace_schema_location

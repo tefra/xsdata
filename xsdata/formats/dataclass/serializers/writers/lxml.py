@@ -2,6 +2,7 @@ from typing import Dict
 from typing import Generator
 from typing import TextIO
 
+from lxml.etree import indent
 from lxml.etree import tostring
 from lxml.sax import ElementTreeContentHandler
 
@@ -36,6 +37,9 @@ class LxmlEventWriter(XmlWriter):
         super().write(events)
 
         assert isinstance(self.handler, ElementTreeContentHandler)
+
+        if self.config.pretty_print and self.config.pretty_print_indent is not None:
+            indent(self.handler.etree, self.config.pretty_print_indent)
 
         xml = tostring(
             self.handler.etree,

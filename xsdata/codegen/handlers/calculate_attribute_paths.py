@@ -18,10 +18,12 @@ class CalculateAttributePaths(HandlerInterface):
     @classmethod
     def process(cls, target: Class):
         for attr in target.attrs:
-            if not attr.restrictions.path or attr.is_attribute or attr.is_enumeration:
-                continue
-
-            cls.process_attr_path(attr)
+            if (
+                attr.restrictions.path
+                and not attr.is_attribute
+                and not attr.is_enumeration
+            ):
+                cls.process_attr_path(attr)
 
     @classmethod
     def process_attr_path(cls, attr: Attr):

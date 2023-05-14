@@ -116,6 +116,90 @@ class ElementMapperTests(FactoryTestCase):
         actual.inner.clear()
         self.assertEqual(expected, actual)
 
+    def test_build_class_with_sequences(self):
+        element = AnyElement(
+            qname="root",
+            children=[
+                AnyElement(qname="a"),
+                AnyElement(qname="b"),
+                AnyElement(qname="a"),
+                AnyElement(qname="b"),
+                AnyElement(qname="c"),
+                AnyElement(qname="d"),
+                AnyElement(qname="e"),
+                AnyElement(qname="d"),
+            ],
+        )
+
+        actual = ElementMapper.build_class(element, "target")
+        expected = ClassFactory.create(
+            tag=Tag.ELEMENT,
+            qname="root",
+            namespace="",
+            location="",
+            module=None,
+            ns_map={},
+            attrs=[
+                AttrFactory.native(
+                    DataType.ANY_SIMPLE_TYPE,
+                    tag=Tag.ELEMENT,
+                    name="a",
+                    namespace="",
+                    index=0,
+                    restrictions=Restrictions(
+                        min_occurs=1,
+                        max_occurs=sys.maxsize,
+                        path=[("s", 1, 1, sys.maxsize)],
+                    ),
+                ),
+                AttrFactory.native(
+                    DataType.ANY_SIMPLE_TYPE,
+                    tag=Tag.ELEMENT,
+                    name="b",
+                    namespace="",
+                    index=1,
+                    restrictions=Restrictions(
+                        min_occurs=1,
+                        max_occurs=sys.maxsize,
+                        path=[("s", 1, 1, sys.maxsize)],
+                    ),
+                ),
+                AttrFactory.native(
+                    DataType.ANY_SIMPLE_TYPE,
+                    tag=Tag.ELEMENT,
+                    name="c",
+                    namespace="",
+                    index=2,
+                    restrictions=Restrictions(min_occurs=1, max_occurs=1),
+                ),
+                AttrFactory.native(
+                    DataType.ANY_SIMPLE_TYPE,
+                    tag=Tag.ELEMENT,
+                    name="d",
+                    namespace="",
+                    index=3,
+                    restrictions=Restrictions(
+                        min_occurs=1,
+                        max_occurs=sys.maxsize,
+                        path=[("s", 2, 1, sys.maxsize)],
+                    ),
+                ),
+                AttrFactory.native(
+                    DataType.ANY_SIMPLE_TYPE,
+                    tag=Tag.ELEMENT,
+                    name="e",
+                    namespace="",
+                    index=4,
+                    restrictions=Restrictions(
+                        min_occurs=1,
+                        max_occurs=sys.maxsize,
+                        path=[("s", 2, 1, sys.maxsize)],
+                    ),
+                ),
+            ],
+        )
+        self.assertEqual(expected, actual)
+
     def test_build_class_mixed_content(self):
         element = AnyElement(
             qname="{xsdata}root",
@@ -217,13 +301,10 @@ class ElementMapperTests(FactoryTestCase):
 
         self.assertEqual(2, len(target.attrs))
         self.assertEqual(sys.maxsize, target.attrs[0].restrictions.max_occurs)
-        self.assertEqual(2, len(target.attrs[0].types))
-        self.assertIsNone(target.attrs[0].restrictions.sequence)
+        self.assertEqual(1, len(target.attrs[0].types))
 
         attr = target.attrs[1].clone()
-        attr.restrictions.sequence = 1
         ElementMapper.add_attribute(target, attr)
-        self.assertEqual(1, target.attrs[1].restrictions.sequence)
 
         attr = AttrFactory.create()
         ElementMapper.add_attribute(target, attr)
@@ -238,25 +319,25 @@ class ElementMapperTests(FactoryTestCase):
         self.assertEqual("b", ElementMapper.select_namespace("b", "a", Tag.ATTRIBUTE))
         self.assertIsNone(ElementMapper.select_namespace(None, "a", Tag.ATTRIBUTE))
 
-    def test_sequence_names(self):
+    def test_sequential_groups(self):
         a = AnyElement(qname="a")
         b = AnyElement(qname="b")
         c = AnyElement(qname="c")
         d = AnyElement(qname="d")
         e = AnyElement(qname="e")
 
-        p = AnyElement(children=[a, b])
-        actual = ElementMapper.sequence_names(p)
-        self.assertEqual(0, len(actual))
+        p = AnyElement(children=[a, b, c, d])
+        actual = ElementMapper.sequential_groups(p)
+        self.assertEqual([], actual)
 
         p = AnyElement(children=[a, b, a])
-        actual = ElementMapper.sequence_names(p)
-        self.assertEqual({"a", "b"}, actual)
+        actual = ElementMapper.sequential_groups(p)
+        self.assertEqual([[0, 1, 2]], actual)
 
         p = AnyElement(children=[a, b, a, c])
-        actual = ElementMapper.sequence_names(p)
-        self.assertEqual({"a", "b"}, actual)
+        actual = ElementMapper.sequential_groups(p)
+        self.assertEqual([[0, 1, 2]], actual)
 
         p = AnyElement(children=[a, b, a, c, d, e, d])
-        actual = ElementMapper.sequence_names(p)
-        self.assertEqual({"a", "b", "d", "e"}, actual)
+        actual = ElementMapper.sequential_groups(p)
+        self.assertEqual([[0, 1, 2], [4, 5, 6]], actual)

@@ -84,12 +84,16 @@ class UpdateAttributesEffectiveChoiceTests(FactoryTestCase):
                 AttrFactory.element(
                     name="b", namespace="b", restrictions=restrictions.clone()
                 ),
+                AttrFactory.element(name="c", namespace="b"),
+                AttrFactory.element(
+                    name="d", namespace="b", restrictions=Restrictions(choice=1)
+                ),
             ]
         )
 
         self.processor.process(target)
 
-        self.assertEqual(2, len(target.attrs))
+        self.assertEqual(4, len(target.attrs))
 
         actual = [
             (
@@ -105,6 +109,8 @@ class UpdateAttributesEffectiveChoiceTests(FactoryTestCase):
         expected = [
             ("a", None, 1, 2, 2, [("g", 0, 1, 1), ("s", 1, 1, 2)]),
             ("b", None, 1, 2, 2, [("g", 0, 1, 1), ("s", 1, 1, 2)]),
+            ("c", None, None, None, None, []),
+            ("d", 1, None, None, None, []),
         ]
         self.assertEqual(expected, actual)
 

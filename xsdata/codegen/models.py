@@ -360,10 +360,6 @@ class Attr:
         return text.alnum(self.name)
 
     @property
-    def qname(self) -> str:
-        return namespaces.build_qname(self.namespace, self.name)
-
-    @property
     def xml_type(self) -> Optional[str]:
         """Return the xml node type this attribute is mapped to."""
         return xml_type_map.get(self.tag)

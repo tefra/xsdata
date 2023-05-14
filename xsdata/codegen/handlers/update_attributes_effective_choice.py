@@ -79,7 +79,7 @@ class UpdateAttributesEffectiveChoice(HandlerInterface):
         attrs = []
 
         for index, attr in enumerate(target.attrs):
-            group = cls.find_group(groups, index)
+            group = collections.find_connected_component(groups, index)
 
             if group == -1:
                 attrs.append(attr)
@@ -98,14 +98,6 @@ class UpdateAttributesEffectiveChoice(HandlerInterface):
                 existing.restrictions.max_occurs += attr.restrictions.max_occurs or 0
 
         return attrs
-
-    @classmethod
-    def find_group(cls, groups: List[List[int]], index: int) -> int:
-        for group_index, group in enumerate(groups):
-            if index in group:
-                return group_index
-
-        return -1
 
     @classmethod
     def group_repeating_attrs(cls, target: Class) -> List[List[int]]:

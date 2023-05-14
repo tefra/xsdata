@@ -39,3 +39,18 @@ class CollectionsTests(TestCase):
 
         self.assertIsInstance(actual, Iterator)
         self.assertEqual([[1, 2, 3, 4], [6]], list(actual))
+
+    def test_find_connected_component(self):
+        groups = [[1, 2, 3], [4, 5, 6]]
+
+        actual = collections.find_connected_component(groups, 1)
+        self.assertEqual(0, actual)
+
+        actual = collections.find_connected_component(groups, 2)
+        self.assertEqual(0, actual)
+
+        actual = collections.find_connected_component(groups, 4)
+        self.assertEqual(1, actual)
+
+        actual = collections.find_connected_component(groups, 100)
+        self.assertEqual(-1, actual)

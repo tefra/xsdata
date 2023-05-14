@@ -583,11 +583,11 @@ class XmlSerializerTests(TestCase):
             (x0, 1),
             (x1, 2),
             (x2, 6),
-            (x3, 9),
-            (x4, 10),
             (x1, 3),
             (x2, 7),
             (x1, 4),
+            (x3, 9),
+            (x4, 10),
         ]
 
         self.assertIsInstance(actual, Generator)

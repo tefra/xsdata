@@ -104,3 +104,11 @@ def connected_components(lists: List[List[Any]]) -> Iterator[List[Any]]:
     for item in neighbors:
         if item not in seen:
             yield sorted(component(item, neighbors, seen))
+
+
+def find_connected_component(groups: List[List[Any]], value: Any) -> int:
+    for index, group in enumerate(groups):
+        if value in group:
+            return index
+
+    return -1

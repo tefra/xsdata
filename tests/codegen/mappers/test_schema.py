@@ -237,7 +237,9 @@ class SchemaMapperTests(FactoryTestCase):
         children = SchemaMapper.element_children(complex_type, parent_restrictions)
 
         child, restrictions = next(children)
-        expected = Restrictions(path=[("s", 2, 0, 3), ("c", 0, 1, 1)])
+        expected = Restrictions(
+            path=[("s", id(complex_type.sequence), 0, 3), ("c", id(choice), 1, 1)]
+        )
         self.assertEqual(expected, restrictions)
 
     def test_children_extensions(self):

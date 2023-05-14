@@ -23,4 +23,4 @@ class AlternativeTests(TestCase):
 
     def test_get_restrictions(self):
         obj = Alternative()
-        self.assertEqual({"path": [("alt", 0, 0, 1)]}, obj.get_restrictions())
+        self.assertEqual({"path": [("alt", id(obj), 0, 1)]}, obj.get_restrictions())

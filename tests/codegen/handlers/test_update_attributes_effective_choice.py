@@ -1,4 +1,3 @@
-import xsdata.codegen.models
 from xsdata.codegen.handlers import UpdateAttributesEffectiveChoice
 from xsdata.codegen.models import Restrictions
 from xsdata.utils.testing import AttrFactory

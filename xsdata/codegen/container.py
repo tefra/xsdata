@@ -16,6 +16,7 @@ from xsdata.codegen.handlers import ProcessAttributeTypes
 from xsdata.codegen.handlers import ProcessMixedContentClass
 from xsdata.codegen.handlers import RenameDuplicateAttributes
 from xsdata.codegen.handlers import RenameDuplicateClasses
+from xsdata.codegen.handlers import ResetAttributeSequenceNumbers
 from xsdata.codegen.handlers import ResetAttributeSequences
 from xsdata.codegen.handlers import SanitizeAttributesDefaultValue
 from xsdata.codegen.handlers import SanitizeEnumerationClass
@@ -77,6 +78,8 @@ class ClassContainer(ContainerInterface):
             Steps.FINALIZE: [
                 VacuumInnerClasses(),
                 CreateCompoundFields(self),
+                # Prettify things!!!
+                ResetAttributeSequenceNumbers(self),
             ],
         }
 

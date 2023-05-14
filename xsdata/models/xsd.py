@@ -441,7 +441,7 @@ class All(AnnotationBase):
         max_occurs = sys.maxsize if self.max_occurs == "unbounded" else self.max_occurs
 
         return {
-            "path": [("a", self.index, self.min_occurs, max_occurs)],
+            "path": [("a", id(self), self.min_occurs, max_occurs)],
         }
 
 
@@ -471,7 +471,7 @@ class Sequence(AnnotationBase):
         max_occurs = sys.maxsize if self.max_occurs == "unbounded" else self.max_occurs
 
         return {
-            "path": [("s", self.index, self.min_occurs, max_occurs)],
+            "path": [("s", id(self), self.min_occurs, max_occurs)],
         }
 
 
@@ -501,7 +501,7 @@ class Choice(AnnotationBase):
         max_occurs = sys.maxsize if self.max_occurs == "unbounded" else self.max_occurs
 
         return {
-            "path": [("c", self.index, self.min_occurs, max_occurs)],
+            "path": [("c", id(self), self.min_occurs, max_occurs)],
         }
 
 
@@ -540,7 +540,7 @@ class Group(AnnotationBase):
         max_occurs = sys.maxsize if self.max_occurs == "unbounded" else self.max_occurs
 
         return {
-            "path": [("g", self.index, self.min_occurs, max_occurs)],
+            "path": [("g", id(self), self.min_occurs, max_occurs)],
         }
 
 
@@ -1046,7 +1046,7 @@ class Alternative(AnnotationBase):
 
     def get_restrictions(self) -> Dict[str, Anything]:
         return {
-            "path": [("alt", self.index, 0, 1)],
+            "path": [("alt", id(self), 0, 1)],
         }
 
 

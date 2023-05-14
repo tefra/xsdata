@@ -53,7 +53,11 @@ class ClassContainerTests(FactoryTestCase):
             ],
             30: ["ResetAttributeSequences", "SanitizeAttributesDefaultValue"],
             40: ["ValidateAttributesOverrides", "RenameDuplicateAttributes"],
-            50: ["VacuumInnerClasses", "CreateCompoundFields"],
+            50: [
+                "VacuumInnerClasses",
+                "CreateCompoundFields",
+                "ResetAttributeSequenceNumbers",
+            ],
         }
 
         self.assertEqual(expected, actual)

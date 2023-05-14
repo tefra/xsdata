@@ -10,6 +10,7 @@ from .process_attributes_types import ProcessAttributeTypes
 from .process_mixed_content_class import ProcessMixedContentClass
 from .rename_duplicate_attributes import RenameDuplicateAttributes
 from .rename_duplicate_classes import RenameDuplicateClasses
+from .reset_attribute_sequence_numbers import ResetAttributeSequenceNumbers
 from .reset_attribute_sequences import ResetAttributeSequences
 from .sanitize_attributes_default_value import SanitizeAttributesDefaultValue
 from .sanitize_enumeration_class import SanitizeEnumerationClass
@@ -32,6 +33,7 @@ __all__ = [
     "RenameDuplicateAttributes",
     "RenameDuplicateClasses",
     "ResetAttributeSequences",
+    "ResetAttributeSequenceNumbers",
     "SanitizeAttributesDefaultValue",
     "SanitizeEnumerationClass",
     "UnnestInnerClasses",

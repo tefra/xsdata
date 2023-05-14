@@ -42,6 +42,8 @@ class CalculateAttributePaths(HandlerInterface):
                     attr.restrictions.choice = index
             elif name == GROUP:
                 attr.restrictions.group = index
+            else:
+                pass
 
             min_occurs *= mi
             max_occurs *= ma

@@ -401,6 +401,35 @@ class ElementNodeTests(FactoryTestCase):
         mock_xsi_type.assert_called_once_with(attrs, ns_map)
         mock_ctx_fetch.assert_called_once_with(var.clazz, namespace, xsi_type)
 
+    @mock.patch.object(ParserUtils, "xsi_type", return_value="foo")
+    @mock.patch.object(XmlContext, "fetch")
+    def test_build_node_with_dataclass_var_and_mismatch_xsi_type(
+        self, mock_ctx_fetch, mock_xsi_type
+    ):
+        var = XmlVarFactory.create(
+            xml_type=XmlType.ELEMENT,
+            name="a",
+            qname="a",
+            types=(TypeB,),
+            derived=False,
+        )
+        xsi_type = "foo"
+        namespace = self.meta.namespace
+        mock_ctx_fetch.return_value = self.meta
+        mock_xsi_type.return_value = xsi_type
+
+        attrs = {"a": "b"}
+        ns_map = {"ns0": "xsdata"}
+        actual = self.node.build_node(var, attrs, ns_map, 10)
+
+        self.assertIsInstance(actual, ElementNode)
+        self.assertEqual(10, actual.position)
+        self.assertEqual(DerivedElement, actual.derived_factory)
+        self.assertIs(mock_ctx_fetch.return_value, actual.meta)
+
+        mock_xsi_type.assert_called_once_with(attrs, ns_map)
+        mock_ctx_fetch.assert_called_once_with(var.clazz, namespace, xsi_type)
+
     @mock.patch.object(XmlContext, "fetch")
     def test_build_node_with_dataclass_var_validates_nillable(self, mock_ctx_fetch):
         var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, qname="a", types=(TypeC,))

@@ -52,6 +52,12 @@ class ResetAttributeSequencesTests(FactoryTestCase):
         expected = [None, None, None, None, None, 3, 3, 4, 4]
         self.assertEqual(expected, actual)
 
-    def test_is_repeatable_sequence_with_no_sequence(self):
+    def test_is_repeatable_sequence(self):
         attr = AttrFactory.create()
         self.assertFalse(self.processor.is_repeatable_sequence(attr))
+
+        attr.restrictions.sequence = 1
+        self.assertFalse(self.processor.is_repeatable_sequence(attr))
+
+        attr.restrictions.path.append(("s", 15, 1, 2))
+        self.assertTrue(self.processor.is_repeatable_sequence(attr))

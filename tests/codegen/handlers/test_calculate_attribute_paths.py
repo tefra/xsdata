@@ -47,14 +47,14 @@ class CalculateAttributePathsTests(FactoryTestCase):
                     restrictions=Restrictions(
                         min_occurs=1,
                         max_occurs=1,
-                        path=[("s", 1, 1, 1), ("c", 4, 0, 1)],
+                        path=[("s", 1, 1, 1), ("c", 4, 0, 1), ("c", 100, 1, 1)],
                     )
                 ),
                 AttrFactory.element(
                     restrictions=Restrictions(
                         min_occurs=1,
                         max_occurs=1,
-                        path=[("s", 1, 1, 1), ("c", 4, 0, 1)],
+                        path=[("s", 1, 1, 1), ("c", 4, 0, 1), ("a", 101, 1, 1)],
                     )
                 ),
                 AttrFactory.element(

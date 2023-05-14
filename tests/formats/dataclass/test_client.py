@@ -5,6 +5,7 @@ from tests.fixtures.calculator import Add
 from tests.fixtures.calculator import CalculatorSoapAdd
 from tests.fixtures.calculator import CalculatorSoapAddInput
 from tests.fixtures.calculator import CalculatorSoapAddOutput
+from tests.fixtures.hello import HelloGetHelloAsString
 from xsdata.exceptions import ClientValueError
 from xsdata.formats.dataclass.client import Client
 from xsdata.formats.dataclass.client import Config
@@ -37,6 +38,7 @@ class ClientTests(TestCase):
             "soap_action": "http://tempuri.org/Add",
             "output": CalculatorSoapAddOutput,
             "transport": "http://schemas.xmlsoap.org/soap/http",
+            "encoding": None,
         }
 
         self.assertEqual(expected, actual)
@@ -87,6 +89,13 @@ class ClientTests(TestCase):
                 "SOAPAction": "http://tempuri.org/Add",
             },
         )
+
+    def test_prepare_payload_with_encoding(self):
+        client = Client.from_service(HelloGetHelloAsString, encoding="utf-8")
+        result = client.prepare_payload(
+            {"Body": {"getHelloAsString": {"arg0": "Χριστόδουλος"}}}
+        )
+        self.assertIn("Χριστόδουλος".encode(), result)
 
     def test_prepare_payload_raises_error_with_type_mismatch(self):
         client = Client.from_service(CalculatorSoapAdd)

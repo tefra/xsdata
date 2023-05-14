@@ -32,6 +32,7 @@ class Config(NamedTuple):
     soap_action: str
     input: Type
     output: Type
+    encoding: Optional[str] = None
 
     @classmethod
     def from_service(cls, obj: Any, **kwargs: Any) -> "Config":
@@ -129,4 +130,8 @@ class Client:
                 f"got `{type(obj).__name__}`"
             )
 
-        return self.serializer.render(obj)
+        result = self.serializer.render(obj)
+        if self.config.encoding:
+            return result.encode(self.config.encoding)
+
+        return result

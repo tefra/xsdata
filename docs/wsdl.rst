@@ -69,8 +69,7 @@ The client can be initialized from the an operation class directly
 
     client = Client.from_service(CalculatorSoapAdd)
     client.config
-    # Config(style='document', location='http://www.dneonline.com/calculator.asmx', transport='http://schemas.xmlsoap.org/soap/http', soap_action='http://tempuri.org/Add', input=<class 'tests.fixtures.calculator.services.CalculatorSoapAddInput'>, output=<class 'tests.fixtures.calculator.services.CalculatorSoapAddOutput'>)
-
+    # Config(style='document', location='http://www.dneonline.com/calculator.asmx', transport='http://schemas.xmlsoap.org/soap/http', soap_action='http://tempuri.org/Add', input=<class 'tests.fixtures.calculator.services.CalculatorSoapAddInput'>, output=<class 'tests.fixtures.calculator.services.CalculatorSoapAddOutput'>, encoding=None)
 
 But you can also override any properties as you see fit
 
@@ -123,3 +122,10 @@ are needed for the webservice to work can not be overwritten.,
 .. code-block::
 
     client.send(params, headers={"User-Agent": "xsdata"})
+
+
+You will need to encode the payload if you intend to send non-ascii characters.
+
+.. code-block::
+
+    client = Client.from_service(encoding="utf-8")

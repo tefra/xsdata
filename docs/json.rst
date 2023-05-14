@@ -137,6 +137,7 @@ all the imported modules to find a matching dataclass.
 .. doctest::
 
     >>> from tests.fixtures.books import *  # Import all classes
+    >>> from xsdata.formats.dataclass.parsers.config import ParserConfig
     >>> json_string = """{
     ...   "author": "Hightower, Kim",
     ...   "title": "The First Book",

@@ -62,8 +62,9 @@ imported objects, enables xsdata to serialize the models.
 
 
 .. testoutput::
+    :options: +NORMALIZE_WHITESPACE
 
-   <?xml version="1.0" encoding="UTF-8"?>
+    <?xml version="1.0" encoding="UTF-8"?>
     <City>
       <name>footown</name>
       <streets>

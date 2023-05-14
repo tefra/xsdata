@@ -1,3 +1,4 @@
+import logging
 import platform
 import sys
 import tempfile
@@ -14,6 +15,7 @@ from xsdata.cli import resolve_source
 from xsdata.codegen.transformer import SchemaTransformer
 from xsdata.codegen.writer import CodeWriter
 from xsdata.formats.dataclass.generator import DataclassGenerator
+from xsdata.logger import logger
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.config import StructureStyle
 from xsdata.utils.downloader import Downloader
@@ -85,6 +87,12 @@ class CliTests(TestCase):
         self.assertIsNone(result.exception)
         self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
         self.assertTrue(mock_init.call_args[1]["print"])
+
+    @mock.patch.object(SchemaTransformer, "process")
+    @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
+    def test_generate_with_debug_mode(self, *args):
+        self.runner.invoke(cli, ["foo.xsd", "--package", "foo", "--debug"])
+        self.assertEqual(logging.DEBUG, logger.level)
 
     @mock.patch("xsdata.cli.logger.info")
     def test_init_config(self, mock_info):

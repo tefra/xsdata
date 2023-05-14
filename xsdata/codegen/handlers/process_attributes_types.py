@@ -196,6 +196,9 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
         attr_type.reference = id(source)
         attr_type.circular = self.is_circular_dependency(source, target, set())
 
+        if attr_type.circular:
+            logger.debug("Possible circular reference %s, %s", target.name, source.name)
+
     def is_circular_dependency(self, source: Class, target: Class, seen: Set) -> bool:
         """Check if any source dependencies recursively match the target
         class."""

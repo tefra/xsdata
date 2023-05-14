@@ -117,6 +117,7 @@ def download(source: str, output: str):
 @click.option("-c", "--config", default=".xsdata.xml", help="Project configuration")
 @click.option("-pp", "--print", is_flag=True, default=False, help="Print output")
 @click.option("--cache", is_flag=True, default=False, help="Cache sources loading")
+@click.option("--debug", is_flag=True, default=False, help="Show debug messages")
 @model_options(GeneratorOutput)
 def generate(**kwargs: Any):
     """
@@ -126,6 +127,11 @@ def generate(**kwargs: Any):
     The input source can be either a filepath, uri or a directory
     containing xml, json, xsd and wsdl files.
     """
+
+    debug = kwargs.pop("debug")
+    if debug:
+        logger.setLevel(logging.DEBUG)
+
     source = kwargs.pop("source")
     stdout = kwargs.pop("print")
     cache = kwargs.pop("cache")

@@ -111,7 +111,7 @@ class LogFormatter(logging.Formatter):
             level = record.levelname.lower()
             msg = record.getMessage()
             if level in self.colors:
-                prefix = click.style(f"{level}:", **self.colors[level])
+                prefix = click.style(f"{level}", **self.colors[level])
                 msg = f"{prefix}: {msg}"
             return msg
 

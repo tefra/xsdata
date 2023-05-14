@@ -228,6 +228,9 @@ class JsonParser(AbstractParser):
             if choice:
                 return self.bind_text(meta, choice, value)
 
+            if value is None:
+                return value
+
             raise ParserError(
                 f"Failed to bind '{value}' "
                 f"to {meta.clazz.__qualname__}.{var.name} field"

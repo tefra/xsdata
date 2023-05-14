@@ -114,6 +114,19 @@ class ChoiceType:
         }
     )
 
+@dataclass
+class OptionalChoiceType:
+    a_or_b: Optional[object] = field(
+        metadata={
+            "type": "Elements",
+            "choices": (
+                {"name": "a", "type": TypeA},
+                {"name": "b", "type": TypeB},
+            ),
+        }
+    )
+
+
 
 @dataclass
 class UnionType:

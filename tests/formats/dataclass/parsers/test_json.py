@@ -11,6 +11,7 @@ from tests.fixtures.models import BaseC
 from tests.fixtures.models import BaseType
 from tests.fixtures.models import ChoiceType
 from tests.fixtures.models import ExtendedType
+from tests.fixtures.models import OptionalChoiceType
 from tests.fixtures.models import TypeA
 from tests.fixtures.models import TypeB
 from tests.fixtures.models import TypeC
@@ -264,6 +265,11 @@ class JsonParserTests(FactoryTestCase):
             "Failed to bind '!NotAQname' to ChoiceType.choice field",
             str(cm.exception),
         )
+
+    def test_bind_simple_type_with_optional_elements_var(self):
+        data = {"a_or_b": None}
+        actual = self.parser.bind_dataclass(data, OptionalChoiceType)
+        self.assertIsNone(None, actual.a_or_b)
 
     def test_bind_any_element(self):
         data = {

@@ -10,6 +10,7 @@ from typing import Dict
 from typing import Iterator
 from typing import List
 from typing import Optional
+from typing import Tuple
 from typing import Type
 
 from xsdata.exceptions import CodeGenerationError
@@ -78,8 +79,9 @@ class Restrictions:
     sequence: Optional[int] = field(default=None)
     tokens: Optional[bool] = field(default=None)
     format: Optional[str] = field(default=None)
-    choice: Optional[str] = field(default=None)
+    choice: Optional[int] = field(default=None)
     group: Optional[int] = field(default=None)
+    path: List[Tuple[str, int, int, int]] = field(default_factory=list)
 
     @property
     def is_list(self) -> bool:
@@ -99,27 +101,18 @@ class Restrictions:
         """Update properties from another instance."""
         self.update(source)
 
-        min_occurs = source.min_occurs
-        max_occurs = source.max_occurs
-        is_list = max_occurs is not None and max_occurs > 1
+        self.path = source.path + self.path
+        self.sequence = self.sequence or source.sequence
+        self.choice = self.choice or source.choice
+        self.tokens = self.tokens or source.tokens
+        self.format = self.format or source.format
+        self.group = self.group or source.group
 
-        # Update the sequence number if new value is valid and restrictions indicate
-        # the field was and still is a list.
-        if source.sequence is not None and (is_list or not self.is_list):
-            self.sequence = source.sequence
+        if self.min_occurs is None and source.min_occurs is not None:
+            self.min_occurs = source.min_occurs
 
-        self.choice = source.choice or self.choice
-        self.tokens = source.tokens or self.tokens
-        self.format = source.format or self.format
-        self.group = source.group or self.group
-
-        # Update min occurs if current value is None or the new value is more than one.
-        if self.min_occurs is None or (min_occurs is not None and min_occurs != 1):
-            self.min_occurs = min_occurs
-
-        # Update max occurs if current value is None or the new value is more than one.
-        if self.max_occurs is None or (max_occurs is not None and max_occurs != 1):
-            self.max_occurs = max_occurs
+        if self.max_occurs is None and source.max_occurs is not None:
+            self.max_occurs = source.max_occurs
 
     def update(self, source: "Restrictions"):
         keys = (
@@ -161,7 +154,13 @@ class Restrictions:
             result["required"] = True
 
         for key, value in asdict(self).items():
-            if value is None or key in ("choice", "group", "min_occurs", "max_occurs"):
+            if value is None or key in (
+                "choice",
+                "group",
+                "min_occurs",
+                "max_occurs",
+                "path",
+            ):
                 continue
 
             if key.endswith("clusive") and types:
@@ -265,6 +264,10 @@ class Attr:
 
     def __post_init__(self):
         self.local_name = self.name
+
+    @property
+    def key(self) -> str:
+        return f"{self.tag}.{self.namespace}.{self.local_name}"
 
     @property
     def is_attribute(self) -> bool:
@@ -641,6 +644,7 @@ get_name = operator.attrgetter("name")
 get_qname = operator.attrgetter("qname")
 get_tag = operator.attrgetter("tag")
 get_restriction_choice = operator.attrgetter("restrictions.choice")
+get_restriction_sequence = operator.attrgetter("restrictions.sequence")
 get_slug = operator.attrgetter("slug")
 get_target_namespace = operator.attrgetter("target_namespace")
 is_enumeration = operator.attrgetter("is_enumeration")

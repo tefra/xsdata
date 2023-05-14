@@ -7,16 +7,17 @@ from typing import Iterator
 from typing import List
 from typing import Optional
 from typing import Sequence
+from typing import Set
 from typing import TypeVar
 
 T = TypeVar("T")
 
 
 def is_array(value: Any) -> bool:
-    if isinstance(value, (list, tuple, set)):
+    if isinstance(value, tuple):
         return not hasattr(value, "_fields")
 
-    return False
+    return isinstance(value, (list, set, frozenset))
 
 
 def unique_sequence(items: Iterable[T], key: Optional[str] = None) -> List[T]:
@@ -77,3 +78,37 @@ def first(items: Iterator[T]) -> Optional[T]:
 def prepend(target: List, *args: Any):
     """Prepend items to the target list."""
     target[:0] = args
+
+
+def connected_components(lists: List[List[Any]]) -> Iterator[List[Any]]:
+    """
+    Merge lists of lists that share common elements.
+
+    https://stackoverflow.com/questions/4842613/merge-lists-that-share-
+    common-elements
+    """
+    neighbors = defaultdict(set)
+    for each in lists:
+        for item in each:
+            neighbors[item].update(each)
+
+    def component(node: Any, neigh: Dict[Any, Set], see: Set[Any]):
+        nodes = {node}
+        while nodes:
+            next_node = nodes.pop()
+            see.add(next_node)
+            nodes |= neigh[next_node] - see
+            yield next_node
+
+    seen: Set[Any] = set()
+    for item in neighbors:
+        if item not in seen:
+            yield sorted(component(item, neighbors, seen))
+
+
+def find_connected_component(groups: List[List[Any]], value: Any) -> int:
+    for index, group in enumerate(groups):
+        if value in group:
+            return index
+
+    return -1

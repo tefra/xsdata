@@ -17,4 +17,4 @@ class GroupTests(TestCase):
 
     def test_get_restrictions(self):
         obj = Group(min_occurs=1, max_occurs=2)
-        self.assertEqual({"max_occurs": 2, "min_occurs": 1}, obj.get_restrictions())
+        self.assertEqual({"path": [("g", id(obj), 1, 2)]}, obj.get_restrictions())

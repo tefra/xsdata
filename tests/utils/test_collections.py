@@ -1,4 +1,5 @@
 from collections import namedtuple
+from typing import Iterator
 from unittest import TestCase
 
 from xsdata.utils import collections
@@ -30,3 +31,26 @@ class CollectionsTests(TestCase):
         self.assertFalse(collections.is_array(fixture(1, 2)))
         self.assertTrue(collections.is_array([]))
         self.assertTrue(collections.is_array(tuple()))
+        self.assertTrue(collections.is_array(frozenset()))
+
+    def test_connected_components(self):
+        lists = [[1, 2, 3], [4], [3, 4], [6]]
+        actual = collections.connected_components(lists)
+
+        self.assertIsInstance(actual, Iterator)
+        self.assertEqual([[1, 2, 3, 4], [6]], list(actual))
+
+    def test_find_connected_component(self):
+        groups = [[1, 2, 3], [4, 5, 6]]
+
+        actual = collections.find_connected_component(groups, 1)
+        self.assertEqual(0, actual)
+
+        actual = collections.find_connected_component(groups, 2)
+        self.assertEqual(0, actual)
+
+        actual = collections.find_connected_component(groups, 4)
+        self.assertEqual(1, actual)
+
+        actual = collections.find_connected_component(groups, 100)
+        self.assertEqual(-1, actual)

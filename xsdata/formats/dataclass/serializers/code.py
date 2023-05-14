@@ -71,10 +71,8 @@ class PycodeSerializer(AbstractSerializer):
         for tp in types:
             module = tp.__module__
             name = tp.__qualname__
-            if module == "builtins" or "." in name:
-                continue
-
-            imports.append(f"from {module} import {name}\n")
+            if module != "builtins" and "." not in name:
+                imports.append(f"from {module} import {name}\n")
 
         return "".join(sorted(imports))
 

@@ -106,6 +106,8 @@ class SchemaTransformer:
     def process(self, uris: List[str], cache: bool = False):
         cache_file = self.get_cache_file(uris) if cache else None
         if cache_file and cache_file.exists():
+            logger.info(f"Loading from cache {cache_file}")
+
             self.classes = pickle.loads(cache_file.read_bytes())
         else:
             self.process_sources(uris)

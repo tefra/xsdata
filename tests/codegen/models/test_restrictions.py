@@ -22,6 +22,7 @@ class RestrictionsTests(TestCase):
             pattern=r"[A-Z]",
             explicit_timezone="+1",
             nillable=True,
+            path=[("s", 0, 1, 1)],
         )
 
     def test_property_is_list(self):
@@ -59,6 +60,21 @@ class RestrictionsTests(TestCase):
         child.nillable = False
         child.merge(parent)
         self.assertFalse(child.nillable)
+
+    def test_merge_occurs(self):
+        a = Restrictions()
+        b = Restrictions()
+
+        a.merge(b)
+
+        self.assertIsNone(a.min_occurs)
+        self.assertIsNone(a.max_occurs)
+
+        b.min_occurs = 0
+        b.max_occurs = 1
+        a.merge(b)
+        self.assertEqual(0, a.min_occurs)
+        self.assertEqual(1, a.max_occurs)
 
     def test_asdict(self):
         expected = {

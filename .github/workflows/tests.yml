@@ -90,16 +90,16 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.7'
+          python-version: '3.9'
       - name: Install pip install .
         run: |
           pip install -e .
       - name: Verify
         run: |
-          python tests/integration/benchmarks/conftest.py -c XmlEventWriter
-          python tests/integration/benchmarks/conftest.py -c XmlEventHandler
-          python tests/integration/benchmarks/conftest.py -c JsonParser
-          python tests/integration/benchmarks/conftest.py -c JsonSerializer
+          python benchmark.py -c XmlEventWriter
+          python benchmark.py -c XmlEventHandler
+          python benchmark.py -c JsonParser
+          python benchmark.py -c JsonSerializer
           xsdata | xargs -0 python -c "import sys; assert 'Install cli' in sys.argv[1]"
   pre-commit:
     name: Pre-commit Hooks

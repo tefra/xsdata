@@ -146,8 +146,8 @@ class SchemaMapper:
             if child.is_property:
                 yield child, parent_restrictions
             else:
-                restrictions = parent_restrictions.clone()
-                restrictions.merge(Restrictions.from_element(child))
+                restrictions = Restrictions.from_element(child)
+                restrictions.merge(parent_restrictions)
                 yield from cls.element_children(child, restrictions)
 
     @classmethod

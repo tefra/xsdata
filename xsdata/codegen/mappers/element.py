@@ -3,7 +3,6 @@ from collections import defaultdict
 from typing import Any
 from typing import List
 from typing import Optional
-from typing import Set
 
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
@@ -66,8 +65,8 @@ class ElementMapper:
     def build_elements(
         cls, target: Class, element: AnyElement, namespace: Optional[str]
     ):
-        sequential_set = cls.sequence_names(element)
-        for child in element.children:
+        sequences = cls.sequential_groups(element)
+        for index, child in enumerate(element.children):
             if isinstance(child, AnyElement) and child.qname:
                 if child.tail:
                     target.mixed = True
@@ -79,15 +78,14 @@ class ElementMapper:
                 else:
                     attr_type = cls.build_attribute_type(child.qname, child.text)
 
-                sequence = 1 if child.qname in sequential_set else None
-
+                sequence = collections.find_connected_component(sequences, index)
                 cls.build_attribute(
                     target,
                     child.qname,
                     attr_type,
                     namespace,
                     Tag.ELEMENT,
-                    sequence,
+                    sequence + 1,
                 )
 
     @classmethod
@@ -128,7 +126,7 @@ class ElementMapper:
         attr_type: AttrType,
         parent_namespace: Optional[str] = None,
         tag: str = Tag.ELEMENT,
-        sequence: Optional[int] = None,
+        sequence: int = 0,
     ):
         namespace, name = split_qname(qname)
         namespace = cls.select_namespace(namespace, parent_namespace, tag)
@@ -136,7 +134,10 @@ class ElementMapper:
 
         attr = Attr(index=index, name=name, tag=tag, namespace=namespace)
         attr.types.append(attr_type)
-        attr.restrictions.sequence = sequence
+
+        if sequence:
+            attr.restrictions.path.append(("s", sequence, 1, sys.maxsize))
+
         attr.restrictions.min_occurs = 1
         attr.restrictions.max_occurs = 1
         cls.add_attribute(target, attr)
@@ -149,9 +150,7 @@ class ElementMapper:
             existing = target.attrs[pos]
             existing.restrictions.max_occurs = sys.maxsize
             existing.types.extend(attr.types)
-
-            if attr.restrictions.sequence is not None:
-                existing.restrictions.sequence = attr.restrictions.sequence
+            existing.types = collections.unique_sequence(existing.types, key="qname")
         else:
             target.attrs.append(attr)
 
@@ -171,22 +170,21 @@ class ElementMapper:
         return namespace
 
     @classmethod
-    def sequence_names(cls, element: AnyElement) -> Set[str]:
-        mapping = defaultdict(list)
-        names = [
-            child.qname
-            for child in element.children
-            if isinstance(child, AnyElement) and child.qname
-        ]
-        indices: Set[int] = set()
+    def sequential_groups(cls, element: AnyElement) -> List[List[int]]:
+        groups = cls.group_repeating_attrs(element)
+        return list(collections.connected_components(groups))
 
-        for index, name in enumerate(names):
-            mapping[name].append(index)
+    @classmethod
+    def group_repeating_attrs(cls, element: AnyElement) -> List[List[int]]:
+        counters = defaultdict(list)
+        for index, child in enumerate(element.children):
+            if isinstance(child, AnyElement) and child.qname:
+                counters[child.qname].append(index)
 
-        for pos in mapping.values():
-            total = len(pos)
+        groups = []
+        if len(counters) > 1:
+            for x in counters.values():
+                if len(x) > 1:
+                    groups.append(list(range(x[0], x[-1] + 1)))
 
-            if 1 < total < pos[-1] - pos[0] + 1:
-                indices.update(list(range(pos[0], pos[-1] + 1)))
-
-        return {names[index] for index in indices}
+        return groups

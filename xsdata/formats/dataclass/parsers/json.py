@@ -289,8 +289,6 @@ class JsonParser(AbstractParser):
 
         if not isinstance(params, dict):
             value = self.bind_text(meta, var, params)
-        elif var.clazz:
-            value = self.bind_complex_type(meta, var, params)
         elif xsi_type:
             clazz: Optional[Type] = self.context.find_type(xsi_type)
 
@@ -298,6 +296,8 @@ class JsonParser(AbstractParser):
                 raise ParserError(f"Unable to locate xsi:type `{xsi_type}`")
 
             value = self.bind_dataclass(params, clazz)
+        elif var.clazz:
+            value = self.bind_complex_type(meta, var, params)
         else:
             value = self.bind_best_dataclass(params, meta.element_types)
 

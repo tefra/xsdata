@@ -121,3 +121,19 @@ class AddAttributeSubstitutionsTests(FactoryTestCase):
         )
 
         self.assertEqual(expected, actual)
+
+    def test_prepare_substituted(self):
+        attr = AttrFactory.create()
+        attr.restrictions.min_occurs = 1
+        attr.restrictions.path.append(("s", 0, 1, 1))
+
+        self.processor.prepare_substituted(attr)
+
+        self.assertEqual(0, attr.restrictions.min_occurs)
+        self.assertEqual(id(attr), attr.restrictions.choice)
+        self.assertEqual(2, len(attr.restrictions.path))
+        self.assertEqual(("c", id(attr), 1, 1), attr.restrictions.path[-1])
+
+        attr.restrictions.choice = 1
+        self.processor.prepare_substituted(attr)
+        self.assertEqual(("c", id(attr), 1, 1), attr.restrictions.path[-1])

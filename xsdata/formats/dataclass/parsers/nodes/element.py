@@ -367,10 +367,11 @@ class ElementNode(XmlNode):
         if var.clazz:
             return self.build_element_node(
                 var.clazz,
+                var.derived,
                 attrs,
                 ns_map,
                 position,
-                derived_factory if var.derived else None,
+                derived_factory,
                 xsi_type,
                 xsi_nil,
             )
@@ -395,10 +396,11 @@ class ElementNode(XmlNode):
         if clazz:
             node = self.build_element_node(
                 clazz,
+                derived,
                 attrs,
                 ns_map,
                 position,
-                derived_factory if derived else None,
+                derived_factory,
                 xsi_type,
                 xsi_nil,
             )
@@ -417,10 +419,11 @@ class ElementNode(XmlNode):
     def build_element_node(
         self,
         clazz: Type,
+        derived: bool,
         attrs: Dict,
         ns_map: Dict,
         position: int,
-        derived_factory: Optional[Type] = None,
+        derived_factory: Type,
         xsi_type: Optional[str] = None,
         xsi_nil: Optional[bool] = None,
     ) -> Optional[XmlNode]:
@@ -429,6 +432,9 @@ class ElementNode(XmlNode):
         if not meta or (meta.nillable and xsi_nil is False):
             return None
 
+        if xsi_type and not derived and not issubclass(meta.clazz, clazz):
+            derived = True
+
         return ElementNode(
             meta=meta,
             config=self.config,
@@ -436,7 +442,7 @@ class ElementNode(XmlNode):
             ns_map=ns_map,
             context=self.context,
             position=position,
-            derived_factory=derived_factory,
+            derived_factory=derived_factory if derived else None,
             xsi_type=xsi_type,
             xsi_nil=xsi_nil,
             mixed=self.meta.mixed_content,

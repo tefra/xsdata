@@ -55,11 +55,7 @@ class AddAttributeSubstitutions(RelativeHandlerInterface):
 
             attr_type.substituted = True
             for substitution in self.substitutions.get(attr_type.qname, []):
-                attr.restrictions.min_occurs = 0
-
-                if not attr.restrictions.choice:
-                    attr.restrictions.choice = id(attr)
-                    attr.restrictions.path.append(("c", id(attr), 1, 1))
+                self.prepare_substituted(attr)
 
                 clone = ClassUtils.clone_attribute(substitution, attr.restrictions)
                 clone.restrictions.min_occurs = 0
@@ -80,6 +76,14 @@ class AddAttributeSubstitutions(RelativeHandlerInterface):
             for qname in obj.substitutions:
                 attr = self.create_substitution(obj)
                 self.substitutions[qname].append(attr)
+
+    @classmethod
+    def prepare_substituted(cls, attr: Attr):
+        attr.restrictions.min_occurs = 0
+        if not attr.restrictions.choice:
+            choice = id(attr)
+            attr.restrictions.choice = choice
+            attr.restrictions.path.append(("c", choice, 1, 1))
 
     @classmethod
     def create_substitution(cls, source: Class) -> Attr:

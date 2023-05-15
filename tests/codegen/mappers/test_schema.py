@@ -319,12 +319,6 @@ class SchemaMapperTests(FactoryTestCase):
         mock_build_class_attribute_types.assert_called_once_with(item, attribute)
         mock_element_namespace.assert_called_once_with(attribute, item.target_namespace)
 
-    def test_build_class_attribute_skip_prohibited(self):
-        item = ClassFactory.create(ns_map={"bar": "foo"})
-        attribute = Attribute(use=UseType.PROHIBITED)
-        SchemaMapper.build_class_attribute(item, attribute, Restrictions())
-        self.assertEqual(0, len(item.attrs))
-
     @mock.patch.object(Attribute, "attr_types", new_callable=mock.PropertyMock)
     @mock.patch.object(SchemaMapper, "build_inner_classes")
     def test_build_class_attribute_types(

@@ -302,6 +302,11 @@ class Attr:
         return self.restrictions.is_list
 
     @property
+    def is_prohibited(self) -> bool:
+        """Return whether this attribute is prohibited."""
+        return self.restrictions.is_prohibited
+
+    @property
     def is_nameless(self) -> bool:
         """Return whether this attribute has a local name that will be used
         during parsing/serialization."""

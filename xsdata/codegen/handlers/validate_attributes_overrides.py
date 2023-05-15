@@ -34,6 +34,8 @@ class ValidateAttributesOverrides(RelativeHandlerInterface):
                     self.validate_override(target, attr, base_attr)
                 else:
                     self.resolve_conflict(attr, base_attr)
+            elif attr.is_prohibited:
+                self.remove_attribute(target, attr)
 
     @classmethod
     def overrides(cls, a: Attr, b: Attr) -> bool:

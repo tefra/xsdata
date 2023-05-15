@@ -7,6 +7,7 @@ from typing import Tuple
 
 stop_words = {
     "",
+    "Any",
     "Decimal",
     "Dict",
     "Enum",

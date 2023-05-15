@@ -51,6 +51,13 @@ class ValidateAttributesOverridesTests(FactoryTestCase):
             class_a.attrs[1], class_c.attrs[1]
         )
 
+    def test_process_remove_non_overriding_prohibited_attrs(self):
+        target = ClassFactory.elements(1)
+        target.attrs[0].restrictions.max_occurs = 0
+
+        self.processor.process(target)
+        self.assertEqual(0, len(target.attrs))
+
     def test_overrides(self):
         a = AttrFactory.create(tag=Tag.SIMPLE_TYPE)
         b = a.clone()

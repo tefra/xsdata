@@ -19,6 +19,7 @@ from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.formats.converter import converter
+from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.models.config import DocstringStyle
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.config import ObjectType
@@ -163,10 +164,10 @@ class Filters:
         metadata = self.field_metadata(attr, parent_namespace, parents)
 
         kwargs: Dict[str, Any] = {}
-        if attr.fixed:
+        if attr.fixed or attr.is_prohibited:
             kwargs["init"] = False
 
-        if default_value is not False:
+        if default_value is not False and not attr.is_prohibited:
             key = self.FACTORY_KEY if attr.is_factory else self.DEFAULT_KEY
             kwargs[key] = default_value
 
@@ -281,6 +282,9 @@ class Filters:
         self, attr: Attr, parent_namespace: Optional[str], parents: List[str]
     ) -> Dict:
         """Return a metadata dictionary for the given attribute."""
+
+        if attr.is_prohibited:
+            return {"type": XmlType.IGNORE}
 
         name = namespace = None
 
@@ -588,6 +592,10 @@ class Filters:
 
     def field_type(self, attr: Attr, parents: List[str]) -> str:
         """Generate type hints for the given attribute."""
+
+        if attr.is_prohibited:
+            return "Any"
+
         type_names = collections.unique_sequence(
             self.field_type_name(x, parents) for x in attr.types
         )
@@ -703,6 +711,7 @@ class Filters:
                 "Tuple": ["Tuple["],
                 "Type": ["Type["],
                 "Union": ["Union["],
+                "Any": type_patterns("Any"),
             },
             "xml.etree.ElementTree": {"QName": type_patterns("QName")},
             "xsdata.models.datatype": {

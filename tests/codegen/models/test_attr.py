@@ -63,6 +63,13 @@ class AttrTests(FactoryTestCase):
         attr.restrictions.max_occurs = 1
         self.assertFalse(attr.is_list)
 
+    def test_property_is_prohibited(self):
+        attr = AttrFactory.create(restrictions=Restrictions(max_occurs=0))
+        self.assertTrue(attr.is_prohibited)
+
+        attr.restrictions.max_occurs = 1
+        self.assertFalse(attr.is_list)
+
     def test_property_is_optional(self):
         attr = AttrFactory.create(restrictions=Restrictions(min_occurs=0))
         self.assertTrue(attr.is_optional)

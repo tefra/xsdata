@@ -228,9 +228,6 @@ class SchemaMapper:
         if obj.class_name in (Tag.ELEMENT, Tag.ANY, Tag.GROUP):
             restrictions.merge(parent_restrictions)
 
-        if restrictions.is_prohibited:
-            return
-
         name = obj.real_name
         target.attrs.append(
             Attr(

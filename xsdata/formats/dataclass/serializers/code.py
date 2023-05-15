@@ -18,6 +18,9 @@ from xsdata.utils.objects import literal_value
 spaces = "    "
 
 
+unset = object()
+
+
 @dataclass
 class PycodeSerializer(AbstractSerializer):
     """
@@ -123,8 +126,16 @@ class PycodeSerializer(AbstractSerializer):
         yield f"{obj.__class__.__qualname__}(\n"
 
         next_level = level + 1
-        for index, f in enumerate(self.context.class_type.get_fields(obj)):
+        index = 0
+        for f in self.context.class_type.get_fields(obj):
             if not f.init:
+                continue
+
+            value = getattr(obj, f.name, types)
+            default = self.context.class_type.default_value(f, default=unset)
+            if default is not unset and (
+                (callable(default) and default() == value) or default == value
+            ):
                 continue
 
             if index:
@@ -132,7 +143,8 @@ class PycodeSerializer(AbstractSerializer):
             else:
                 yield f"{spaces * next_level}{f.name}="
 
-            value = getattr(obj, f.name, types)
             yield from self.write_object(value, next_level, types)
+
+            index += 1
 
         yield f"\n{spaces * level})"

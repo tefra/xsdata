@@ -1,5 +1,7 @@
 from unittest import TestCase
 
+from tests.fixtures.books import BookForm
+from tests.fixtures.books import Books
 from tests.fixtures.books.fixtures import books
 from xsdata.formats.dataclass.serializers import PycodeSerializer
 from xsdata.models.enums import Namespace
@@ -42,6 +44,24 @@ class PycodeSerializerTests(TestCase):
             ")\n"
         )
 
+        self.assertEqual(expected, result)
+
+    def test_write_class_with_default_values(self):
+        books = Books(book=[BookForm(author="me")])
+        result = self.serializer.render(books, var_name="books")
+        expected = (
+            "from tests.fixtures.books.books import BookForm\n"
+            "from tests.fixtures.books.books import Books\n"
+            "\n"
+            "\n"
+            "books = Books(\n"
+            "    book=[\n"
+            "        BookForm(\n"
+            '            author="me"\n'
+            "        ),\n"
+            "    ]\n"
+            ")\n"
+        )
         self.assertEqual(expected, result)
 
     def test_write_object_with_empty_array(self):

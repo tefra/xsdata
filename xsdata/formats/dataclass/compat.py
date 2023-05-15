@@ -5,6 +5,7 @@ from dataclasses import is_dataclass
 from dataclasses import MISSING
 from typing import Any
 from typing import Dict
+from typing import Optional
 from typing import Set
 from typing import Tuple
 from typing import Type
@@ -55,7 +56,7 @@ class ClassType(abc.ABC):
         """Return the models fields in the correct mro ordering."""
 
     @abc.abstractmethod
-    def default_value(self, field: Any) -> Any:
+    def default_value(self, field: Any, default: Optional[Any] = None) -> Any:
         """Return the default value or factory of the given model field."""
 
     @abc.abstractmethod
@@ -124,15 +125,14 @@ class Dataclasses(ClassType):
     def get_fields(self, obj: Any) -> Tuple[Any, ...]:
         return fields(obj)
 
-    def default_value(self, field: Field) -> Any:
-        # Ignore type because of https://github.com/python/mypy/issues/6910
-        if field.default_factory is not MISSING:  # type: ignore
-            return field.default_factory  # type: ignore
+    def default_value(self, field: Field, default: Optional[Any] = None) -> Any:
+        if field.default_factory is not MISSING:
+            return field.default_factory
 
         if field.default is not MISSING:
             return field.default
 
-        return None
+        return default
 
     def default_choice_value(self, choice: Dict) -> Any:
         factory = choice.get("default_factory")

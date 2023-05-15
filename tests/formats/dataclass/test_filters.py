@@ -145,6 +145,22 @@ class FiltersTests(FactoryTestCase):
         )
         self.assertEqual(expected, result)
 
+    def test_field_definition_with_prohibited_attr(self):
+        attr = AttrFactory.native(DataType.INT)
+        attr.restrictions.max_occurs = 0
+        attr.default = "foo"
+
+        result = self.filters.field_definition(attr, {}, None, ["Root"])
+        expected = (
+            "field(\n"
+            "        init=False,\n"
+            "        metadata={\n"
+            '            "type": "Ignore",\n'
+            "        }\n"
+            "    )"
+        )
+        self.assertEqual(expected, result)
+
     @mock.patch.object(Filters, "field_default_value")
     def test_field_definition_with_restriction_pattern(self, mock_field_default_value):
         mock_field_default_value.return_value = None
@@ -538,6 +554,11 @@ class FiltersTests(FactoryTestCase):
         )
         self.assertEqual("Optional[int]", self.filters.field_type(attr, ["a", "b"]))
 
+    def test_field_type_with_prohibited_attr(self):
+        attr = AttrFactory.create(restrictions=Restrictions(max_occurs=0))
+
+        self.assertEqual("Any", self.filters.field_type(attr, ["a", "b"]))
+
     def test_choice_type(self):
         choice = AttrFactory.create(types=[AttrTypeFactory.create("foobar")])
         actual = self.filters.choice_type(choice, ["a", "b"])
@@ -654,6 +675,10 @@ class FiltersTests(FactoryTestCase):
 
         output = " Type["
         expected = "from typing import Type"
+        self.assertIn(expected, self.filters.default_imports(output))
+
+        output = ": Any = "
+        expected = "from typing import Any"
         self.assertIn(expected, self.filters.default_imports(output))
 
     def test_default_imports_combo(self):

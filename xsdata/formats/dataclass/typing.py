@@ -1,3 +1,4 @@
+
 from typing import _eval_type  # type: ignore
 from typing import Any
 from typing import Dict
@@ -12,8 +13,16 @@ from typing import Union
 NONE_TYPE = type(None)
 EMPTY_ARGS = ()
 
+try:
+    from types import UnionType
+except:
+    class UnionType:  # type: ignore
+        pass
+
+
 
 def get_origin(tp: Any) -> Any:
+    UnionType
     if tp is Dict:
         return Dict
 
@@ -22,6 +31,9 @@ def get_origin(tp: Any) -> Any:
 
     if isinstance(tp, TypeVar):
         return TypeVar
+
+    if isinstance(tp, UnionType):
+        return Union
 
     origin = getattr(tp, "__origin__", None)
     if origin:
@@ -42,6 +54,8 @@ def get_origin(tp: Any) -> Any:
 
     if origin or str(tp).startswith("typing."):
         raise TypeError()
+
+
 
     return None
 

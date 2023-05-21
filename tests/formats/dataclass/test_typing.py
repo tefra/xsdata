@@ -1,4 +1,5 @@
 import datetime
+import typing
 from decimal import Decimal
 from enum import Enum
 from typing import Any
@@ -47,6 +48,11 @@ class TypingTests(TestCase):
         self.assertEqual(Dict, get_origin(Dict[Union[int], Union[str]]))
 
     def test_get_origin_union(self):
+
+        # self.assertEqual("", evaluate(Optional[int]))
+        self.assertEqual("", evaluate(dict[str, int]))
+
+
         self.assertIsNone(get_origin(Union[int]))
         self.assertEqual(Union, get_origin(Optional[int]))
         self.assertEqual(Union, get_origin(Union[int, str]))

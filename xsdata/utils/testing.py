@@ -196,24 +196,30 @@ class ClassFactory(Factory):
 
 class ExtensionFactory(Factory):
     counter = 65
+    tags = [Tag.ELEMENT, Tag.EXTENSION, Tag.RESTRICTION]
 
     @classmethod
     def create(
         cls,
         attr_type: Optional[AttrType] = None,
         restrictions: Optional[Restrictions] = None,
+        tag: Optional[str] = None,
         **kwargs: Any,
     ) -> Extension:
         return Extension(
+            tag=tag or random.choice(cls.tags),
             type=attr_type or AttrTypeFactory.create(**kwargs),
             restrictions=restrictions or Restrictions(),
         )
 
     @classmethod
     def reference(cls, qname: str, **kwargs: Any) -> Extension:
+        tag = kwargs.pop("tag", None)
         restrictions = kwargs.pop("restrictions", None)
         return cls.create(
-            AttrTypeFactory.create(qname=qname, **kwargs), restrictions=restrictions
+            AttrTypeFactory.create(qname=qname, **kwargs),
+            tag=tag,
+            restrictions=restrictions,
         )
 
     @classmethod

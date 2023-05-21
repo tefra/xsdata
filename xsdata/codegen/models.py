@@ -389,10 +389,12 @@ class Extension:
     """
     Model representation of a dataclass base class.
 
+    :param tag:
     :param type:
     :param restrictions:
     """
 
+    tag: str
     type: AttrType
     restrictions: Restrictions = field(hash=False)
 

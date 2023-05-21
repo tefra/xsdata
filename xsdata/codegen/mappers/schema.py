@@ -114,7 +114,8 @@ class SchemaMapper:
 
         restrictions = obj.get_restrictions()
         extensions = [
-            cls.build_class_extension(target, base, restrictions) for base in obj.bases
+            cls.build_class_extension(obj.class_name, target, base, restrictions)
+            for base in obj.bases
         ]
         extensions.extend(cls.children_extensions(obj, target))
         target.extensions = collections.unique_sequence(extensions)
@@ -198,17 +199,20 @@ class SchemaMapper:
                 continue
 
             for ext in child.bases:
-                yield cls.build_class_extension(target, ext, child.get_restrictions())
+                yield cls.build_class_extension(
+                    child.class_name, target, ext, child.get_restrictions()
+                )
 
             yield from cls.children_extensions(child, target)
 
     @classmethod
     def build_class_extension(
-        cls, target: Class, name: str, restrictions: Dict
+        cls, tag: str, target: Class, name: str, restrictions: Dict
     ) -> Extension:
         """Create an extension for the target class."""
         return Extension(
             type=cls.build_data_type(target, name),
+            tag=tag,
             restrictions=Restrictions(**restrictions),
         )
 

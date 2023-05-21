@@ -148,7 +148,7 @@ class FiltersTests(FactoryTestCase):
     def test_field_definition_with_prohibited_attr(self):
         attr = AttrFactory.native(DataType.INT)
         attr.restrictions.max_occurs = 0
-        attr.default = "foo"
+        attr.default = "1"
 
         result = self.filters.field_definition(attr, {}, None, ["Root"])
         expected = (

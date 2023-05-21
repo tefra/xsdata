@@ -151,7 +151,7 @@ class FlattenClassExtensions(RelativeHandlerInterface):
         extension completely, copy all source attributes to the target
         class or leave the extension alone.
         """
-        if cls.should_remove_extension(source, target):
+        if cls.should_remove_extension(source, target, ext):
             target.extensions.remove(ext)
         elif cls.should_flatten_extension(source, target):
             ClassUtils.copy_attributes(source, target, ext)
@@ -177,7 +177,9 @@ class FlattenClassExtensions(RelativeHandlerInterface):
         return None
 
     @classmethod
-    def should_remove_extension(cls, source: Class, target: Class) -> bool:
+    def should_remove_extension(
+        cls, source: Class, target: Class, ext: Extension
+    ) -> bool:
         """
         Return whether the extension should be removed because of some
         violation.
@@ -185,10 +187,15 @@ class FlattenClassExtensions(RelativeHandlerInterface):
         Violations:
             - Circular Reference
             - Forward Reference
+            - Unordered sequences
             - MRO Violation A(B), C(B) and extensions includes A, B, C
         """
         # Circular or Forward reference
-        if source is target or target in source.inner:
+        if (
+            source is target
+            or target in source.inner
+            or cls.have_unordered_sequences(source, target, ext)
+        ):
             return True
 
         # MRO Violation
@@ -212,31 +219,41 @@ class FlattenClassExtensions(RelativeHandlerInterface):
             source.is_simple_type
             or target.has_suffix_attr
             or (source.has_suffix_attr and target.attrs)
-            or not cls.validate_sequence_order(source, target)
         ):
             return True
 
         return False
 
     @classmethod
-    def validate_sequence_order(cls, source: Class, target: Class) -> bool:
+    def have_unordered_sequences(
+        cls, source: Class, target: Class, ext: Extension
+    ) -> bool:
         """
         Validate sequence attributes are in the same order in the parent class.
 
         Dataclasses fields ordering follows the python mro pattern, the
-        parent fields are always first and they are updated if the
+        parent fields are always first, and they are updated if the
         subclass is overriding any of them but the overall ordering
         doesn't change!
+
+        @todo This needs a complete rewrite and most likely it needs to
+        @todo move way down in the process chain.
         """
+
+        if ext.tag == Tag.EXTENSION or source.extensions:
+            return False
+
         sequence = [
-            attr.name for attr in target.attrs if attr.restrictions.sequence is not None
+            attr.name
+            for attr in target.attrs
+            if attr.restrictions.sequence is not None and not attr.is_prohibited
         ]
         if len(sequence) > 1:
             compare = [attr.name for attr in source.attrs if attr.name in sequence]
             if compare and compare != sequence:
-                return False
+                return True
 
-        return True
+        return False
 
     @classmethod
     def replace_attributes_type(cls, target: Class, extension: Extension):

@@ -180,13 +180,14 @@ class SchemaMapperTests(FactoryTestCase):
         bar_type = AttrTypeFactory.create(qname="bar")
         foo_type = AttrTypeFactory.create(qname="foo")
 
-        bar = ExtensionFactory.create(bar_type)
-        double = ExtensionFactory.create(bar_type)
-        foo = ExtensionFactory.create(foo_type)
+        bar = ExtensionFactory.create(bar_type, tag=Tag.RESTRICTION)
+        double = ExtensionFactory.create(bar_type, tag=Tag.RESTRICTION)
+        foo = ExtensionFactory.create(foo_type, tag=Tag.EXTENSION)
 
         mock_children_extensions.return_value = [bar, double, foo]
         self_ext = ExtensionFactory.reference(
             qname="{xsdata}something",
+            tag=Tag.ELEMENT,
             restrictions=Restrictions(min_occurs=1, max_occurs=1),
         )
 
@@ -253,15 +254,16 @@ class SchemaMapperTests(FactoryTestCase):
 
         item = ClassFactory.create(ns_map={"bk": "book"})
         children = SchemaMapper.children_extensions(complex_type, item)
-        expected = list(
-            map(
-                ExtensionFactory.create,
-                [
-                    AttrTypeFactory.create(qname=build_qname("book", "b")),
-                    AttrTypeFactory.create(qname=build_qname("book", "c")),
-                ],
-            )
-        )
+        expected = [
+            ExtensionFactory.create(
+                AttrTypeFactory.create(qname=build_qname("book", "b")),
+                tag=Tag.RESTRICTION,
+            ),
+            ExtensionFactory.create(
+                AttrTypeFactory.create(qname=build_qname("book", "c")),
+                tag=Tag.EXTENSION,
+            ),
+        ]
 
         self.assertIsInstance(children, GeneratorType)
         self.assertEqual(expected, list(children))

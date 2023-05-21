@@ -293,7 +293,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
         self.assertEqual(0, len(target.extensions))
         self.assertEqual(1, len(target.attrs))
 
-        mock_should_remove_extension.assert_called_once_with(source, target)
+        mock_should_remove_extension.assert_called_once_with(source, target, extension)
         self.assertEqual(0, mock_copy_attributes.call_count)
         self.assertEqual(0, extension.type.reference)
 
@@ -343,23 +343,46 @@ class FlattenClassExtensionsTests(FactoryTestCase):
     def test_should_remove_extension(self):
         source = ClassFactory.create()
         target = ClassFactory.create()
+        extension = ExtensionFactory.create(tag=Tag.EXTENSION)
+        callback = self.processor.should_remove_extension
 
         # source is target
-        self.assertTrue(self.processor.should_remove_extension(source, source))
-        self.assertFalse(self.processor.should_remove_extension(source, target))
+        self.assertTrue(callback(source, source, extension))
+        self.assertFalse(callback(source, target, extension))
 
         # Source is parent class
         source.inner.append(target)
-        self.assertTrue(self.processor.should_remove_extension(target, target))
+        self.assertTrue(callback(target, target, extension))
 
         # MRO Violation
         source.inner.clear()
         target.extensions.append(ExtensionFactory.reference("foo"))
         target.extensions.append(ExtensionFactory.reference("bar"))
-        self.assertFalse(self.processor.should_remove_extension(source, target))
+        self.assertFalse(callback(source, target, extension))
 
         source.extensions.append(ExtensionFactory.reference("bar"))
-        self.assertTrue(self.processor.should_remove_extension(source, target))
+        self.assertTrue(callback(source, target, extension))
+
+        # Sequential violation
+        extension.tag = Tag.RESTRICTION
+        source = ClassFactory.elements(4)
+        target = source.clone()
+        self.assertFalse(callback(source, target, extension))
+
+        for attr in target.attrs:
+            attr.restrictions.sequence = 1
+
+        target.attrs[3].restrictions.max_occurs = 0
+
+        self.assertFalse(callback(source, target, extension))
+
+        target.attrs = [
+            target.attrs[1],
+            target.attrs[0],
+            target.attrs[2],
+            target.attrs[3],
+        ]
+        self.assertTrue(callback(source, target, extension))
 
     def test_should_flatten_extension(self):
         source = ClassFactory.create()
@@ -386,19 +409,6 @@ class FlattenClassExtensionsTests(FactoryTestCase):
         # Source is a simple type
         source = ClassFactory.create(attrs=[AttrFactory.create(tag=Tag.SIMPLE_TYPE)])
         target = ClassFactory.elements(1)
-        self.assertTrue(self.processor.should_flatten_extension(source, target))
-
-        # Sequential violation
-        source = ClassFactory.elements(3)
-        target = source.clone()
-        self.assertFalse(self.processor.should_flatten_extension(source, target))
-
-        for attr in target.attrs:
-            attr.restrictions.sequence = 1
-
-        self.assertFalse(self.processor.should_flatten_extension(source, target))
-
-        target.attrs = [target.attrs[1], target.attrs[0], target.attrs[2]]
         self.assertTrue(self.processor.should_flatten_extension(source, target))
 
     def test_replace_attributes_type(self):

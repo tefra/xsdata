@@ -1,6 +1,8 @@
+import re
 import sys
 import warnings
 from dataclasses import dataclass
+from dataclasses import field
 from enum import Enum
 from pathlib import Path
 from typing import Any
@@ -8,6 +10,7 @@ from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Pattern
 from typing import TextIO
 
 from xsdata import __version__
@@ -163,6 +166,18 @@ class ObjectType(Enum):
     FIELD = "field"
     MODULE = "module"
     PACKAGE = "package"
+
+
+class ExtensionType(Enum):
+    """
+    Extension type enumeration.
+
+    :cvar CLASS: class
+    :cvar DECORATOR: decorator
+    """
+
+    CLASS = "class"
+    DECORATOR = "decorator"
 
 
 @dataclass
@@ -376,6 +391,52 @@ class GeneratorSubstitution:
 
 
 @dataclass
+class GeneratorExtension:
+    """
+    Add decorators or base classes on the generated classes that match the
+    class name pattern.
+
+    :param type: The extension type
+    :param class_name: The class name  or a pattern to apply the extension
+    :param import_string: The import string of the extension type
+    :param prepend: Prepend or append decorator or base class
+    :param apply_if_derived: Apply or skip if the class is already a subclass
+    """
+
+    type: ExtensionType = attribute(required=True)
+    class_name: str = attribute(required=True, name="class")
+    import_string: str = attribute(required=True, name="import")
+    prepend: bool = attribute(default=False)
+    apply_if_derived: bool = attribute(default=False, name="applyIfDerived")
+
+    module_path: str = field(
+        init=False,
+        metadata={"type": "Ignore"},
+    )
+    func_name: str = field(
+        init=False,
+        metadata={"type": "Ignore"},
+    )
+    pattern: Pattern = field(
+        init=False,
+        metadata={"type": "Ignore"},
+    )
+
+    def __post_init__(self):
+        try:
+            self.module_path, self.func_name = self.import_string.rsplit(".", 1)
+        except (ValueError, AttributeError):
+            raise GeneratorConfigError(
+                f"Invalid extension import '{self.import_string}'"
+            )
+
+        try:
+            self.pattern = re.compile(self.class_name)
+        except re.error:
+            raise GeneratorConfigError(f"Failed to compile pattern '{self.class_name}'")
+
+
+@dataclass
 class GeneratorSubstitutions:
     """
     Generator search and replace substitutions for classes, fields, packages
@@ -391,6 +452,20 @@ class GeneratorSubstitutions:
 
 
 @dataclass
+class GeneratorExtensions:
+    """
+    Generator extensions for classes. The process runs after the default naming
+    conventions.
+
+    .. warning:: The generator doesn't validate imports!
+
+    :param extension: The list of extensions
+    """
+
+    extension: List[GeneratorExtension] = array_element()
+
+
+@dataclass
 class GeneratorConfig:
     """
     Generator configuration binding model.
@@ -401,6 +476,7 @@ class GeneratorConfig:
     :param aliases: Generator aliases, Deprecated since v21.12, use substitutions
     :param substitutions: Generator search and replace substitutions for classes,
         fields, packages and modules names.
+    :param extensions: Generator custom base classes and decorators for classes.
     """
 
     class Meta:
@@ -414,6 +490,7 @@ class GeneratorConfig:
     substitutions: GeneratorSubstitutions = element(
         default_factory=GeneratorSubstitutions
     )
+    extensions: GeneratorExtensions = element(default_factory=GeneratorExtensions)
 
     def __post_init__(self):
         if self.aliases:

@@ -5,13 +5,14 @@
 {% set parent_namespace = obj.namespace if obj.namespace is not none else parent_namespace|default(None) -%}
 {% set parents = parents|default([obj.name]) -%}
 {% set class_name =  obj.name|class_name -%}
+{% set class_annotations =  obj | class_annotations(class_name) -%}
 {% set global_type = level == 0 and not obj.local_type -%}
 {% set local_name =  obj.meta_name or obj.name -%}
 {% set local_name = None if class_name == local_name or not global_type else local_name -%}
-{% set base_classes = obj.extensions|map(attribute='type')|map('type_name')|join(', ') -%}
+{% set base_classes = obj | class_bases(class_name) | join(', ')-%}
 {% set target_namespace = obj.target_namespace if global_type and module_namespace != obj.target_namespace else None %}
 
-{{ class_annotation }}
+{{ class_annotations | join('\n') }}
 class {{ class_name }}{{"({})".format(base_classes) if base_classes }}:
 {%- if help %}
 {{ help|indent(4, first=True) }}

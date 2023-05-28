@@ -32,11 +32,14 @@ like naming conventions and substitutions.
     OutputFormat
     GeneratorConventions
     GeneratorSubstitutions
+    GeneratorExtensions
     StructureStyle
     DocstringStyle
     ClassFilterStrategy
     CompoundFields
     ObjectType
+    ExtensionType
     GeneratorSubstitution
+    GeneratorExtension
     NameConvention
     NameCase

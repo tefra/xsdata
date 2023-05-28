@@ -14,6 +14,7 @@ Code Generation
     examples/dtd-modeling
     examples/compound-fields
     examples/dataclasses-features
+    examples/extending-models
 
 
 Data Binding

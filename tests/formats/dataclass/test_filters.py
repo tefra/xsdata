@@ -5,7 +5,9 @@ from tests.fixtures.datatypes import Telephone
 from xsdata.codegen.models import Restrictions
 from xsdata.formats.dataclass.filters import Filters
 from xsdata.models.config import DocstringStyle
+from xsdata.models.config import ExtensionType
 from xsdata.models.config import GeneratorConfig
+from xsdata.models.config import GeneratorExtension
 from xsdata.models.config import GeneratorSubstitution
 from xsdata.models.config import NameCase
 from xsdata.models.config import ObjectType
@@ -14,6 +16,8 @@ from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
 from xsdata.utils.testing import AttrFactory
 from xsdata.utils.testing import AttrTypeFactory
+from xsdata.utils.testing import ClassFactory
+from xsdata.utils.testing import ExtensionFactory
 from xsdata.utils.testing import FactoryTestCase
 
 type_str = AttrTypeFactory.native(DataType.STRING)
@@ -41,6 +45,102 @@ class FiltersTests(FactoryTestCase):
         self.assertEqual("ListType", self.filters.class_name("List"))
         self.assertEqual("TypeType", self.filters.class_name(".*"))
         self.assertEqual("Cbad", self.filters.class_name("abcd"))
+
+    def test_class_bases(self):
+        etp = ExtensionType.CLASS
+        self.filters.extensions[etp] = [
+            GeneratorExtension(
+                type=etp,
+                class_name=".*Bar",
+                import_string="a.b",
+                apply_if_derived=True,
+                prepend=False,
+            ),
+            GeneratorExtension(
+                type=etp,
+                class_name="Foo.*",
+                import_string="a.b",
+                apply_if_derived=True,
+                prepend=True,
+            ),
+            GeneratorExtension(
+                type=etp,
+                class_name="Foo.*",
+                import_string="a.c",
+                apply_if_derived=True,
+                prepend=True,
+            ),
+            GeneratorExtension(
+                type=etp,
+                class_name="Foo.*",
+                import_string="a.d",
+                apply_if_derived=False,
+                prepend=True,
+            ),
+            GeneratorExtension(
+                type=etp,
+                class_name="Nope.*",
+                import_string="a.e",
+                apply_if_derived=True,
+                prepend=False,
+            ),
+        ]
+        target = ClassFactory.create(extensions=ExtensionFactory.list(1))
+
+        expected = self.filters.class_bases(target, "FooBar")
+        self.assertEqual(["c", "b", "AttrB"], expected)
+
+        target.extensions.clear()
+        expected = self.filters.class_bases(target, "FooBar")
+        self.assertEqual(["d", "c", "b"], expected)
+
+    def test_class_annotations(self):
+        etp = ExtensionType.DECORATOR
+        self.filters.extensions[etp] = [
+            GeneratorExtension(
+                type=etp,
+                class_name=".*Bar",
+                import_string="a.b",
+                apply_if_derived=True,
+                prepend=False,
+            ),
+            GeneratorExtension(
+                type=etp,
+                class_name="Foo.*",
+                import_string="a.b",
+                apply_if_derived=True,
+                prepend=True,
+            ),
+            GeneratorExtension(
+                type=etp,
+                class_name="Foo.*",
+                import_string="a.c",
+                apply_if_derived=True,
+                prepend=True,
+            ),
+            GeneratorExtension(
+                type=etp,
+                class_name="Foo.*",
+                import_string="a.d",
+                apply_if_derived=False,
+                prepend=False,
+            ),
+            GeneratorExtension(
+                type=etp,
+                class_name="Nope.*",
+                import_string="a.e",
+                apply_if_derived=True,
+                prepend=False,
+            ),
+        ]
+        target = ClassFactory.create(extensions=ExtensionFactory.list(1))
+
+        expected = self.filters.class_annotations(target, "FooBar")
+        self.assertEqual(["@c", "@b", "@dataclass"], expected)
+
+        target.extensions.clear()
+        expected = self.filters.class_annotations(target, "FooBar")
+        self.assertEqual(["@c", "@b", "@dataclass", "@d"], expected)
 
     def test_field_name(self):
         self.filters.substitutions[ObjectType.FIELD]["abc"] = "cba"
@@ -817,6 +917,14 @@ class FiltersTests(FactoryTestCase):
         config.substitutions.substitution.append(
             GeneratorSubstitution(ObjectType.PACKAGE, "m", "n")
         )
+        config.extensions.extension.extend(
+            [
+                GeneratorExtension(ExtensionType.DECORATOR, "a", "a.b"),
+                GeneratorExtension(ExtensionType.DECORATOR, "b", "a.c"),
+                GeneratorExtension(ExtensionType.CLASS, "c", "a.d"),
+                GeneratorExtension(ExtensionType.CLASS, "d", "a.e"),
+            ]
+        )
 
         filters = Filters(config)
 
@@ -839,3 +947,17 @@ class FiltersTests(FactoryTestCase):
             ObjectType.PACKAGE: {"m": "n"},
         }
         self.assertEqual(expected_substitutions, filters.substitutions)
+
+        expected_extensions = {
+            ExtensionType.DECORATOR: config.extensions.extension[0:2],
+            ExtensionType.CLASS: config.extensions.extension[2:4],
+        }
+        self.assertEqual(expected_extensions, filters.extensions)
+
+        expected_imports = {
+            "b": {"@b"},
+            "c": {"@c"},
+            "d": {"(d", " d)"},
+            "e": {"(e", " e)"},
+        }
+        self.assertEqual(expected_imports, filters.import_patterns["a"])

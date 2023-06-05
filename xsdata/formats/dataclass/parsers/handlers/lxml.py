@@ -23,10 +23,10 @@ class LxmlEventHandler(XmlHandler):
     def parse(self, source: Any) -> Any:
         """
         Parse an XML document from a system identifier or an InputSource or
-        directly from an lxml Element or Tree.
+        directly from a lxml Element or Tree.
 
-        When Source is an lxml Element or Tree the handler will switch
-        to the :class:`lxml.etree.iterwalk` api.
+        When Source is a lxml Element or Tree the handler will switch to
+        the :class:`lxml.etree.iterwalk` api.
 
         When source is a system identifier or an InputSource the parser
         will ignore comments and recover from errors.
@@ -41,7 +41,13 @@ class LxmlEventHandler(XmlHandler):
             tree.xinclude()
             ctx = etree.iterwalk(tree, EVENTS)
         else:
-            ctx = etree.iterparse(source, EVENTS, recover=True, remove_comments=True)
+            ctx = etree.iterparse(
+                source,
+                EVENTS,
+                recover=True,
+                remove_comments=True,
+                load_dtd=self.parser.config.load_dtd,
+            )
 
         return self.process_context(ctx)
 

@@ -95,6 +95,16 @@ Or if you know what you are doing
     client = Client(config=config)
 
 
+Initialize a transport with a custom requests session instance.
+
+.. code-block::
+
+    from requests import Session
+
+    transport = DefaultTransport(session=Session())
+    client = Client(config=config, transport=transport)
+
+
 Performing Requests
 -------------------
 

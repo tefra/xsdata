@@ -108,3 +108,6 @@ venv.bak/
 
 # vscode
 .vscode/
+
+# idea runs
+.run/

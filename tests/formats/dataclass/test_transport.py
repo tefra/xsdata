@@ -3,6 +3,7 @@ from unittest import TestCase
 
 from requests import HTTPError
 from requests import Response
+from requests import Session
 
 from xsdata.formats.dataclass.transports import DefaultTransport
 
@@ -10,7 +11,7 @@ from xsdata.formats.dataclass.transports import DefaultTransport
 class DefaultTransportTest(TestCase):
     @mock.patch.object(Response, "content", new_callable=mock.PropertyMock)
     @mock.patch.object(Response, "raise_for_status")
-    @mock.patch("xsdata.formats.dataclass.transports.requests.get")
+    @mock.patch.object(Session, "get")
     def test_get(self, mock_get, mock_raise_for_status, mock_content):
         transport = DefaultTransport()
         params = {"a": "b"}
@@ -31,7 +32,7 @@ class DefaultTransportTest(TestCase):
 
     @mock.patch.object(Response, "content", new_callable=mock.PropertyMock)
     @mock.patch.object(Response, "raise_for_status")
-    @mock.patch("xsdata.formats.dataclass.transports.requests.post")
+    @mock.patch.object(Session, "post")
     def test_post(self, mock_post, mock_raise_for_status, mock_content):
         transport = DefaultTransport(timeout=1.0)
         data = {"a": "b"}

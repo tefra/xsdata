@@ -145,7 +145,7 @@ class XmlMetaBuilder:
                 yield var
 
     def build_class_meta(
-        self, clazz: Type, parent_namespace: Optional[str]
+        self, clazz: Type, parent_namespace: Optional[str] = None
     ) -> ClassMeta:
         """
         Fetch the class meta options and merge defaults.

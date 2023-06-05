@@ -54,6 +54,16 @@ class XmlContext:
         self.xsi_cache.clear()
         self.sys_modules = 0
 
+    def get_builder(
+        self, globalns: Optional[Dict[str, Callable]] = None
+    ) -> XmlMetaBuilder:
+        return XmlMetaBuilder(
+            class_type=self.class_type,
+            element_name_generator=self.element_name_generator,
+            attribute_name_generator=self.attribute_name_generator,
+            globalns=globalns,
+        )
+
     def fetch(
         self,
         clazz: Type,
@@ -83,18 +93,10 @@ class XmlContext:
             return
 
         self.xsi_cache.clear()
-        builder = XmlMetaBuilder(
-            class_type=self.class_type,
-            element_name_generator=self.element_name_generator,
-            attribute_name_generator=self.attribute_name_generator,
-        )
+        builder = self.get_builder()
         for clazz in self.get_subclasses(object):
-            # This is new!
-            if clazz.__module__.startswith("_pytest"):
-                continue
-
             if self.class_type.is_model(clazz):
-                meta = builder.build_class_meta(clazz, None)
+                meta = builder.build_class_meta(clazz)
 
                 if meta.target_qname:
                     self.xsi_cache[meta.target_qname].append(clazz)
@@ -187,14 +189,8 @@ class XmlContext:
         :param clazz: A dataclass type
         :param parent_ns: The inherited parent namespace
         """
-
         if clazz not in self.cache:
-            builder = XmlMetaBuilder(
-                class_type=self.class_type,
-                element_name_generator=self.element_name_generator,
-                attribute_name_generator=self.attribute_name_generator,
-                globalns=globalns,
-            )
+            builder = self.get_builder(globalns)
             self.cache[clazz] = builder.build(clazz, parent_ns)
         return self.cache[clazz]
 
@@ -214,7 +210,14 @@ class XmlContext:
             meta = self.build(clazz)
             local_names = {var.local_name for var in meta.get_all_vars()}
             return not names.difference(local_names)
-        except XmlContextError:
+        except (XmlContextError, NameError):
+            # The dataclass includes unsupported typing annotations
+            # Let's remove it from xsi_cache
+            builder = self.get_builder()
+            target_qname = builder.build_class_meta(clazz).target_qname
+            if target_qname and target_qname in self.xsi_cache:
+                self.xsi_cache[target_qname].remove(clazz)
+
             return False
 
     @classmethod

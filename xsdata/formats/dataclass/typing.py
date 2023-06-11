@@ -1,67 +1,74 @@
-from typing import _eval_type  # type: ignore
+import sys
 from typing import Any
-from typing import Dict
 from typing import Iterator
-from typing import List
-from typing import Optional
 from typing import Tuple
 from typing import Type
 from typing import TypeVar
 from typing import Union
 
+from typing_extensions import get_args
+from typing_extensions import get_origin
+
 NONE_TYPE = type(None)
-EMPTY_ARGS = ()
 
 
-def get_origin(tp: Any) -> Any:
-    if tp is Dict:
-        return Dict
-
-    if tp in (Tuple, List, Union):
-        raise TypeError()
-
-    if isinstance(tp, TypeVar):
-        return TypeVar
-
-    origin = getattr(tp, "__origin__", None)
-    if origin:
-        if origin in (list, List):
-            return List
-
-        if origin in (tuple, Tuple):
-            return Tuple
-
-        if origin in (dict, Dict):
-            return Dict
-
-        if origin is Union:
-            return Union
-
-        if origin in (type, Type):
-            return Type
-
-    if origin or str(tp).startswith("typing."):
-        raise TypeError()
-
-    return None
+try:
+    from types import UnionType  # type: ignore
+except ImportError:
+    UnionType = ()  # type: ignore
 
 
-def get_args(tp: Any) -> Tuple:
-    return getattr(tp, "__args__", EMPTY_ARGS) or EMPTY_ARGS
+if (3, 9) <= sys.version_info[:2] <= (3, 10):
+    # Backport this fix for python 3.9 and 3.10
+    # https://github.com/python/cpython/pull/30900
+
+    from types import GenericAlias
+    from typing import ForwardRef
+    from typing import _eval_type as __eval_type  # type: ignore
+
+    def _eval_type(tp: Any, globalns: Any, localns: Any) -> Any:
+        if isinstance(tp, GenericAlias):
+            args = tuple(
+                ForwardRef(arg) if isinstance(arg, str) else arg for arg in tp.__args__
+            )
+            tp = tp.__origin__[args]  # type: ignore
+
+        return __eval_type(tp, globalns, localns)
+
+else:
+    from typing import _eval_type  # type: ignore
+
+
+intern_typing = sys.intern("typing.")
+
+
+def is_from_typing(tp: Any) -> bool:
+    return str(tp).startswith(intern_typing)
 
 
 def evaluate(
-    tp: Any, globalns: Optional[Any] = None, localns: Optional[Any] = None
+    tp: Any,
+    globalns: Any = None,
+    localns: Any = None,
 ) -> Tuple[Type, ...]:
     return tuple(_evaluate(_eval_type(tp, globalns, localns)))
 
 
 def _evaluate(tp: Any) -> Iterator[Type]:
-    origin = get_origin(tp)
+    if tp in (dict, list, tuple):
+        origin = tp
+    elif isinstance(tp, TypeVar):
+        origin = TypeVar
+    else:
+        origin = get_origin(tp)
 
-    func = __evaluations__.get(origin)
-    if func:
-        yield from func(tp)
+    if origin:
+        try:
+            yield from __evaluations__[origin](tp)
+        except KeyError:
+            raise TypeError()
+    elif is_from_typing(tp):
+        raise TypeError()
     else:
         yield tp
 
@@ -82,15 +89,14 @@ def _evaluate_mapping(tp: Any) -> Iterator[Type]:
         yield str
 
     for arg in args:
-        origin = get_origin(arg)
-        if origin is TypeVar:
+        if isinstance(arg, TypeVar):
             try:
                 next(_evaluate_typevar(arg))
             except TypeError:
                 yield str
             else:
                 raise TypeError()
-        elif origin is not None:
+        elif is_from_typing(arg) or get_origin(arg) is not None:
             raise TypeError()
         else:
             yield arg
@@ -100,12 +106,22 @@ def _evaluate_list(tp: Any) -> Iterator[Type]:
     yield list
 
     args = get_args(tp)
+    if not args:
+        yield str
+
     for arg in args:
+        yield from _evaluate_array_arg(arg)
+
+
+def _evaluate_array_arg(arg: Any) -> Iterator[Type]:
+    if isinstance(arg, TypeVar):
+        yield from _evaluate_typevar(arg)
+    else:
         origin = get_origin(arg)
 
-        if origin is None:
+        if origin is None and not is_from_typing(arg):
             yield arg
-        elif origin in (Union, List, Tuple, TypeVar):
+        elif origin in (Union, UnionType, list, tuple):
             yield from __evaluations__[origin](arg)
         else:
             raise TypeError()
@@ -115,17 +131,14 @@ def _evaluate_tuple(tp: Any) -> Iterator[Type]:
     yield tuple
 
     args = get_args(tp)
+    if not args:
+        yield str
+
     for arg in args:
         if arg is Ellipsis:
             continue
 
-        origin = get_origin(arg)
-        if origin is None:
-            yield arg
-        elif origin in (Union, List, Tuple, TypeVar):
-            yield from __evaluations__[origin](arg)
-        else:
-            raise TypeError()
+        yield from _evaluate_array_arg(arg)
 
 
 def _evaluate_union(tp: Any) -> Iterator[Type]:
@@ -134,14 +147,17 @@ def _evaluate_union(tp: Any) -> Iterator[Type]:
         if arg is NONE_TYPE:
             continue
 
-        origin = get_origin(arg)
-        if origin is None:
-            yield arg
-        elif origin is List and not origin_locked:
-            yield from _evaluate_list(arg)
-            origin_locked = True
+        if isinstance(arg, TypeVar):
+            yield from _evaluate_typevar(arg)
         else:
-            raise TypeError()
+            origin = get_origin(arg)
+            if origin is list and not origin_locked:
+                yield from _evaluate_list(arg)
+                origin_locked = True
+            elif origin is None and not is_from_typing(arg):
+                yield arg
+            else:
+                raise TypeError()
 
 
 def _evaluate_typevar(tp: TypeVar):
@@ -155,10 +171,11 @@ def _evaluate_typevar(tp: TypeVar):
 
 
 __evaluations__ = {
-    Tuple: _evaluate_tuple,
-    List: _evaluate_list,
-    Dict: _evaluate_mapping,
+    tuple: _evaluate_tuple,
+    list: _evaluate_list,
+    dict: _evaluate_mapping,
     Union: _evaluate_union,
-    Type: _evaluate_type,
+    UnionType: _evaluate_union,
+    type: _evaluate_type,
     TypeVar: _evaluate_typevar,
 }

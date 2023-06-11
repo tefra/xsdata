@@ -255,8 +255,12 @@ class GeneratorOutput:
     :param docstring_style: Docstring style, default: reStructuredText
     :param filter_strategy: Class filter strategy, default: globals
     :param relative_imports: Use relative imports, default: false
-    :param compound_fields: Use compound fields for repeatable elements, default: false
+    :param compound_fields: Use compound fields for repeatable elements,
+        default: false
     :param max_line_length: Adjust the maximum line length, default: 79
+    :param subscriptable_types: Use PEP-585 generics for standard collections,
+        default: false, python>=3.9 Only
+    :param union_type: Use PEP-604 union type, default: false, python>=3.10 Only
     :param postponed_annotations: Enable postponed evaluation of annotations,
         default: false, python>=3.7 Only
     :param unnest_classes: Move inner classes to upper level, default: false
@@ -277,10 +281,37 @@ class GeneratorOutput:
     relative_imports: bool = element(default=False)
     compound_fields: CompoundFields = element(default_factory=CompoundFields)
     max_line_length: int = attribute(default=79)
+    subscriptable_types: bool = attribute(default=False)
+    union_type: bool = attribute(default=False)
     postponed_annotations: bool = element(default=False)
     unnest_classes: bool = element(default=False)
     ignore_patterns: bool = element(default=False)
     include_header: bool = element(default=False)
+
+    def __post_init__(self):
+        self.validate()
+
+    def validate(self):
+        if self.subscriptable_types and sys.version_info < (3, 9):
+            self.subscriptable_types = False
+            warnings.warn(
+                "Generics PEP 585 requires python >= 3.9, reverting...",
+                CodeGenerationWarning,
+            )
+
+        if self.union_type and sys.version_info < (3, 10):
+            self.union_type = False
+            warnings.warn(
+                "UnionType PEP 604 requires python >= 3.10, reverting...",
+                CodeGenerationWarning,
+            )
+
+        if self.union_type and not self.postponed_annotations:
+            self.postponed_annotations = True
+            warnings.warn(
+                "Enabling postponed annotations, because `union_type==True`",
+                CodeGenerationWarning,
+            )
 
     def update(self, **kwargs: Any):
         objects.update(self, **kwargs)

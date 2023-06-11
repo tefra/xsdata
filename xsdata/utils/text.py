@@ -58,6 +58,7 @@ stop_words = {
     "self",
     "str",
     "try",
+    "type",
     "while",
     "with",
     "yield",

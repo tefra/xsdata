@@ -74,7 +74,7 @@ class JsonParser(AbstractParser):
         try:
             origin = get_origin(clazz)
             list_type = False
-            if origin is List:
+            if origin is list:
                 list_type = True
                 args = get_args(clazz)
 

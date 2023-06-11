@@ -95,7 +95,7 @@ class XmlDate(NamedTuple):
 
         .. warning::
 
-        date instances don't have timezone information!
+            date instances don't have timezone information!
         """
         return cls(obj.year, obj.month, obj.day)
 

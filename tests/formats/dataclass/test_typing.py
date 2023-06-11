@@ -1,4 +1,5 @@
 import datetime
+import sys
 from decimal import Decimal
 from enum import Enum
 from typing import Any
@@ -26,141 +27,167 @@ from xsdata.models.enums import Namespace
 
 
 class TypingTests(TestCase):
-    def test_get_origin_list(self):
-        self.assertEqual(List, get_origin(List[int]))
-        self.assertEqual(List, get_origin(List[Union[int]]))
-
-        with self.assertRaises(TypeError):
-            get_origin(List)
-
-    def test_get_origin_tuple(self):
-        self.assertEqual(Tuple, get_origin(Tuple[int]))
-        self.assertEqual(Tuple, get_origin(Tuple[Union[int, str]]))
-        self.assertEqual(Tuple, get_origin(Tuple[int, ...]))
-
-        with self.assertRaises(TypeError):
-            get_origin(Tuple)
-
-    def test_get_origin_dict(self):
-        self.assertEqual(Dict, get_origin(Dict))
-        self.assertEqual(Dict, get_origin(Dict[int, str]))
-        self.assertEqual(Dict, get_origin(Dict[Union[int], Union[str]]))
-
-    def test_get_origin_union(self):
-        self.assertIsNone(get_origin(Union[int]))
-        self.assertEqual(Union, get_origin(Optional[int]))
-        self.assertEqual(Union, get_origin(Union[int, str]))
-
-        with self.assertRaises(TypeError):
-            get_origin(Union)
-
-        with self.assertRaises(TypeError):
-            get_origin(Optional)
-
-    def test_get_origin_type(self):
-        self.assertEqual(Type, get_origin(Type[str]))
-
-    def test_get_origin_types(self):
-        self.assertIsNone(get_origin(str))
-        self.assertIsNone(get_origin(int))
-        self.assertIsNone(get_origin(bool))
-        self.assertIsNone(get_origin(float))
-        self.assertIsNone(get_origin(bytes))
-        self.assertIsNone(get_origin(object))
-        self.assertIsNone(get_origin(datetime.time))
-        self.assertIsNone(get_origin(datetime.date))
-        self.assertIsNone(get_origin(datetime.datetime))
-        self.assertIsNone(get_origin(XmlTime))
-        self.assertIsNone(get_origin(XmlDate))
-        self.assertIsNone(get_origin(XmlDateTime))
-        self.assertIsNone(get_origin(XmlDuration))
-        self.assertIsNone(get_origin(XmlPeriod))
-        self.assertIsNone(get_origin(QName))
-        self.assertIsNone(get_origin(Decimal))
-        self.assertIsNone(get_origin(Enum))
-        self.assertIsNone(get_origin(Namespace))
-
-    def test_get_origin_unsupported(self):
-        unsupported = [Set, Tuple]
-        for check in unsupported:
-            with self.assertRaises(TypeError, msg=check):
-                get_origin(check)
-
-    def test_get_args(self):
-        self.assertEqual((), get_args(int))
-        self.assertEqual((int,), get_args(List[int]))
-        self.assertEqual((int, Ellipsis), get_args(Tuple[int, ...]))
-        self.assertEqual((int,), get_args(Tuple[int]))
-        self.assertEqual((int, str, float), get_args(Tuple[int, str, float]))
-        self.assertEqual((Union[str, int],), get_args(Tuple[Union[str, int]]))
-        self.assertEqual((List[int], type(None)), get_args(Optional[List[int]]))
-        self.assertEqual((int, str), get_args(Union[int, str]))
-        self.assertEqual((int, type(None)), get_args(Optional[int]))
-        self.assertEqual((int, type(None), str), get_args(Union[Optional[int], str]))
+    def assertCases(self, cases):
+        for tp, result in cases.items():
+            if result is False:
+                with self.assertRaises(TypeError):
+                    evaluate(tp)
+            else:
+                self.assertEqual(result, evaluate(tp), msg=tp)
 
     def test_evaluate_simple(self):
-        self.assertEqual((int,), evaluate(int))
+        types = (
+            int,
+            str,
+            int,
+            bool,
+            float,
+            bytes,
+            object,
+            datetime.time,
+            datetime.date,
+            datetime.datetime,
+            XmlTime,
+            XmlDate,
+            XmlDateTime,
+            XmlDuration,
+            XmlPeriod,
+            QName,
+            Decimal,
+            Enum,
+            Namespace,
+        )
+        cases = {tp: (tp,) for tp in types}
+        self.assertCases(cases)
+
+    def test_evaluate_unsupported_typing(self):
+        cases = [Any, Set[str]]
+
+        for case in cases:
+            with self.assertRaises(TypeError):
+                evaluate(case)
 
     def test_evaluate_dict(self):
-        self.assertEqual((dict, str, str), evaluate(Dict))
-        self.assertEqual((dict, str, int), evaluate(Dict[str, int]))
+        cases = {
+            Dict: (dict, str, str),
+            Dict[str, int]: (dict, str, int),
+            Dict[Any, Any]: False,
+            Dict[Union[str, int], int]: False,
+            Dict[int, Union[str, int]]: False,
+            Dict[TypeVar("A", bound=int), str]: False,
+            Dict[TypeVar("A"), str]: (dict, str, str),
+        }
 
-        unsupported_cases = [
-            Dict[Any, Any],
-            Dict[Union[str, int], int],
-            Dict[int, Union[str, int]],
-            Dict[TypeVar("A", bound=int), str],
-        ]
+        if sys.version_info[:2] >= (3, 9):
+            cases.update(
+                {
+                    dict: (dict, str, str),
+                    dict[str, int]: (dict, str, int),
+                    dict[Any, Any]: False,
+                    dict[Union[str, int], int]: False,
+                    dict[int, Union[str, int]]: False,
+                    dict[TypeVar("A", bound=int), str]: False,
+                    dict[TypeVar("A"), str]: (dict, str, str),
+                }
+            )
 
-        for case in unsupported_cases:
-            with self.assertRaises(TypeError, msg=case):
-                evaluate(case)
+        if sys.version_info[:2] >= (3, 10):
+            cases.update({dict[str | int, int]: False})
 
-    def test_evaluate_union(self):
-        self.assertEqual((bool, str), evaluate(Optional[Union[bool, str]]))
-        self.assertEqual(
-            (list, int, float), evaluate(Optional[List[Union[int, float]]])
-        )
-
-        unsupported_cases = [Optional[T], Union[List[int], Dict[str, str]]]
-        for case in unsupported_cases:
-            with self.assertRaises(TypeError, msg=case):
-                evaluate(case)
+        self.assertCases(cases)
 
     def test_evaluate_list(self):
         A = TypeVar("A", int, str)
 
-        self.assertEqual((list, int, str), evaluate(List[A]))
-        self.assertEqual((list, int), evaluate(List[int]))
-        self.assertEqual((list, float, str), evaluate(List[Union[float, str]]))
-        self.assertEqual((list, int), evaluate(List[Optional[int]]))
-        self.assertEqual((list, tuple, int), evaluate(List[Tuple[int]]))
-        self.assertEqual(
-            (list, list, bool, str), evaluate(List[List[Union[bool, str]]])
-        )
+        cases = {
+            List[A]: (list, int, str),
+            List[int]: (list, int),
+            List[Union[float, str]]: (list, float, str),
+            List[Optional[int]]: (list, int),
+            List[Tuple[int]]: (list, tuple, int),
+            List[List[Union[bool, str]]]: (list, list, bool, str),
+            List: (list, str),
+            List[Dict[str, str]]: False,
+            List[Any]: False,
+        }
 
-        unsupported_cases = [List, List[Dict[str, str]]]
-        for case in unsupported_cases:
-            with self.assertRaises(TypeError, msg=case):
-                evaluate(case)
+        if sys.version_info[:2] >= (3, 9):
+            cases.update(
+                {
+                    list[A]: (list, int, str),
+                    list[int]: (list, int),
+                    list[Union[float, str]]: (list, float, str),
+                    list[Optional[int]]: (list, int),
+                    list[Tuple[int]]: (list, tuple, int),
+                    list[list[Union[bool, str]]]: (list, list, bool, str),
+                    list: (list, str),
+                    list["str"]: (list, str),
+                    list[dict[str, str]]: False,
+                    list[Any]: False,
+                }
+            )
+
+        self.assertCases(cases)
 
     def test_evaluate_tuple(self):
         A = TypeVar("A", int, str)
 
-        self.assertEqual((tuple, int, str), evaluate(Tuple[A]))
-        self.assertEqual((tuple, int), evaluate(Tuple[int]))
-        self.assertEqual((tuple, int), evaluate(Tuple[int, ...]))
-        self.assertEqual((tuple, list, int), evaluate(Tuple[List[int], ...]))
-        self.assertEqual((tuple, float, str), evaluate(Tuple[Union[float, str]]))
-        self.assertEqual((tuple, int), evaluate(Tuple[Optional[int]]))
-        self.assertEqual(
-            (tuple, tuple, bool, str), evaluate(Tuple[Tuple[Union[bool, str]]])
-        )
+        cases = {
+            Tuple[A]: (tuple, int, str),
+            Tuple[int]: (tuple, int),
+            Tuple[int, ...]: (tuple, int),
+            Tuple[List[int], ...]: (tuple, list, int),
+            Tuple[Union[float, str]]: (tuple, float, str),
+            Tuple[Optional[int]]: (tuple, int),
+            Tuple[Tuple[int]]: (tuple, tuple, int),
+            Tuple[Tuple[Union[bool, str]]]: (tuple, tuple, bool, str),
+            Tuple: (tuple, str),
+            Tuple[Dict[str, str]]: False,
+            Tuple[Any, ...]: False,
+        }
 
-        unsupported_cases = [Tuple, Tuple[Dict[str, str]]]
-        for case in unsupported_cases:
-            with self.assertRaises(TypeError, msg=case):
-                evaluate(case)
+        if sys.version_info[:2] >= (3, 9):
+            cases.update(
+                {
+                    tuple[A]: (tuple, int, str),
+                    tuple[int]: (tuple, int),
+                    tuple[int, ...]: (tuple, int),
+                    tuple[List[int], ...]: (tuple, list, int),
+                    tuple[Union[float, str]]: (tuple, float, str),
+                    tuple[Optional[int]]: (tuple, int),
+                    tuple[tuple[int]]: (tuple, tuple, int),
+                    tuple[tuple[Union[bool, str]]]: (tuple, tuple, bool, str),
+                    tuple: (tuple, str),
+                    tuple[dict[str, str]]: False,
+                    tuple[Any, ...]: False,
+                }
+            )
+
+        self.assertCases(cases)
+
+    def test_evaluate_union(self):
+        A = TypeVar("A", int, str)
+
+        cases = {
+            Optional[Union[bool, str]]: (bool, str),
+            Optional[List[Union[int, float]]]: (list, int, float),
+            Optional[A]: (int, str),
+            Union[List[int], None]: (list, int),
+            Union[List[int], List[str]]: False,
+        }
+
+        if sys.version_info[:2] >= (3, 10):
+            cases.update(
+                {
+                    None | bool | str: (bool, str),
+                    None | List[int | float]: (list, int, float),
+                    None | A: (int, str),
+                    List[int] | None: (list, int),
+                    List[int] | List[str]: False,
+                }
+            )
+
+        self.assertCases(cases)
 
     def test_evaluate_type(self):
         self.assertEqual((str,), evaluate(Type["str"]))

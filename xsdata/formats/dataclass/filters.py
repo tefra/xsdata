@@ -53,6 +53,8 @@ class Filters:
         "module_safe_prefix",
         "docstring_style",
         "max_line_length",
+        "union_type",
+        "subscriptable_types",
         "relative_imports",
         "postponed_annotations",
         "format",
@@ -99,6 +101,8 @@ class Filters:
         self.module_safe_prefix: str = config.conventions.module_name.safe_prefix
         self.docstring_style: DocstringStyle = config.output.docstring_style
         self.max_line_length: int = config.output.max_line_length
+        self.union_type: bool = config.output.union_type
+        self.subscriptable_types: bool = config.output.subscriptable_types
         self.relative_imports: bool = config.output.relative_imports
         self.postponed_annotations: bool = config.output.postponed_annotations
         self.format = config.output.format
@@ -664,11 +668,16 @@ class Filters:
             self.field_type_name(x, parents) for x in attr.types
         )
 
-        result = ", ".join(type_names)
-        if len(type_names) > 1:
-            result = f"Union[{result}]"
+        if self.union_type:
+            result = " | ".join(type_names)
+        else:
+            result = ", ".join(type_names)
+            if len(type_names) > 1:
+                result = f"Union[{result}]"
 
         iterable = "Tuple[{}, ...]" if self.format.frozen else "List[{}]"
+        if self.subscriptable_types:
+            iterable = iterable.lower()
 
         if attr.is_tokens:
             result = iterable.format(result)
@@ -680,12 +689,12 @@ class Filters:
             return result
 
         if attr.is_dict:
-            return "Dict[str, str]"
+            return "dict[str, str]" if self.subscriptable_types else "Dict[str, str]"
 
         if attr.is_nillable or (
             attr.default is None and (attr.is_optional or not self.format.kw_only)
         ):
-            return f"Optional[{result}]"
+            return f"None | {result}" if self.union_type else f"Optional[{result}]"
 
         return result
 
@@ -704,14 +713,22 @@ class Filters:
             self.field_type_name(x, parents) for x in choice.types
         )
 
-        result = ", ".join(type_names)
-        if len(type_names) > 1:
-            result = f"Union[{result}]"
+        if self.union_type:
+            result = " | ".join(type_names)
+        else:
+            result = ", ".join(type_names)
+            if len(type_names) > 1:
+                result = f"Union[{result}]"
 
         if choice.is_tokens:
-            result = (
-                f"Tuple[{result}, ...]" if self.format.frozen else f"List[{result}]"
-            )
+            iterable = "Tuple[{}, ...]" if self.format.frozen else "List[{}]"
+            if self.subscriptable_types:
+                iterable = iterable.lower()
+
+            result = iterable.format(result)
+
+        if self.subscriptable_types:
+            return f"type[{result}]"
 
         return f"Type[{result}]"
 
@@ -726,6 +743,9 @@ class Filters:
             name = f'"{outer_str}.{name}"'
         elif attr_type.circular:
             name = f'"{name}"'
+
+        if self.postponed_annotations:
+            name = name.strip('"')
 
         return name
 
@@ -789,4 +809,13 @@ class Filters:
 
     @classmethod
     def build_type_patterns(cls, x: str) -> Tuple:
-        return f": {x} =", f"[{x}]", f"[{x},", f" {x},", f" {x}]", f" {x}("
+        return (
+            f": {x} =",
+            f"[{x}]",
+            f"[{x},",
+            f" {x},",
+            f" {x}]",
+            f" {x}(",
+            f" | {x}",
+            f"{x} |",
+        )

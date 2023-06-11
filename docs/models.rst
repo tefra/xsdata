@@ -120,6 +120,22 @@ Simply follow the Python lib :mod:`python:dataclasses` documentation.
     Everything else will raise an exception as unsupported.
 
 
+
+Support for generics in standard collections and the new union type was added
+in v23.6
+
+
+.. warning::
+
+    You will get false positive errors from mypy if you are using compound fields.
+
+    Mypy `issue <https://github.com/python/mypy/issues/13026>`_
+
+    .. code-block::
+
+        Value of type "Type[type]" is not indexable  [index]
+
+
 Field Metadata
 ==============
 

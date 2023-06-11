@@ -2,12 +2,12 @@ exclude: tests/fixtures
 
 repos:
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.4.0
+    rev: v3.7.0
     hooks:
       - id: pyupgrade
         args: [ --py37-plus ]
   - repo: https://github.com/asottile/reorder_python_imports
-    rev: v3.9.0
+    rev: v3.10.0
     hooks:
       - id: reorder-python-imports
   - repo: https://github.com/ambv/black
@@ -36,12 +36,12 @@ repos:
       - id: end-of-file-fixer
       - id: debug-statements
   - repo: https://github.com/PyCQA/docformatter
-    rev: v1.6.5
+    rev: v1.7.3
     hooks:
       - id: docformatter
         args: [ "--in-place", "--pre-summary-newline" ]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.3.0
+    rev: v1.4.0
     hooks:
       - id: mypy
         files: ^(xsdata/)
@@ -53,11 +53,6 @@ repos:
           - types-docutils
           - types-toposort
         args: [ "--check-untyped-defs", "--ignore-missing-imports"]
-  - repo: https://github.com/asottile/setup-cfg-fmt
-    rev: v2.2.0
-    hooks:
-      - id: setup-cfg-fmt
-        args: [ "--min-py3-version=3.7", "--max-py-version=3.11", "--include-version-classifiers" ]
   - repo: https://github.com/PyCQA/doc8
     rev: v1.1.1
     hooks:

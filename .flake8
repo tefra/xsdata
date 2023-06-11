@@ -1,0 +1,11 @@
+[flake8]
+max-line-length = 88
+ignore =
+    W503,
+    ANN101,
+    ANN102,
+    ANN401,
+    E203,
+    B028
+exclude =
+    tests/*

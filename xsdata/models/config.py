@@ -188,11 +188,14 @@ class OutputFormat:
     :param value: Output format name, default: dataclasses
     :param repr: Generate __repr__ method, default: true
     :param eq: Generate __eq__ method, default: true
-    :param order: Generate  __lt__, __le__, __gt__, and __ge__ methods, default: false
-    :param unsafe_hash: Generate __hash__ method if not frozen, default: false
+    :param order: Generate __lt__, __le__, __gt__, and __ge__ methods,
+        default: false
+    :param unsafe_hash: Generate __hash__ method if not frozen, default:
+        false
     :param frozen: Enable read only properties, default false
     :param slots: Enable __slots__, default: false, python>=3.10 Only
-    :param kw_only: Enable keyword only arguments, default: false, python>=3.10 Only
+    :param kw_only: Enable keyword only arguments, default: false,
+        python>=3.10 Only
     """
 
     value: str = text_node(default="dataclasses", cli="output")
@@ -232,11 +235,13 @@ class CompoundFields:
     """
     Compound fields options.
 
-    :param enabled: Use compound fields for repeatable elements, default: false
+    :param enabled: Use compound fields for repeatable elements,
+        default: false
     :param default_name: Default compound field name, default: choice
-    :param force_default_name: Always use the default compound field, otherwise
-        if the number of elements is less than 4 the generator will try to dynamically
-        create the field name eg. hat_or_dress_or_something.
+    :param force_default_name: Always use the default compound field,
+        otherwise if the number of elements is less than 4 the generator
+        will try to dynamically create the field name eg.
+        hat_or_dress_or_something.
     """
 
     enabled: bool = text_node(default=False, cli="compound-fields")
@@ -428,10 +433,12 @@ class GeneratorExtension:
     class name pattern.
 
     :param type: The extension type
-    :param class_name: The class name  or a pattern to apply the extension
+    :param class_name: The class name or a pattern to apply the
+        extension
     :param import_string: The import string of the extension type
     :param prepend: Prepend or append decorator or base class
-    :param apply_if_derived: Apply or skip if the class is already a subclass
+    :param apply_if_derived: Apply or skip if the class is already a
+        subclass
     """
 
     type: ExtensionType = attribute(required=True)
@@ -504,10 +511,12 @@ class GeneratorConfig:
     :cvar version: xsdata version number the config was created/updated
     :param output: Output options
     :param conventions: Generator conventions
-    :param aliases: Generator aliases, Deprecated since v21.12, use substitutions
-    :param substitutions: Generator search and replace substitutions for classes,
-        fields, packages and modules names.
-    :param extensions: Generator custom base classes and decorators for classes.
+    :param aliases: Generator aliases, Deprecated since v21.12, use
+        substitutions
+    :param substitutions: Generator search and replace substitutions for
+        classes, fields, packages and modules names.
+    :param extensions: Generator custom base classes and decorators for
+        classes.
     """
 
     class Meta:

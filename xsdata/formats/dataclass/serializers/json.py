@@ -38,8 +38,10 @@ class JsonSerializer(AbstractSerializer):
 
     :param config: Serializer configuration
     :param context: Model context provider
-    :param dict_factory: Override default dict factory to add further logic
-    :param dump_factory: Override default json.dump call with another implementation
+    :param dict_factory: Override default dict factory to add further
+        logic
+    :param dump_factory: Override default json.dump call with another
+        implementation
     :param indent: Output indentation level
     """
 

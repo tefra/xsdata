@@ -59,8 +59,8 @@ class XmlVar(MetaMixin):
     :param name: Field name
     :param qname: Qualified name
     :param types: List of all the supported data types
-    :param init:  Include field in the constructor
-    :param mixed:  Field supports mixed content type values
+    :param init: Include field in the constructor
+    :param mixed: Field supports mixed content type values
     :param tokens: Field is derived from xs:list
     :param format: Value format information
     :param derived: Wrap parsed values with a generic type
@@ -298,7 +298,8 @@ class XmlMeta(MetaMixin):
     :param clazz: The dataclass type
     :param qname: The namespace qualified name.
     :param target_qname: The target namespace qualified name.
-    :param nillable: Specifies whether an explicit empty value can be assigned.
+    :param nillable: Specifies whether an explicit empty value can be
+        assigned.
     :param mixed_content: Has a wildcard with mixed flag enabled
     :param text: Text var
     :param choices: List of compound vars

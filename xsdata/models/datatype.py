@@ -54,7 +54,8 @@ class XmlDate(NamedTuple):
     :param year: Any signed integer, eg (0, -535, 2020)
     :param month: Unsigned integer between 1-12
     :param day: Unsigned integer between 1-31
-    :param offset: Signed integer representing timezone offset in minutes
+    :param offset: Signed integer representing timezone offset in
+        minutes
     """
 
     year: int
@@ -141,9 +142,8 @@ class XmlDateTime(NamedTuple):
     """
     Concrete xs:dateTime builtin type.
 
-    Represents iso 8601 date time format [-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm]
-    with rich comparisons and hashing.
-
+    Represents iso 8601 date time format [-]CCYY-MM-DDThh
+    :mm: ss[Z|(+|-)hh:mm] with rich comparisons and hashing.
     :param year: Any signed integer, eg (0, -535, 2020)
     :param month: Unsigned integer between 1-12
     :param day: Unsigned integer between 1-31
@@ -330,14 +330,14 @@ class XmlTime(NamedTuple):
     """
     Concrete xs:time builtin type.
 
-    Represents iso 8601 time format hh:mm:ss[Z|(+|-)hh:mm]
-    with rich comparisons and hashing.
-
+    Represents iso 8601 time format hh
+    :mm: ss[Z|(+|-)hh:mm] with rich comparisons and hashing.
     :param hour: Unsigned integer between 0-24
     :param minute: Unsigned integer between 0-59
     :param second: Unsigned integer between 0-59
     :param fractional_second: Unsigned integer between 0-999999999
-    :param offset: Signed integer representing timezone offset in minutes
+    :param offset: Signed integer representing timezone offset in
+        minutes
     """
 
     hour: int

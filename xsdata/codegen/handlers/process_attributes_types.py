@@ -161,9 +161,11 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
         Replace the given attribute type with the types of the single field
         source class.
 
-        Ignore enumerations and gracefully handle dump types with no attributes.
+        Ignore enumerations and gracefully handle dump types with no
+        attributes.
 
-        :raises: AnalyzerValueError if the source class has more than one attributes
+        :raises: AnalyzerValueError if the source class has more than
+            one attributes
         """
         source_attr = source.attrs[0]
         index = attr.types.index(attr_type)

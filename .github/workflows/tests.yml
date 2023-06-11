@@ -20,6 +20,7 @@ jobs:
           - {name: Python 3.9, python: '3.9', os: ubuntu}
           - {name: Python 3.10, python: '3.10', os: ubuntu}
           - {name: Python 3.11, python: '3.11', os: ubuntu}
+#          - {name: Python 3.12, python: '3.12-dev', os: ubuntu}
           - {name: Windows py37, python: '3.7', os: windows}
           - {name: MacOS py37, python: '3.7', os: macos}
     steps:
@@ -29,7 +30,7 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - name: Install libxml2
-        if: startsWith(matrix.python, 'pypy')
+        if: startsWith(matrix.python, 'pypy') || startsWith(matrix.python, '3.12-dev')
         run: |
           sudo apt-get install libxml2-dev libxslt-dev
       - name: Install dependencies

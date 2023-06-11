@@ -381,7 +381,8 @@ class XmlSerializer(AbstractSerializer):
         :param meta: Object metadata
         :param nillable: Is model nillable
         :param xsi_type: The true xsi:type of the object
-        :param ignore_optionals: Skip optional attributes with default value
+        :param ignore_optionals: Skip optional attributes with default
+            value
         :return:
         """
         for var in meta.get_attribute_vars():

@@ -26,8 +26,7 @@ class PycodeSerializer(AbstractSerializer):
     """
     Pycode serializer for dataclasses.
 
-    Return a python representation code of
-    a model instance.
+    Return a python representation code of a model instance.
 
     :param config: Serializer configuration
     :param context: Model context provider

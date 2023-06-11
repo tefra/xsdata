@@ -8,8 +8,8 @@ def strongly_connected_components(edges: Dict[str, List[str]]) -> Iterator[Set[s
     """
     Compute Strongly Connected Components of a directed graph.
 
-    From https://code.activestate.com/recipes/578507/
-    From https://github.com/python/mypy/blob/master/mypy/build.py
+    From https://code.activestate.com/recipes/578507/ From
+    https://github.com/python/mypy/blob/master/mypy/build.py
 
     :param edges: Mapping of vertex-edges values
     """

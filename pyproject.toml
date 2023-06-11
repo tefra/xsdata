@@ -1,0 +1,92 @@
+[build-system]
+requires = ["setuptools>=61.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xsdata"
+description = "Python XML Binding"
+authors = [{name = "Christodoulos Tsoulloftas", email = "chris@komposta.net"}]
+license = {text = "MIT"}
+classifiers = [
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Text Processing :: Markup :: XML",
+]
+keywords = ["xsd", "wsdl", "schema", "dtd", "binding", "xml", "json", "dataclasses", "generator", "cli"]
+requires-python = ">=3.7"
+dependencies = [
+    "typing-extensions",
+    'importlib-metadata;python_version<"3.8"',
+]
+dynamic = ["version"]
+
+[project.readme]
+file = "README.rst"
+content-type = "text/x-rst"
+
+[project.urls]
+Homepage = "https://github.com/tefra/xsdata"
+Source = "https://github.com/tefra/xsdata"
+Documentation = "https://xsdata.readthedocs.io/"
+Changelog = "https://xsdata.readthedocs.io/en/latest/changelog.html"
+
+[project.optional-dependencies]
+cli = [
+    "click>=5.0",
+    "click-default-group>=1.2",
+    "docformatter>=1.7.2",
+    "jinja2>=2.10",
+    "toposort>=1.5",
+]
+docs = [
+    "furo",
+    "sphinx",
+    "sphinx-autobuild",
+    "sphinx-autodoc-typehints",
+    "sphinx-copybutton",
+    "sphinx-inline-tabs",
+]
+lxml = ["lxml>=4.4.1"]
+soap = ["requests"]
+test = [
+    "pre-commit",
+    "pytest",
+    "pytest-benchmark",
+    "pytest-cov",
+]
+
+[project.scripts]
+xsdata = "xsdata.__main__:main"
+
+[tool.setuptools]
+packages = ["xsdata"]
+include-package-data = true
+license-files = ["LICENSE"]
+
+[tool.setuptools.dynamic]
+version = {attr = "xsdata.__version__"}
+
+[tool.doc8]
+max-line-length = 88
+
+[tool.pytest.ini_options]
+addopts = "--color=yes --benchmark-skip"
+
+[tool.coverage.run]
+omit = [
+    "xsdata/__main__.py",
+    "xsdata/utils/debug.py",
+]

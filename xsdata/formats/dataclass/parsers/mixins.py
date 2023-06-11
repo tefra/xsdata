@@ -78,9 +78,9 @@ class XmlNode(abc.ABC):
         Initialize the next child node to be queued, when a new xml element
         starts.
 
-        This entry point is responsible to create the next node
-        type with all the necessary information on how to bind
-        the incoming input data.
+        This entry point is responsible to create the next node type
+        with all the necessary information on how to bind the incoming
+        input data.
 
         :param qname: Qualified name
         :param attrs: Attribute key-value map
@@ -96,14 +96,14 @@ class XmlNode(abc.ABC):
         result was successful or not.
 
         This entry point is called when an xml element ends and is
-        responsible to parse the current element attributes/text,
-        bind any children objects and initialize  new object.
+        responsible to parse the current element attributes/text, bind
+        any children objects and initialize  new object.
 
         :param qname: Qualified name
         :param text: Text content
         :param tail: Tail content
-        :param objects: The list of intermediate parsed objects,
-            eg [(qname, object)]
+        :param objects: The list of intermediate parsed objects, eg
+            [(qname, object)]
         """
 
 

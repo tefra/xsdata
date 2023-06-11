@@ -145,7 +145,8 @@ class ElementBase:
         Return the real name for this element by looking by looking either to
         the name or ref attribute value.
 
-        :raises SchemaValueError: when instance has no name/ref attribute.
+        :raises SchemaValueError: when instance has no name/ref
+            attribute.
         """
         name = getattr(self, "name", None) or getattr(self, "ref", None)
         if name:

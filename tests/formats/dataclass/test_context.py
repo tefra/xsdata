@@ -109,6 +109,12 @@ class XmlContextTests(FactoryTestCase):
         self.assertIsNone(self.ctx.find_subclass(c, "Unknown"))
         self.assertIsNone(self.ctx.find_subclass(c, "Other"))
 
+    def is_binding_model(self):
+        self.assertTrue(self.ctx.is_binding_model(ChoiceType))
+
+        self.ctx.models_package = "xsdata.models"
+        self.assertFalse(self.ctx.is_binding_model(ChoiceType))
+
     def test_is_derived(self):
         a = make_dataclass("A", fields=[])
         b = make_dataclass("B", fields=[], bases=(a,))

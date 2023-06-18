@@ -19,11 +19,12 @@ from xsdata.utils.constants import return_input
 
 class XmlContext:
     """
-    The service provider for binding operations metadata.
+    The service provider for binding operations' metadata.
 
     :param element_name_generator: Default element name generator
     :param attribute_name_generator: Default attribute name generator
     :param class_type: Default class type `dataclasses`
+    :param models_package: Restrict auto locate to a specific package
     """
 
     __slots__ = (
@@ -33,6 +34,7 @@ class XmlContext:
         "cache",
         "xsi_cache",
         "sys_modules",
+        "models_package",
     )
 
     def __init__(
@@ -40,6 +42,7 @@ class XmlContext:
         element_name_generator: Callable = return_input,
         attribute_name_generator: Callable = return_input,
         class_type: str = "dataclasses",
+        models_package: Optional[str] = None,
     ):
         self.element_name_generator = element_name_generator
         self.attribute_name_generator = attribute_name_generator
@@ -47,6 +50,7 @@ class XmlContext:
 
         self.cache: Dict[Type, XmlMeta] = {}
         self.xsi_cache: Dict[str, List[Type]] = defaultdict(list)
+        self.models_package = models_package
         self.sys_modules = 0
 
     def reset(self):
@@ -95,13 +99,23 @@ class XmlContext:
         self.xsi_cache.clear()
         builder = self.get_builder()
         for clazz in self.get_subclasses(object):
-            if self.class_type.is_model(clazz):
+            if self.is_binding_model(clazz):
                 meta = builder.build_class_meta(clazz)
 
                 if meta.target_qname:
                     self.xsi_cache[meta.target_qname].append(clazz)
 
         self.sys_modules = len(sys.modules)
+
+    def is_binding_model(self, clazz: Type[T]) -> bool:
+        if not self.class_type.is_model(clazz):
+            return False
+
+        return not self.models_package or (
+            hasattr(clazz, "__module__")
+            and isinstance(clazz.__module__, str)
+            and clazz.__module__.startswith(self.models_package)
+        )
 
     def find_types(self, qname: str) -> List[Type[T]]:
         """

@@ -7,7 +7,7 @@ from xsdata.utils.constants import DEFAULT_ATTR_NAME
 
 
 def attr_group_name(x: Attr) -> str:
-    return x.name or DEFAULT_ATTR_NAME
+    return x.slug or DEFAULT_ATTR_NAME
 
 
 class RenameDuplicateAttributes(HandlerInterface):

@@ -69,11 +69,11 @@ class ClassContainer(ContainerInterface):
             ],
             Steps.SANITIZE: [
                 ResetAttributeSequences(),
+                RenameDuplicateAttributes(),
                 SanitizeAttributesDefaultValue(self),
             ],
             Steps.RESOLVE: [
                 ValidateAttributesOverrides(self),
-                RenameDuplicateAttributes(),
             ],
             Steps.FINALIZE: [
                 VacuumInnerClasses(),

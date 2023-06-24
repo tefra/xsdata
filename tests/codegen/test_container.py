@@ -51,8 +51,12 @@ class ClassContainerTests(FactoryTestCase):
                 "MergeAttributes",
                 "ProcessMixedContentClass",
             ],
-            30: ["ResetAttributeSequences", "SanitizeAttributesDefaultValue"],
-            40: ["ValidateAttributesOverrides", "RenameDuplicateAttributes"],
+            30: [
+                "ResetAttributeSequences",
+                "RenameDuplicateAttributes",
+                "SanitizeAttributesDefaultValue",
+            ],
+            40: ["ValidateAttributesOverrides"],
             50: [
                 "VacuumInnerClasses",
                 "CreateCompoundFields",

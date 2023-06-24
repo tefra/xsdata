@@ -34,7 +34,8 @@ class JsonParser(AbstractParser):
 
     :param config: Parser configuration
     :param context: Model context provider
-    :param load_factory: Replace the default json.load call with another implementation
+    :param load_factory: Replace the default json.load call with another
+        implementation
     """
 
     config: ParserConfig = field(default_factory=ParserConfig)

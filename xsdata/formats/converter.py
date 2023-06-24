@@ -44,7 +44,8 @@ class Converter(abc.ABC):
         """
         Convert any type to the converter dedicated type.
 
-        :raises ConverterError: if converter fails with and expected ValueError
+        :raises ConverterError: if converter fails with and expected
+            ValueError
         """
 
     @abc.abstractmethod
@@ -69,7 +70,8 @@ class ConverterFactory:
         """
         Attempt to convert a any value to one of the given types.
 
-        If all attempts fail return the value input value and issue a warning.
+        If all attempts fail return the value input value and issue a
+        warning.
 
         :return: The first successful converted value.
         """

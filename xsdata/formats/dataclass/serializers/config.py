@@ -19,8 +19,8 @@ class SerializerConfig:
     :param schema_location: xsi:schemaLocation attribute value
     :param no_namespace_schema_location: xsi:noNamespaceSchemaLocation
         attribute value
-    :param globalns: Dictionary containing global variables to extend
-        or overwrite for typing
+    :param globalns: Dictionary containing global variables to extend or
+        overwrite for typing
     """
 
     __slots__ = (

@@ -71,9 +71,11 @@ class NamespaceType:
     Wildcard elements/attributes namespace types.
 
     :cvar ANY_NS: elements from any namespace is allowed
-    :cvar OTHER_NS: elements from any namespace except the parent element's namespace
+    :cvar OTHER_NS: elements from any namespace except the parent
+        element's namespace
     :cvar LOCAL_NS: elements must come from no namespace
-    :cvar TARGET_NS: elements from the namespace of the parent element can be present
+    :cvar TARGET_NS: elements from the namespace of the parent element
+        can be present
     """
 
     ANY_NS = "##any"

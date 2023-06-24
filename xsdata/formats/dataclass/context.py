@@ -76,9 +76,9 @@ class XmlContext:
 
         :param clazz: The requested dataclass type
         :param parent_ns: The inherited parent namespace
-        :param xsi_type: if present it means that the given clazz is derived and the
-            lookup procedure needs to check and match a dataclass model to the qualified
-            name instead
+        :param xsi_type: if present it means that the given clazz is
+            derived and the lookup procedure needs to check and match a
+            dataclass model to the qualified name instead
         """
         meta = self.build(clazz, parent_ns)
         subclass = None

@@ -183,9 +183,9 @@ class ElementNode(XmlNode):
         """
         Add the given value to the params dictionary with the var name as key.
 
-        Wrap the value to a list if var is a list. If the var name already exists it
-        means we have a name conflict and the parser needs to lookup for any available
-        wildcard fields.
+        Wrap the value to a list if var is a list. If the var name
+        already exists it means we have a name conflict and the parser
+        needs to lookup for any available wildcard fields.
 
         :return: Whether the binding process was successful or not.
         """

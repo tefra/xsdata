@@ -414,13 +414,14 @@ class XmlVarBuilder:
         Resolve the namespace(s) for the given xml type and the parent
         namespace.
 
-        Only elements and wildcards are allowed to inherit the parent namespace if
-        the given namespace is empty.
+        Only elements and wildcards are allowed to inherit the parent
+        namespace if the given namespace is empty.
 
-        In case of wildcard try to decode the ##any, ##other, ##local, ##target.
+        In case of wildcard try to decode the ##any, ##other, ##local,
+        ##target.
 
-
-        :param xml_type: The xml type (Text|Element(s)|Attribute(s)|Wildcard)
+        :param xml_type: The xml type
+            (Text|Element(s)|Attribute(s)|Wildcard)
         :param namespace: The field namespace
         :param parent_namespace: The parent namespace
         """
@@ -448,8 +449,8 @@ class XmlVarBuilder:
         """
         Return the first valid namespace uri or None.
 
-        :param namespaces: A list of namespace options which may
-            include valid uri(s) or one of the ##any, ##other,
+        :param namespaces: A list of namespace options which may include
+            valid uri(s) or one of the ##any, ##other,
             ##targetNamespace, ##local
         """
         for namespace in namespaces:
@@ -474,10 +475,11 @@ class XmlVarBuilder:
         Analyze a type hint and return the origin, sub origin and the type
         args.
 
-        The only case we support a sub origin is for fields derived from xs:NMTOKENS!
+        The only case we support a sub origin is for fields derived from
+        xs:NMTOKENS!
 
-
-        :raises XmlContextError: if the typing is not supported for binding
+        :raises XmlContextError: if the typing is not supported for
+            binding
         """
         try:
             types = evaluate(type_hint, globalns)

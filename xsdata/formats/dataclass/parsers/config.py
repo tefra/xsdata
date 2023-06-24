@@ -19,10 +19,10 @@ class ParserConfig:
     :param load_dtd: Enable loading external dtd (lxml only)
     :param process_xinclude: Enable xinclude statements processing
     :param class_factory: Override default object instantiation
-    :param fail_on_unknown_properties: Skip unknown properties or
+    :param fail_on_unknown_properties: Skip unknown properties or fail
+        with exception
+    :param fail_on_unknown_attributes: Skip unknown XML attributes or
         fail with exception
-    :param fail_on_unknown_attributes: Skip unknown XML attributes
-        or fail with exception
     :param fail_on_converter_warnings: Turn converter warnings to
         exceptions
     """

@@ -130,9 +130,8 @@ class XmlWriter:
         """
         Start tag notification receiver.
 
-        The receiver will flush the start of any pending element,
-        create new namespaces context and queue the current tag
-        for generation.
+        The receiver will flush the start of any pending element, create
+        new namespaces context and queue the current tag for generation.
 
         :param qname: Tag qualified name
         """
@@ -148,9 +147,9 @@ class XmlWriter:
         """
         Add attribute notification receiver.
 
-        The receiver will convert the key to a namespace, name tuple
-        and convert the value to string. Internally the converter will
-        also generate any missing namespace prefixes.
+        The receiver will convert the key to a namespace, name tuple and
+        convert the value to string. Internally the converter will also
+        generate any missing namespace prefixes.
 
         :param key: Attribute name
         :param value: Attribute value
@@ -183,12 +182,12 @@ class XmlWriter:
         """
         Set data notification receiver.
 
-        The receiver will convert the data to string, flush any previous pending
-        start element and send it to the handler for generation.
+        The receiver will convert the data to string, flush any previous
+        pending start element and send it to the handler for generation.
 
-        If the text content of the tag has already been generated then treat the
-        current data as element tail content and queue it to be generated when the
-        tag ends.
+        If the text content of the tag has already been generated then
+        treat the current data as element tail content and queue it to
+        be generated when the tag ends.
 
         :param data: Element text or tail content
         """

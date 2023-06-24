@@ -140,8 +140,7 @@ class NodeParser(PushParser):
         End element notification receiver.
 
         Pop the last XmlNode from the queue and use it to build and
-        return the resulting object tree with its text and tail
-        content.
+        return the resulting object tree with its text and tail content.
 
         :param queue: Xml nodes queue
         :param objects: List of parsed objects
@@ -175,8 +174,8 @@ class RecordParser(NodeParser):
         """
         Start element notification receiver.
 
-        Build and queue the XmlNode for the starting element, append
-        the event with the attributes and ns map to the events list.
+        Build and queue the XmlNode for the starting element, append the
+        event with the attributes and ns map to the events list.
 
         :param clazz: Root class type, if it's missing look for any
             suitable models from the current context.
@@ -201,9 +200,9 @@ class RecordParser(NodeParser):
         End element notification receiver.
 
         Pop the last XmlNode from the queue and use it to build and
-        return the resulting object tree with its text and tail
-        content. Append the end event with the text,tail content to
-        the events list.
+        return the resulting object tree with its text and tail content.
+        Append the end event with the text,tail content to the events
+        list.
 
         :param queue: Xml nodes queue
         :param objects: List of parsed objects

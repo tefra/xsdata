@@ -99,39 +99,14 @@ Features
 
 
 
-Changelog: 23.5 (2023-05-21)
+Changelog: 23.6 (2023-06-24)
 ----------------------------
-- Fixed XML meta var index conflicts.
-- Fixed mixed content handling for DTD elements. (`#749 <https://github.com/tefra/xsdata/pull/749>`_, `#762 <https://github.com/tefra/xsdata/pull/762>`_)
-- Fixed an issue with required attributes turning into optional ones.
-- Fixed calculation of min/max occurs when parsing XML/JSON documents. (`#756 <https://github.com/tefra/xsdata/pull/756>`_)
-- Fixed calculation of min/max occurs when parsing DTD choice content types. (`#760 <https://github.com/tefra/xsdata/pull/760>`_)
-- Fixed an issue when parsing tail content for compound wildcard elements.
-- Fixed an issue with the code analyzer not fully processing some classes.
-- Fixed an issue with the code analyzer taking forever to process very large enumerations. (`#776 <https://github.com/tefra/xsdata/issue/776>`_)
-- Fixed an issue in the JSON parser with optional choice elements.
-- Updated the transformer to silently ignore malformed JSON files. (`#750 <https://github.com/tefra/xsdata/pull/750>`_)
-- Updated the override attribute handler to fix naming conflicts.
-- Updated the override attribute handler to allow wildcard overrides.
-- Updated conditions on extensions flattening (over-flattening). (`#754 <https://github.com/tefra/xsdata/pull/754>`_)
-- Updated Group, AttributeGroup handling, skipping a few cases.
-- Updated how min/max occurs are calculated with nested containers.
-- Updated handling of element substitutions to treat them as choices. (`#786 <https://github.com/tefra/xsdata/pull/786>`_)
-- Updated Pycodeserializer to skip default field values.
-- Updated flattening restriction base classes when sequence elements are out of order.
-- Updated docformatter to v1.6.5.
-- Added support to override compound fields.
-- Added support for multiple sequential groups in a class.
-- Added support for non-list compound fields.
-- Added support to mix list and non-list fields with sequence groups.
-- Added an option to include headers in generated files. (`#746 <https://github.com/tefra/xsdata/pull/746>`_)
-- Added an option to cache the initial load and mapping of resources.
-- Added support for regular expressions in config substitutions. (`#755 <https://github.com/tefra/xsdata/pull/755>`_)
-- Added a pretty print indentation option in the serializer config. (`#780 <https://github.com/tefra/xsdata/pull/780>`_)
-- Added an option to set the encoding in the SOAP Client. (`#773 <https://github.com/tefra/xsdata/pull/773>`_)
-- Added a CLI flag to show debug messages.
-- Added a debug message for possible circular references during code generation.
-- Added support to generate prohibited fields when they restrict parent fields. (`#781 <https://github.com/tefra/xsdata/pull/781>`_)
-
-This release is bigger than intended and includes many major changes,
-that's why it took so long.
+- Fixed conflicting enum values leading to wrong default values (`#806 <https://github.com/tefra/xsdata/pull/806>`_)
+- Added support for custom decorators and base classes (`#793 <https://github.com/tefra/xsdata/pull/793>`_)
+- Added parser config to load external dtd to resolve entities (`#797 <https://github.com/tefra/xsdata/pull/797>`_)
+- Added requests sessions on the wsdl client transport (`#798 <https://github.com/tefra/xsdata/pull/798>`_)
+- Added support subscriptable types and UnionType (`#801 <https://github.com/tefra/xsdata/pull/801>`_)
+- Added option to restrict models package for auto-locator (`#809 <https://github.com/tefra/xsdata/pull/809>`_)
+- Updated context to only cache supported classes (`#796 <https://github.com/tefra/xsdata/pull/796>`_)
+- Removed tox requirement (`#800 <https://github.com/tefra/xsdata/pull/800>`_)
+- Converted to pyproject.toml (`#802 <https://github.com/tefra/xsdata/pull/802>`_)

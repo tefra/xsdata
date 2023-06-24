@@ -1,3 +1,15 @@
+23.6 (2023-06-24)
+-----------------
+- Fixed conflicting enum values leading to wrong default values (`#806 <https://github.com/tefra/xsdata/pull/806>`_)
+- Added support for custom decorators and base classes (`#793 <https://github.com/tefra/xsdata/pull/793>`_)
+- Added parser config to load external dtd to resolve entities (`#797 <https://github.com/tefra/xsdata/pull/797>`_)
+- Added requests sessions on the wsdl client transport (`#798 <https://github.com/tefra/xsdata/pull/798>`_)
+- Added support subscriptable types and UnionType (`#801 <https://github.com/tefra/xsdata/pull/801>`_)
+- Added option to restrict models package for auto-locator (`#809 <https://github.com/tefra/xsdata/pull/809>`_)
+- Updated context to only cache supported classes (`#796 <https://github.com/tefra/xsdata/pull/796>`_)
+- Removed tox requirement (`#800 <https://github.com/tefra/xsdata/pull/800>`_)
+- Converted to pyproject.toml (`#802 <https://github.com/tefra/xsdata/pull/802>`_)
+
 23.5 (2023-05-21)
 ------------------
 - Fixed XML meta var index conflicts.

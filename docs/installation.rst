@@ -22,7 +22,7 @@ install directly from the git repo.
 
 .. code-block:: console
 
-    $ pip install git+https://github.com/tefra/xsdata@master#egg=xsdata[cli,lxml]
+    $ pip install xsdata[cli,lxml] @ git+https://github.com/tefra/xsdata
 
 
 Install using conda

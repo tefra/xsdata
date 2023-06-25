@@ -1,4 +1,4 @@
-.. image:: https://github.com/tefra/xsdata/raw/master/docs/_static/logo.svg
+.. image:: https://github.com/tefra/xsdata/raw/main/docs/_static/logo.svg
     :target: https://xsdata.readthedocs.io/
 
 Naive XML Bindings for python
@@ -10,7 +10,7 @@ Naive XML Bindings for python
 .. image:: https://readthedocs.org/projects/xsdata/badge
     :target: https://xsdata.readthedocs.io/
 
-.. image:: https://codecov.io/gh/tefra/xsdata/branch/master/graph/badge.svg
+.. image:: https://codecov.io/gh/tefra/xsdata/branch/main/graph/badge.svg
     :target: https://codecov.io/gh/tefra/xsdata
 
 .. image:: https://img.shields.io/github/languages/top/tefra/xsdata.svg

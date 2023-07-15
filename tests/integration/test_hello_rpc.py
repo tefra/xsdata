@@ -24,7 +24,7 @@ os.chdir(root)
 
 class HelloRpcServiceTests(TestCase):
     def test_wsdl_codegen(self):
-        schema = fixtures_dir.joinpath("hello/hello.wsdl")
+        schema = fixtures_dir.joinpath("hello")
         package = "tests.fixtures.hello"
         runner = CliRunner()
         result = runner.invoke(cli, [str(schema), "--package", package])

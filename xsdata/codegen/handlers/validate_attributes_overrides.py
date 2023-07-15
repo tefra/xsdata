@@ -49,7 +49,6 @@ class ValidateAttributesOverrides(RelativeHandlerInterface):
 
     def group_fields(self, target: Class, attrs: List[Attr]):
         """Group attributes into a new compound field."""
-        pos = target.attrs.index(attrs[0])
         choice = attrs[0].restrictions.choice
 
         assert choice is not None

@@ -4,11 +4,12 @@ from typing import List
 from typing import Optional
 
 from xsdata.codegen.mixins import RelativeHandlerInterface
-from xsdata.codegen.models import Attr
+from xsdata.codegen.models import Attr, get_restriction_choice
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import get_slug
 from xsdata.codegen.utils import ClassUtils
 from xsdata.utils import collections
+from xsdata.utils.collections import group_by
 
 
 class ValidateAttributesOverrides(RelativeHandlerInterface):
@@ -34,8 +35,40 @@ class ValidateAttributesOverrides(RelativeHandlerInterface):
                     self.validate_override(target, attr, base_attr)
                 else:
                     self.resolve_conflict(attr, base_attr)
+
+                # imagine the situation where the restriction in the child
+                # class would choice it to either one element of the upstream
+                # choice or the other upstream choice, potentially having the
+                # same class name, what to retain?
+                if attr.restrictions.choice is None and base_attr.restrictions.choice:
+                    self.rename_choice_to_basename(attr, base_attrs[0], target)
+
             elif attr.is_prohibited:
                 self.remove_attribute(target, attr)
+
+
+    def group_fields(self, target: Class, attrs: List[Attr]):
+        """Group attributes into a new compound field."""
+        pos = target.attrs.index(attrs[0])
+        choice = attrs[0].restrictions.choice
+
+        assert choice is not None
+
+        names = []
+        for attr in attrs:
+            names.append(attr.local_name)
+
+        # Must use the same self.choose_name(target, names) as create_compound_fields,
+        # this does not fulfill this.
+        return "_Or_".join(names)
+
+    def rename_choice_to_basename(self, attr:Attr, base_attr:Attr, target: Class):
+        base_attrs = self.base_attrs(target)
+        groups = group_by(base_attrs, get_restriction_choice)
+        for choice, attrs in groups.items():
+            if choice and len(attrs) > 1 and base_attr.restrictions.choice == choice:
+                attr.name = self.group_fields(target, attrs)
+                break
 
     @classmethod
     def overrides(cls, a: Attr, b: Attr) -> bool:
@@ -62,6 +95,7 @@ class ValidateAttributesOverrides(RelativeHandlerInterface):
             and bool_eq(attr.restrictions.nillable, source_attr.restrictions.nillable)
             and bool_eq(attr.restrictions.is_optional, source_attr.restrictions.is_optional)
             and bool_eq(attr.restrictions.is_prohibited, source_attr.restrictions.is_prohibited)
+            and bool_eq(attr.restrictions.choice, source_attr.restrictions.choice)
         ):
             cls.remove_attribute(target, attr)
 

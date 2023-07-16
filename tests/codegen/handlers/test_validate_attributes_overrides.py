@@ -102,12 +102,19 @@ class ValidateAttributesOverridesTests(FactoryTestCase):
         attr_b.fixed = attr_a.fixed
         attr_a.restrictions.tokens = not attr_b.restrictions.tokens
         attr_a.restrictions.nillable = not attr_b.restrictions.nillable
+        attr_a.restrictions.min_occurs = 0
+        attr_b.restrictions.min_occurs = 1
+        attr_a.restrictions.max_occurs = 0
+        attr_b.restrictions.max_occurs = 1
+
         self.processor.validate_override(target, attr_a, attr_b)
         self.assertEqual(1, len(target.attrs))
 
         # Restrictions are compatible again
         attr_a.restrictions.tokens = attr_b.restrictions.tokens
         attr_a.restrictions.nillable = attr_b.restrictions.nillable
+        attr_a.restrictions.min_occurs = attr_b.restrictions.min_occurs = 1
+        attr_a.restrictions.max_occurs = attr_b.restrictions.max_occurs = 1
         self.processor.validate_override(target, attr_a, attr_b)
         self.assertEqual(0, len(target.attrs))
 

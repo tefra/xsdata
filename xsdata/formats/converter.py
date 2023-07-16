@@ -324,7 +324,7 @@ class DecimalConverter(Converter):
         if value.is_infinite():
             return str(value).replace("Infinity", "INF")
 
-        return str(value)
+        return f"{value:f}"
 
 
 class QNameConverter(Converter):

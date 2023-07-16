@@ -4,6 +4,9 @@
 {{ "Properties" if obj.is_enumeration else "Parameters" }}
 ----------
 {%- for var_name, var_doc in obj | class_params %}
-{{ "{}: {}".format(var_name, var_doc) | text_wrap(offset) }}
+{{ var_name }}
+{%- if var_doc %}
+{{ var_doc | text_wrap(offset, subsequent_indent="") | indent(width=4, first=True) }}
+{%-  endif -%}
 {%- endfor -%}
 {%- endif %}

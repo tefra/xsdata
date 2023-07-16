@@ -69,6 +69,13 @@ class CalculateAttributePathsTests(FactoryTestCase):
                         min_occurs=1,
                         max_occurs=1,
                         path=[("s", 1, 1, 1), ("c", 5, 2, 2)],
+                    ),
+                ),
+                AttrFactory.element(
+                    restrictions=Restrictions(
+                        min_occurs=1,
+                        max_occurs=1,
+                        path=[("s", 1, 1, 1), ("c", 6, 1, 21)],
                     )
                 ),
             ]
@@ -99,5 +106,6 @@ class CalculateAttributePathsTests(FactoryTestCase):
             (1, None, 0, 1),
             (1, None, 2, 2),
             (1, None, 2, 2),
+            (1, None, 1, 21),
         ]
         self.assertEqual(expected, actual)

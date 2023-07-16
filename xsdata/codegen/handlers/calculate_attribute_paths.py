@@ -36,8 +36,6 @@ class CalculateAttributePaths(HandlerInterface):
                 if not attr.restrictions.sequence:
                     attr.restrictions.sequence = index
             elif name == CHOICE:
-                if mi <= 1:
-                    mi = 0
                 if not attr.restrictions.choice:
                     attr.restrictions.choice = index
             elif name == GROUP:

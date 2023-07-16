@@ -60,6 +60,8 @@ class ValidateAttributesOverrides(RelativeHandlerInterface):
             and bool_eq(attr.mixed, source_attr.mixed)
             and bool_eq(attr.restrictions.tokens, source_attr.restrictions.tokens)
             and bool_eq(attr.restrictions.nillable, source_attr.restrictions.nillable)
+            and bool_eq(attr.is_prohibited, source_attr.is_prohibited)
+            and bool_eq(attr.is_optional, source_attr.is_optional)
         ):
             cls.remove_attribute(target, attr)
 

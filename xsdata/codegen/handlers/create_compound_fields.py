@@ -17,6 +17,11 @@ from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
 from xsdata.utils.collections import group_by
 
+ALL = "a"
+GROUP = "g"
+SEQUENCE = "s"
+CHOICE = "c"
+
 
 class CreateCompoundFields(RelativeHandlerInterface):
     """Group attributes that belong in the same choice and replace them by
@@ -35,19 +40,34 @@ class CreateCompoundFields(RelativeHandlerInterface):
             for choice, attrs in groups.items():
                 if choice and len(attrs) > 1:
                     self.group_fields(target, attrs)
+        else:
+            for attr in target.attrs:
+                if attr.restrictions.choice:
+                    self.calculate_choice_min_occurs(attr)
+
+    @classmethod
+    def calculate_choice_min_occurs(cls, attr: Attr):
+        for path in attr.restrictions.path:
+            name, index, mi, ma = path
+            if name == CHOICE and mi <= 1:
+                attr.restrictions.min_occurs = 0
 
     @classmethod
     def update_counters(cls, attr: Attr, counters: Dict):
         started = False
         choice = attr.restrictions.choice
         for path in attr.restrictions.path:
-            if not started and path[0] != "c" and path[1] != choice:
+            name, index, mi, ma = path
+            if not started and name != CHOICE and index != choice:
                 continue
 
             started = True
             if path not in counters:
                 counters[path] = {"min": [], "max": []}
             counters = counters[path]
+
+            if mi <= 1:
+                attr.restrictions.min_occurs = 0
 
         counters["min"].append(attr.restrictions.min_occurs)
         counters["max"].append(attr.restrictions.max_occurs)

@@ -45,6 +45,31 @@ class CreateCompoundFieldsTests(FactoryTestCase):
             ]
         )
 
+    def test_process_with_config_enabled_false_calculate_min_occurs(self):
+        self.processor.config.enabled = False
+        target = ClassFactory.elements(5)
+        target.attrs[0].restrictions.choice = 1
+        target.attrs[1].restrictions.choice = 1
+        target.attrs[2].restrictions.choice = 2
+        target.attrs[3].restrictions.choice = 2
+
+        for attr in target.attrs:
+            attr.restrictions.min_occurs = 2
+            attr.restrictions.max_occurs = 3
+
+        target.attrs[0].restrictions.path = [("g", 0, 1, 1), ("c", 1, 2, 1)]
+        target.attrs[1].restrictions.path = [("g", 0, 1, 1), ("c", 1, 2, 1)]
+        target.attrs[2].restrictions.path = [("g", 0, 1, 1), ("c", 2, 1, 1)]
+        target.attrs[3].restrictions.path = [("g", 0, 1, 1), ("c", 2, 1, 1)]
+        self.processor.process(target)
+
+        actual = [
+            (attr.restrictions.min_occurs, attr.restrictions.max_occurs)
+            for attr in target.attrs
+        ]
+        expected = [(2, 3), (2, 3), (0, 3), (0, 3), (2, 3)]
+        self.assertEqual(expected, actual)
+
     def test_group_fields(self):
         target = ClassFactory.create(attrs=AttrFactory.list(4))
         target.attrs[0].restrictions.choice = 1
@@ -91,7 +116,7 @@ class CreateCompoundFieldsTests(FactoryTestCase):
                 ),
             ],
         )
-        expected_res = Restrictions(min_occurs=1, max_occurs=20)
+        expected_res = Restrictions(min_occurs=0, max_occurs=20)
 
         self.processor.group_fields(target, list(target.attrs))
         self.assertEqual(1, len(target.attrs))
@@ -241,3 +266,23 @@ class CreateCompoundFieldsTests(FactoryTestCase):
 
         result = self.processor.sum_counters(counters)
         self.assertEqual((0, 3), (sum(result[0]), sum(result[1])))
+
+    def test_update_counters(self):
+        attr = AttrFactory.create()
+        attr.restrictions.min_occurs = 2
+        attr.restrictions.max_occurs = 3
+        attr.restrictions.path = [("c", 0, 1, 1)]
+
+        counters = {}
+        self.processor.update_counters(attr, counters)
+
+        expected = {("c", 0, 1, 1): {"max": [3], "min": [0]}}
+        self.assertEqual(expected, counters)
+
+        attr.restrictions.min_occurs = 2
+        attr.restrictions.path = [("c", 0, 2, 1)]
+
+        counters = {}
+        self.processor.update_counters(attr, counters)
+        expected = {("c", 0, 2, 1): {"max": [3], "min": [2]}}
+        self.assertEqual(expected, counters)

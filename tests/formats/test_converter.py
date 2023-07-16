@@ -42,7 +42,7 @@ class ConverterFactoryTests(TestCase):
         self.assertEqual("1.5", converter.serialize(1.5))
         self.assertEqual("true", converter.serialize(True))
         self.assertEqual("optional", converter.serialize(UseType.OPTIONAL))
-        self.assertEqual("8.77683E-8", converter.serialize(Decimal("8.77683E-8")))
+        self.assertEqual("0.0000000877683", converter.serialize(Decimal("8.77683E-8")))
         self.assertEqual("8.77683E-08", converter.serialize(float("8.77683E-8")))
 
     def test_test(self):
@@ -254,7 +254,9 @@ class DecimalConverterTests(TestCase):
         self.assertEqual("INF", self.converter.serialize(Decimal("inf")))
         self.assertEqual("INF", self.converter.serialize(Decimal("+inf")))
         self.assertEqual("-INF", self.converter.serialize(Decimal("-inf")))
-        self.assertEqual("8.77683E-8", self.converter.serialize(Decimal("8.77683E-8")))
+        self.assertEqual(
+            "0.0000000877683", self.converter.serialize(Decimal("8.77683E-8"))
+        )
 
 
 class DateTimeConverterTests(TestCase):

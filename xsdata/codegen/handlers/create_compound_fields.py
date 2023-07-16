@@ -35,22 +35,21 @@ class CreateCompoundFields(RelativeHandlerInterface):
         self.config = container.config.output.compound_fields
 
     def process(self, target: Class):
-        if self.config.enabled:
-            groups = group_by(target.attrs, get_restriction_choice)
-            for choice, attrs in groups.items():
-                if choice and len(attrs) > 1:
+        groups = group_by(target.attrs, get_restriction_choice)
+        for choice, attrs in groups.items():
+            if choice and len(attrs) > 1:
+                if self.config.enabled:
                     self.group_fields(target, attrs)
-        else:
-            for attr in target.attrs:
-                if attr.restrictions.choice:
-                    self.calculate_choice_min_occurs(attr)
+                else:
+                    self.calculate_choice_min_occurs(attrs)
 
     @classmethod
-    def calculate_choice_min_occurs(cls, attr: Attr):
-        for path in attr.restrictions.path:
-            name, index, mi, ma = path
-            if name == CHOICE and mi <= 1:
-                attr.restrictions.min_occurs = 0
+    def calculate_choice_min_occurs(cls, attrs: List[Attr]):
+        for attr in attrs:
+            for path in attr.restrictions.path:
+                name, index, mi, ma = path
+                if name == CHOICE and mi <= 1:
+                    attr.restrictions.min_occurs = 0
 
     @classmethod
     def update_counters(cls, attr: Attr, counters: Dict):

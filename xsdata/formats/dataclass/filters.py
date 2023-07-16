@@ -522,7 +522,9 @@ class Filters:
         )
         return f"(\n{value}\n{' ' * indent})"
 
-    def text_wrap(self, string: str, offset: int = 0) -> str:
+    def text_wrap(
+        self, string: str, offset: int = 0, subsequent_indent: str = "    "
+    ) -> str:
         """Wrap text in respect to the max line length and the given offset."""
         return "\n".join(
             textwrap.wrap(
@@ -531,7 +533,7 @@ class Filters:
                 drop_whitespace=True,
                 replace_whitespace=True,
                 break_long_words=False,
-                subsequent_indent="    ",
+                subsequent_indent=subsequent_indent,
             )
         )
 

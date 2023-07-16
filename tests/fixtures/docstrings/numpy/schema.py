@@ -28,9 +28,11 @@ class RootEnum(Enum):
     """
     Properties
     ----------
-    A: Lorem ipsum dolor
-    B: Lorem ipsum dolor '''sit''' amet, consectetur adipiscing elit.
-        Morbi dapibus. My\\Ipsum
+    A
+        Lorem ipsum dolor
+    B
+        Lorem ipsum dolor '''sit''' amet, consectetur adipiscing elit. Morbi
+        dapibus. My\\Ipsum
     """
     A = "A"
     B = "B"
@@ -40,9 +42,11 @@ class RootB(Enum):
     """
     Properties
     ----------
-    YES: This is an inner enum member documentation. Lorem ipsum dolor
-        sit amet, consectetur adipiscing elit. Etiam mollis.
-    NO: Lorem ipsum dolor My\\Ipsum
+    YES
+        This is an inner enum member documentation. Lorem ipsum dolor sit
+        amet, consectetur adipiscing elit. Etiam mollis.
+    NO
+        Lorem ipsum dolor My\\Ipsum
     """
     YES = "Yes"
     NO = "No"
@@ -64,12 +68,13 @@ class Root:
 
     Parameters
     ----------
-    a: This is an inner type '''field''' documentation. Lorem ipsum
-        dolor sit amet, consectetur adipiscing elit. Aliquam nec.
-        My\\Ipsum
-    b: This is a second root type field documentation.
-    c:
-    d:
+    a
+        This is an inner type '''field''' documentation. Lorem ipsum dolor
+        sit amet, consectetur adipiscing elit. Aliquam nec. My\\Ipsum
+    b
+        This is a second root type field documentation.
+    c
+    d
     """
     class Meta:
         namespace = "urn:docs"
@@ -114,9 +119,10 @@ class Root:
 
         Parameters
         ----------
-        sub_a: This is an inner type '''field''' documentation. Lorem
-            ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-            efficitur. My\\Ipsum
+        sub_a
+            This is an inner type '''field''' documentation. Lorem ipsum
+            dolor sit amet, consectetur adipiscing elit. Vivamus efficitur.
+            My\\Ipsum
         """
         sub_a: Optional[str] = field(
             default=None,

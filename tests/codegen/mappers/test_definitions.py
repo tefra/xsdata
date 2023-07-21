@@ -158,8 +158,8 @@ class DefinitionsMapperTests(FactoryTestCase):
     def test_map_binding_operation(
         self, mock_operation_namespace, mock_map_binding_operation_messages
     ):
-        definitions = Definitions(location="foo.wsdl", target_namespace="xsdata")
-        operation = BindingOperation(name="Add")
+        definitions = Definitions(target_namespace="xsdata")
+        operation = BindingOperation(name="Add", location="foo.wsdl")
         operation.ns_map["foo"] = "bar"
         port_operation = PortTypeOperation()
         config = {"a": "one", "b": "two", "style": "rpc"}
@@ -333,14 +333,17 @@ class DefinitionsMapperTests(FactoryTestCase):
         name = "some_operation_bindings"
         style = "document"
         namespace = "xsdata"
-        definitions = Definitions(location="foo.wsdl", target_namespace="bar")
-        port_type_message = PortTypeMessage(message="some_operation")
+        definitions = Definitions(target_namespace="bar")
+        port_type_message = PortTypeMessage(
+            message="some_operation", location="foo.wsdl"
+        )
         binding_message = BindingMessage(
             extended=[
                 AnyElement(qname="body"),
                 AnyElement(qname="header"),
                 AnyElement(qname="header"),
-            ]
+            ],
+            location="foo.wsdl",
         )
         binding_message.ns_map["foo"] = "bar"
 
@@ -415,14 +418,17 @@ class DefinitionsMapperTests(FactoryTestCase):
         name = "some_operation_bindings"
         style = "rpc"
         namespace = "xsdata"
-        definitions = Definitions(location="foo.wsdl", target_namespace="bar")
-        port_type_message = PortTypeMessage(message="some_operation")
+        definitions = Definitions(target_namespace="bar")
+        port_type_message = PortTypeMessage(
+            message="some_operation", location="foo.wsdl"
+        )
         binding_message = BindingMessage(
             extended=[
                 AnyElement(qname="body", attributes={"namespace": "bodyns"}),
                 AnyElement(qname="header"),
                 AnyElement(qname="header"),
-            ]
+            ],
+            location="foo.wsdl",
         )
         binding_message.ns_map["foo"] = "bar"
 
@@ -705,10 +711,8 @@ class DefinitionsMapperTests(FactoryTestCase):
     def test_build_message_class(self, mock_create_message_attributes):
         message = Message(name="bar", parts=[Part()])
         message.ns_map["foo"] = "bar"
-        definitions = Definitions(
-            messages=[message], target_namespace="xsdata", location="foo.wsdl"
-        )
-        port_type_message = PortTypeMessage(message="foo:bar")
+        definitions = Definitions(messages=[message], target_namespace="xsdata")
+        port_type_message = PortTypeMessage(message="foo:bar", location="foo.wsdl")
 
         attrs = AttrFactory.list(2)
         mock_create_message_attributes.return_value = attrs

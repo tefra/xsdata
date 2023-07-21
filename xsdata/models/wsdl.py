@@ -32,10 +32,13 @@ class WsdlElement:
     """
     :param name:
     :param documentation:
+    :param location:
+    :param ns_map
     """
 
     name: str = attribute()
     documentation: Optional[Documentation] = element()
+    location: Optional[str] = field(default=None, metadata={"type": "Ignore"})
     ns_map: Dict[str, str] = field(
         default_factory=dict, init=False, metadata={"type": "Ignore"}
     )
@@ -207,7 +210,6 @@ class Definitions(ExtensibleElement):
     port_types: List[PortType] = array_element(name="portType")
     bindings: List[Binding] = array_element(name="binding")
     services: List[Service] = array_element(name="service")
-    location: Optional[str] = field(default=None)
 
     @property
     def schemas(self):

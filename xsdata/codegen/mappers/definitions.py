@@ -110,13 +110,13 @@ class DefinitionsMapper:
                 message_type = message_class.name.split("_")[-1]
                 attrs.append(cls.build_attr(message_type, message_class.qname))
 
-        assert definitions.location is not None
+        assert binding_operation.location is not None
 
         yield Class(
             qname=namespaces.build_qname(definitions.target_namespace, name),
             status=Status.FLATTENED,
             tag=type(binding_operation).__name__,
-            location=definitions.location,
+            location=binding_operation.location,
             ns_map=binding_operation.ns_map,
             attrs=attrs,
         )
@@ -210,13 +210,13 @@ class DefinitionsMapper:
         """Step 6.1: Build Envelope class for the given binding message with
         attributes from the port type message."""
 
-        assert definitions.location is not None
+        assert binding_message.location is not None
 
         target = Class(
             qname=namespaces.build_qname(definitions.target_namespace, name),
             meta_name="Envelope",
             tag=Tag.BINDING_MESSAGE,
-            location=definitions.location,
+            location=binding_message.location,
             ns_map=binding_message.ns_map,
             namespace=namespace,
         )
@@ -253,14 +253,14 @@ class DefinitionsMapper:
         ns_map = definition_message.ns_map.copy()
         source_namespace = ns_map.get(prefix)
 
-        assert definitions.location is not None
+        assert port_type_message.location is not None
 
         return Class(
             qname=namespaces.build_qname(source_namespace, name),
             namespace=source_namespace,
             status=Status.RAW,
             tag=Tag.ELEMENT,
-            location=definitions.location,
+            location=port_type_message.location,
             ns_map=ns_map,
             attrs=list(cls.build_parts_attributes(definition_message.parts, ns_map)),
         )

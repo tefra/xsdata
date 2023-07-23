@@ -17,9 +17,7 @@ class DoubleQuotesDescription:
 
 @dataclass
 class DoubleQuotesSummary:
-    """
-    Dont trip on quotes: "A", "B", "C", "D" My\\Ipsum.
-    """
+    """Dont trip on quotes: "A", "B", "C", "D" My\\Ipsum"""
     class Meta:
         namespace = "urn:docs"
 

@@ -13,7 +13,7 @@ class DefinitionsParserTests(TestCase):
 
     def test_complete(self):
         path = fixtures_dir.joinpath("calculator/services.wsdl").resolve()
-        parser = DefinitionsParser()
+        parser = DefinitionsParser(location="here.wsdl")
         definitions = parser.from_path(path, Definitions)
 
         self.assertIsInstance(definitions, Definitions)
@@ -22,20 +22,15 @@ class DefinitionsParserTests(TestCase):
         self.assertEqual(1, len(definitions.port_types))
         self.assertEqual(1, len(definitions.types.schemas))
         self.assertEqual(8, len(definitions.messages))
+        self.assertEqual(parser.location, definitions.bindings[0].location)
 
-    def test_end_definitions(self):
-        parser = DefinitionsParser()
-        definitions = Definitions(
-            imports=[Import(location="../foo.xsd"), Import(location="bar.xsd")]
-        )
+    def test_end_import(self):
+        parser = DefinitionsParser(location="foo/bar.wsdl")
+        imp = Import(location="../hello/foo.wsdl")
 
-        parser.end_definitions(definitions)
-        self.assertEqual("bar.xsd", definitions.imports[1].location)
+        parser.end_import(imp)
+        self.assertEqual("hello/foo.wsdl", imp.location)
 
-        parser.location = "file://a/b/services/parent.wsdl"
-        parser.end_definitions(definitions)
-        self.assertEqual("file://a/b/foo.xsd", definitions.imports[0].location)
-        self.assertEqual("file://a/b/services/bar.xsd", definitions.imports[1].location)
-
-        # Update only Definitions instances
-        parser.end_definitions("foo")
+        parser.location = None
+        parser.end_import(imp)
+        self.assertEqual("hello/foo.wsdl", imp.location)

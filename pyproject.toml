@@ -70,7 +70,6 @@ test = [
 xsdata = "xsdata.__main__:main"
 
 [tool.setuptools]
-packages = ["xsdata"]
 include-package-data = true
 license-files = ["LICENSE"]
 

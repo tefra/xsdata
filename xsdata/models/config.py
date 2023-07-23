@@ -240,7 +240,7 @@ class CompoundFields:
     :param default_name: Default compound field name, default: choice
     :param force_default_name: Always use the default compound field,
         otherwise if the number of elements is less than 4 the generator
-        will try to dynamically create the field name eg.
+        will try to dynamically create the field name e.g.
         hat_or_dress_or_something.
     """
 
@@ -267,7 +267,7 @@ class GeneratorOutput:
         default: false, python>=3.9 Only
     :param union_type: Use PEP-604 union type, default: false, python>=3.10 Only
     :param postponed_annotations: Enable postponed evaluation of annotations,
-        default: false, python>=3.7 Only
+        default: false
     :param unnest_classes: Move inner classes to upper level, default: false
     :param ignore_patterns: Ignore pattern restrictions, default: false
     :param include_header: Include a header with codegen information in the output,
@@ -328,7 +328,7 @@ class NameConvention:
     """
     Name convention model.
 
-    :param case: Naming scheme, eg camelCase, snakeCase
+    :param case: Naming scheme, e.g. camelCase, snakeCase
     :param safe_prefix: A prefix to be prepended into names that match
         one of the reserved words: and, except, lambda, with, as,
         finally, nonlocal, while, assert, false, none, yield, break,
@@ -378,7 +378,7 @@ class GeneratorAlias:
     Each alias has a source attribute that refers to the original name
     in the schema definition and the target attribute for output name.
     For package and module aliases the source refers to the schema
-    filename or target namespace depending the selected output
+    filename or target namespace depending on the selected output
     structure.
 
     :param source: The source name from schema definition

@@ -1,13 +1,8 @@
-import sys
-
-if sys.version_info >= (3, 8):
-    from importlib import metadata as importlib_metadata
-else:
-    import importlib_metadata
+from importlib import metadata
 
 
 def load_entry_points(name: str):
-    entry_points = importlib_metadata.entry_points()
+    entry_points = metadata.entry_points()
 
     if hasattr(entry_points, "select"):
         plugins = entry_points.select(group=name)  # type: ignore

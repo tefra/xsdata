@@ -99,14 +99,10 @@ Features
 
 
 
-Changelog: 23.6 (2023-06-24)
+Changelog: 23.7 (2023-07-23)
 ----------------------------
-- Fixed conflicting enum values leading to wrong default values (`#806 <https://github.com/tefra/xsdata/pull/806>`_)
-- Added support for custom decorators and base classes (`#793 <https://github.com/tefra/xsdata/pull/793>`_)
-- Added parser config to load external dtd to resolve entities (`#797 <https://github.com/tefra/xsdata/pull/797>`_)
-- Added requests sessions on the wsdl client transport (`#798 <https://github.com/tefra/xsdata/pull/798>`_)
-- Added support subscriptable types and UnionType (`#801 <https://github.com/tefra/xsdata/pull/801>`_)
-- Added option to restrict models package for auto-locator (`#809 <https://github.com/tefra/xsdata/pull/809>`_)
-- Updated context to only cache supported classes (`#796 <https://github.com/tefra/xsdata/pull/796>`_)
-- Removed tox requirement (`#800 <https://github.com/tefra/xsdata/pull/800>`_)
-- Converted to pyproject.toml (`#802 <https://github.com/tefra/xsdata/pull/802>`_)
+- Fixed decimal converter to avoid scientific notations (`#826 <https://github.com/tefra/xsdata/pull/826>`_)
+- Fixed nympy paramater docstring format  (`#827 <https://github.com/tefra/xsdata/pull/827>`_)
+- Fixed optional/required override validation (`#820 <https://github.com/tefra/xsdata/pull/820>`_)
+- Fixed WSDL mapper to respect the elements original location (`#832 <https://github.com/tefra/xsdata/pull/832>`_)
+- Added Python 3.12 support

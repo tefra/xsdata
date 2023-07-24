@@ -174,10 +174,10 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual({"wildcard": ["txt", "tail"]}, params)
 
         self.node.bind_wild_text(params, var, None, "tail")
-        self.assertEqual({"wildcard": ["txt", "tail", "tail"]}, params)
+        self.assertEqual({"wildcard": [None, "txt", "tail", "tail"]}, params)
 
         self.node.bind_wild_text(params, var, "first", None)
-        self.assertEqual({"wildcard": ["first", "txt", "tail", "tail"]}, params)
+        self.assertEqual({"wildcard": ["first", None, "txt", "tail", "tail"]}, params)
 
     def test_bind_attrs(self):
         self.node.meta = self.context.build(AttrsType)

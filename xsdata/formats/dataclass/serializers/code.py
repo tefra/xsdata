@@ -69,14 +69,17 @@ class PycodeSerializer(AbstractSerializer):
 
     @classmethod
     def build_imports(cls, types: Set[Type]) -> str:
-        imports = []
+        imports = set()
         for tp in types:
             module = tp.__module__
             name = tp.__qualname__
-            if module != "builtins" and "." not in name:
-                imports.append(f"from {module} import {name}\n")
+            if module != "builtins":
+                if "." in name:
+                    name = name.split(".")[0]
 
-        return "".join(sorted(imports))
+                imports.add(f"from {module} import {name}\n")
+
+        return "".join(sorted(set(imports)))
 
     def write_object(self, obj: Any, level: int, types: Set[Type]):
         types.add(type(obj))

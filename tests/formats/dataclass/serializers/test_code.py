@@ -3,6 +3,7 @@ from unittest import TestCase
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
 from tests.fixtures.books.fixtures import books
+from tests.fixtures.models import Parent
 from xsdata.formats.dataclass.serializers import PycodeSerializer
 from xsdata.models.enums import Namespace
 
@@ -85,9 +86,7 @@ class PycodeSerializerTests(TestCase):
         iterator = self.serializer.write_object(Namespace.SOAP11, 0, set())
         self.assertEqual("Namespace.SOAP11", "".join(iterator))
 
-    def test_build_imports_ignores_nested_types(self):
-        class Foo:
-            pass
-
-        actual = self.serializer.build_imports({Foo})
-        self.assertEqual("", actual)
+    def test_build_imports_with_nested_types(self):
+        expected = "from tests.fixtures.models import Parent\n"
+        actual = self.serializer.build_imports({Parent.Inner})
+        self.assertEqual(expected, actual)

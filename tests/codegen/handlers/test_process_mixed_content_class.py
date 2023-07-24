@@ -20,12 +20,13 @@ class ProcessMixedContentClassTests(FactoryTestCase):
             AttrFactory.attribute(),  # keep
             AttrFactory.reference("foo", restrictions=res.clone()),  # choice
             AttrFactory.native(DataType.INT, restrictions=res.clone()),  # choice
+            AttrFactory.native(DataType.ANY_TYPE, restrictions=res.clone()),  # drop
             AttrFactory.any(),  # drop
         ]
         item = ClassFactory.create(attrs=attrs)
 
         self.processor.process(item)
-        self.assertEqual(4, len(item.attrs))
+        self.assertEqual(5, len(item.attrs))
 
         item.mixed = True
         self.processor.process(item)
@@ -39,7 +40,7 @@ class ProcessMixedContentClassTests(FactoryTestCase):
         expected.restrictions.min_occurs = 0
         expected.restrictions.max_occurs = sys.maxsize
         choices = []
-        for attr in attrs[1:-1]:
+        for attr in attrs[1:-2]:
             choice = attr.clone()
             choice.restrictions.min_occurs = None
             choice.restrictions.max_occurs = None

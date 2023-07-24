@@ -31,7 +31,7 @@ class ProcessMixedContentClass(HandlerInterface):
         for attr in list(target.attrs):
             if attr.is_attribute:
                 attrs.append(attr)
-            elif attr.tag != Tag.ANY:
+            elif not attr.is_any_type:
                 choice = attr.clone()
                 choice.restrictions.min_occurs = None
                 choice.restrictions.max_occurs = None

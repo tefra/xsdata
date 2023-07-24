@@ -167,7 +167,8 @@ class GeneratorConfigTests(TestCase):
             )
 
         else:
-            self.assertTrue(GeneratorOutput(union_type=True).union_type)
+            output = GeneratorOutput(union_type=True, postponed_annotations=True)
+            self.assertTrue(output.union_type)
 
     def test_format_slots_requires_310(self):
         if sys.version_info < (3, 10):

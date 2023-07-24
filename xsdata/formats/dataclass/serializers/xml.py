@@ -130,11 +130,15 @@ class XmlSerializer(AbstractSerializer):
                 yield from self.write_value(value, choice, namespace)
             else:
                 yield from self.write_dataclass(value, namespace)
-        else:
+        elif var.is_element:
             xsi_type = self.xsi_type(var, value, namespace)
             yield from self.write_dataclass(
                 value, namespace, var.qname, var.nillable, xsi_type
             )
+        else:
+            # var elements
+            meta = self.context.fetch(value.__class__, namespace)
+            yield from self.write_dataclass(value, qname=meta.target_qname)
 
     def write_value(self, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
         """
@@ -251,7 +255,7 @@ class XmlSerializer(AbstractSerializer):
         clazz = var.clazz
         if clazz is None or self.context.is_derived(value, clazz):
             meta = self.context.fetch(value.__class__, namespace)
-            return meta.target_qname
+            return namespaces.real_xsi_type(var.qname, meta.target_qname)
 
         raise SerializerError(
             f"{value.__class__.__name__} is not derived from {clazz.__name__}"
@@ -289,6 +293,10 @@ class XmlSerializer(AbstractSerializer):
             check_subclass = self.context.class_type.is_model(value)
             choice = var.find_value_choice(value, check_subclass)
             func = self.write_value
+
+            if not choice and check_subclass:
+                func = self.write_xsi_type
+                choice = var
 
         if not choice:
             raise SerializerError(

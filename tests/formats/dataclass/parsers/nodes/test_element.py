@@ -235,15 +235,16 @@ class ElementNodeTests(FactoryTestCase):
 
     def test_bind_wild_var(self):
         self.node.meta = self.context.build(ExtendedType)
+        x = make_dataclass("x", [("value", int)])
 
         params = {}
-        objects = [("x", 1), ("x", 2), ("z", 3.0)]
+        objects = [("x", x(1)), ("y", 2), ("z", 3.0)]
         self.node.bind_objects(params, objects)
         expected = {
             "wildcard": AnyElement(
                 children=[
-                    AnyElement(qname="x", text="1"),
-                    AnyElement(qname="x", text="2"),
+                    x(1),
+                    AnyElement(qname="y", text="2"),
                     AnyElement(qname="z", text="3.0"),
                 ]
             )
@@ -287,19 +288,7 @@ class ElementNodeTests(FactoryTestCase):
 
         fixture = make_dataclass("Fixture", [("content", str)])
         actual = self.node.prepare_generic_value("a", fixture("foo"), var)
-        expected = DerivedElement(qname="a", value=fixture("foo"), type="Fixture")
-        self.assertEqual(expected, actual)
-
-        fixture = make_dataclass("Fixture", [("content", str)])
-        actual = self.node.prepare_generic_value("known", fixture("foo"), var)
         self.assertEqual(fixture("foo"), actual)
-
-        actual = self.node.prepare_generic_value("a", expected, var)
-        self.assertIs(expected, actual)
-
-        actual = self.node.prepare_generic_value("Fixture", fixture("foo"), var)
-        expected = DerivedElement(qname="Fixture", value=fixture("foo"))
-        self.assertEqual(expected, actual)
 
     def test_child(self):
         var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, qname="a", types=(TypeC,))
@@ -316,10 +305,10 @@ class ElementNodeTests(FactoryTestCase):
 
     def test_child_with_unique_element(self):
         single = XmlVarFactory.create(
-            index=1, xml_type=XmlType.ELEMENT, qname="a", types=(TypeC,)
+            index=1, xml_type=XmlType.ELEMENT, qname="cc", types=(TypeC,)
         )
         wildcard = XmlVarFactory.create(
-            index=2, xml_type=XmlType.WILDCARD, qname="a", types=(object,)
+            index=2, xml_type=XmlType.WILDCARD, qname="cc", types=(object,)
         )
         self.meta.elements[single.qname] = [single]
         self.meta.wildcards.append(wildcard)
@@ -328,11 +317,11 @@ class ElementNodeTests(FactoryTestCase):
         ns_map = {"ns0": "xsdata"}
         position = 1
 
-        actual = self.node.child("a", attrs, ns_map, position)
+        actual = self.node.child("cc", attrs, ns_map, position)
         self.assertIsInstance(actual, ElementNode)
         self.assertIn(single.index, self.node.assigned)
 
-        actual = self.node.child("a", attrs, ns_map, position)
+        actual = self.node.child("cc", attrs, ns_map, position)
         self.assertIsInstance(actual, WildcardNode)
         self.assertNotIn(wildcard.index, self.node.assigned)
 
@@ -364,7 +353,7 @@ class ElementNodeTests(FactoryTestCase):
         )
         attrs = {"a": "b"}
         ns_map = {"ns0": "xsdata"}
-        actual = self.node.build_node(var, attrs, ns_map, 10)
+        actual = self.node.build_node(var.qname, var, attrs, ns_map, 10)
 
         self.assertIsInstance(actual, UnionNode)
         self.assertEqual(10, actual.position)
@@ -391,7 +380,7 @@ class ElementNodeTests(FactoryTestCase):
 
         attrs = {"a": "b"}
         ns_map = {"ns0": "xsdata"}
-        actual = self.node.build_node(var, attrs, ns_map, 10)
+        actual = self.node.build_node(var.qname, var, attrs, ns_map, 10)
 
         self.assertIsInstance(actual, ElementNode)
         self.assertEqual(10, actual.position)
@@ -420,7 +409,7 @@ class ElementNodeTests(FactoryTestCase):
 
         attrs = {"a": "b"}
         ns_map = {"ns0": "xsdata"}
-        actual = self.node.build_node(var, attrs, ns_map, 10)
+        actual = self.node.build_node(var.qname, var, attrs, ns_map, 10)
 
         self.assertIsInstance(actual, ElementNode)
         self.assertEqual(10, actual.position)
@@ -439,13 +428,13 @@ class ElementNodeTests(FactoryTestCase):
         mock_ctx_fetch.side_effect = [self.meta, self.meta, nillable_meta]
         attrs = {QNames.XSI_NIL: "false"}
 
-        self.assertIsNotNone(self.node.build_node(var, attrs, ns_map, 10))
+        self.assertIsNotNone(self.node.build_node(var.qname, var, attrs, ns_map, 10))
 
         attrs = {QNames.XSI_NIL: "true"}
-        self.assertIsNotNone(self.node.build_node(var, attrs, ns_map, 10))
+        self.assertIsNone(self.node.build_node(var.qname, var, attrs, ns_map, 10))
 
         attrs = {QNames.XSI_NIL: "false"}
-        self.assertIsNone(self.node.build_node(var, attrs, ns_map, 10))
+        self.assertIsNone(self.node.build_node(var.qname, var, attrs, ns_map, 10))
 
     def test_build_node_with_any_type_var_with_matching_xsi_type(self):
         var = XmlVarFactory.create(
@@ -457,7 +446,7 @@ class ElementNodeTests(FactoryTestCase):
         )
         attrs = {QNames.XSI_TYPE: "bk:books"}
         ns_map = {"bk": "urn:books"}
-        actual = self.node.build_node(var, attrs, ns_map, 10)
+        actual = self.node.build_node(var.qname, var, attrs, ns_map, 10)
 
         self.assertIsInstance(actual, ElementNode)
         self.assertEqual(10, actual.position)
@@ -476,7 +465,7 @@ class ElementNodeTests(FactoryTestCase):
         )
         attrs = {QNames.XSI_TYPE: "xs:hexBinary"}
         ns_map = {Namespace.XS.prefix: Namespace.XS.uri}
-        actual = self.node.build_node(var, attrs, ns_map, 10)
+        actual = self.node.build_node(var.qname, var, attrs, ns_map, 10)
 
         self.assertIsInstance(actual, StandardNode)
         self.assertEqual(ns_map, actual.ns_map)
@@ -487,12 +476,12 @@ class ElementNodeTests(FactoryTestCase):
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT,
             name="a",
-            qname="a",
+            qname="aaa",
             types=(object,),
             any_type=True,
         )
         attrs = {QNames.XSI_TYPE: "noMatch"}
-        actual = self.node.build_node(var, attrs, {}, 10)
+        actual = self.node.build_node(var.qname, var, attrs, {}, 10)
 
         self.assertIsInstance(actual, WildcardNode)
         self.assertEqual(10, actual.position)
@@ -504,12 +493,12 @@ class ElementNodeTests(FactoryTestCase):
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT,
             name="a",
-            qname="a",
+            qname="aaaa",
             types=(object,),
             any_type=True,
         )
         attrs = {}
-        actual = self.node.build_node(var, attrs, {}, 10)
+        actual = self.node.build_node(var.qname, var, attrs, {}, 10)
 
         self.assertIsInstance(actual, WildcardNode)
         self.assertEqual(10, actual.position)
@@ -517,10 +506,29 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual(attrs, actual.attrs)
         self.assertEqual({}, actual.ns_map)
 
-    def test_build_node_with_wildcard_var(self):
-        var = XmlVarFactory.create(xml_type=XmlType.WILDCARD, qname="a")
+    def test_build_node_with_any_type_var_with_no_xsi_type_and_type_Exists(self):
+        var = XmlVarFactory.create(
+            xml_type=XmlType.ELEMENT,
+            name="a",
+            qname="a",
+            types=(object,),
+            any_type=True,
+        )
+        attrs = {}
+        a = make_dataclass("a", [("a", int)])
+        actual = self.node.build_node(var.qname, var, attrs, {}, 10)
 
-        actual = self.node.build_node(var, {}, {}, 10)
+        self.assertIsInstance(actual, ElementNode)
+        self.assertEqual(10, actual.position)
+        self.assertEqual(self.context.build(a), actual.meta)
+        self.assertEqual(attrs, actual.attrs)
+        self.assertEqual({}, actual.ns_map)
+        self.assertFalse(actual.mixed)
+
+    def test_build_node_with_wildcard_var(self):
+        var = XmlVarFactory.create(xml_type=XmlType.WILDCARD, qname="aaaaa")
+
+        actual = self.node.build_node(var.qname, var, {}, {}, 10)
 
         self.assertIsInstance(actual, WildcardNode)
         self.assertEqual(10, actual.position)
@@ -532,7 +540,7 @@ class ElementNodeTests(FactoryTestCase):
         )
         attrs = {"a": "b"}
         ns_map = {"ns0": "xsdata"}
-        actual = self.node.build_node(var, attrs, ns_map, 10)
+        actual = self.node.build_node(var.qname, var, attrs, ns_map, 10)
 
         self.assertIsInstance(actual, PrimitiveNode)
         self.assertEqual(ns_map, actual.ns_map)

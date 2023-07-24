@@ -17,7 +17,6 @@ from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.formats.dataclass.parsers.utils import PendingCollection
 from xsdata.logger import logger
 from xsdata.models.enums import DataType
-from xsdata.utils import namespaces
 
 
 class ElementNode(XmlNode):
@@ -222,8 +221,9 @@ class ElementNode(XmlNode):
                 items.append(value)
         elif var.name in params:
             previous = params[var.name]
-            if previous.qname:
-                factory = self.context.class_type.any_element
+            factory = self.context.class_type.any_element
+
+            if not isinstance(previous, factory) or previous.qname:
                 params[var.name] = factory(children=[previous])
 
             params[var.name].children.append(value)
@@ -248,18 +248,9 @@ class ElementNode(XmlNode):
     ) -> Any:
         """Prepare parsed value before binding to a wildcard field."""
 
-        if qname:
+        if qname and not self.context.class_type.is_model(value):
             any_factory = self.context.class_type.any_element
-            derived_factory = self.context.class_type.derived_element
-
-            if not self.context.class_type.is_model(value):
-                value = any_factory(qname=qname, text=converter.serialize(value))
-            elif not isinstance(
-                value, (any_factory, derived_factory)
-            ) and not var.find_choice(qname):
-                meta = self.context.fetch(type(value))
-                xsi_type = namespaces.real_xsi_type(qname, meta.target_qname)
-                value = derived_factory(qname=qname, value=value, type=xsi_type)
+            value = any_factory(qname=qname, text=converter.serialize(value))
 
         return value
 
@@ -336,7 +327,7 @@ class ElementNode(XmlNode):
         for var in self.meta.find_children(qname):
             unique = 0 if not var.is_element or var.list_element else var.index
             if not unique or unique not in self.assigned:
-                node = self.build_node(var, attrs, ns_map, position)
+                node = self.build_node(qname, var, attrs, ns_map, position)
 
                 if node:
                     if unique:
@@ -350,7 +341,7 @@ class ElementNode(XmlNode):
         return nodes.SkipNode()
 
     def build_node(
-        self, var: XmlVar, attrs: Dict, ns_map: Dict, position: int
+        self, qname: str, var: XmlVar, attrs: Dict, ns_map: Dict, position: int
     ) -> Optional[XmlNode]:
         if var.is_clazz_union:
             return nodes.UnionNode(
@@ -370,6 +361,7 @@ class ElementNode(XmlNode):
             return self.build_element_node(
                 var.clazz,
                 var.derived,
+                var.nillable,
                 attrs,
                 ns_map,
                 position,
@@ -399,10 +391,30 @@ class ElementNode(XmlNode):
             node = self.build_element_node(
                 clazz,
                 derived,
+                var.nillable,
                 attrs,
                 ns_map,
                 position,
                 derived_factory,
+                xsi_type,
+                xsi_nil,
+            )
+
+        if node:
+            return node
+
+        if var.process_contents != "skip":
+            clazz = self.context.find_type(qname)
+
+        if clazz:
+            node = self.build_element_node(
+                clazz,
+                False,
+                var.nillable,
+                attrs,
+                ns_map,
+                position,
+                None,
                 xsi_type,
                 xsi_nil,
             )
@@ -422,6 +434,7 @@ class ElementNode(XmlNode):
         self,
         clazz: Type,
         derived: bool,
+        nillable: bool,
         attrs: Dict,
         ns_map: Dict,
         position: int,
@@ -430,8 +443,9 @@ class ElementNode(XmlNode):
         xsi_nil: Optional[bool] = None,
     ) -> Optional[XmlNode]:
         meta = self.context.fetch(clazz, self.meta.namespace, xsi_type)
+        nillable = nillable or meta.nillable
 
-        if not meta or (meta.nillable and xsi_nil is False):
+        if not meta or (xsi_nil is not None and nillable != xsi_nil):
             return None
 
         if xsi_type and not derived and not issubclass(meta.clazz, clazz):

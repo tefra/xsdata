@@ -311,10 +311,12 @@ class ElementNode(XmlNode):
             if items is None:
                 params[var.name] = items = PendingCollection(None, var.factory)
 
-            if txt:
-                items.insert(0, txt)
             if tail:
                 items.append(tail)
+
+            if txt or tail:
+                items.insert(0, txt)
+
         else:
             previous = params.get(var.name, None)
             factory = self.context.class_type.any_element

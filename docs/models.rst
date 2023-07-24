@@ -176,7 +176,10 @@ binding procedures.
    * - format
      - str
      - Format option for types like datetime, or bytes, see :ref:`Data Types`
-
+   * - process_contents
+     - str
+     - Specify the level of validation for wildcard fields:
+       ``strict | skip``, default: ``strict`` will avoid using generics.
 
 The code generator adds also the field restrictions like `minLength` or `required` flag
 but currently they are only used to troubleshoot the code generator.

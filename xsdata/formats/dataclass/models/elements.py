@@ -90,6 +90,7 @@ class XmlVar(MetaMixin):
         "format",
         "derived",
         "any_type",
+        "process_contents",
         "required",
         "nillable",
         "sequence",
@@ -126,6 +127,7 @@ class XmlVar(MetaMixin):
         format: Optional[str],
         derived: bool,
         any_type: bool,
+        process_contents: str,
         required: bool,
         nillable: bool,
         sequence: Optional[int],
@@ -148,6 +150,7 @@ class XmlVar(MetaMixin):
         self.format = format
         self.derived = derived
         self.any_type = any_type
+        self.process_contents = process_contents
         self.required = required
         self.nillable = nillable
         self.sequence = sequence

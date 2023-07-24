@@ -389,7 +389,9 @@ class Any(AnnotationBase):
     namespace: str = attribute(default="##any")
     min_occurs: int = attribute(default=1, name="minOccurs")
     max_occurs: UnionType[int, str] = attribute(default=1, name="maxOccurs")
-    process_contents: Optional[ProcessType] = attribute(name="processContents")
+    process_contents: ProcessType = attribute(
+        default=ProcessType.STRICT, name="processContents"
+    )
 
     def __post_init__(self):
         self.namespace = " ".join(unique_sequence(self.namespace.split()))
@@ -417,6 +419,7 @@ class Any(AnnotationBase):
         return {
             "min_occurs": 0,
             "max_occurs": max_occurs,
+            "process_contents": self.process_contents.value,
         }
 
 

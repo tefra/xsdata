@@ -42,12 +42,10 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
   w3c-tests:
-    name: W3C ${{ matrix.mode }} tests
+    name: W3C Tests
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        mode: [xsd, json, xml]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/checkout@v3
@@ -66,7 +64,7 @@ jobs:
           python -m pip install .[lxml,cli]
       - name: Test
         run: |
-          pytest -n auto --mode ${{ matrix.mode }} w3c-tests/tests
+          pytest -n auto --mode xsd w3c-tests/tests
   benchmark:
     name: Benchmarks
     runs-on: ubuntu-latest

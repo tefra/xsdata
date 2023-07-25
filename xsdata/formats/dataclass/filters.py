@@ -764,11 +764,8 @@ class Filters:
 
     def default_imports(self, output: str) -> str:
         """Generate the default imports for the given package output."""
-        result = []
-
-        if self.postponed_annotations:
-            result.append("from __future__ import annotations")
-
+        module_imports = set()
+        func_imports = set()
         for library, types in self.import_patterns.items():
             names = [
                 name
@@ -777,11 +774,15 @@ class Filters:
             ]
 
             if len(names) == 1 and names[0] == "__module__":
-                result.append(f"import {library}")
+                module_imports.add(f"import {library}")
             elif names:
-                result.append(f"from {library} import {', '.join(names)}")
+                func_imports.add(f"from {library} import {', '.join(names)}")
 
-        return "\n".join(sorted(result))
+        imports = sorted(module_imports) + sorted(func_imports)
+        if self.postponed_annotations:
+            imports.insert(0, "from __future__ import annotations")
+
+        return "\n".join(imports)
 
     @classmethod
     def build_import_patterns(cls) -> Dict[str, Dict]:

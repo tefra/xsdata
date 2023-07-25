@@ -37,29 +37,8 @@ GLOBAL_TYPES = (Tag.ELEMENT, Tag.BINDING_OPERATION, Tag.BINDING_MESSAGE, Tag.MES
 
 @dataclass
 class Restrictions:
-    """
-    Model representation of a dataclass field validation and type metadata.
-
-    :param min_occurs:
-    :param max_occurs:
-    :param min_exclusive:
-    :param min_inclusive:
-    :param min_length:
-    :param max_exclusive:
-    :param max_inclusive:
-    :param max_length:
-    :param total_digits:
-    :param fraction_digits:
-    :param length:
-    :param white_space:
-    :param pattern:
-    :param explicit_timezone:
-    :param nillable:
-    :param sequence:
-    :param tokens:
-    :param format:
-    :param choice:
-    """
+    """Model representation of a dataclass field validation and type
+    metadata."""
 
     min_occurs: Optional[int] = field(default=None)
     max_occurs: Optional[int] = field(default=None)
@@ -81,6 +60,7 @@ class Restrictions:
     format: Optional[str] = field(default=None)
     choice: Optional[int] = field(default=None)
     group: Optional[int] = field(default=None)
+    process_contents: Optional[str] = field(default=None)
     path: List[Tuple[str, int, int, int]] = field(default_factory=list)
 
     @property
@@ -128,6 +108,7 @@ class Restrictions:
             "white_space",
             "pattern",
             "explicit_timezone",
+            "process_contents",
         )
 
         for key in keys:
@@ -163,6 +144,9 @@ class Restrictions:
             ):
                 continue
 
+            if key == "process_contents" and value != "skip":
+                continue
+
             if key.endswith("clusive") and types:
                 value = converter.deserialize(value, sorted_types)
 
@@ -188,17 +172,8 @@ class AttrCategory(IntEnum):
 
 @dataclass(unsafe_hash=True)
 class AttrType:
-    """
-    Model representation for the typing information for fields and extensions.
-
-    :param qname:
-    :param alias:
-    :param reference:
-    :param native:
-    :param forward:
-    :param circular:
-    :param substituted:
-    """
+    """Model representation for the typing information for fields and
+    extensions."""
 
     qname: str
     alias: Optional[str] = field(default=None, compare=False)
@@ -232,22 +207,7 @@ class AttrType:
 
 @dataclass
 class Attr:
-    """
-    Model representation for a dataclass field.
-
-    :param tag:
-    :param name:
-    :param local_name:
-    :param index:
-    :param default:
-    :param fixed:
-    :param mixed:
-    :param types:
-    :param choices:
-    :param namespace:
-    :param help:
-    :param restrictions:
-    """
+    """Model representation for a dataclass field."""
 
     tag: str
     name: str = field(compare=False)
@@ -386,13 +346,7 @@ class Attr:
 
 @dataclass(unsafe_hash=True)
 class Extension:
-    """
-    Model representation of a dataclass base class.
-
-    :param tag:
-    :param type:
-    :param restrictions:
-    """
+    """Model representation of a dataclass base class."""
 
     tag: str
     type: AttrType
@@ -423,32 +377,8 @@ class Status(IntEnum):
 
 @dataclass
 class Class:
-    """
-    Model representation of a dataclass with fields, base/inner classes and
-    additional metadata settings.
-
-    :param qname:
-    :param tag:
-    :param location:
-    :param mixed:
-    :param abstract:
-    :param nillable:
-    :param local_type:
-    :param status:
-    :param container:
-    :param package:
-    :param module:
-    :param namespace:
-    :param help:
-    :param meta_name:
-    :param default:
-    :param fixed:
-    :param substitutions:
-    :param extensions:
-    :param attrs:
-    :param inner:
-    :param ns_map:
-    """
+    """Model representation of a dataclass with fields, base/inner classes and
+    additional metadata settings."""
 
     qname: str
     tag: str

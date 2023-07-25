@@ -534,6 +534,29 @@ class XmlSerializerTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
+    def test_write_choice_when_no_matching_choice_exists_but_value_is_model(self):
+        var = XmlVarFactory.create(
+            xml_type=XmlType.ELEMENTS,
+            name="compound",
+            qname="compound",
+            elements={
+                "a": XmlVarFactory.create(
+                    xml_type=XmlType.WILDCARD, qname="a", types=(object,)
+                )
+            },
+        )
+
+        ebook = make_dataclass("eBook", [], bases=(BookForm,))
+        expected = [
+            (XmlWriterEvent.START, "eBook"),
+            (XmlWriterEvent.ATTR, "lang", "en"),
+            (XmlWriterEvent.END, "eBook"),
+        ]
+
+        result = self.serializer.write_value(ebook(), var, None)
+        self.assertIsInstance(result, Generator)
+        self.assertEqual(expected, list(result))
+
     def test_write_choice_when_no_matching_choice_exists(self):
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENTS,

@@ -421,6 +421,7 @@ class XmlVarFactory(Factory):
             required=required,
             nillable=nillable,
             sequence=sequence,
+            process_contents="strict",
             list_element=list_element,
             default=default,
             xml_type=xml_type,

@@ -23,6 +23,7 @@ class RestrictionsTests(TestCase):
             explicit_timezone="+1",
             nillable=True,
             path=[("s", 0, 1, 1)],
+            process_contents="skip",
         )
 
     def test_property_is_list(self):
@@ -89,6 +90,7 @@ class RestrictionsTests(TestCase):
             "min_length": 1,
             "nillable": True,
             "pattern": "[A-Z]",
+            "process_contents": "skip",
             "total_digits": 333,
             "white_space": "collapse",
         }
@@ -113,6 +115,7 @@ class RestrictionsTests(TestCase):
             "min_length": 1,
             "nillable": True,
             "pattern": "[A-Z]",
+            "process_contents": "skip",
             "total_digits": 333,
             "white_space": "collapse",
         }

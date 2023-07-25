@@ -39,4 +39,5 @@ class AnyTests(TestCase):
 
     def test_get_restrictions(self):
         obj = Any(min_occurs=1, max_occurs=2)
-        self.assertEqual({"max_occurs": 2, "min_occurs": 0}, obj.get_restrictions())
+        expected = {"max_occurs": 2, "min_occurs": 0, "process_contents": "strict"}
+        self.assertEqual(expected, obj.get_restrictions())

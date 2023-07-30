@@ -20,14 +20,23 @@ class SanitizeAttributesDefaultValueTests(FactoryTestCase):
         container = ClassContainer(config=GeneratorConfig())
         self.processor = SanitizeAttributesDefaultValue(container=container)
 
-    def test_process_attribute_with_enumeration(self):
+    def test_process_with_enumeration(self):
         target = ClassFactory.create()
-        attr = AttrFactory.enumeration()
-        attr.restrictions.max_occurs = 2
-        attr.fixed = True
+        one = AttrFactory.native(DataType.FLOAT, tag=Tag.ENUMERATION, default="0.1")
+        two = AttrFactory.native(DataType.FLOAT, tag=Tag.ENUMERATION, default="0.2")
+        target.attrs.extend((one, two))
+        self.processor.process(target)
 
-        self.processor.process_attribute(target, attr)
-        self.assertTrue(attr.fixed)
+        for attr in target.attrs:
+            self.assertEqual([float], attr.native_types)
+
+        three = AttrFactory.native(DataType.FLOAT, tag=Tag.ENUMERATION, default="false")
+        target.attrs.append(three)
+
+        self.processor.process(target)
+
+        for attr in target.attrs:
+            self.assertEqual([str], attr.native_types)
 
     @mock.patch.object(SanitizeAttributesDefaultValue, "process_attribute")
     def test_process_with_attr_choices(self, mock_process_attribute):

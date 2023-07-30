@@ -8,20 +8,22 @@ from xsdata.models.enums import DataType
 
 
 class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
-    """
-    Sanitize attributes default values.
-
-    Cases:
-        1. Ignore enumerations.
-        2. List fields can not have a default value
-        3. Optional choice/sequence fields can not have a default value
-        4. xsi:type fields are ignored, mark them as optional
-        5. Convert string literal default value for enum fields.
-    """
+    """Sanitize attributes default values."""
 
     __slots__ = ()
 
     def process(self, target: Class):
+        if target.is_enumeration:
+            self.process_enumeration(target)
+        else:
+            self.process_class(target)
+
+    def process_enumeration(self, target: Class):
+        if not all(self.is_valid_native_value(target, attr) for attr in target.attrs):
+            for attr in target.attrs:
+                self.reset_attribute_types(attr)
+
+    def process_class(self, target: Class):
         for attr in target.attrs:
             self.process_attribute(target, attr)
 

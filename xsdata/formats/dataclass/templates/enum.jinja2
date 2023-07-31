@@ -2,9 +2,10 @@
 {% set help | format_docstring(level + 1) %}
     {%- include "docstrings." + docstring_name + ".jinja2" -%}
 {% endset -%}
+{% set base_classes = obj | enum_bases | join(', ')-%}
 {% set class_name = obj.name | class_name %}
 
-class {{ class_name }}(Enum):
+class {{ class_name }}{{"({})".format(base_classes) if base_classes }}:
 {%- if help %}
 {{ help | indent(4, first=True) }}
 {%- endif -%}

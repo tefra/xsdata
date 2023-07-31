@@ -99,7 +99,7 @@ class FlattenClassExtensions(RelativeHandlerInterface):
         for tp in source_attr.types:
             if tp.native:
                 for target_attr in target.attrs:
-                    target_attr.types.append(tp.clone())
+                    target_attr.types = [tp.clone()]
                     target_attr.restrictions.merge(source_attr.restrictions)
             else:
                 base = self.find_dependency(tp)

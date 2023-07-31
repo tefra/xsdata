@@ -12,6 +12,7 @@ from typing import Set
 from typing import Tuple
 from typing import Type
 
+from decimal import Decimal
 from docformatter import configuration
 from docformatter import format
 from jinja2 import Environment
@@ -131,6 +132,7 @@ class Filters:
                 "class_bases": self.class_bases,
                 "class_annotations": self.class_annotations,
                 "class_params": self.class_params,
+                "enum_bases": self.enum_bases,
                 "format_string": self.format_string,
                 "format_docstring": self.format_docstring,
                 "constant_name": self.constant_name,
@@ -198,6 +200,33 @@ class Filters:
                     bases.append(ext.func_name)
 
         return collections.unique_sequence(bases)
+
+    def enum_bases(self, obj: Class) -> List[str]:
+        native_types = set()
+        tokens = set()
+        for attr in obj.attrs:
+            native_types.update(attr.native_types)
+            tokens.add(attr.is_tokens)
+
+
+        result = []
+        allowed = (str, int, float, Decimal)
+        if len(native_types) == 1 and len(tokens) == 1:
+
+            base = next(iter(native_types)).__name__
+            if base in allowed:
+                is_tokens = next(iter(tokens))
+
+                if is_tokens:
+                    result.append(f"Tuple[{base}, ...]")
+                else:
+                    result.append(base)
+        else:
+            raise Exception(native_types)
+
+        result.append("Enum")
+        return result
+
 
     def class_annotations(self, obj: Class, class_name: str) -> List[str]:
         """Return a list of decorator names."""
@@ -790,7 +819,7 @@ class Filters:
         return {
             "dataclasses": {"dataclass": ["@dataclass"], "field": [" = field("]},
             "decimal": {"Decimal": type_patterns("Decimal")},
-            "enum": {"Enum": ["(Enum)"]},
+            "enum": {"Enum": ["Enum):"]},
             "typing": {
                 "Dict": [": Dict"],
                 "List": [": List["],

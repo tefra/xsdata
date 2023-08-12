@@ -1,3 +1,11 @@
+23.8 (2023-08-12)
+-----------------
+- Removed Python 3.7 support
+- Fixed PycodeSerializer not adding imports for nested classes
+- Fixed imports ordering
+- Added support for strict content wildcard processing (`#803 <https://github.com/tefra/xsdata/pull/803>`_)
+
+
 23.7 (2023-07-23)
 -----------------
 - Fixed decimal converter to avoid scientific notations (`#826 <https://github.com/tefra/xsdata/pull/826>`_)

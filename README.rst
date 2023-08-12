@@ -99,10 +99,9 @@ Features
 
 
 
-Changelog: 23.7 (2023-07-23)
+Changelog: 23.8 (2023-08-12)
 ----------------------------
-- Fixed decimal converter to avoid scientific notations (`#826 <https://github.com/tefra/xsdata/pull/826>`_)
-- Fixed nympy paramater docstring format  (`#827 <https://github.com/tefra/xsdata/pull/827>`_)
-- Fixed optional/required override validation (`#820 <https://github.com/tefra/xsdata/pull/820>`_)
-- Fixed WSDL mapper to respect the elements original location (`#832 <https://github.com/tefra/xsdata/pull/832>`_)
-- Added Python 3.12 support
+- Removed Python 3.7 support
+- Fixed PycodeSerializer not adding imports for nested classes
+- Fixed imports ordering
+- Added support for strict content wildcard processing (`#803 <https://github.com/tefra/xsdata/pull/803>`_)

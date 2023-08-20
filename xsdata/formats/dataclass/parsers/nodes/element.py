@@ -17,6 +17,8 @@ from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.formats.dataclass.parsers.utils import PendingCollection
 from xsdata.logger import logger
 from xsdata.models.enums import DataType
+from xsdata.models.enums import Namespace
+from xsdata.utils.namespaces import target_uri
 
 
 class ElementNode(XmlNode):
@@ -134,7 +136,10 @@ class ElementNode(XmlNode):
                 if var:
                     self.bind_any_attr(params, var, qname, value)
                 else:
-                    if self.config.fail_on_unknown_attributes:
+                    if (
+                        self.config.fail_on_unknown_attributes
+                        and target_uri(qname) != Namespace.XSI.uri
+                    ):
                         raise ParserError(
                             f"Unknown attribute {self.meta.qname}:{qname}"
                         )

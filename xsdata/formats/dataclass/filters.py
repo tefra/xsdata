@@ -142,6 +142,7 @@ class Filters:
                 "clean_docstring": self.clean_docstring,
                 "import_module": self.import_module,
                 "import_class": self.import_class,
+                "post_meta_hook": self.post_meta_hook,
             }
         )
 
@@ -201,7 +202,9 @@ class Filters:
 
     def class_annotations(self, obj: Class, class_name: str) -> List[str]:
         """Return a list of decorator names."""
-        annotations = [self.default_class_annotation]
+        annotations = []
+        if self.default_class_annotation:
+            annotations.append(self.default_class_annotation)
 
         derived = len(obj.extensions) > 0
         for ext in self.extensions[ExtensionType.DECORATOR]:
@@ -345,6 +348,11 @@ class Filters:
             return f"{self.class_name(name)} as {self.class_name(alias)}"
 
         return self.class_name(name)
+
+    def post_meta_hook(self, obj: Class) -> str | None:
+        """Plugin hook to render additional information after the xsdata meta
+        class."""
+        return None
 
     def field_metadata(
         self, attr: Attr, parent_namespace: Optional[str], parents: List[str]

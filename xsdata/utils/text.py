@@ -36,6 +36,7 @@ stop_words = {
     "else",
     "except",
     "field",
+    "Field",
     "finally",
     "float",
     "for",

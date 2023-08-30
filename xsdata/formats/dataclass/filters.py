@@ -349,7 +349,7 @@ class Filters:
 
         return self.class_name(name)
 
-    def post_meta_hook(self, obj: Class) -> str | None:
+    def post_meta_hook(self, obj: Class) -> Optional[str]:
         """Plugin hook to render additional information after the xsdata meta
         class."""
         return None

@@ -21,7 +21,7 @@ from xsdata.utils.hooks import load_entry_points
 class FieldInfo(NamedTuple):
     name: str
     init: bool
-    metadata: dict[str, Any]
+    metadata: Dict[str, Any]
     default: Any
     default_factory: Any
 

@@ -142,6 +142,10 @@ class FiltersTests(FactoryTestCase):
         expected = self.filters.class_annotations(target, "FooBar")
         self.assertEqual(["@c", "@b", "@dataclass", "@d"], expected)
 
+        self.filters.default_class_annotation = None
+        expected = self.filters.class_annotations(target, "FooBar")
+        self.assertEqual(["@c", "@b", "@d"], expected)
+
     def test_field_name(self):
         self.filters.substitutions[ObjectType.FIELD]["abc"] = "cba"
 

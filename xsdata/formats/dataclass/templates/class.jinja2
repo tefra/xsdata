@@ -10,6 +10,7 @@
 {% set local_name =  obj.meta_name or obj.name -%}
 {% set local_name = None if class_name == local_name or not global_type else local_name -%}
 {% set base_classes = obj | class_bases(class_name) | join(', ')-%}
+{% set post_meta_output = obj | post_meta_hook -%}
 {% set target_namespace = obj.target_namespace if global_type and module_namespace != obj.target_namespace else None %}
 
 {{ class_annotations | join('\n') }}
@@ -34,8 +35,11 @@ class {{ class_name }}{{"({})".format(base_classes) if base_classes }}:
         {%- if target_namespace and target_namespace != obj.namespace %}
         target_namespace = "{{ target_namespace }}"
         {%- endif %}
-{% elif obj.attrs|length == 0 and not help %}
+{% elif obj.attrs|length == 0 and not help and not extra_output %}
     pass
+{%- endif -%}
+{%- if post_meta_output %}
+{{ post_meta_output|indent(4, first=True) }}
 {%- endif -%}
 {%- for attr in obj.attrs %}
     {%- set field_typing = attr|field_type(parents) %}

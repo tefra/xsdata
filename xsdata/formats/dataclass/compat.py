@@ -1,13 +1,15 @@
 import abc
-from dataclasses import Field
 from dataclasses import fields
 from dataclasses import is_dataclass
 from dataclasses import MISSING
 from typing import Any
+from typing import cast
 from typing import Dict
+from typing import Iterator
+from typing import List
+from typing import NamedTuple
 from typing import Optional
 from typing import Set
-from typing import Tuple
 from typing import Type
 
 from xsdata.exceptions import XmlContextError
@@ -16,27 +18,35 @@ from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.utils.hooks import load_entry_points
 
 
+class FieldInfo(NamedTuple):
+    name: str
+    init: bool
+    metadata: dict[str, Any]
+    default: Any
+    default_factory: Any
+
+
 class ClassType(abc.ABC):
     __slots__ = ()
 
     @property
     @abc.abstractmethod
     def any_element(self) -> Type:
-        """Return the any type used to bind wildcard element nodes."""
+        """Return the AnyElement used to bind wildcard element nodes."""
 
     @property
     @abc.abstractmethod
     def derived_element(self) -> Type:
-        """Return the derived type used to bind ambiguous element nodes."""
+        """Return the DerivedElement used to bind ambiguous element nodes."""
 
     @property
     def any_keys(self) -> Set[str]:
-        """Return the field names of the any type."""
+        """Return the field names of the AnyElement class."""
         return {field.name for field in self.get_fields(self.any_element)}
 
     @property
     def derived_keys(self) -> Set[str]:
-        """Return the field names of the derived type."""
+        """Return the field names of the DerivedElement class."""
         return {field.name for field in self.get_fields(self.derived_element)}
 
     @abc.abstractmethod
@@ -52,11 +62,11 @@ class ClassType(abc.ABC):
         """
 
     @abc.abstractmethod
-    def get_fields(self, obj: Any) -> Tuple[Any, ...]:
+    def get_fields(self, obj: Any) -> Iterator[FieldInfo]:
         """Return the models fields in the correct mro ordering."""
 
     @abc.abstractmethod
-    def default_value(self, field: Any, default: Optional[Any] = None) -> Any:
+    def default_value(self, field: FieldInfo, default: Optional[Any] = None) -> Any:
         """Return the default value or factory of the given model field."""
 
     @abc.abstractmethod
@@ -122,10 +132,10 @@ class Dataclasses(ClassType):
         if not self.is_model(obj):
             raise XmlContextError(f"Type '{obj}' is not a dataclass.")
 
-    def get_fields(self, obj: Any) -> Tuple[Any, ...]:
-        return fields(obj)
+    def get_fields(self, obj: Any) -> Iterator[FieldInfo]:
+        yield from cast(List[FieldInfo], fields(obj))
 
-    def default_value(self, field: Field, default: Optional[Any] = None) -> Any:
+    def default_value(self, field: FieldInfo, default: Optional[Any] = None) -> Any:
         if field.default_factory is not MISSING:
             return field.default_factory
 

@@ -127,6 +127,7 @@ class Filters:
                 "field_default": self.field_default_value,
                 "field_metadata": self.field_metadata,
                 "field_definition": self.field_definition,
+                "is_null": self.is_null,
                 "class_name": self.class_name,
                 "class_bases": self.class_bases,
                 "class_annotations": self.class_annotations,
@@ -222,6 +223,12 @@ class Filters:
             name = re.sub(rf"{search}", rf"{replace}", name)
 
         return name
+
+    def is_null(
+        self,
+        attr: Attr
+    ) -> bool:
+        return attr.restrictions.is_null
 
     def field_definition(
         self,

@@ -92,7 +92,7 @@ class CreateCompoundFieldsTests(FactoryTestCase):
             name="choice",
             tag="Choice",
             index=0,
-            types=[AttrTypeFactory.native(DataType.ANY_TYPE)],
+            types=list({t for attr in target.attrs for t in attr.types}),
             choices=[
                 AttrFactory.create(
                     tag=target.attrs[0].tag,

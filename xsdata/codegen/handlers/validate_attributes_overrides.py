@@ -47,8 +47,8 @@ class ValidateAttributesOverrides(RelativeHandlerInterface):
             restriction_attrs = {a.slug: a for a in original_attrs}
             all_attrs = dict(base_attrs_map.items())
             for slug, attr in all_attrs.items():
-                if slug not in restriction_attrs:
-                    attr_new = Attr(tag=attr[0].tag, name=attr[0].name, restrictions=Restrictions(is_null=True))
+                if not attr[0].is_attribute and slug not in restriction_attrs:
+                    attr_new = Attr(tag=attr[0].tag, name=attr[0].name, index=attr[0].index, restrictions=Restrictions(is_null=True))
                     target.attrs.append(attr_new)
 
     @classmethod

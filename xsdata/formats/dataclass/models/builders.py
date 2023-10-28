@@ -526,8 +526,8 @@ class XmlVarBuilder:
             # xs:NMTOKENS need origin list
             return False
 
-        if object in types:
-            # Any type, secondary types are not allowed
+        if object in types and xml_type != XmlType.ELEMENTS:
+            # Any type, secondary types are not allowed except for 'Elements' XML type
             return len(types) == 1
 
         return self.is_typing_supported(types)

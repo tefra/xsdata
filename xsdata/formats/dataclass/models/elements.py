@@ -176,10 +176,10 @@ class XmlVar(MetaMixin):
         self.is_attribute = False
         self.is_attributes = False
 
-        if xml_type == XmlType.ELEMENT or self.clazz:
-            self.is_element = True
-        elif xml_type == XmlType.ELEMENTS:
+        if xml_type == XmlType.ELEMENTS:
             self.is_elements = True
+        elif xml_type == XmlType.ELEMENT or self.clazz:
+            self.is_element = True
         elif xml_type == XmlType.ATTRIBUTE:
             self.is_attribute = True
         elif xml_type == XmlType.ATTRIBUTES:

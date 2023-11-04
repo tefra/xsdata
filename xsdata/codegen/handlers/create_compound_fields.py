@@ -7,13 +7,11 @@ from typing import Tuple
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.mixins import RelativeHandlerInterface
 from xsdata.codegen.models import Attr
-from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import get_restriction_choice
 from xsdata.codegen.models import Restrictions
 from xsdata.codegen.utils import ClassUtils
 from xsdata.formats.dataclass.models.elements import XmlType
-from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
 from xsdata.utils.collections import group_by
 
@@ -86,18 +84,18 @@ class CreateCompoundFields(RelativeHandlerInterface):
             ClassUtils.remove_attribute(target, attr)
             names.append(attr.local_name)
             choices.append(self.build_attr_choice(attr))
-
             self.update_counters(attr, counters)
 
         min_occurs, max_occurs = self.sum_counters(counters)
         name = self.choose_name(target, names)
+        types = list({t for attr in attrs for t in attr.types})
 
         target.attrs.insert(
             pos,
             Attr(
                 name=name,
                 index=0,
-                types=[AttrType(qname=str(DataType.ANY_TYPE), native=True)],
+                types=types,
                 tag=Tag.CHOICE,
                 restrictions=Restrictions(
                     min_occurs=sum(min_occurs),

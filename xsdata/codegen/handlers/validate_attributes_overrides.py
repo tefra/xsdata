@@ -25,7 +25,7 @@ class ValidateAttributesOverrides(RelativeHandlerInterface):
     __slots__ = ()
 
     def process(self, target: Class):
-        restriction_attrs = []
+        restriction_attrs: dict[str, Attr] = {}
         if len([ext for ext in target.extensions if ext.tag == "Restriction"]) > 0:
             restriction_attrs = {
                 attr.slug: attr for attr in target.attrs if not attr.is_attribute

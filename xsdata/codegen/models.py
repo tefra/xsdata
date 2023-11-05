@@ -62,7 +62,7 @@ class Restrictions:
     group: Optional[int] = field(default=None)
     process_contents: Optional[str] = field(default=None)
     path: List[Tuple[str, int, int, int]] = field(default_factory=list)
-    is_null: bool = field(default=False)
+    is_restricted: bool = field(default=False)
 
     @property
     def is_list(self) -> bool:

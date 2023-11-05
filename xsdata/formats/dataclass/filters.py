@@ -127,7 +127,7 @@ class Filters:
                 "field_default": self.field_default_value,
                 "field_metadata": self.field_metadata,
                 "field_definition": self.field_definition,
-                "is_null": self.is_null,
+                "is_restricted": self.is_restricted,
                 "class_name": self.class_name,
                 "class_bases": self.class_bases,
                 "class_annotations": self.class_annotations,
@@ -224,11 +224,11 @@ class Filters:
 
         return name
 
-    def is_null(
+    def is_restricted(
         self,
         attr: Attr
     ) -> bool:
-        return attr.restrictions.is_null
+        return attr.restrictions.is_restricted
 
     def field_definition(
         self,

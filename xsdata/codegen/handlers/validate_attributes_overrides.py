@@ -24,9 +24,9 @@ class ValidateAttributesOverrides(RelativeHandlerInterface):
     __slots__ = ()
 
     def process(self, target: Class):
-        original_attrs = []
+        restriction_attrs = []
         if len([ext for ext in target.extensions if ext.tag == 'Restriction']) > 0:
-            original_attrs = list(target.attrs)
+            restriction_attrs = {attr.slug: attr for attr in target.attrs if not attr.is_attribute}
 
         base_attrs_map = self.base_attrs_map(target)
         for attr in list(target.attrs):
@@ -43,13 +43,10 @@ class ValidateAttributesOverrides(RelativeHandlerInterface):
 
         if len([ext for ext in target.extensions if ext.tag == 'Restriction']) > 0:
             # What we want here is to check the restriction.attrs against base_attrs_map
-            # restriction_attrs = {a.slug: a for a in self.base_attrs(self.container.find(target.extensions[0].type.qname))}
-            restriction_attrs = {a.slug: a for a in original_attrs}
-            all_attrs = dict(base_attrs_map.items())
-            for slug, attr in all_attrs.items():
+            for slug, attr in base_attrs_map.items():
                 if not attr[0].is_attribute and slug not in restriction_attrs:
-                    attr_new = Attr(tag=attr[0].tag, name=attr[0].name, index=attr[0].index, restrictions=Restrictions(is_null=True))
-                    target.attrs.append(attr_new)
+                    attr_restricted = Attr(tag=attr[0].tag, name=attr[0].name, index=attr[0].index, restrictions=Restrictions(is_restricted=True))
+                    target.attrs.append(attr_restricted)
 
     @classmethod
     def overrides(cls, a: Attr, b: Attr) -> bool:

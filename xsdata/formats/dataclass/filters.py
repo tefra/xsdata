@@ -224,10 +224,7 @@ class Filters:
 
         return name
 
-    def is_restricted(
-        self,
-        attr: Attr
-    ) -> bool:
+    def is_restricted(self, attr: Attr) -> bool:
         return attr.restrictions.is_restricted
 
     def field_definition(

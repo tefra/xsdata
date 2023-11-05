@@ -4,9 +4,10 @@ from typing import List
 from typing import Optional
 
 from xsdata.codegen.mixins import RelativeHandlerInterface
-from xsdata.codegen.models import Attr, Restrictions
+from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import get_slug
+from xsdata.codegen.models import Restrictions
 from xsdata.codegen.utils import ClassUtils
 from xsdata.utils import collections
 
@@ -26,7 +27,9 @@ class ValidateAttributesOverrides(RelativeHandlerInterface):
     def process(self, target: Class):
         restriction_attrs = []
         if len([ext for ext in target.extensions if ext.tag == 'Restriction']) > 0:
-            restriction_attrs = {attr.slug: attr for attr in target.attrs if not attr.is_attribute}
+            restriction_attrs = {
+                attr.slug: attr for attr in target.attrs if not attr.is_attribute
+            }
 
         base_attrs_map = self.base_attrs_map(target)
         for attr in list(target.attrs):
@@ -45,7 +48,12 @@ class ValidateAttributesOverrides(RelativeHandlerInterface):
             # What we want here is to check the restriction.attrs against base_attrs_map
             for slug, attr in base_attrs_map.items():
                 if not attr[0].is_attribute and slug not in restriction_attrs:
-                    attr_restricted = Attr(tag=attr[0].tag, name=attr[0].name, index=attr[0].index, restrictions=Restrictions(is_restricted=True))
+                    attr_restricted = Attr(
+                        tag=attr[0].tag,
+                        name=attr[0].name,
+                        index=attr[0].index,
+                        restrictions=Restrictions(is_restricted=True)
+                    )
                     target.attrs.append(attr_restricted)
 
     @classmethod

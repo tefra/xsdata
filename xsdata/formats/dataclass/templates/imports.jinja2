@@ -9,3 +9,7 @@ from {{ source | import_module(module) }} import (
 )
 {% endif -%}
 {%- endfor %}
+{#
+TODO: remove
+#}
+from typing import ClassVar as RestrictedVar

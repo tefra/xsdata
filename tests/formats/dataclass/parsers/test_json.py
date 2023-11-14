@@ -1,6 +1,9 @@
 import json
+from dataclasses import asdict
+from dataclasses import make_dataclass
 from typing import List
 from typing import Optional
+from typing import Union
 from xml.etree.ElementTree import QName
 
 from tests import fixtures_dir
@@ -369,6 +372,15 @@ class JsonParserTests(FactoryTestCase):
             self.parser.bind_dataclass(data, ExtendedType)
 
         self.assertEqual("Unable to locate xsi:type `notexists`", str(cm.exception))
+
+    def test_bind_text_with_unions(self):
+        Fixture = make_dataclass("Fixture", [("x", List[Union[int, float, str, bool]])])
+        values = ["foo", 12.2, "12.2", 12, "12", True, "false"]
+        data = json.dumps({"x": values})
+
+        result = self.parser.from_string(data, Fixture)
+        expected = ["foo", 12.2, 12.2, 12, 12, True, False]
+        self.assertEqual({"x": expected}, asdict(result))
 
     def test_find_var(self):
         meta = self.parser.context.build(TypeB)

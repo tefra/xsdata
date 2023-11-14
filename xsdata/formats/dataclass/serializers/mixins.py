@@ -213,7 +213,7 @@ class XmlWriter:
         :param qname: Tag qualified name
         """
         self.flush_start(True)
-        self.handler.endElementNS(split_qname(qname), None)
+        self.handler.endElementNS(split_qname(qname), "")
 
         if self.tail:
             self.handler.characters(self.tail)
@@ -239,20 +239,22 @@ class XmlWriter:
         :param is_nil: If true add ``xsi:nil="true"`` to the element
             attributes
         """
-        if self.pending_tag:
-            if not is_nil:
-                self.attrs.pop(XSI_NIL, None)
+        if not self.pending_tag:
+            return
 
-            for name in self.attrs.keys():
-                self.add_namespace(name[0])
+        if not is_nil:
+            self.attrs.pop(XSI_NIL, None)
 
-            self.reset_default_namespace()
-            self.start_namespaces()
+        for name in self.attrs.keys():
+            self.add_namespace(name[0])
 
-            self.handler.startElementNS(self.pending_tag, None, self.attrs)
-            self.attrs = {}
-            self.in_tail = False
-            self.pending_tag = None
+        self.reset_default_namespace()
+        self.start_namespaces()
+
+        self.handler.startElementNS(self.pending_tag, "", self.attrs)  # type: ignore
+        self.attrs = {}
+        self.in_tail = False
+        self.pending_tag = None
 
     def start_namespaces(self):
         """

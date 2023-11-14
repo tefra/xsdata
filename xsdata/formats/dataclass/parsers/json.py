@@ -16,6 +16,7 @@ from xsdata.exceptions import ConverterWarning
 from xsdata.exceptions import ParserError
 from xsdata.formats.bindings import AbstractParser
 from xsdata.formats.bindings import T
+from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
@@ -240,6 +241,8 @@ class JsonParser(AbstractParser):
         if var.any_type or var.is_wildcard:
             # field can support any object return the value as it is
             return value
+
+        value = converter.serialize(value)
 
         # Convert value according to the field types
         return ParserUtils.parse_value(

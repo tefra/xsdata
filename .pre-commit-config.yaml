@@ -2,20 +2,20 @@ exclude: tests/fixtures
 
 repos:
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.10.1
+    rev: v3.15.0
     hooks:
       - id: pyupgrade
         args: [ --py38-plus ]
   - repo: https://github.com/asottile/reorder_python_imports
-    rev: v3.10.0
+    rev: v3.12.0
     hooks:
       - id: reorder-python-imports
   - repo: https://github.com/ambv/black
-    rev: 23.7.0
+    rev: 23.11.0
     hooks:
       - id: black
   - repo: https://github.com/PyCQA/autoflake
-    rev: v2.2.0
+    rev: v2.2.1
     hooks:
       - id: autoflake
   - repo: https://github.com/PyCQA/flake8
@@ -30,7 +30,7 @@ repos:
         args: [ "--suppress-none-returning" ]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.5.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -41,7 +41,7 @@ repos:
       - id: docformatter
         args: [ "--in-place", "--pre-summary-newline" ]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.5.1
+    rev: v1.7.0
     hooks:
       - id: mypy
         files: ^(xsdata/)

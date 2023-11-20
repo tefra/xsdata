@@ -4,8 +4,8 @@ from pathlib import Path
 from typing import Dict
 from typing import Optional
 from typing import Union
-from urllib.request import urlopen
 
+from xsdata.codegen import opener
 from xsdata.codegen.parsers import DefinitionsParser
 from xsdata.codegen.parsers import SchemaParser
 from xsdata.logger import logger
@@ -37,7 +37,7 @@ class Downloader:
 
             logger.info("Fetching %s", uri)
 
-            input_stream = urlopen(uri).read()  # nosec
+            input_stream = opener.open(uri).read()  # nosec
             if uri.endswith("wsdl"):
                 self.parse_definitions(uri, input_stream)
             else:

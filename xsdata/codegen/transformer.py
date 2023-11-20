@@ -12,8 +12,8 @@ from typing import List
 from typing import NamedTuple
 from typing import Optional
 from typing import Tuple
-from urllib.request import urlopen
 
+from xsdata.codegen import opener
 from xsdata.codegen.analyzer import ClassAnalyzer
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.mappers.definitions import DefinitionsMapper
@@ -294,7 +294,7 @@ class SchemaTransformer:
         if uri not in self.processed:
             try:
                 self.processed.append(uri)
-                return self.preloaded.pop(uri, None) or urlopen(uri).read()  # nosec
+                return self.preloaded.pop(uri, None) or opener.open(uri).read()  # nosec
             except OSError:
                 logger.warning("Resource not found %s", uri)
         else:

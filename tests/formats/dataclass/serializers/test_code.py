@@ -65,6 +65,24 @@ class PycodeSerializerTests(TestCase):
         )
         self.assertEqual(expected, result)
 
+    def test_write_string_with_unicode_characters(self):
+        books = Books(book=[BookForm(author="Backslashes \\ One Two \x12 Three")])
+        result = self.serializer.render(books, var_name="books")
+        expected = (
+            "from tests.fixtures.books.books import BookForm\n"
+            "from tests.fixtures.books.books import Books\n"
+            "\n"
+            "\n"
+            "books = Books(\n"
+            "    book=[\n"
+            "        BookForm(\n"
+            '            author="Backslashes \\\\ One Two \\x12 Three"\n'
+            "        ),\n"
+            "    ]\n"
+            ")\n"
+        )
+        self.assertEqual(expected, result)
+
     def test_write_object_with_empty_array(self):
         iterator = self.serializer.write_object([], 0, set())
         self.assertEqual("[]", "".join(iterator))

@@ -21,7 +21,7 @@ def attrsetter(obj: Any, attr: str, value: Any):
 
 def literal_value(value: Any) -> str:
     if isinstance(value, str):
-        return quoteattr(value)
+        return quoteattr(value.encode("unicode_escape").decode("ASCII"))
 
     if isinstance(value, float):
         return str(value) if math.isfinite(value) else f'float("{value}")'

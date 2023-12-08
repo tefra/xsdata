@@ -295,7 +295,7 @@ class BytesConverter(Converter):
                 return binascii.unhexlify(value)
 
             if fmt == "base64":
-                return base64.b64decode(value)
+                return base64.b64decode(value, validate=True)
 
             raise ConverterError(f"Unknown format '{fmt}'")
         except ValueError as e:

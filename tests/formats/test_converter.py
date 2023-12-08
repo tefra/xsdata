@@ -223,6 +223,9 @@ class BytesConverterTests(TestCase):
         with self.assertRaises(ConverterError):
             self.converter.deserialize("aaa", format="base16")
 
+        with self.assertRaises(ConverterError):
+            self.converter.deserialize("AA~AA", format="base64")
+
     def test_unknown_formats(self):
         with self.assertRaises(ConverterError):
             self.converter.serialize("foo")

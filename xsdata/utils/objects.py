@@ -29,4 +29,7 @@ def literal_value(value: Any) -> str:
     if isinstance(value, QName):
         return f'QName("{value.text}")'
 
+    if isinstance(value, bytes):
+        return repr(value)
+
     return repr(value).replace("'", '"')

@@ -40,7 +40,10 @@ class PrimitiveNode(XmlNode):
         )
 
         if obj is None and not self.var.nillable:
-            obj = ""
+            if bytes in self.var.types:
+                obj = b""
+            else:
+                obj = ""
 
         if self.var.derived:
             obj = self.derived_factory(qname=qname, value=obj)

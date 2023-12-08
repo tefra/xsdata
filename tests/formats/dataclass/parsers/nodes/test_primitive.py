@@ -58,6 +58,25 @@ class PrimitiveNodeTests(TestCase):
         self.assertTrue(node.bind("foo", None, None, objects))
         self.assertIsNone(objects[-1][1])
 
+    def test_bind_nillable_bytes_content(self):
+        var = XmlVarFactory.create(
+            xml_type=XmlType.TEXT,
+            name="foo",
+            qname="foo",
+            types=(bytes,),
+            nillable=False,
+        )
+        ns_map = {"foo": "bar"}
+        node = PrimitiveNode(var, ns_map, False, DerivedElement)
+        objects = []
+
+        self.assertTrue(node.bind("foo", None, None, objects))
+        self.assertEqual(b"", objects[-1][1])
+
+        var.nillable = True
+        self.assertTrue(node.bind("foo", None, None, objects))
+        self.assertIsNone(objects[-1][1])
+
     def test_bind_mixed_with_tail_content(self):
         var = XmlVarFactory.create(
             xml_type=XmlType.TEXT, name="foo", types=(int,), derived=True

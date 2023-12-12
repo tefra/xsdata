@@ -104,10 +104,12 @@ class PycodeSerializerTests(TestCase):
         iterator = self.serializer.write_object(Namespace.SOAP11, 0, set())
         self.assertEqual("Namespace.SOAP11", "".join(iterator))
 
-    def test_write_bytes_with_single_quote(self):
-        iterator = self.serializer.write_object(b"\xfaj'", 0, set())
-        self.assertEqual("b\"\\xfaj'\"", "".join(iterator))
+    def test_write_bytes(self):
+        iterator = self.serializer.write_object(b"a", 0, set())
+        self.assertEqual('b"a"', "".join(iterator))
 
+        iterator = self.serializer.write_object(b"\xfa\"'", 0, set())
+        self.assertEqual('b"\\xfa"\\\'"', "".join(iterator))
 
     def test_build_imports_with_nested_types(self):
         expected = "from tests.fixtures.models import Parent\n"

@@ -1,4 +1,5 @@
 import math
+import re
 from typing import Any
 from xml.etree.ElementTree import QName
 from xml.sax.saxutils import quoteattr
@@ -30,6 +31,8 @@ def literal_value(value: Any) -> str:
         return f'QName("{value.text}")'
 
     if isinstance(value, bytes):
-        return repr(value)
+        # Use the contents of the bytes verbatim, but ensure that it is
+        # wrapped in double quotes
+        return re.sub(r"b'(.*)'$", r'b"\g<1>"', repr(value))
 
     return repr(value).replace("'", '"')

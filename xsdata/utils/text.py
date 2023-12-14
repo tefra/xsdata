@@ -226,3 +226,11 @@ def alnum(value: str) -> str:
     """Return a lower case version of the string only with ascii alphanumerical
     characters."""
     return "".join(filter(__alnum_ascii__.__contains__, value)).lower()
+
+
+def variable(value: str) -> str:
+    """Returns a version of the string that will be a valid Python variable."""
+    # Strip out all characters that are not alphanumeric or underscores
+    value = re.sub(r"\W", "", value)
+    # Then strip out leading digit and underscore characters
+    return re.sub(r"^[^a-zA-Z]+", "", value)

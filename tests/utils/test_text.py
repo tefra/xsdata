@@ -15,6 +15,7 @@ from xsdata.utils.text import screaming_snake_case
 from xsdata.utils.text import snake_case
 from xsdata.utils.text import split_words
 from xsdata.utils.text import StringType
+from xsdata.utils.text import variable
 
 
 class TextTests(TestCase):
@@ -142,6 +143,13 @@ class TextTests(TestCase):
         self.assertEqual("foo1", alnum("\tfoo*1"))
         self.assertEqual("foo1", alnum(" foo*1"))
         self.assertEqual("1", alnum(" βιβλίο*1"))
+
+    def test_variable(self):
+        self.assertEqual("foO1", variable("foO1"))
+        self.assertEqual("foo_1", variable("foo_1"))
+        self.assertEqual("foo1", variable("foo-1"))
+        self.assertEqual("foo1", variable("@foo1"))
+        self.assertEqual("foo1", variable("1foo1"))
 
     def test_classify(self):
         for ltr in string.ascii_uppercase:

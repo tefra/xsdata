@@ -159,6 +159,9 @@ class FiltersTests(FactoryTestCase):
         self.assertEqual("value_minus_1_1", self.filters.field_name("-1.1", "cls"))
         self.assertEqual("cbad", self.filters.field_name("abcd", "cls"))
 
+        self.filters.field_case = NameCase.ORIGINAL
+        self.assertEqual("foo", self.filters.field_name("@foo", "cls"))
+
     def test_constant_name(self):
         self.filters.substitutions[ObjectType.FIELD]["ABC"] = "CBA"
 

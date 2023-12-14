@@ -743,6 +743,10 @@ class FiltersTests(FactoryTestCase):
         actual = self.filters.choice_type(choice, ["a", "b"])
         self.assertEqual("Type[Foobar]", actual)
 
+        choice.types[0].substituted = True
+        actual = self.filters.choice_type(choice, ["a", "b"])
+        self.assertEqual('Type["Foobar"]', actual)
+
     def test_choice_type_with_multiple_types(self):
         choice = AttrFactory.create(types=[type_str, type_bool])
         actual = self.filters.choice_type(choice, ["a", "b"])

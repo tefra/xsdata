@@ -754,7 +754,9 @@ class Filters:
         elif attr_type.circular:
             name = f'"{name}"'
 
-        if self.postponed_annotations:
+        if self.postponed_annotations and not (
+            attr_type.substituted and attr_type.circular
+        ):
             name = name.strip('"')
 
         return name

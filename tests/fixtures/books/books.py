@@ -10,7 +10,7 @@ class BookForm:
     """
     Book Definition.
 
-    Attributes
+    Attributes:
         author: Writer's name
         title: Book Title
         genre: Book Genre

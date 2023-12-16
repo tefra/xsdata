@@ -1,7 +1,7 @@
 {% set offset = (level + 2) * 4 + 7 -%}
 {{ '"""{}"""'.format(obj.help | clean_docstring) }}
 {% if obj.has_help_attr %}
-Attributes
+Attributes:
 {%- for var_name, var_doc in obj | class_params %}
 {{ "{}: {}".format(var_name, var_doc) | text_wrap(offset) | indent(first=True) }}
 {%- endfor -%}

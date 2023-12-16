@@ -24,7 +24,7 @@ class DoubleQuotesSummary:
 
 class RootEnum(Enum):
     """
-    Attributes
+    Attributes:
         A: Lorem ipsum dolor
         B: Lorem ipsum dolor '''sit''' amet, consectetur adipiscing
             elit. Morbi dapibus. My\\Ipsum
@@ -35,7 +35,7 @@ class RootEnum(Enum):
 
 class RootB(Enum):
     """
-    Attributes
+    Attributes:
         YES: This is an inner enum member documentation. Lorem ipsum
             dolor sit amet, consectetur adipiscing elit. Etiam mollis.
         NO: Lorem ipsum dolor My\\Ipsum
@@ -58,7 +58,7 @@ class Root:
     Donec imperdiet lacus sed sagittis scelerisque. Ut sodales metus:
     "sit", "amet", "lectus" My\\Ipsum
 
-    Attributes
+    Attributes:
         a: This is an inner type '''field''' documentation. Lorem ipsum
             dolor sit amet, consectetur adipiscing elit. Aliquam nec.
             My\\Ipsum
@@ -107,7 +107,7 @@ class Root:
         """
         This is an inner type documentation.
 
-        Attributes
+        Attributes:
             sub_a: This is an inner type '''field''' documentation.
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                 Vivamus efficitur. My\\Ipsum

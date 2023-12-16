@@ -13,6 +13,7 @@ from xsdata.codegen.models import Restrictions
 from xsdata.codegen.utils import ClassUtils
 from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.models.enums import Tag
+from xsdata.utils import collections
 from xsdata.utils.collections import group_by
 
 ALL = "a"
@@ -88,7 +89,7 @@ class CreateCompoundFields(RelativeHandlerInterface):
 
         min_occurs, max_occurs = self.sum_counters(counters)
         name = self.choose_name(target, names)
-        types = list({t for attr in attrs for t in attr.types})
+        types = collections.unique_sequence(t for attr in attrs for t in attr.types)
 
         target.attrs.insert(
             pos,

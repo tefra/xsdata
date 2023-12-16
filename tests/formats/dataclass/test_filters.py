@@ -741,7 +741,7 @@ class FiltersTests(FactoryTestCase):
 
         self.filters.postponed_annotations = True
         actual = self.filters.choice_type(choice, ["a", "b"])
-        self.assertEqual("Type[Foobar]", actual)
+        self.assertEqual('Type["Foobar"]', actual)
 
     def test_choice_type_with_multiple_types(self):
         choice = AttrFactory.create(types=[type_str, type_bool])

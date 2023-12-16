@@ -720,7 +720,7 @@ class Filters:
         is also ignored.
         """
         type_names = collections.unique_sequence(
-            self.field_type_name(x, parents) for x in choice.types
+            self.field_type_name(x, parents, choice=True) for x in choice.types
         )
 
         if self.union_type:
@@ -742,7 +742,9 @@ class Filters:
 
         return f"Type[{result}]"
 
-    def field_type_name(self, attr_type: AttrType, parents: List[str]) -> str:
+    def field_type_name(
+        self, attr_type: AttrType, parents: List[str], choice: bool = False
+    ) -> str:
         name = self.type_name(attr_type)
 
         if attr_type.forward and attr_type.circular:
@@ -754,7 +756,7 @@ class Filters:
         elif attr_type.circular:
             name = f'"{name}"'
 
-        if self.postponed_annotations:
+        if self.postponed_annotations and not choice:
             name = name.strip('"')
 
         return name

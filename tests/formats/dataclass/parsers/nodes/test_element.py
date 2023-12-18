@@ -515,7 +515,7 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual(attrs, actual.attrs)
         self.assertEqual({}, actual.ns_map)
 
-    def test_build_node_with_any_type_var_with_no_xsi_type_and_type_Exists(self):
+    def test_build_node_with_any_type_var_with_no_xsi_type_and_type_exists(self):
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT,
             name="a",
@@ -536,6 +536,7 @@ class ElementNodeTests(FactoryTestCase):
 
     def test_build_node_with_wildcard_var(self):
         var = XmlVarFactory.create(xml_type=XmlType.WILDCARD, qname="aaaaa")
+        var.process_contents = "skip"
 
         actual = self.node.build_node(var.qname, var, {}, {}, 10)
 

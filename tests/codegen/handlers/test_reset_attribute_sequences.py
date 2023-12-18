@@ -59,5 +59,8 @@ class ResetAttributeSequencesTests(FactoryTestCase):
         attr.restrictions.sequence = 1
         self.assertFalse(self.processor.is_repeatable_sequence(attr))
 
+        attr.restrictions.path.append(("s", 15, 1, 1))
+        self.assertFalse(self.processor.is_repeatable_sequence(attr))
+
         attr.restrictions.path.append(("s", 15, 1, 2))
         self.assertTrue(self.processor.is_repeatable_sequence(attr))

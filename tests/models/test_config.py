@@ -156,7 +156,7 @@ class GeneratorConfigTests(TestCase):
                 GeneratorOutput(subscriptable_types=True).subscriptable_types
             )
 
-    def test_use_union_type_requires_310(self):
+    def test_use_union_type_requires_310_and_postponed_annotations(self):
         if sys.version_info < (3, 10):
             with warnings.catch_warnings(record=True) as w:
                 self.assertFalse(GeneratorOutput(union_type=True).union_type)
@@ -165,10 +165,15 @@ class GeneratorConfigTests(TestCase):
                 "UnionType PEP 604 requires python >= 3.10, reverting...",
                 str(w[-1].message),
             )
-
         else:
-            output = GeneratorOutput(union_type=True, postponed_annotations=True)
-            self.assertTrue(output.union_type)
+            with warnings.catch_warnings(record=True) as w:
+                output = GeneratorOutput(union_type=True)
+                self.assertTrue(output.postponed_annotations)
+
+                self.assertEqual(
+                    "Enabling postponed annotations, because `union_type==True`",
+                    str(w[-1].message),
+                )
 
     def test_format_slots_requires_310(self):
         if sys.version_info < (3, 10):

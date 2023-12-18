@@ -288,6 +288,14 @@ class FiltersTests(FactoryTestCase):
         )
         self.assertEqual(expected, result)
 
+    @mock.patch.object(Filters, "field_metadata")
+    def test_field_definition_without_metadata(self, mock_field_metadata):
+        mock_field_metadata.return_value = {}
+        str_attr = AttrFactory.create(types=[type_str], tag=Tag.RESTRICTION)
+        result = self.filters.field_definition(str_attr, {}, None, ["Root"])
+        expected = "field(\n" "        default=None\n" "    )"
+        self.assertEqual(expected, result)
+
     def test_field_default_value_with_value_none(self):
         attr = AttrFactory.create(types=[type_str])
         self.assertEqual(None, self.filters.field_default_value(attr))

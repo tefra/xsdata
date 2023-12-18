@@ -131,6 +131,13 @@ class RestrictionsTests(TestCase):
         restrictions.max_occurs = sys.maxsize
         self.assertEqual({}, restrictions.asdict())
 
+    def test_asdict_with_process_contents(self):
+        restrictions = Restrictions(process_contents="skip")
+        self.assertEqual({"process_contents": "skip"}, restrictions.asdict())
+
+        restrictions.process_contents = "strict"
+        self.assertEqual({}, restrictions.asdict())
+
     def test_clone(self):
         restrictions = Restrictions(max_occurs=2)
         clone = restrictions.clone()

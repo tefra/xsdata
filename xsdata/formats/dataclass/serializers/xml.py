@@ -349,7 +349,9 @@ class XmlSerializer(AbstractSerializer):
                 continue
 
             indices = range(index, stop)
-            end = next(i for i in indices[::-1] if attrs[i].sequence == var.sequence)
+            end = next(
+                i for i in indices[::-1] if attrs[i].sequence == var.sequence
+            )  # pragma: no cover
             sequence = attrs[index : end + 1]
             index = end + 1
             j = 0

@@ -73,6 +73,7 @@ class ValidateAttributesOverridesTests(FactoryTestCase):
     def test_validate_override(self):
         attr_a = AttrFactory.create()
         attr_b = attr_a.clone()
+        attr_b.parent = ClassFactory.create()
         target = ClassFactory.create()
         target.attrs.append(attr_a)
 

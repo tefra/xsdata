@@ -226,7 +226,7 @@ class XmlDateTimeTests(TestCase):
             XmlDateTime.utcnow().replace(fractional_second=0, second=0, minute=1),
         )
 
-        now = datetime.utcnow().replace(microsecond=0, second=0, minute=1)
+        now = datetime.now(timezone.utc).replace(microsecond=0, second=0, minute=1)
         self.assertEqual(
             XmlDateTime.from_datetime(now),
             XmlDateTime.utcnow().replace(fractional_second=0, second=0, minute=1),
@@ -372,7 +372,7 @@ class XmlTimeTests(TestCase):
             XmlTime.utcnow().replace(fractional_second=0, second=0, minute=1),
         )
 
-        now = datetime.utcnow().replace(microsecond=0, second=0, minute=1)
+        now = datetime.now(timezone.utc).replace(microsecond=0, second=0, minute=1)
         self.assertEqual(
             XmlTime.from_time(now.time()),
             XmlTime.utcnow().replace(fractional_second=0, second=0, minute=1),

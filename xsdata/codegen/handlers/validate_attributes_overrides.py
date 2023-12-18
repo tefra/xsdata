@@ -8,6 +8,7 @@ from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import get_slug
 from xsdata.codegen.utils import ClassUtils
+from xsdata.logger import logger
 from xsdata.utils import collections
 
 
@@ -53,6 +54,13 @@ class ValidateAttributesOverrides(RelativeHandlerInterface):
         if attr.is_list and not source_attr.is_list:
             # Hack much??? idk but Optional[str] can't override List[str]
             source_attr.restrictions.max_occurs = sys.maxsize
+            assert source_attr.parent is not None
+            logger.warning(
+                "Converting parent field `%s::%s` to a list to match child class `%s`",
+                source_attr.parent.name,
+                source_attr.name,
+                target.name,
+            )
 
         if (
             attr.default == source_attr.default

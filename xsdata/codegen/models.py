@@ -160,7 +160,7 @@ class Restrictions:
 
     @classmethod
     def from_element(cls, element: ElementBase) -> "Restrictions":
-        """Static constructor from an xsd model."""
+        """Static constructor from a xsd model."""
         return cls(**element.get_restrictions())
 
 
@@ -193,7 +193,7 @@ class AttrType:
         return namespaces.local_name(self.qname)
 
     def is_dependency(self, allow_circular: bool) -> bool:
-        """Return true if attribute is not a forward/circular references and
+        """Return true if attribute is not a forward/circular references, and
         it's not a native python time."""
 
         return not (
@@ -221,6 +221,7 @@ class Attr:
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None, compare=False)
     restrictions: Restrictions = field(default_factory=Restrictions, compare=False)
+    parent: Optional["Class"] = field(default=None, compare=False)
 
     def __post_init__(self):
         self.local_name = self.name
@@ -231,13 +232,13 @@ class Attr:
 
     @property
     def is_attribute(self) -> bool:
-        """Return whether this attribute is derived from an xs:attribute or
+        """Return whether this attribute is derived from a xs:attribute or
         xs:anyAttribute."""
         return self.tag in (Tag.ATTRIBUTE, Tag.ANY_ATTRIBUTE)
 
     @property
     def is_enumeration(self) -> bool:
-        """Return whether this attribute is derived from an xs:enumeration."""
+        """Return whether this attribute is derived from a xs:enumeration."""
         return self.tag == Tag.ENUMERATION
 
     @property
@@ -252,7 +253,7 @@ class Attr:
 
     @property
     def is_group(self) -> bool:
-        """Return whether this attribute is derived from an xs:group or
+        """Return whether this attribute is derived from a xs:group or
         xs:attributeGroup."""
         return self.tag in (Tag.ATTRIBUTE_GROUP, Tag.GROUP)
 
@@ -283,7 +284,7 @@ class Attr:
 
     @property
     def is_suffix(self) -> bool:
-        """Return whether this attribute is not derived from an xs element with
+        """Return whether this attribute is not derived from a xs element with
         mode suffix."""
         return self.index == sys.maxsize
 
@@ -431,13 +432,13 @@ class Class:
 
     @property
     def is_complex(self) -> bool:
-        """Return whether this instance is derived from an xs:element or
+        """Return whether this instance is derived from a xs:element or
         xs:complexType."""
         return self.tag in (Tag.ELEMENT, Tag.COMPLEX_TYPE)
 
     @property
     def is_element(self) -> bool:
-        """Return whether this instance is derived from an non abstract
+        """Return whether this instance is derived from a non abstract
         xs:element."""
         return self.tag == Tag.ELEMENT
 
@@ -456,7 +457,7 @@ class Class:
 
     @property
     def is_group(self) -> bool:
-        """Return whether this attribute is derived from an xs:group or
+        """Return whether this attribute is derived from a xs:group or
         xs:attributeGroup."""
         return self.tag in (Tag.ATTRIBUTE_GROUP, Tag.GROUP)
 

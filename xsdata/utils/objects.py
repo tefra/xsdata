@@ -2,7 +2,6 @@ import math
 import re
 from typing import Any
 from xml.etree.ElementTree import QName
-from xml.sax.saxutils import quoteattr
 
 
 def update(obj: Any, **kwargs: Any):
@@ -22,7 +21,7 @@ def attrsetter(obj: Any, attr: str, value: Any):
 
 def literal_value(value: Any) -> str:
     if isinstance(value, str):
-        return quoteattr(value.encode("unicode_escape").decode("ASCII"))
+        return '"' + repr("'\0" + value)[6:]
 
     if isinstance(value, float):
         return str(value) if math.isfinite(value) else f'float("{value}")'

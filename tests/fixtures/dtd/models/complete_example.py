@@ -4,8 +4,8 @@ from typing import List, Optional
 
 
 class PostStatus(Enum):
-    DRAFT = "draft"
-    PUBLISHED = "published"
+    DRAFT = 'draft'
+    PUBLISHED = 'published'
 
 
 @dataclass
@@ -29,7 +29,7 @@ class Post:
         }
     )
     lang: str = field(
-        default="en",
+        default='en',
         metadata={
             "type": "Attribute",
             "namespace": "http://www.w3.org/XML/1998/namespace",

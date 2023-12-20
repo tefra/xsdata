@@ -308,7 +308,7 @@ class FiltersTests(FactoryTestCase):
 
     def test_field_default_value_with_type_str(self):
         attr = AttrFactory.create(types=[type_str], default="foo")
-        self.assertEqual('"foo"', self.filters.field_default_value(attr))
+        self.assertEqual("'foo'", self.filters.field_default_value(attr))
 
     def test_field_default_value_with_type_tokens(self):
         attr = AttrFactory.create(types=[type_int, type_str], default="1  \n bar")
@@ -350,13 +350,13 @@ class FiltersTests(FactoryTestCase):
 
     def test_field_default_value_with_type_decimal(self):
         attr = AttrFactory.create(types=[type_decimal], default="1.5")
-        self.assertEqual('Decimal("1.5")', self.filters.field_default_value(attr))
+        self.assertEqual("Decimal('1.5')", self.filters.field_default_value(attr))
 
         attr.default = "-inf"
-        self.assertEqual('Decimal("-Infinity")', self.filters.field_default_value(attr))
+        self.assertEqual("Decimal('-Infinity')", self.filters.field_default_value(attr))
 
         attr.default = "inf"
-        self.assertEqual('Decimal("Infinity")', self.filters.field_default_value(attr))
+        self.assertEqual("Decimal('Infinity')", self.filters.field_default_value(attr))
 
     def test_field_default_value_with_type_int(self):
         attr = AttrFactory.create(types=[type_int], default="1")
@@ -528,7 +528,7 @@ class FiltersTests(FactoryTestCase):
                 "wildcard": True,
                 "type": "Type[object]",
             },
-            {"default": '"aa"', "name": "bar", "type": "Type[str]"},
+            {"default": "'aa'", "name": "bar", "type": "Type[str]"},
             {
                 "default_factory": "list",
                 "name": "tok",

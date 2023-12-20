@@ -18,18 +18,18 @@ class DoubleQuotesSummary:
 
 
 class RootEnum(Enum):
-    A = "A"
-    B = "B"
+    A = 'A'
+    B = 'B'
 
 
 class RootB(Enum):
-    YES = "Yes"
-    NO = "No"
+    YES = 'Yes'
+    NO = 'No'
 
 
 class RootD(Enum):
-    TRUE = "true"
-    FALSE = "false"
+    TRUE = 'true'
+    FALSE = 'false'
 
 
 @dataclass

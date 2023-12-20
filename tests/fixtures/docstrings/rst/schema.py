@@ -28,8 +28,8 @@ class RootEnum(Enum):
     :cvar B: Lorem ipsum dolor '''sit''' amet, consectetur adipiscing
         elit. Morbi dapibus. My\\Ipsum
     """
-    A = "A"
-    B = "B"
+    A = 'A'
+    B = 'B'
 
 
 class RootB(Enum):
@@ -38,13 +38,13 @@ class RootB(Enum):
         dolor sit amet, consectetur adipiscing elit. Etiam mollis.
     :cvar NO: Lorem ipsum dolor My\\Ipsum
     """
-    YES = "Yes"
-    NO = "No"
+    YES = 'Yes'
+    NO = 'No'
 
 
 class RootD(Enum):
-    TRUE = "true"
-    FALSE = "false"
+    TRUE = 'true'
+    FALSE = 'false'
 
 
 @dataclass

@@ -76,7 +76,7 @@ class BookForm:
     )
     lang: str = field(
         init=False,
-        default="en",
+        default='en',
         metadata={
             "type": "Attribute",
         }

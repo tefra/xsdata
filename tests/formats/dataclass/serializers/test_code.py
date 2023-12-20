@@ -24,22 +24,22 @@ class PycodeSerializerTests(TestCase):
             "books = Books(\n"
             "    book=[\n"
             "        BookForm(\n"
-            '            author="Hightower, Kim",\n'
-            '            title="The First Book",\n'
-            '            genre="Fiction",\n'
+            "            author='Hightower, Kim',\n"
+            "            title='The First Book',\n"
+            "            genre='Fiction',\n"
             "            price=44.95,\n"
             "            pub_date=XmlDate(2000, 10, 1),\n"
-            '            review="An amazing story of nothing.",\n'
-            '            id="bk001"\n'
+            "            review='An amazing story of nothing.',\n"
+            "            id='bk001'\n"
             "        ),\n"
             "        BookForm(\n"
-            '            author="Nagata, Suanne",\n'
-            '            title="Becoming Somebody",\n'
-            '            genre="Biography",\n'
+            "            author='Nagata, Suanne',\n"
+            "            title='Becoming Somebody',\n"
+            "            genre='Biography',\n"
             "            price=33.95,\n"
             "            pub_date=XmlDate(2001, 1, 10),\n"
-            '            review="A masterpiece of the fine art of gossiping.",\n'
-            '            id="bk002"\n'
+            "            review='A masterpiece of the fine art of gossiping.',\n"
+            "            id='bk002'\n"
             "        ),\n"
             "    ]\n"
             ")\n"
@@ -58,7 +58,7 @@ class PycodeSerializerTests(TestCase):
             "books = Books(\n"
             "    book=[\n"
             "        BookForm(\n"
-            '            author="me"\n'
+            "            author='me'\n"
             "        ),\n"
             "    ]\n"
             ")\n"
@@ -76,7 +76,7 @@ class PycodeSerializerTests(TestCase):
             "books = Books(\n"
             "    book=[\n"
             "        BookForm(\n"
-            '            author="Backslashes \\\\ One Two \\x12 Three"\n'
+            "            author='Backslashes \\\\ One Two \\x12 Three'\n"
             "        ),\n"
             "    ]\n"
             ")\n"
@@ -98,18 +98,11 @@ class PycodeSerializerTests(TestCase):
         self.assertEqual("{}", "".join(iterator))
 
         iterator = self.serializer.write_object({"foo": "bar"}, 0, set())
-        self.assertEqual('{\n    "foo": "bar",\n}', "".join(iterator))
+        self.assertEqual("{\n    'foo': 'bar',\n}", "".join(iterator))
 
     def test_write_object_with_enum(self):
         iterator = self.serializer.write_object(Namespace.SOAP11, 0, set())
         self.assertEqual("Namespace.SOAP11", "".join(iterator))
-
-    def test_write_bytes(self):
-        iterator = self.serializer.write_object(b"a", 0, set())
-        self.assertEqual('b"a"', "".join(iterator))
-
-        iterator = self.serializer.write_object(b"\xfa\"'", 0, set())
-        self.assertEqual('b"\\xfa"\\\'"', "".join(iterator))
 
     def test_build_imports_with_nested_types(self):
         expected = "from tests.fixtures.models import Parent\n"

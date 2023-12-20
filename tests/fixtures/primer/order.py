@@ -127,7 +127,7 @@ class Usaddress:
     )
     country: str = field(
         init=False,
-        default="US",
+        default='US',
         metadata={
             "type": "Attribute",
         }
@@ -140,7 +140,7 @@ class Comment:
         name = "comment"
 
     value: str = field(
-        default="",
+        default='',
         metadata={
             "required": True,
         }

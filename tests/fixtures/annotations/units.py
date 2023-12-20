@@ -5,7 +5,7 @@ __NAMESPACE__ = "http://domain.org/schema/model/units"
 
 
 class unit(Enum):
-    M = "m"
-    KG = "kg"
-    VALUE = "%"
-    NA = "NA"
+    M = 'm'
+    KG = 'kg'
+    VALUE = '%'
+    NA = 'NA'

@@ -23,8 +23,8 @@ class DoubleQuotesSummary:
 
 
 class RootEnum(Enum):
-    A = "A"
-    B = "B"
+    A = 'A'
+    B = 'B'
 
 
 RootEnum.A.__doc__ = "Lorem ipsum dolor"
@@ -35,8 +35,8 @@ RootEnum.B.__doc__ = (
 
 
 class RootB(Enum):
-    YES = "Yes"
-    NO = "No"
+    YES = 'Yes'
+    NO = 'No'
 
 
 RootB.YES.__doc__ = (
@@ -47,8 +47,8 @@ RootB.NO.__doc__ = "Lorem ipsum dolor\nMy\\Ipsum"
 
 
 class RootD(Enum):
-    TRUE = "true"
-    FALSE = "false"
+    TRUE = 'true'
+    FALSE = 'false'
 
 
 @dataclass

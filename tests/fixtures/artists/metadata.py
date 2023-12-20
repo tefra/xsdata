@@ -46,7 +46,7 @@ class Alias:
         }
     )
     value: str = field(
-        default="",
+        default='',
         metadata={
             "required": True,
         }
@@ -97,7 +97,7 @@ class Gender:
         }
     )
     value: str = field(
-        default="",
+        default='',
         metadata={
             "required": True,
         }

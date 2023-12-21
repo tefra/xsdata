@@ -2,17 +2,16 @@ from unittest import mock
 
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import ProcessAttributeTypes
-from xsdata.codegen.models import Class
-from xsdata.codegen.models import Restrictions
-from xsdata.codegen.models import Status
+from xsdata.codegen.models import Class, Restrictions, Status
 from xsdata.codegen.utils import ClassUtils
 from xsdata.models.config import GeneratorConfig
-from xsdata.models.enums import DataType
-from xsdata.models.enums import Tag
-from xsdata.utils.testing import AttrFactory
-from xsdata.utils.testing import AttrTypeFactory
-from xsdata.utils.testing import ClassFactory
-from xsdata.utils.testing import FactoryTestCase
+from xsdata.models.enums import DataType, Tag
+from xsdata.utils.testing import (
+    AttrFactory,
+    AttrTypeFactory,
+    ClassFactory,
+    FactoryTestCase,
+)
 
 
 class ProcessAttributeTypesTests(FactoryTestCase):

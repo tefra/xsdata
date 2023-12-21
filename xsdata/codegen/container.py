@@ -1,32 +1,29 @@
-from typing import Callable
-from typing import Dict
-from typing import Iterator
-from typing import List
-from typing import Optional
+from typing import Callable, Dict, Iterator, List, Optional
 
-from xsdata.codegen.handlers import AddAttributeSubstitutions
-from xsdata.codegen.handlers import CalculateAttributePaths
-from xsdata.codegen.handlers import CreateCompoundFields
-from xsdata.codegen.handlers import DesignateClassPackages
-from xsdata.codegen.handlers import FilterClasses
-from xsdata.codegen.handlers import FlattenAttributeGroups
-from xsdata.codegen.handlers import FlattenClassExtensions
-from xsdata.codegen.handlers import MergeAttributes
-from xsdata.codegen.handlers import ProcessAttributeTypes
-from xsdata.codegen.handlers import ProcessMixedContentClass
-from xsdata.codegen.handlers import RenameDuplicateAttributes
-from xsdata.codegen.handlers import RenameDuplicateClasses
-from xsdata.codegen.handlers import ResetAttributeSequenceNumbers
-from xsdata.codegen.handlers import ResetAttributeSequences
-from xsdata.codegen.handlers import SanitizeAttributesDefaultValue
-from xsdata.codegen.handlers import SanitizeEnumerationClass
-from xsdata.codegen.handlers import UnnestInnerClasses
-from xsdata.codegen.handlers import UpdateAttributesEffectiveChoice
-from xsdata.codegen.handlers import VacuumInnerClasses
-from xsdata.codegen.handlers import ValidateAttributesOverrides
+from xsdata.codegen.handlers import (
+    AddAttributeSubstitutions,
+    CalculateAttributePaths,
+    CreateCompoundFields,
+    DesignateClassPackages,
+    FilterClasses,
+    FlattenAttributeGroups,
+    FlattenClassExtensions,
+    MergeAttributes,
+    ProcessAttributeTypes,
+    ProcessMixedContentClass,
+    RenameDuplicateAttributes,
+    RenameDuplicateClasses,
+    ResetAttributeSequenceNumbers,
+    ResetAttributeSequences,
+    SanitizeAttributesDefaultValue,
+    SanitizeEnumerationClass,
+    UnnestInnerClasses,
+    UpdateAttributesEffectiveChoice,
+    VacuumInnerClasses,
+    ValidateAttributesOverrides,
+)
 from xsdata.codegen.mixins import ContainerInterface
-from xsdata.codegen.models import Class
-from xsdata.codegen.models import Status
+from xsdata.codegen.models import Class, Status
 from xsdata.codegen.utils import ClassUtils
 from xsdata.models.config import GeneratorConfig
 from xsdata.utils import collections

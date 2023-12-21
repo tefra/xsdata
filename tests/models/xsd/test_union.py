@@ -1,13 +1,15 @@
 from typing import Iterator
 from unittest import TestCase
 
-from xsdata.models.xsd import MaxExclusive
-from xsdata.models.xsd import MinExclusive
-from xsdata.models.xsd import MinInclusive
-from xsdata.models.xsd import MinLength
-from xsdata.models.xsd import Restriction
-from xsdata.models.xsd import SimpleType
-from xsdata.models.xsd import Union
+from xsdata.models.xsd import (
+    MaxExclusive,
+    MinExclusive,
+    MinInclusive,
+    MinLength,
+    Restriction,
+    SimpleType,
+    Union,
+)
 
 
 class UnionTests(TestCase):

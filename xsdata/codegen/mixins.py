@@ -1,12 +1,8 @@
 import abc
 from abc import ABCMeta
-from typing import Callable
-from typing import Iterator
-from typing import List
-from typing import Optional
+from typing import Callable, Iterator, List, Optional
 
-from xsdata.codegen.models import Attr
-from xsdata.codegen.models import Class
+from xsdata.codegen.models import Attr, Class
 from xsdata.models.config import GeneratorConfig
 from xsdata.utils.constants import return_true
 

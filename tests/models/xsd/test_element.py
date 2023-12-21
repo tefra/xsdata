@@ -2,12 +2,14 @@ from unittest import TestCase
 
 from xsdata.exceptions import SchemaValueError
 from xsdata.models.enums import Namespace
-from xsdata.models.xsd import Alternative
-from xsdata.models.xsd import ComplexType
-from xsdata.models.xsd import Element
-from xsdata.models.xsd import Length
-from xsdata.models.xsd import Restriction
-from xsdata.models.xsd import SimpleType
+from xsdata.models.xsd import (
+    Alternative,
+    ComplexType,
+    Element,
+    Length,
+    Restriction,
+    SimpleType,
+)
 
 
 class ElementTests(TestCase):

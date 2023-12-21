@@ -1,3 +1,0 @@
-[bandit]
-exclude: tests/,docs/
-skips: B701,B410

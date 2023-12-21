@@ -3,8 +3,7 @@ import platform
 import sys
 import warnings
 from pathlib import Path
-from typing import Any
-from typing import Iterator
+from typing import Any, Iterator
 
 import click
 from click_default_group import DefaultGroup
@@ -12,11 +11,8 @@ from click_default_group import DefaultGroup
 from xsdata import __version__
 from xsdata.codegen.transformer import SchemaTransformer
 from xsdata.logger import logger
-from xsdata.models.config import GeneratorConfig
-from xsdata.models.config import GeneratorOutput
-from xsdata.utils.click import LogFormatter
-from xsdata.utils.click import LogHandler
-from xsdata.utils.click import model_options
+from xsdata.models.config import GeneratorConfig, GeneratorOutput
+from xsdata.utils.click import LogFormatter, LogHandler, model_options
 from xsdata.utils.downloader import Downloader
 from xsdata.utils.hooks import load_entry_points
 

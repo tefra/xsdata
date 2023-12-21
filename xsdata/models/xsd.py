@@ -1,27 +1,28 @@
 import sys
 import textwrap
-from dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass, field
 from typing import Any as Anything
-from typing import Dict
-from typing import Iterator
+from typing import Dict, Iterator, Optional
 from typing import List as Array
-from typing import Optional
 from typing import Union as UnionType
 
 from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
-from xsdata.models.enums import DataType
-from xsdata.models.enums import FormType
-from xsdata.models.enums import Mode
-from xsdata.models.enums import Namespace
-from xsdata.models.enums import ProcessType
-from xsdata.models.enums import UseType
-from xsdata.models.mixins import array_any_element
-from xsdata.models.mixins import array_element
-from xsdata.models.mixins import attribute
-from xsdata.models.mixins import element
-from xsdata.models.mixins import ElementBase
+from xsdata.models.enums import (
+    DataType,
+    FormType,
+    Mode,
+    Namespace,
+    ProcessType,
+    UseType,
+)
+from xsdata.models.mixins import (
+    ElementBase,
+    array_any_element,
+    array_element,
+    attribute,
+    element,
+)
 from xsdata.utils import text
 from xsdata.utils.collections import unique_sequence
 from xsdata.utils.constants import DEFAULT_ATTR_NAME

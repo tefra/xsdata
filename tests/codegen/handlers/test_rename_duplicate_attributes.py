@@ -1,8 +1,6 @@
 from xsdata.codegen.handlers import RenameDuplicateAttributes
 from xsdata.models.enums import Tag
-from xsdata.utils.testing import AttrFactory
-from xsdata.utils.testing import ClassFactory
-from xsdata.utils.testing import FactoryTestCase
+from xsdata.utils.testing import AttrFactory, ClassFactory, FactoryTestCase
 
 
 class RenameDuplicateAttributesTests(FactoryTestCase):

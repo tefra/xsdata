@@ -1,16 +1,13 @@
 import datetime
-from typing import Iterator
-from typing import List
+from typing import Iterator, List
 from unittest import mock
 
 from xsdata import __version__
 from xsdata.codegen.models import Class
 from xsdata.exceptions import CodeGenerationError
-from xsdata.formats.mixins import AbstractGenerator
-from xsdata.formats.mixins import GeneratorResult
+from xsdata.formats.mixins import AbstractGenerator, GeneratorResult
 from xsdata.models.config import GeneratorConfig
-from xsdata.utils.testing import ClassFactory
-from xsdata.utils.testing import FactoryTestCase
+from xsdata.utils.testing import ClassFactory, FactoryTestCase
 
 
 class NoneGenerator(AbstractGenerator):

@@ -1,18 +1,9 @@
 from collections import UserList
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import Iterable
-from typing import Optional
-from typing import Sequence
-from typing import Type
+from typing import Any, Callable, Dict, Iterable, Optional, Sequence, Type
 
-from xsdata.formats.converter import converter
-from xsdata.formats.converter import QNameConverter
+from xsdata.formats.converter import QNameConverter, converter
 from xsdata.models.enums import QNames
-from xsdata.utils import collections
-from xsdata.utils import constants
-from xsdata.utils import text
+from xsdata.utils import collections, constants, text
 from xsdata.utils.namespaces import build_qname
 
 

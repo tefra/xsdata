@@ -2,22 +2,15 @@ import os
 import re
 from collections import defaultdict
 from pathlib import Path
-from typing import Iterable
-from typing import Iterator
-from typing import List
-from typing import Optional
-from typing import Set
+from typing import Iterable, Iterator, List, Optional, Set
 from urllib.parse import urlparse
 
 from toposort import toposort_flatten
 
 from xsdata.codegen.mixins import ContainerHandlerInterface
-from xsdata.codegen.models import Class
-from xsdata.codegen.models import get_location
-from xsdata.codegen.models import get_target_namespace
+from xsdata.codegen.models import Class, get_location, get_target_namespace
 from xsdata.exceptions import CodeGenerationError
-from xsdata.models.config import ObjectType
-from xsdata.models.config import StructureStyle
+from xsdata.models.config import ObjectType, StructureStyle
 from xsdata.models.enums import COMMON_SCHEMA_DIR
 from xsdata.utils import collections
 from xsdata.utils.graphs import strongly_connected_components

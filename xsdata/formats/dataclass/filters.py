@@ -2,34 +2,23 @@ import re
 import sys
 import textwrap
 from collections import defaultdict
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import Iterable
-from typing import List
-from typing import Optional
-from typing import Set
-from typing import Tuple
-from typing import Type
+from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Tuple, Type
 
-from docformatter import configuration
-from docformatter import format
+from docformatter import configuration, format
 from jinja2 import Environment
 
-from xsdata.codegen.models import Attr
-from xsdata.codegen.models import AttrType
-from xsdata.codegen.models import Class
+from xsdata.codegen.models import Attr, AttrType, Class
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.models.elements import XmlType
-from xsdata.models.config import DocstringStyle
-from xsdata.models.config import ExtensionType
-from xsdata.models.config import GeneratorConfig
-from xsdata.models.config import GeneratorExtension
-from xsdata.models.config import ObjectType
-from xsdata.models.config import OutputFormat
-from xsdata.utils import collections
-from xsdata.utils import namespaces
-from xsdata.utils import text
+from xsdata.models.config import (
+    DocstringStyle,
+    ExtensionType,
+    GeneratorConfig,
+    GeneratorExtension,
+    ObjectType,
+    OutputFormat,
+)
+from xsdata.utils import collections, namespaces, text
 from xsdata.utils.objects import literal_value
 
 

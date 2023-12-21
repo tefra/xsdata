@@ -1,32 +1,22 @@
 import itertools
-from typing import Dict
-from typing import Iterator
-from typing import List
-from typing import Optional
-from typing import Tuple
+from typing import Dict, Iterator, List, Optional, Tuple
 
-from xsdata.codegen.models import Attr
-from xsdata.codegen.models import AttrType
-from xsdata.codegen.models import Class
-from xsdata.codegen.models import Restrictions
-from xsdata.codegen.models import Status
+from xsdata.codegen.models import Attr, AttrType, Class, Restrictions, Status
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.logger import logger
-from xsdata.models.enums import DataType
-from xsdata.models.enums import Namespace
-from xsdata.models.enums import Tag
-from xsdata.models.wsdl import Binding
-from xsdata.models.wsdl import BindingMessage
-from xsdata.models.wsdl import BindingOperation
-from xsdata.models.wsdl import Definitions
-from xsdata.models.wsdl import Part
-from xsdata.models.wsdl import PortType
-from xsdata.models.wsdl import PortTypeMessage
-from xsdata.models.wsdl import PortTypeOperation
-from xsdata.models.wsdl import ServicePort
-from xsdata.utils import collections
-from xsdata.utils import namespaces
-from xsdata.utils import text
+from xsdata.models.enums import DataType, Namespace, Tag
+from xsdata.models.wsdl import (
+    Binding,
+    BindingMessage,
+    BindingOperation,
+    Definitions,
+    Part,
+    PortType,
+    PortTypeMessage,
+    PortTypeOperation,
+    ServicePort,
+)
+from xsdata.utils import collections, namespaces, text
 
 
 class DefinitionsMapper:

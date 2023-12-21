@@ -1,21 +1,23 @@
 import string
 from unittest import TestCase
 
-from xsdata.utils.text import alnum
-from xsdata.utils.text import camel_case
-from xsdata.utils.text import capitalize
-from xsdata.utils.text import classify
-from xsdata.utils.text import kebab_case
-from xsdata.utils.text import mixed_case
-from xsdata.utils.text import mixed_pascal_case
-from xsdata.utils.text import mixed_snake_case
-from xsdata.utils.text import original_case
-from xsdata.utils.text import pascal_case
-from xsdata.utils.text import screaming_snake_case
-from xsdata.utils.text import snake_case
-from xsdata.utils.text import split_words
-from xsdata.utils.text import StringType
-from xsdata.utils.text import variable
+from xsdata.utils.text import (
+    StringType,
+    alnum,
+    camel_case,
+    capitalize,
+    classify,
+    kebab_case,
+    mixed_case,
+    mixed_pascal_case,
+    mixed_snake_case,
+    original_case,
+    pascal_case,
+    screaming_snake_case,
+    snake_case,
+    split_words,
+    variable,
+)
 
 
 class TextTests(TestCase):

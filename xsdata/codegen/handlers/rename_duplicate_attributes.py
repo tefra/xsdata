@@ -1,6 +1,5 @@
 from xsdata.codegen.mixins import HandlerInterface
-from xsdata.codegen.models import Attr
-from xsdata.codegen.models import Class
+from xsdata.codegen.models import Attr, Class
 from xsdata.codegen.utils import ClassUtils
 from xsdata.utils.collections import group_by
 from xsdata.utils.constants import DEFAULT_ATTR_NAME

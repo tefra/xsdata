@@ -1,13 +1,10 @@
 import logging
 import re
-from typing import Dict
-from typing import List
+from typing import Dict, List
 
 from toposort import toposort_flatten
 
-from xsdata.codegen.models import Class
-from xsdata.codegen.models import get_slug
-from xsdata.codegen.models import Import
+from xsdata.codegen.models import Class, Import, get_slug
 from xsdata.exceptions import ResolverValueError
 from xsdata.utils import collections
 

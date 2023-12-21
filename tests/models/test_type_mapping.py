@@ -3,9 +3,11 @@ from unittest import TestCase
 from tests.models.typemapping.city import City
 from tests.models.typemapping.house import House
 from tests.models.typemapping.street import Street
-from xsdata.formats.dataclass.serializers import JsonSerializer
-from xsdata.formats.dataclass.serializers import PycodeSerializer
-from xsdata.formats.dataclass.serializers import XmlSerializer
+from xsdata.formats.dataclass.serializers import (
+    JsonSerializer,
+    PycodeSerializer,
+    XmlSerializer,
+)
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
 
 

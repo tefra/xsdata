@@ -4,12 +4,13 @@ from unittest import mock
 from xsdata.codegen.mappers.dict import DictMapper
 from xsdata.codegen.models import Restrictions
 from xsdata.codegen.utils import ClassUtils
-from xsdata.models.enums import DataType
-from xsdata.models.enums import Tag
-from xsdata.utils.testing import AttrFactory
-from xsdata.utils.testing import AttrTypeFactory
-from xsdata.utils.testing import ClassFactory
-from xsdata.utils.testing import FactoryTestCase
+from xsdata.models.enums import DataType, Tag
+from xsdata.utils.testing import (
+    AttrFactory,
+    AttrTypeFactory,
+    ClassFactory,
+    FactoryTestCase,
+)
 
 
 class DictMapperTests(FactoryTestCase):

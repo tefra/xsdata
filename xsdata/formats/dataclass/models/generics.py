@@ -1,10 +1,5 @@
-from dataclasses import dataclass
-from dataclasses import field
-from typing import Dict
-from typing import Generic
-from typing import List
-from typing import Optional
-from typing import TypeVar
+from dataclasses import dataclass, field
+from typing import Dict, Generic, List, Optional, TypeVar
 
 from xsdata.formats.dataclass.models.elements import XmlType
 

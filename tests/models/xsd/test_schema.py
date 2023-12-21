@@ -2,11 +2,7 @@ from typing import Iterator
 from unittest import TestCase
 
 from xsdata.models.enums import Namespace
-from xsdata.models.xsd import Import
-from xsdata.models.xsd import Include
-from xsdata.models.xsd import Override
-from xsdata.models.xsd import Redefine
-from xsdata.models.xsd import Schema
+from xsdata.models.xsd import Import, Include, Override, Redefine, Schema
 
 
 class SchemaTests(TestCase):

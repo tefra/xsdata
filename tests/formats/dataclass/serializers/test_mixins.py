@@ -1,15 +1,12 @@
 from io import StringIO
-from typing import Dict
-from typing import TextIO
+from typing import Dict, TextIO
 from unittest import TestCase
 from xml.sax.saxutils import XMLGenerator
 
 from xsdata.exceptions import XmlWriterError
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
-from xsdata.formats.dataclass.serializers.mixins import XmlWriter
-from xsdata.formats.dataclass.serializers.mixins import XmlWriterEvent
-from xsdata.models.enums import DataType
-from xsdata.models.enums import QNames
+from xsdata.formats.dataclass.serializers.mixins import XmlWriter, XmlWriterEvent
+from xsdata.models.enums import DataType, QNames
 
 
 class XmlWriterImpl(XmlWriter):

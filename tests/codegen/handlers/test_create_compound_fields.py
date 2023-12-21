@@ -6,10 +6,12 @@ from xsdata.codegen.models import Restrictions
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import Tag
 from xsdata.utils import collections
-from xsdata.utils.testing import AttrFactory
-from xsdata.utils.testing import ClassFactory
-from xsdata.utils.testing import ExtensionFactory
-from xsdata.utils.testing import FactoryTestCase
+from xsdata.utils.testing import (
+    AttrFactory,
+    ClassFactory,
+    ExtensionFactory,
+    FactoryTestCase,
+)
 
 
 class CreateCompoundFieldsTests(FactoryTestCase):

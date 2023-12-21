@@ -1,10 +1,5 @@
 import abc
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Tuple
-from typing import Type
+from typing import Any, Dict, List, Optional, Tuple, Type
 
 from xsdata.exceptions import XmlHandlerError
 from xsdata.formats.bindings import AbstractParser

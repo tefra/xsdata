@@ -1,8 +1,7 @@
 from unittest import TestCase
 
 from xsdata.exceptions import DefinitionsValueError
-from xsdata.models.wsdl import PortType
-from xsdata.models.wsdl import PortTypeOperation
+from xsdata.models.wsdl import PortType, PortTypeOperation
 
 
 class PortTypeTests(TestCase):

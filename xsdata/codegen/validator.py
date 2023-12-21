@@ -1,11 +1,7 @@
-from typing import List
-from typing import Optional
+from typing import List, Optional
 
 from xsdata.codegen.container import ClassContainer
-from xsdata.codegen.models import Attr
-from xsdata.codegen.models import Class
-from xsdata.codegen.models import Extension
-from xsdata.codegen.models import get_tag
+from xsdata.codegen.models import Attr, Class, Extension, get_tag
 from xsdata.codegen.utils import ClassUtils
 from xsdata.logger import logger
 from xsdata.models.enums import Tag

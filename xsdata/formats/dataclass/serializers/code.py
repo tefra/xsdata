@@ -1,13 +1,7 @@
-from dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass, field
 from enum import Enum
 from io import StringIO
-from typing import Any
-from typing import List
-from typing import Mapping
-from typing import Set
-from typing import TextIO
-from typing import Type
+from typing import Any, List, Mapping, Set, TextIO, Type
 
 from xsdata.formats.bindings import AbstractSerializer
 from xsdata.formats.dataclass.context import XmlContext

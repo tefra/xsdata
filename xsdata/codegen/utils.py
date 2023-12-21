@@ -1,22 +1,19 @@
 import sys
-from typing import Iterator
-from typing import List
-from typing import Optional
-from typing import Set
+from typing import Iterator, List, Optional, Set
 
-from xsdata.codegen.models import Attr
-from xsdata.codegen.models import AttrType
-from xsdata.codegen.models import Class
-from xsdata.codegen.models import Extension
-from xsdata.codegen.models import get_qname
-from xsdata.codegen.models import get_slug
-from xsdata.codegen.models import Restrictions
-from xsdata.codegen.models import Status
+from xsdata.codegen.models import (
+    Attr,
+    AttrType,
+    Class,
+    Extension,
+    Restrictions,
+    Status,
+    get_qname,
+    get_slug,
+)
 from xsdata.exceptions import CodeGenerationError
 from xsdata.models.enums import DataType
-from xsdata.utils import collections
-from xsdata.utils import namespaces
-from xsdata.utils import text
+from xsdata.utils import collections, namespaces, text
 
 
 class ClassUtils:

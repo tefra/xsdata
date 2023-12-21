@@ -1,21 +1,14 @@
 import sys
 from collections import defaultdict
-from typing import Any
-from typing import List
-from typing import Optional
+from typing import Any, List, Optional
 
-from xsdata.codegen.models import Attr
-from xsdata.codegen.models import AttrType
-from xsdata.codegen.models import Class
+from xsdata.codegen.models import Attr, AttrType, Class
 from xsdata.codegen.utils import ClassUtils
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.models.generics import AnyElement
-from xsdata.models.enums import DataType
-from xsdata.models.enums import QNames
-from xsdata.models.enums import Tag
+from xsdata.models.enums import DataType, QNames, Tag
 from xsdata.utils import collections
-from xsdata.utils.namespaces import build_qname
-from xsdata.utils.namespaces import split_qname
+from xsdata.utils.namespaces import build_qname, split_qname
 
 
 class ElementMapper:

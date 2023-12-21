@@ -1,19 +1,13 @@
 import shlex
 import subprocess
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Tuple
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, List, Tuple
 
 from docutils import nodes
-from docutils.nodes import Element
-from docutils.nodes import Node
+from docutils.nodes import Element, Node
 from docutils.parsers.rst import directives  # type: ignore
 from sphinx.directives.code import container_wrapper
 from sphinx.locale import __
-from sphinx.util import logging
-from sphinx.util import parselinenos
+from sphinx.util import logging, parselinenos
 from sphinx.util.docutils import SphinxDirective
 from sphinx.util.typing import OptionSpec
 

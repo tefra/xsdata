@@ -3,15 +3,15 @@ import statistics
 from timeit import Timer
 
 from tests import xsdata_temp_dir
-from tests.integration.benchmarks.utils import make_books
-from tests.integration.benchmarks.utils import parse
-from tests.integration.benchmarks.utils import parse_json
-from tests.integration.benchmarks.utils import write
-from tests.integration.benchmarks.utils import write_json
-from xsdata.formats.dataclass.parsers import handlers
-from xsdata.formats.dataclass.parsers import JsonParser
-from xsdata.formats.dataclass.serializers import JsonSerializer
-from xsdata.formats.dataclass.serializers import writers
+from tests.integration.benchmarks.utils import (
+    make_books,
+    parse,
+    parse_json,
+    write,
+    write_json,
+)
+from xsdata.formats.dataclass.parsers import JsonParser, handlers
+from xsdata.formats.dataclass.serializers import JsonSerializer, writers
 
 if __name__ == "__main__":
     components = [

@@ -1,7 +1,5 @@
 from dataclasses import dataclass
-from typing import Any
-from typing import List
-from typing import Optional
+from typing import Any, List, Optional
 
 from xsdata.codegen.parsers.schema import SchemaParser
 from xsdata.formats.bindings import T

@@ -1,13 +1,7 @@
 import sys
-from typing import Any
-from typing import Iterator
-from typing import Tuple
-from typing import Type
-from typing import TypeVar
-from typing import Union
+from typing import Any, Iterator, Tuple, Type, TypeVar, Union
 
-from typing_extensions import get_args
-from typing_extensions import get_origin
+from typing_extensions import get_args, get_origin
 
 NONE_TYPE = type(None)
 

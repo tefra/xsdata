@@ -1,11 +1,8 @@
 import sys
-from typing import Any
-from typing import Dict
-from typing import List
+from typing import Any, Dict, List
 
 from xsdata.codegen.mappers.element import ElementMapper
-from xsdata.codegen.models import AttrType
-from xsdata.codegen.models import Class
+from xsdata.codegen.models import AttrType, Class
 from xsdata.codegen.utils import ClassUtils
 from xsdata.models.enums import Tag
 

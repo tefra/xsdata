@@ -1,9 +1,6 @@
-from unittest import mock
-from unittest import TestCase
+from unittest import TestCase, mock
 
-from requests import HTTPError
-from requests import Response
-from requests import Session
+from requests import HTTPError, Response, Session
 
 from xsdata.formats.dataclass.transports import DefaultTransport
 

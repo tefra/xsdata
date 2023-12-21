@@ -1,7 +1,5 @@
 from xsdata.codegen.mixins import HandlerInterface
-from xsdata.codegen.models import Attr
-from xsdata.codegen.models import Class
-from xsdata.codegen.models import get_restriction_sequence
+from xsdata.codegen.models import Attr, Class, get_restriction_sequence
 from xsdata.utils import collections
 
 

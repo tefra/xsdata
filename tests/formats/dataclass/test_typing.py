@@ -2,27 +2,13 @@ import datetime
 import sys
 from decimal import Decimal
 from enum import Enum
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Set
-from typing import Tuple
-from typing import Type
-from typing import TypeVar
-from typing import Union
+from typing import Any, Dict, List, Optional, Set, Tuple, Type, TypeVar, Union
 from unittest import TestCase
 from xml.etree.ElementTree import QName
 
 from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.typing import evaluate
-from xsdata.formats.dataclass.typing import get_args
-from xsdata.formats.dataclass.typing import get_origin
-from xsdata.models.datatype import XmlDate
-from xsdata.models.datatype import XmlDateTime
-from xsdata.models.datatype import XmlDuration
-from xsdata.models.datatype import XmlPeriod
-from xsdata.models.datatype import XmlTime
+from xsdata.models.datatype import XmlDate, XmlDateTime, XmlDuration, XmlPeriod, XmlTime
 from xsdata.models.enums import Namespace
 
 

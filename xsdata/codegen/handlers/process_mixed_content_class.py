@@ -1,13 +1,8 @@
 import sys
 
 from xsdata.codegen.mixins import HandlerInterface
-from xsdata.codegen.models import Attr
-from xsdata.codegen.models import AttrType
-from xsdata.codegen.models import Class
-from xsdata.codegen.models import Restrictions
-from xsdata.models.enums import DataType
-from xsdata.models.enums import NamespaceType
-from xsdata.models.enums import Tag
+from xsdata.codegen.models import Attr, AttrType, Class, Restrictions
+from xsdata.models.enums import DataType, NamespaceType, Tag
 
 
 class ProcessMixedContentClass(HandlerInterface):

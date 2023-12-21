@@ -1,26 +1,19 @@
 import sys
-from typing import Any
-from typing import Dict
-from typing import Iterator
-from typing import List
-from typing import Optional
+from typing import Any, Dict, Iterator, List, Optional
 
-from xsdata.codegen.models import Attr
-from xsdata.codegen.models import AttrType
-from xsdata.codegen.models import Class
-from xsdata.codegen.models import Extension
-from xsdata.codegen.models import Restrictions
-from xsdata.models.dtd import Dtd
-from xsdata.models.dtd import DtdAttribute
-from xsdata.models.dtd import DtdAttributeDefault
-from xsdata.models.dtd import DtdAttributeType
-from xsdata.models.dtd import DtdContent
-from xsdata.models.dtd import DtdContentOccur
-from xsdata.models.dtd import DtdContentType
-from xsdata.models.dtd import DtdElement
-from xsdata.models.dtd import DtdElementType
-from xsdata.models.enums import DataType
-from xsdata.models.enums import Tag
+from xsdata.codegen.models import Attr, AttrType, Class, Extension, Restrictions
+from xsdata.models.dtd import (
+    Dtd,
+    DtdAttribute,
+    DtdAttributeDefault,
+    DtdAttributeType,
+    DtdContent,
+    DtdContentOccur,
+    DtdContentType,
+    DtdElement,
+    DtdElementType,
+)
+from xsdata.models.enums import DataType, Tag
 from xsdata.utils.constants import DEFAULT_ATTR_NAME
 
 

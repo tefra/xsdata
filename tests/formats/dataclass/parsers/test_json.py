@@ -1,28 +1,25 @@
 import json
-from dataclasses import asdict
-from dataclasses import make_dataclass
-from typing import List
-from typing import Optional
-from typing import Union
+from dataclasses import asdict, make_dataclass
+from typing import List, Optional, Union
 from xml.etree.ElementTree import QName
 
 from tests import fixtures_dir
-from tests.fixtures.books import BookForm
-from tests.fixtures.books import Books
-from tests.fixtures.models import AttrsType
-from tests.fixtures.models import BaseC
-from tests.fixtures.models import BaseType
-from tests.fixtures.models import ChoiceType
-from tests.fixtures.models import ExtendedType
-from tests.fixtures.models import OptionalChoiceType
-from tests.fixtures.models import TypeA
-from tests.fixtures.models import TypeB
-from tests.fixtures.models import TypeC
-from tests.fixtures.models import TypeD
-from tests.fixtures.models import UnionType
+from tests.fixtures.books import BookForm, Books
+from tests.fixtures.models import (
+    AttrsType,
+    BaseC,
+    BaseType,
+    ChoiceType,
+    ExtendedType,
+    OptionalChoiceType,
+    TypeA,
+    TypeB,
+    TypeC,
+    TypeD,
+    UnionType,
+)
 from xsdata.exceptions import ParserError
-from xsdata.formats.dataclass.models.generics import AnyElement
-from xsdata.formats.dataclass.models.generics import DerivedElement
+from xsdata.formats.dataclass.models.generics import AnyElement, DerivedElement
 from xsdata.formats.dataclass.parsers.json import JsonParser
 from xsdata.formats.dataclass.serializers import JsonSerializer
 from xsdata.models.datatype import XmlDate

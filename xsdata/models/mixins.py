@@ -1,19 +1,9 @@
-from dataclasses import dataclass
-from dataclasses import field
-from dataclasses import fields
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import Iterator
-from typing import List
-from typing import Optional
+from dataclasses import dataclass, field, fields
+from typing import Any, Callable, Dict, Iterator, List, Optional
 
 from xsdata.exceptions import SchemaValueError
 from xsdata.formats.dataclass.models.elements import XmlType
-from xsdata.models.enums import DataType
-from xsdata.models.enums import FormType
-from xsdata.models.enums import Namespace
-from xsdata.models.enums import NamespaceType
+from xsdata.models.enums import DataType, FormType, Namespace, NamespaceType
 from xsdata.utils import text
 from xsdata.utils.constants import return_true
 

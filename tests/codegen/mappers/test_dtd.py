@@ -3,24 +3,25 @@ from typing import Iterator
 from unittest import mock
 
 from xsdata.codegen.mappers.dtd import DtdMapper
-from xsdata.codegen.models import Class
-from xsdata.codegen.models import Restrictions
-from xsdata.models.dtd import DtdAttributeDefault
-from xsdata.models.dtd import DtdAttributeType
-from xsdata.models.dtd import DtdContentOccur
-from xsdata.models.dtd import DtdContentType
-from xsdata.models.dtd import DtdElementType
-from xsdata.models.enums import DataType
-from xsdata.models.enums import Namespace
-from xsdata.models.enums import Tag
-from xsdata.utils.testing import AttrFactory
-from xsdata.utils.testing import AttrTypeFactory
-from xsdata.utils.testing import ClassFactory
-from xsdata.utils.testing import DtdAttributeFactory
-from xsdata.utils.testing import DtdContentFactory
-from xsdata.utils.testing import DtdElementFactory
-from xsdata.utils.testing import DtdFactory
-from xsdata.utils.testing import FactoryTestCase
+from xsdata.codegen.models import Class, Restrictions
+from xsdata.models.dtd import (
+    DtdAttributeDefault,
+    DtdAttributeType,
+    DtdContentOccur,
+    DtdContentType,
+    DtdElementType,
+)
+from xsdata.models.enums import DataType, Namespace, Tag
+from xsdata.utils.testing import (
+    AttrFactory,
+    AttrTypeFactory,
+    ClassFactory,
+    DtdAttributeFactory,
+    DtdContentFactory,
+    DtdElementFactory,
+    DtdFactory,
+    FactoryTestCase,
+)
 
 
 class DtdMapperTests(FactoryTestCase):

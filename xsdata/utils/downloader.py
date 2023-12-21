@@ -1,13 +1,10 @@
 import os
 import re
 from pathlib import Path
-from typing import Dict
-from typing import Optional
-from typing import Union
+from typing import Dict, Optional, Union
 
 from xsdata.codegen import opener
-from xsdata.codegen.parsers import DefinitionsParser
-from xsdata.codegen.parsers import SchemaParser
+from xsdata.codegen.parsers import DefinitionsParser, SchemaParser
 from xsdata.logger import logger
 from xsdata.models.wsdl import Definitions
 from xsdata.models.xsd import Schema

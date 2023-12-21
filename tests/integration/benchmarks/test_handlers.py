@@ -3,9 +3,7 @@ import random
 import pytest
 
 from tests import xsdata_temp_dir
-from tests.integration.benchmarks.utils import make_books
-from tests.integration.benchmarks.utils import parse
-from tests.integration.benchmarks.utils import write
+from tests.integration.benchmarks.utils import make_books, parse, write
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers import handlers as readers
 from xsdata.formats.dataclass.serializers import writers

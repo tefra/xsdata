@@ -1,16 +1,17 @@
 import enum
 import logging
-from dataclasses import fields
-from dataclasses import is_dataclass
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import get_type_hints
-from typing import Iterator
-from typing import List
-from typing import Type
-from typing import TypeVar
-from typing import Union
+from dataclasses import fields, is_dataclass
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Type,
+    TypeVar,
+    Union,
+    get_type_hints,
+)
 
 import click
 from click import Command

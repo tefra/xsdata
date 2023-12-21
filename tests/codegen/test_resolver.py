@@ -5,12 +5,14 @@ from xsdata.codegen.resolver import DependenciesResolver
 from xsdata.exceptions import ResolverValueError
 from xsdata.models.enums import DataType
 from xsdata.utils.namespaces import build_qname
-from xsdata.utils.testing import AttrFactory
-from xsdata.utils.testing import AttrTypeFactory
-from xsdata.utils.testing import ClassFactory
-from xsdata.utils.testing import ExtensionFactory
-from xsdata.utils.testing import FactoryTestCase
-from xsdata.utils.testing import PackageFactory
+from xsdata.utils.testing import (
+    AttrFactory,
+    AttrTypeFactory,
+    ClassFactory,
+    ExtensionFactory,
+    FactoryTestCase,
+    PackageFactory,
+)
 
 
 class DependenciesResolverTest(FactoryTestCase):
@@ -190,7 +192,7 @@ class DependenciesResolverTest(FactoryTestCase):
             self.resolver.find_package("nope")
 
     def test_import_classes(self):
-        self.resolver.class_list = [x for x in "abcdefg"]
+        self.resolver.class_list = list("abcdefg")
         self.resolver.class_map = {x: x for x in "bdg"}
         self.assertEqual(["a", "c", "e", "f"], self.resolver.import_classes())
 

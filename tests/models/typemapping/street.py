@@ -1,8 +1,5 @@
-from dataclasses import dataclass
-from dataclasses import field
-from typing import List
-from typing import Optional
-from typing import TYPE_CHECKING
+from dataclasses import dataclass, field
+from typing import TYPE_CHECKING, List, Optional
 
 if TYPE_CHECKING:
     from tests.models.typemapping.city import City

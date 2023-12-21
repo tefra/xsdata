@@ -1,7 +1,4 @@
-from typing import Callable
-from typing import Dict
-from typing import Optional
-from typing import Type
+from typing import Callable, Dict, Optional, Type
 
 from xsdata.formats.bindings import T
 

@@ -1,14 +1,16 @@
 from collections import defaultdict
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import Iterable
-from typing import Iterator
-from typing import List
-from typing import Optional
-from typing import Sequence
-from typing import Set
-from typing import TypeVar
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+    Set,
+    TypeVar,
+)
 
 T = TypeVar("T")
 

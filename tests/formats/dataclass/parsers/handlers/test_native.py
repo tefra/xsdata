@@ -5,13 +5,9 @@ from xml import etree
 import pytest
 
 from tests import fixtures_dir
-from tests.fixtures.books import BookForm
-from tests.fixtures.books import Books
-from tests.fixtures.books.fixtures import books
-from tests.fixtures.books.fixtures import events
-from tests.fixtures.books.fixtures import events_default_ns
-from xsdata.exceptions import ParserError
-from xsdata.exceptions import XmlHandlerError
+from tests.fixtures.books import BookForm, Books
+from tests.fixtures.books.fixtures import books, events, events_default_ns
+from xsdata.exceptions import ParserError, XmlHandlerError
 from xsdata.formats.dataclass.parsers.bases import RecordParser
 from xsdata.formats.dataclass.parsers.handlers import XmlEventHandler
 from xsdata.formats.dataclass.parsers.handlers.native import get_base_url

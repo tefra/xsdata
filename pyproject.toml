@@ -76,6 +76,47 @@ license-files = ["LICENSE"]
 [tool.setuptools.dynamic]
 version = {attr = "xsdata.__version__"}
 
+[tool.ruff]
+target-version = "py38"
+
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # flake8-annotations
+    "ANN",
+    # flake8-comprehensions
+    "C4",
+    # isort
+    "I",
+]
+
+ignore = [
+    "ANN101",
+    "ANN102",
+    "ANN201",
+    "ANN202",
+    "ANN204",
+    "ANN206",
+    "ANN401",
+    "E203",
+    "B028",
+    "B904",
+]
+
+isort = { known-first-party = ['xsdata', 'tests'] }
+
+[tool.ruff.lint.per-file-ignores]
+"**/{tests}/*" = ["ANN001", "ANN002", "ANN003", "E501", "B018"]
+
+
 [tool.doc8]
 max-line-length = 88
 

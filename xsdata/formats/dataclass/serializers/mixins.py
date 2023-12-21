@@ -1,23 +1,13 @@
-from typing import Any
-from typing import Dict
-from typing import Generator
-from typing import List
-from typing import Optional
-from typing import TextIO
-from typing import Tuple
+from typing import Any, Dict, Generator, List, Optional, TextIO, Tuple
 from xml.etree.ElementTree import QName
 from xml.sax.handler import ContentHandler
 
 from xsdata.exceptions import XmlWriterError
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
-from xsdata.models.enums import DataType
-from xsdata.models.enums import Namespace
-from xsdata.models.enums import QNames
+from xsdata.models.enums import DataType, Namespace, QNames
 from xsdata.utils.constants import EMPTY_MAP
-from xsdata.utils.namespaces import generate_prefix
-from xsdata.utils.namespaces import prefix_exists
-from xsdata.utils.namespaces import split_qname
+from xsdata.utils.namespaces import generate_prefix, prefix_exists, split_qname
 
 XSI_NIL = (Namespace.XSI.uri, "nil")
 
@@ -245,7 +235,7 @@ class XmlWriter:
         if not is_nil:
             self.attrs.pop(XSI_NIL, None)
 
-        for name in self.attrs.keys():
+        for name in self.attrs:
             self.add_namespace(name[0])
 
         self.reset_default_namespace()

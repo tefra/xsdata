@@ -2,21 +2,18 @@ import sys
 from decimal import Decimal
 from enum import Enum
 from pathlib import Path
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import Optional
-from typing import Tuple
-from typing import Type
+from typing import Any, Callable, Dict, Optional, Tuple, Type
 from xml.etree.ElementTree import QName
 
-from xsdata.models.datatype import XmlBase64Binary
-from xsdata.models.datatype import XmlDate
-from xsdata.models.datatype import XmlDateTime
-from xsdata.models.datatype import XmlDuration
-from xsdata.models.datatype import XmlHexBinary
-from xsdata.models.datatype import XmlPeriod
-from xsdata.models.datatype import XmlTime
+from xsdata.models.datatype import (
+    XmlBase64Binary,
+    XmlDate,
+    XmlDateTime,
+    XmlDuration,
+    XmlHexBinary,
+    XmlPeriod,
+    XmlTime,
+)
 
 COMMON_SCHEMA_DIR = Path(__file__).absolute().parent.parent.joinpath("schemas/")
 

@@ -1,19 +1,18 @@
 import os
-from unittest import mock
-from unittest import TestCase
+from unittest import TestCase, mock
 
 import pytest
 from click.testing import CliRunner
 
-from tests import fixtures_dir
-from tests import root
-from tests.fixtures.hello import GetHelloAsStringResponse
-from tests.fixtures.hello import HelloError
-from tests.fixtures.hello import HelloGetHelloAsString
-from tests.fixtures.hello import HelloGetHelloAsStringOutput
+from tests import fixtures_dir, root
+from tests.fixtures.hello import (
+    GetHelloAsStringResponse,
+    HelloError,
+    HelloGetHelloAsString,
+    HelloGetHelloAsStringOutput,
+)
 from xsdata.cli import cli
-from xsdata.formats.dataclass.client import Client
-from xsdata.formats.dataclass.client import Config
+from xsdata.formats.dataclass.client import Client, Config
 from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.formats.dataclass.transports import DefaultTransport

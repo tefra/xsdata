@@ -5,13 +5,13 @@ from xsdata.codegen.mappers.element import ElementMapper
 from xsdata.codegen.models import Restrictions
 from xsdata.codegen.utils import ClassUtils
 from xsdata.formats.dataclass.models.generics import AnyElement
-from xsdata.models.enums import DataType
-from xsdata.models.enums import QNames
-from xsdata.models.enums import Tag
-from xsdata.utils.testing import AttrFactory
-from xsdata.utils.testing import AttrTypeFactory
-from xsdata.utils.testing import ClassFactory
-from xsdata.utils.testing import FactoryTestCase
+from xsdata.models.enums import DataType, QNames, Tag
+from xsdata.utils.testing import (
+    AttrFactory,
+    AttrTypeFactory,
+    ClassFactory,
+    FactoryTestCase,
+)
 
 
 class ElementMapperTests(FactoryTestCase):

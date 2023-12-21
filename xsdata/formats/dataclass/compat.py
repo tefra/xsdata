@@ -1,20 +1,9 @@
 import abc
-from dataclasses import fields
-from dataclasses import is_dataclass
-from dataclasses import MISSING
-from typing import Any
-from typing import cast
-from typing import Dict
-from typing import Iterator
-from typing import List
-from typing import NamedTuple
-from typing import Optional
-from typing import Set
-from typing import Type
+from dataclasses import MISSING, fields, is_dataclass
+from typing import Any, Dict, Iterator, List, NamedTuple, Optional, Set, Type, cast
 
 from xsdata.exceptions import XmlContextError
-from xsdata.formats.dataclass.models.generics import AnyElement
-from xsdata.formats.dataclass.models.generics import DerivedElement
+from xsdata.formats.dataclass.models.generics import AnyElement, DerivedElement
 from xsdata.utils.hooks import load_entry_points
 
 

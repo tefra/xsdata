@@ -1,7 +1,6 @@
 from unittest import TestCase
 
-from tests.fixtures.books import BookForm
-from tests.fixtures.books import Books
+from tests.fixtures.books import BookForm, Books
 from tests.fixtures.books.fixtures import books
 from tests.fixtures.models import Parent
 from xsdata.formats.dataclass.serializers import PycodeSerializer

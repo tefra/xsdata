@@ -1,18 +1,18 @@
 import io
-from typing import Any
-from typing import List
-from typing import Optional
+from typing import Any, List, Optional
 
 from xsdata.exceptions import ParserError
-from xsdata.models.dtd import Dtd
-from xsdata.models.dtd import DtdAttribute
-from xsdata.models.dtd import DtdAttributeDefault
-from xsdata.models.dtd import DtdAttributeType
-from xsdata.models.dtd import DtdContent
-from xsdata.models.dtd import DtdContentOccur
-from xsdata.models.dtd import DtdContentType
-from xsdata.models.dtd import DtdElement
-from xsdata.models.dtd import DtdElementType
+from xsdata.models.dtd import (
+    Dtd,
+    DtdAttribute,
+    DtdAttributeDefault,
+    DtdAttributeType,
+    DtdContent,
+    DtdContentOccur,
+    DtdContentType,
+    DtdElement,
+    DtdElementType,
+)
 from xsdata.models.enums import Namespace
 
 

@@ -1,12 +1,10 @@
 from unittest.case import TestCase
 
 from tests.fixtures.books import Books
-from tests.fixtures.books.fixtures import books
-from tests.fixtures.books.fixtures import events
+from tests.fixtures.books.fixtures import books, events
 from xsdata.exceptions import XmlHandlerError
 from xsdata.formats.dataclass.parsers.bases import RecordParser
-from xsdata.formats.dataclass.parsers.mixins import EventsHandler
-from xsdata.formats.dataclass.parsers.mixins import XmlHandler
+from xsdata.formats.dataclass.parsers.mixins import EventsHandler, XmlHandler
 
 
 class XmlHandlerTests(TestCase):

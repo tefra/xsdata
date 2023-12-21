@@ -2,17 +2,17 @@ import sys
 from typing import Generator
 from unittest import mock
 
-from xsdata.codegen.models import Restrictions
-from xsdata.codegen.models import Status
+from xsdata.codegen.models import Restrictions, Status
 from xsdata.codegen.utils import ClassUtils
 from xsdata.exceptions import CodeGenerationError
-from xsdata.models.enums import DataType
-from xsdata.models.enums import Tag
-from xsdata.utils.testing import AttrFactory
-from xsdata.utils.testing import AttrTypeFactory
-from xsdata.utils.testing import ClassFactory
-from xsdata.utils.testing import ExtensionFactory
-from xsdata.utils.testing import FactoryTestCase
+from xsdata.models.enums import DataType, Tag
+from xsdata.utils.testing import (
+    AttrFactory,
+    AttrTypeFactory,
+    ClassFactory,
+    ExtensionFactory,
+    FactoryTestCase,
+)
 
 
 class ClassUtilsTests(FactoryTestCase):

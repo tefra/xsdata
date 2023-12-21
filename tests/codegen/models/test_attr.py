@@ -1,12 +1,8 @@
 import sys
 
 from xsdata.codegen.models import Restrictions
-from xsdata.models.enums import DataType
-from xsdata.models.enums import Namespace
-from xsdata.models.enums import Tag
-from xsdata.utils.testing import AttrFactory
-from xsdata.utils.testing import AttrTypeFactory
-from xsdata.utils.testing import FactoryTestCase
+from xsdata.models.enums import DataType, Namespace, Tag
+from xsdata.utils.testing import AttrFactory, AttrTypeFactory, FactoryTestCase
 
 
 class AttrTests(FactoryTestCase):

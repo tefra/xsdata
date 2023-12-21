@@ -1,5 +1,4 @@
-from typing import Any
-from typing import List
+from typing import Any, List
 
 from xsdata.codegen.mixins import RelativeHandlerInterface
 from xsdata.codegen.models import Class

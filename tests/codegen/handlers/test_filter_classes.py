@@ -2,12 +2,9 @@ from unittest import mock
 
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import FilterClasses
-from xsdata.models.config import ClassFilterStrategy
-from xsdata.models.config import GeneratorConfig
+from xsdata.models.config import ClassFilterStrategy, GeneratorConfig
 from xsdata.models.enums import Tag
-from xsdata.utils.testing import AttrFactory
-from xsdata.utils.testing import ClassFactory
-from xsdata.utils.testing import FactoryTestCase
+from xsdata.utils.testing import AttrFactory, ClassFactory, FactoryTestCase
 
 
 class FilterClassesTests(FactoryTestCase):

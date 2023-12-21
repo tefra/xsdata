@@ -3,8 +3,7 @@ from typing import Any
 from unittest import mock
 from unittest.case import TestCase
 
-from tests.fixtures.books import BookForm
-from tests.fixtures.books import Books
+from tests.fixtures.books import BookForm, Books
 from tests.fixtures.models import TypeA
 from xsdata.exceptions import ParserError
 from xsdata.formats.dataclass.models.elements import XmlType
@@ -14,8 +13,7 @@ from xsdata.formats.dataclass.parsers.handlers import XmlEventHandler
 from xsdata.formats.dataclass.parsers.mixins import XmlHandler
 from xsdata.formats.dataclass.parsers.nodes.primitive import PrimitiveNode
 from xsdata.formats.dataclass.parsers.nodes.skip import SkipNode
-from xsdata.models.enums import Namespace
-from xsdata.models.enums import QNames
+from xsdata.models.enums import Namespace, QNames
 from xsdata.utils.testing import XmlVarFactory
 
 

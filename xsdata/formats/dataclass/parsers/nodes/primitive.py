@@ -1,7 +1,4 @@
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Type
+from typing import Dict, List, Optional, Type
 
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.models.elements import XmlVar
@@ -40,10 +37,7 @@ class PrimitiveNode(XmlNode):
         )
 
         if obj is None and not self.var.nillable:
-            if bytes in self.var.types:
-                obj = b""
-            else:
-                obj = ""
+            obj = b"" if bytes in self.var.types else ""
 
         if self.var.derived:
             obj = self.derived_factory(qname=qname, value=obj)

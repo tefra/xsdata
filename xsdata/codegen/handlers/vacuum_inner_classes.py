@@ -1,8 +1,7 @@
 from typing import Iterator
 
 from xsdata.codegen.mixins import HandlerInterface
-from xsdata.codegen.models import AttrType
-from xsdata.codegen.models import Class
+from xsdata.codegen.models import AttrType, Class
 from xsdata.models.enums import DataType
 from xsdata.utils import collections
 from xsdata.utils.namespaces import build_qname

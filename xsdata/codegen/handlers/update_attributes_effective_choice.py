@@ -1,11 +1,8 @@
 from collections import defaultdict
-from typing import List
-from typing import Tuple
+from typing import List, Tuple
 
 from xsdata.codegen.mixins import HandlerInterface
-from xsdata.codegen.models import Attr
-from xsdata.codegen.models import Class
-from xsdata.codegen.models import get_restriction_choice
+from xsdata.codegen.models import Attr, Class, get_restriction_choice
 from xsdata.utils import collections
 
 

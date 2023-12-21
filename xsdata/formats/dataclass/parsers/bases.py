@@ -1,24 +1,18 @@
 import copy
 import warnings
-from dataclasses import dataclass
-from dataclasses import field
-from typing import Any
-from typing import cast
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Tuple
-from typing import Type
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Tuple, Type, cast
 
-from xsdata.exceptions import ConverterWarning
-from xsdata.exceptions import ParserError
+from xsdata.exceptions import ConverterWarning, ParserError
 from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers.config import ParserConfig
-from xsdata.formats.dataclass.parsers.mixins import EventsHandler
-from xsdata.formats.dataclass.parsers.mixins import PushParser
-from xsdata.formats.dataclass.parsers.mixins import XmlHandler
-from xsdata.formats.dataclass.parsers.mixins import XmlNode
+from xsdata.formats.dataclass.parsers.mixins import (
+    EventsHandler,
+    PushParser,
+    XmlHandler,
+    XmlNode,
+)
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.models.enums import EventType
 

@@ -1,15 +1,10 @@
 from typing import Optional
 
 from xsdata.codegen.mixins import RelativeHandlerInterface
-from xsdata.codegen.models import Attr
-from xsdata.codegen.models import AttrType
-from xsdata.codegen.models import Class
-from xsdata.codegen.models import Extension
+from xsdata.codegen.models import Attr, AttrType, Class, Extension
 from xsdata.codegen.utils import ClassUtils
 from xsdata.logger import logger
-from xsdata.models.enums import DataType
-from xsdata.models.enums import NamespaceType
-from xsdata.models.enums import Tag
+from xsdata.models.enums import DataType, NamespaceType, Tag
 from xsdata.utils.constants import DEFAULT_ATTR_NAME
 
 

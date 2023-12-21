@@ -1,7 +1,6 @@
 from unittest import TestCase
 
-from tests.fixtures.models import TypeA
-from tests.fixtures.models import TypeC
+from tests.fixtures.models import TypeA, TypeC
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.compat import Dataclasses
 

@@ -1,17 +1,12 @@
 from pathlib import Path
-from typing import Iterator
-from typing import List
-from typing import Optional
+from typing import Iterator, List, Optional
 
-from jinja2 import Environment
-from jinja2 import FileSystemLoader
+from jinja2 import Environment, FileSystemLoader
 
-from xsdata.codegen.models import Class
-from xsdata.codegen.models import Import
+from xsdata.codegen.models import Class, Import
 from xsdata.codegen.resolver import DependenciesResolver
 from xsdata.formats.dataclass.filters import Filters
-from xsdata.formats.mixins import AbstractGenerator
-from xsdata.formats.mixins import GeneratorResult
+from xsdata.formats.mixins import AbstractGenerator, GeneratorResult
 from xsdata.models.config import GeneratorConfig
 
 

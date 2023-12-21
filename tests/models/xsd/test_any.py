@@ -1,7 +1,6 @@
 from unittest import TestCase
 
-from xsdata.models.enums import Namespace
-from xsdata.models.enums import NamespaceType
+from xsdata.models.enums import Namespace, NamespaceType
 from xsdata.models.xsd import Any
 
 

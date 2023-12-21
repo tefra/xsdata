@@ -1,19 +1,11 @@
-from dataclasses import dataclass
-from dataclasses import field
-from typing import Dict
-from typing import Iterator
-from typing import List
-from typing import Optional
-from typing import TypeVar
+from dataclasses import dataclass, field
+from typing import Dict, Iterator, List, Optional, TypeVar
 
 from xsdata.codegen.models import get_name
 from xsdata.exceptions import DefinitionsValueError
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.models.enums import Namespace
-from xsdata.models.mixins import array_any_element
-from xsdata.models.mixins import array_element
-from xsdata.models.mixins import attribute
-from xsdata.models.mixins import element
+from xsdata.models.mixins import array_any_element, array_element, attribute, element
 from xsdata.models.xsd import Schema
 from xsdata.utils import collections
 

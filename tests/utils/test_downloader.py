@@ -1,12 +1,10 @@
 import tempfile
 from pathlib import Path
-from unittest import mock
-from unittest import TestCase
+from unittest import TestCase, mock
 from urllib.request import urlopen
 
 from tests import fixtures_dir
-from xsdata.models.xsd import Import
-from xsdata.models.xsd import Schema
+from xsdata.models.xsd import Import, Schema
 from xsdata.utils.downloader import Downloader
 
 

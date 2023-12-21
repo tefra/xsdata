@@ -1,9 +1,6 @@
 import re
 import string
-from typing import Any
-from typing import List
-from typing import Match
-from typing import Tuple
+from typing import Any, List, Match, Tuple
 
 stop_words = {
     "",

@@ -4,37 +4,30 @@ import importlib
 import random
 import unittest
 from dataclasses import is_dataclass
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Sequence
-from typing import Type
-from typing import TypeVar
+from typing import Any, Callable, Dict, List, Optional, Sequence, Type, TypeVar
 
-from xsdata.codegen.models import Attr
-from xsdata.codegen.models import AttrType
-from xsdata.codegen.models import Class
-from xsdata.codegen.models import Extension
-from xsdata.codegen.models import Import
-from xsdata.codegen.models import Restrictions
-from xsdata.codegen.models import Status
-from xsdata.formats.dataclass.models.elements import XmlMeta
-from xsdata.formats.dataclass.models.elements import XmlType
-from xsdata.formats.dataclass.models.elements import XmlVar
-from xsdata.models.dtd import Dtd
-from xsdata.models.dtd import DtdAttribute
-from xsdata.models.dtd import DtdAttributeDefault
-from xsdata.models.dtd import DtdAttributeType
-from xsdata.models.dtd import DtdContent
-from xsdata.models.dtd import DtdContentOccur
-from xsdata.models.dtd import DtdContentType
-from xsdata.models.dtd import DtdElement
-from xsdata.models.dtd import DtdElementType
-from xsdata.models.enums import DataType
-from xsdata.models.enums import Namespace
-from xsdata.models.enums import Tag
+from xsdata.codegen.models import (
+    Attr,
+    AttrType,
+    Class,
+    Extension,
+    Import,
+    Restrictions,
+    Status,
+)
+from xsdata.formats.dataclass.models.elements import XmlMeta, XmlType, XmlVar
+from xsdata.models.dtd import (
+    Dtd,
+    DtdAttribute,
+    DtdAttributeDefault,
+    DtdAttributeType,
+    DtdContent,
+    DtdContentOccur,
+    DtdContentType,
+    DtdElement,
+    DtdElementType,
+)
+from xsdata.models.enums import DataType, Namespace, Tag
 from xsdata.utils.collections import first
 from xsdata.utils.namespaces import build_qname
 

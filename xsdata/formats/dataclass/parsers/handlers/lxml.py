@@ -1,5 +1,4 @@
-from typing import Any
-from typing import Iterable
+from typing import Any, Iterable
 
 from lxml import etree
 

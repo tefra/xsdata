@@ -1,7 +1,4 @@
-from typing import ClassVar
-from typing import Dict
-from typing import List
-from typing import Type
+from typing import ClassVar, Dict, List, Type
 
 from xsdata.codegen.models import Class
 from xsdata.exceptions import CodeGenerationError

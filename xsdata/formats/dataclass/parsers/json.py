@@ -1,29 +1,16 @@
 import json
 import warnings
-from dataclasses import dataclass
-from dataclasses import field
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import Iterable
-from typing import List
-from typing import Optional
-from typing import Sequence
-from typing import Type
-from typing import Union
+from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Type, Union
 
-from xsdata.exceptions import ConverterWarning
-from xsdata.exceptions import ParserError
-from xsdata.formats.bindings import AbstractParser
-from xsdata.formats.bindings import T
+from xsdata.exceptions import ConverterWarning, ParserError
+from xsdata.formats.bindings import AbstractParser, T
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.context import XmlContext
-from xsdata.formats.dataclass.models.elements import XmlMeta
-from xsdata.formats.dataclass.models.elements import XmlVar
+from xsdata.formats.dataclass.models.elements import XmlMeta, XmlVar
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
-from xsdata.formats.dataclass.typing import get_args
-from xsdata.formats.dataclass.typing import get_origin
+from xsdata.formats.dataclass.typing import get_args, get_origin
 from xsdata.utils import collections
 from xsdata.utils.constants import EMPTY_MAP
 

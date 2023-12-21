@@ -6,12 +6,7 @@ import pickle
 import tempfile
 from collections import defaultdict
 from pathlib import Path
-from typing import Callable
-from typing import Dict
-from typing import List
-from typing import NamedTuple
-from typing import Optional
-from typing import Tuple
+from typing import Callable, Dict, List, NamedTuple, Optional, Tuple
 
 from xsdata.codegen import opener
 from xsdata.codegen.analyzer import ClassAnalyzer
@@ -243,7 +238,7 @@ class SchemaTransformer:
     def generate_classes(self, schema: Schema) -> List[Class]:
         """Convert the given schema tree to a list of classes."""
         uri = schema.location
-        logger.info("Compiling schema %s", "..." if not uri else uri)
+        logger.info("Compiling schema %s", uri if uri else "...")
         classes = SchemaMapper.map(schema)
 
         class_num, inner_num = self.count_classes(classes)

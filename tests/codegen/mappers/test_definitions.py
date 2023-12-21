@@ -2,27 +2,24 @@ from typing import Generator
 from unittest import mock
 
 from xsdata.codegen.mappers.definitions import DefinitionsMapper
-from xsdata.codegen.models import Class
-from xsdata.codegen.models import Status
+from xsdata.codegen.models import Class, Status
 from xsdata.formats.dataclass.models.generics import AnyElement
-from xsdata.models.enums import DataType
-from xsdata.models.enums import Namespace
-from xsdata.models.enums import Tag
-from xsdata.models.wsdl import Binding
-from xsdata.models.wsdl import BindingMessage
-from xsdata.models.wsdl import BindingOperation
-from xsdata.models.wsdl import Definitions
-from xsdata.models.wsdl import Message
-from xsdata.models.wsdl import Part
-from xsdata.models.wsdl import PortType
-from xsdata.models.wsdl import PortTypeMessage
-from xsdata.models.wsdl import PortTypeOperation
-from xsdata.models.wsdl import Service
-from xsdata.models.wsdl import ServicePort
+from xsdata.models.enums import DataType, Namespace, Tag
+from xsdata.models.wsdl import (
+    Binding,
+    BindingMessage,
+    BindingOperation,
+    Definitions,
+    Message,
+    Part,
+    PortType,
+    PortTypeMessage,
+    PortTypeOperation,
+    Service,
+    ServicePort,
+)
 from xsdata.utils.namespaces import build_qname
-from xsdata.utils.testing import AttrFactory
-from xsdata.utils.testing import ClassFactory
-from xsdata.utils.testing import FactoryTestCase
+from xsdata.utils.testing import AttrFactory, ClassFactory, FactoryTestCase
 
 
 def mock_create_inner(target: Class, name: str):

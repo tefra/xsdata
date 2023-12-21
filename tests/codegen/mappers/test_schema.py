@@ -3,36 +3,36 @@ from typing import Iterator
 from unittest import mock
 
 from xsdata.codegen.mappers.schema import SchemaMapper
-from xsdata.codegen.models import Class
-from xsdata.codegen.models import Restrictions
-from xsdata.models.enums import DataType
-from xsdata.models.enums import FormType
-from xsdata.models.enums import Tag
-from xsdata.models.enums import UseType
-from xsdata.models.xsd import Alternative
-from xsdata.models.xsd import Annotation
-from xsdata.models.xsd import Attribute
-from xsdata.models.xsd import AttributeGroup
-from xsdata.models.xsd import Choice
-from xsdata.models.xsd import ComplexContent
-from xsdata.models.xsd import ComplexType
-from xsdata.models.xsd import Element
-from xsdata.models.xsd import Enumeration
-from xsdata.models.xsd import Extension
-from xsdata.models.xsd import Group
-from xsdata.models.xsd import Override
-from xsdata.models.xsd import Redefine
-from xsdata.models.xsd import Restriction
-from xsdata.models.xsd import Schema
-from xsdata.models.xsd import Sequence
-from xsdata.models.xsd import SimpleContent
-from xsdata.models.xsd import SimpleType
+from xsdata.codegen.models import Class, Restrictions
+from xsdata.models.enums import DataType, FormType, Tag
+from xsdata.models.xsd import (
+    Alternative,
+    Annotation,
+    Attribute,
+    AttributeGroup,
+    Choice,
+    ComplexContent,
+    ComplexType,
+    Element,
+    Enumeration,
+    Extension,
+    Group,
+    Override,
+    Redefine,
+    Restriction,
+    Schema,
+    Sequence,
+    SimpleContent,
+    SimpleType,
+)
 from xsdata.utils.namespaces import build_qname
-from xsdata.utils.testing import AttrFactory
-from xsdata.utils.testing import AttrTypeFactory
-from xsdata.utils.testing import ClassFactory
-from xsdata.utils.testing import ExtensionFactory
-from xsdata.utils.testing import FactoryTestCase
+from xsdata.utils.testing import (
+    AttrFactory,
+    AttrTypeFactory,
+    ClassFactory,
+    ExtensionFactory,
+    FactoryTestCase,
+)
 
 
 class SchemaMapperTests(FactoryTestCase):

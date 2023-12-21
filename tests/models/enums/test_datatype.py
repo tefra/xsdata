@@ -2,10 +2,7 @@ from decimal import Decimal
 from unittest import TestCase
 from xml.etree.ElementTree import QName
 
-from xsdata.models.datatype import XmlDate
-from xsdata.models.datatype import XmlDateTime
-from xsdata.models.datatype import XmlPeriod
-from xsdata.models.datatype import XmlTime
+from xsdata.models.datatype import XmlDate, XmlDateTime, XmlPeriod, XmlTime
 from xsdata.models.enums import DataType
 
 

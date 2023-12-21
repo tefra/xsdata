@@ -1,16 +1,9 @@
-from dataclasses import dataclass
-from dataclasses import field
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Type
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Type
 
-from xsdata.formats.dataclass.parsers.bases import NodeParser
-from xsdata.formats.dataclass.parsers.bases import Parsed
+from xsdata.formats.dataclass.parsers.bases import NodeParser, Parsed
 from xsdata.formats.dataclass.parsers.handlers import default_handler
-from xsdata.formats.dataclass.parsers.mixins import XmlHandler
-from xsdata.formats.dataclass.parsers.mixins import XmlNode
+from xsdata.formats.dataclass.parsers.mixins import XmlHandler, XmlNode
 from xsdata.models.enums import EventType
 from xsdata.utils.namespaces import local_name
 from xsdata.utils.text import snake_case

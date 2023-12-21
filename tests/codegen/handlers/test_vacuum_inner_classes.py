@@ -2,11 +2,13 @@ from typing import Generator
 
 from xsdata.codegen.handlers import VacuumInnerClasses
 from xsdata.models.enums import DataType
-from xsdata.utils.testing import AttrFactory
-from xsdata.utils.testing import AttrTypeFactory
-from xsdata.utils.testing import ClassFactory
-from xsdata.utils.testing import ExtensionFactory
-from xsdata.utils.testing import FactoryTestCase
+from xsdata.utils.testing import (
+    AttrFactory,
+    AttrTypeFactory,
+    ClassFactory,
+    ExtensionFactory,
+    FactoryTestCase,
+)
 
 
 class VacuumInnerClassesTests(FactoryTestCase):

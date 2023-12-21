@@ -1,12 +1,6 @@
 import sys
 from collections import defaultdict
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Set
-from typing import Type
+from typing import Any, Callable, Dict, List, Optional, Set, Type
 
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.bindings import T

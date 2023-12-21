@@ -1,29 +1,19 @@
-from typing import Dict
-from typing import Iterator
-from typing import List
-from typing import Optional
-from typing import Tuple
+from typing import Dict, Iterator, List, Optional, Tuple
 
-from xsdata.codegen.models import Attr
-from xsdata.codegen.models import AttrType
-from xsdata.codegen.models import Class
-from xsdata.codegen.models import Extension
-from xsdata.codegen.models import Restrictions
-from xsdata.models.enums import DataType
-from xsdata.models.enums import Tag
+from xsdata.codegen.models import Attr, AttrType, Class, Extension, Restrictions
+from xsdata.models.enums import DataType, Tag
 from xsdata.models.mixins import ElementBase
-from xsdata.models.xsd import Attribute
-from xsdata.models.xsd import AttributeGroup
-from xsdata.models.xsd import ComplexType
-from xsdata.models.xsd import Element
-from xsdata.models.xsd import Group
-from xsdata.models.xsd import Schema
-from xsdata.models.xsd import SimpleType
-from xsdata.utils import collections
-from xsdata.utils import text
-from xsdata.utils.namespaces import build_qname
-from xsdata.utils.namespaces import is_default
-from xsdata.utils.namespaces import prefix_exists
+from xsdata.models.xsd import (
+    Attribute,
+    AttributeGroup,
+    ComplexType,
+    Element,
+    Group,
+    Schema,
+    SimpleType,
+)
+from xsdata.utils import collections, text
+from xsdata.utils.namespaces import build_qname, is_default, prefix_exists
 
 
 class SchemaMapper:

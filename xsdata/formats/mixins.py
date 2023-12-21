@@ -1,18 +1,14 @@
 import abc
 import datetime
 from pathlib import Path
-from typing import Dict
-from typing import Iterator
-from typing import List
-from typing import NamedTuple
+from typing import Dict, Iterator, List, NamedTuple
 
 from xsdata import __version__
 from xsdata.codegen.models import Class
 from xsdata.exceptions import CodeGenerationError
 from xsdata.models.config import GeneratorConfig
 from xsdata.utils.collections import group_by
-from xsdata.utils.package import module_path
-from xsdata.utils.package import package_path
+from xsdata.utils.package import module_path, package_path
 
 
 class GeneratorResult(NamedTuple):

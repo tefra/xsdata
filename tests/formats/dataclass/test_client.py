@@ -1,15 +1,14 @@
-from unittest import mock
-from unittest import TestCase
+from unittest import TestCase, mock
 
-from tests.fixtures.calculator import Add
-from tests.fixtures.calculator import CalculatorSoapAdd
-from tests.fixtures.calculator import CalculatorSoapAddInput
-from tests.fixtures.calculator import CalculatorSoapAddOutput
+from tests.fixtures.calculator import (
+    Add,
+    CalculatorSoapAdd,
+    CalculatorSoapAddInput,
+    CalculatorSoapAddOutput,
+)
 from tests.fixtures.hello import HelloGetHelloAsString
 from xsdata.exceptions import ClientValueError
-from xsdata.formats.dataclass.client import Client
-from xsdata.formats.dataclass.client import Config
-from xsdata.formats.dataclass.client import TransportTypes
+from xsdata.formats.dataclass.client import Client, Config, TransportTypes
 from xsdata.formats.dataclass.transports import DefaultTransport
 
 response = """

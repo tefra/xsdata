@@ -1,31 +1,30 @@
 import sys
 from collections import defaultdict
 from enum import Enum
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import get_type_hints
-from typing import Iterator
-from typing import List
-from typing import Mapping
-from typing import NamedTuple
-from typing import Optional
-from typing import Sequence
-from typing import Set
-from typing import Tuple
-from typing import Type
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Mapping,
+    NamedTuple,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Type,
+    get_type_hints,
+)
 
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.compat import ClassType
-from xsdata.formats.dataclass.models.elements import XmlMeta
-from xsdata.formats.dataclass.models.elements import XmlType
-from xsdata.formats.dataclass.models.elements import XmlVar
+from xsdata.formats.dataclass.models.elements import XmlMeta, XmlType, XmlVar
 from xsdata.formats.dataclass.typing import evaluate
 from xsdata.models.enums import NamespaceType
 from xsdata.utils.collections import first
-from xsdata.utils.constants import EMPTY_SEQUENCE
-from xsdata.utils.constants import return_input
+from xsdata.utils.constants import EMPTY_SEQUENCE, return_input
 from xsdata.utils.namespaces import build_qname
 
 
@@ -286,13 +285,12 @@ class XmlVarBuilder:
                 f"Xml type '{xml_type}' does not support typing: {type_hint}"
             )
 
-        if wrapper is not None:
-            if not isinstance(origin, type) or not issubclass(
-                origin, (list, set, tuple)
-            ):
-                raise XmlContextError(
-                    f"a wrapper requires a collection type on attribute {name}"
-                )
+        if wrapper is not None and (
+            not isinstance(origin, type) or not issubclass(origin, (list, set, tuple))
+        ):
+            raise XmlContextError(
+                f"a wrapper requires a collection type on attribute {name}"
+            )
 
         local_name = self.build_local_name(xml_type, local_name, name)
 

@@ -1,13 +1,8 @@
 from collections import defaultdict
-from typing import Dict
-from typing import List
-from typing import Optional
+from typing import Dict, List, Optional
 
-from xsdata.codegen.mixins import ContainerInterface
-from xsdata.codegen.mixins import RelativeHandlerInterface
-from xsdata.codegen.models import Attr
-from xsdata.codegen.models import AttrType
-from xsdata.codegen.models import Class
+from xsdata.codegen.mixins import ContainerInterface, RelativeHandlerInterface
+from xsdata.codegen.models import Attr, AttrType, Class
 from xsdata.codegen.utils import ClassUtils
 from xsdata.models.enums import Tag
 from xsdata.utils import collections

@@ -1,9 +1,6 @@
-from typing import Dict
-from typing import Generator
-from typing import TextIO
+from typing import Dict, Generator, TextIO
 
-from lxml.etree import indent
-from lxml.etree import tostring
+from lxml.etree import indent, tostring
 from lxml.sax import ElementTreeContentHandler
 
 from xsdata.formats.dataclass.serializers.config import SerializerConfig

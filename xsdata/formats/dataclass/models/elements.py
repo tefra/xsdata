@@ -1,23 +1,24 @@
 import itertools
 import operator
 import sys
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import Iterator
-from typing import List
-from typing import Mapping
-from typing import Optional
-from typing import Sequence
-from typing import Set
-from typing import Tuple
-from typing import Type
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Type,
+)
 
 from xsdata.formats.converter import converter
 from xsdata.models.enums import NamespaceType
 from xsdata.utils import collections
-from xsdata.utils.namespaces import local_name
-from xsdata.utils.namespaces import target_uri
+from xsdata.utils.namespaces import local_name, target_uri
 
 NoneType = type(None)
 

@@ -1,12 +1,8 @@
 import sys
-from typing import Dict
-from typing import List
-from typing import Optional
+from typing import Dict, List, Optional
 
 from xsdata.codegen.mixins import RelativeHandlerInterface
-from xsdata.codegen.models import Attr
-from xsdata.codegen.models import Class
-from xsdata.codegen.models import get_slug
+from xsdata.codegen.models import Attr, Class, get_slug
 from xsdata.codegen.utils import ClassUtils
 from xsdata.logger import logger
 from xsdata.utils import collections

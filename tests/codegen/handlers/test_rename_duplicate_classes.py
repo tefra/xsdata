@@ -2,14 +2,15 @@ from unittest import mock
 
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import RenameDuplicateClasses
-from xsdata.models.config import GeneratorConfig
-from xsdata.models.config import StructureStyle
+from xsdata.models.config import GeneratorConfig, StructureStyle
 from xsdata.models.enums import Tag
-from xsdata.utils.testing import AttrFactory
-from xsdata.utils.testing import AttrTypeFactory
-from xsdata.utils.testing import ClassFactory
-from xsdata.utils.testing import ExtensionFactory
-from xsdata.utils.testing import FactoryTestCase
+from xsdata.utils.testing import (
+    AttrFactory,
+    AttrTypeFactory,
+    ClassFactory,
+    ExtensionFactory,
+    FactoryTestCase,
+)
 
 
 class RenameDuplicateClassesTests(FactoryTestCase):

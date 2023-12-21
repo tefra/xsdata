@@ -1,8 +1,5 @@
 import sys
-from typing import Any
-from typing import Dict
-from typing import Sequence
-from typing import Tuple
+from typing import Any, Dict, Sequence, Tuple
 
 EMPTY_MAP: Dict = {}
 EMPTY_SEQUENCE: Sequence = []

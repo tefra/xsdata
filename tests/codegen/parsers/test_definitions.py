@@ -2,8 +2,7 @@ from unittest import TestCase
 
 from tests import fixtures_dir
 from xsdata.codegen.parsers import DefinitionsParser
-from xsdata.models.wsdl import Definitions
-from xsdata.models.wsdl import Import
+from xsdata.models.wsdl import Definitions, Import
 
 
 class DefinitionsParserTests(TestCase):

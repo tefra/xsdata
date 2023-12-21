@@ -1,33 +1,30 @@
-from dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass, field
 from enum import Enum
 from io import StringIO
-from typing import Any
-from typing import Dict
-from typing import Generator
-from typing import Iterable
-from typing import Iterator
-from typing import List
-from typing import Optional
-from typing import TextIO
-from typing import Tuple
-from typing import Type
+from typing import (
+    Any,
+    Dict,
+    Generator,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    TextIO,
+    Tuple,
+    Type,
+)
 from xml.etree.ElementTree import QName
 
 from xsdata.exceptions import SerializerError
 from xsdata.formats.bindings import AbstractSerializer
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.context import XmlContext
-from xsdata.formats.dataclass.models.elements import XmlMeta
-from xsdata.formats.dataclass.models.elements import XmlVar
+from xsdata.formats.dataclass.models.elements import XmlMeta, XmlVar
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
-from xsdata.formats.dataclass.serializers.mixins import XmlWriter
-from xsdata.formats.dataclass.serializers.mixins import XmlWriterEvent
+from xsdata.formats.dataclass.serializers.mixins import XmlWriter, XmlWriterEvent
 from xsdata.formats.dataclass.serializers.writers import default_writer
-from xsdata.models.enums import DataType
-from xsdata.models.enums import QNames
-from xsdata.utils import collections
-from xsdata.utils import namespaces
+from xsdata.models.enums import DataType, QNames
+from xsdata.utils import collections, namespaces
 from xsdata.utils.constants import EMPTY_MAP
 
 NoneStr = Optional[str]

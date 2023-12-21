@@ -1,6 +1,5 @@
 from xsdata.codegen.mixins import RelativeHandlerInterface
-from xsdata.codegen.models import Attr
-from xsdata.codegen.models import Class
+from xsdata.codegen.models import Attr, Class
 from xsdata.codegen.utils import ClassUtils
 from xsdata.exceptions import AnalyzerValueError
 

@@ -1,23 +1,15 @@
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Set
-from typing import Type
+from typing import Any, Dict, List, Optional, Set, Type
 
 from xsdata.exceptions import ParserError
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.context import XmlContext
-from xsdata.formats.dataclass.models.elements import XmlMeta
-from xsdata.formats.dataclass.models.elements import XmlVar
+from xsdata.formats.dataclass.models.elements import XmlMeta, XmlVar
 from xsdata.formats.dataclass.parsers import nodes
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.mixins import XmlNode
-from xsdata.formats.dataclass.parsers.utils import ParserUtils
-from xsdata.formats.dataclass.parsers.utils import PendingCollection
+from xsdata.formats.dataclass.parsers.utils import ParserUtils, PendingCollection
 from xsdata.logger import logger
-from xsdata.models.enums import DataType
-from xsdata.models.enums import Namespace
+from xsdata.models.enums import DataType, Namespace
 from xsdata.utils.namespaces import target_uri
 
 
@@ -115,7 +107,7 @@ class ElementNode(XmlNode):
             self.bind_wild_text(params, wild_var, text, tail)
             self.tail_processed = True
 
-        for key in params.keys():
+        for key in params:
             if isinstance(params[key], PendingCollection):
                 params[key] = params[key].evaluate()
 

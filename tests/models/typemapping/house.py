@@ -1,6 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     from tests.models.typemapping.street import Street

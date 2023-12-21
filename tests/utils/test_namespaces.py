@@ -2,17 +2,19 @@ from typing import Dict
 from unittest import TestCase
 
 from xsdata.models.enums import Namespace
-from xsdata.utils.namespaces import build_qname
-from xsdata.utils.namespaces import clean_prefixes
-from xsdata.utils.namespaces import clean_uri
-from xsdata.utils.namespaces import generate_prefix
-from xsdata.utils.namespaces import is_default
-from xsdata.utils.namespaces import is_ncname
-from xsdata.utils.namespaces import is_uri
-from xsdata.utils.namespaces import load_prefix
-from xsdata.utils.namespaces import prefix_exists
-from xsdata.utils.namespaces import split_qname
-from xsdata.utils.namespaces import to_package_name
+from xsdata.utils.namespaces import (
+    build_qname,
+    clean_prefixes,
+    clean_uri,
+    generate_prefix,
+    is_default,
+    is_ncname,
+    is_uri,
+    load_prefix,
+    prefix_exists,
+    split_qname,
+    to_package_name,
+)
 
 
 class NamespacesTests(TestCase):

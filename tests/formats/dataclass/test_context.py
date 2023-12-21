@@ -3,17 +3,12 @@ from dataclasses import make_dataclass
 from pathlib import Path
 from unittest import mock
 
-from tests.fixtures.artists import Artist
-from tests.fixtures.artists import BeginArea
-from tests.fixtures.books import BookForm
-from tests.fixtures.books import BooksForm
-from tests.fixtures.models import BaseType
-from tests.fixtures.models import ChoiceType
-from tests.fixtures.models import UnionType
+from tests.fixtures.artists import Artist, BeginArea
+from tests.fixtures.books import BookForm, BooksForm
+from tests.fixtures.models import BaseType, ChoiceType, UnionType
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.models.enums import DataType
-from xsdata.utils.testing import FactoryTestCase
-from xsdata.utils.testing import XmlMetaFactory
+from xsdata.utils.testing import FactoryTestCase, XmlMetaFactory
 
 
 class XmlContextTests(FactoryTestCase):
@@ -100,7 +95,7 @@ class XmlContextTests(FactoryTestCase):
         a = make_dataclass("A", fields=[])
         b = make_dataclass("B", fields=[], bases=(a,))
         c = make_dataclass("C", fields=[], bases=(a,))
-        other = make_dataclass("Other", fields=[])  # Included in the locals
+        make_dataclass("Other", fields=[])  # Included in the locals
 
         self.assertEqual(b, self.ctx.find_subclass(a, "B"))
         self.assertEqual(b, self.ctx.find_subclass(c, "B"))

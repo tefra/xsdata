@@ -1,9 +1,7 @@
 from unittest import TestCase
 
 from xsdata.formats.dataclass.models.generics import AnyElement
-from xsdata.models.xsd import Annotation
-from xsdata.models.xsd import AnnotationBase
-from xsdata.models.xsd import Documentation
+from xsdata.models.xsd import Annotation, AnnotationBase, Documentation
 
 
 class AnnotationBaseTest(TestCase):

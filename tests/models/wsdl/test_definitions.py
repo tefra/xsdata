@@ -4,12 +4,7 @@ from unittest import TestCase
 
 from xsdata.exceptions import DefinitionsValueError
 from xsdata.formats.dataclass.models.generics import AnyElement
-from xsdata.models.wsdl import Binding
-from xsdata.models.wsdl import Definitions
-from xsdata.models.wsdl import Message
-from xsdata.models.wsdl import PortType
-from xsdata.models.wsdl import Service
-from xsdata.models.wsdl import Types
+from xsdata.models.wsdl import Binding, Definitions, Message, PortType, Service, Types
 from xsdata.models.xsd import Schema
 
 

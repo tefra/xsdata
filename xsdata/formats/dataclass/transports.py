@@ -1,10 +1,7 @@
 import abc
-from typing import Any
-from typing import Dict
-from typing import Optional
+from typing import Any, Dict, Optional
 
-from requests import Response
-from requests import Session
+from requests import Response, Session
 
 
 class Transport(abc.ABC):

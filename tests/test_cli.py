@@ -3,21 +3,18 @@ import platform
 import sys
 import tempfile
 from pathlib import Path
-from unittest import mock
-from unittest import TestCase
+from unittest import TestCase, mock
 
 from click.testing import CliRunner
 
 from tests import fixtures_dir
 from xsdata import __version__
-from xsdata.cli import cli
-from xsdata.cli import resolve_source
+from xsdata.cli import cli, resolve_source
 from xsdata.codegen.transformer import SchemaTransformer
 from xsdata.codegen.writer import CodeWriter
 from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.logger import logger
-from xsdata.models.config import GeneratorConfig
-from xsdata.models.config import StructureStyle
+from xsdata.models.config import GeneratorConfig, StructureStyle
 from xsdata.utils.downloader import Downloader
 
 CodeWriter.register_generator("testing", DataclassGenerator)

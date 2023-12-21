@@ -19,16 +19,9 @@ from xsdata.exceptions import CodeGenerationError
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.parsers import TreeParser
 from xsdata.models.config import GeneratorConfig
-from xsdata.models.wsdl import Binding
-from xsdata.models.wsdl import Definitions
-from xsdata.models.wsdl import Types
-from xsdata.models.xsd import Import
-from xsdata.models.xsd import Include
-from xsdata.models.xsd import Override
-from xsdata.models.xsd import Schema
-from xsdata.utils.testing import ClassFactory
-from xsdata.utils.testing import DtdFactory
-from xsdata.utils.testing import FactoryTestCase
+from xsdata.models.wsdl import Binding, Definitions, Types
+from xsdata.models.xsd import Import, Include, Override, Schema
+from xsdata.utils.testing import ClassFactory, DtdFactory, FactoryTestCase
 
 
 class SchemaTransformerTests(FactoryTestCase):

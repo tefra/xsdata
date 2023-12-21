@@ -1,21 +1,13 @@
 import re
 import sys
 import warnings
-from dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Pattern
-from typing import TextIO
+from typing import Any, Callable, Dict, List, Optional, Pattern, TextIO
 
 from xsdata import __version__
-from xsdata.exceptions import CodeGenerationWarning
-from xsdata.exceptions import GeneratorConfigError
+from xsdata.exceptions import CodeGenerationWarning, GeneratorConfigError
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers import XmlParser
 from xsdata.formats.dataclass.parsers.config import ParserConfig
@@ -24,12 +16,8 @@ from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.formats.dataclass.serializers.writers import XmlEventWriter
 from xsdata.logger import logger
 from xsdata.models.enums import Namespace
-from xsdata.models.mixins import array_element
-from xsdata.models.mixins import attribute
-from xsdata.models.mixins import element
-from xsdata.models.mixins import text_node
-from xsdata.utils import objects
-from xsdata.utils import text
+from xsdata.models.mixins import array_element, attribute, element, text_node
+from xsdata.utils import objects, text
 
 
 class StructureStyle(Enum):

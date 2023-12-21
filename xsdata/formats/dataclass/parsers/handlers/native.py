@@ -1,10 +1,5 @@
 import functools
-from typing import Any
-from typing import Dict
-from typing import Iterable
-from typing import Iterator
-from typing import Optional
-from typing import Tuple
+from typing import Any, Dict, Iterable, Iterator, Optional, Tuple
 from urllib.parse import urljoin
 from xml.etree import ElementInclude as xinclude
 from xml.etree import ElementTree as etree

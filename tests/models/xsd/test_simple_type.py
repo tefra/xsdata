@@ -1,11 +1,6 @@
 from unittest import TestCase
 
-from xsdata.models.xsd import Enumeration
-from xsdata.models.xsd import Length
-from xsdata.models.xsd import List
-from xsdata.models.xsd import Restriction
-from xsdata.models.xsd import SimpleType
-from xsdata.models.xsd import Union
+from xsdata.models.xsd import Enumeration, Length, List, Restriction, SimpleType, Union
 
 
 class SimpleTypeTests(TestCase):
@@ -54,6 +49,6 @@ class SimpleTypeTests(TestCase):
         obj.list = List()
         self.assertEqual({"tokens": True}, obj.get_restrictions())
 
-        expected = dict(length=2)
+        expected = {"length": 2}
         obj.restriction = Restriction(length=Length(value=2))
         self.assertEqual(expected, obj.get_restrictions())

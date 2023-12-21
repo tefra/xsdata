@@ -5,16 +5,17 @@ from pathlib import Path
 from unittest import TestCase
 
 from xsdata import __version__
-from xsdata.exceptions import GeneratorConfigError
-from xsdata.exceptions import ParserError
-from xsdata.models.config import ExtensionType
-from xsdata.models.config import GeneratorAlias
-from xsdata.models.config import GeneratorAliases
-from xsdata.models.config import GeneratorConfig
-from xsdata.models.config import GeneratorExtension
-from xsdata.models.config import GeneratorOutput
-from xsdata.models.config import ObjectType
-from xsdata.models.config import OutputFormat
+from xsdata.exceptions import GeneratorConfigError, ParserError
+from xsdata.models.config import (
+    ExtensionType,
+    GeneratorAlias,
+    GeneratorAliases,
+    GeneratorConfig,
+    GeneratorExtension,
+    GeneratorOutput,
+    ObjectType,
+    OutputFormat,
+)
 
 
 class GeneratorConfigTests(TestCase):
@@ -122,7 +123,7 @@ class GeneratorConfigTests(TestCase):
     def test_read_with_wrong_value(self):
         existing = (
             '<?xml version="1.0" encoding="UTF-8"?>\n'
-            f'<Config xmlns="http://pypi.org/project/xsdata" version="21.7">\n'
+            '<Config xmlns="http://pypi.org/project/xsdata" version="21.7">\n'
             '  <Output maxLineLength="79">\n'
             "    <Structure>unknown</Structure>\n"
             "  </Output>\n"
@@ -243,4 +244,4 @@ class GeneratorConfigTests(TestCase):
                 type=ExtensionType.DECORATOR, import_string="a.b", class_name="*Foo"
             )
 
-        self.assertEqual(f"Failed to compile pattern '*Foo'", str(cm.exception))
+        self.assertEqual("Failed to compile pattern '*Foo'", str(cm.exception))

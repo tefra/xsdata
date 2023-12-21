@@ -1,11 +1,7 @@
-from tests.fixtures.books import BookForm
-from tests.fixtures.books import Books
-from tests.integration.benchmarks.conftest import context
-from tests.integration.benchmarks.conftest import xsdata_temp_dir
-from xsdata.formats.dataclass.parsers import JsonParser
-from xsdata.formats.dataclass.parsers import XmlParser
-from xsdata.formats.dataclass.serializers import JsonSerializer
-from xsdata.formats.dataclass.serializers import XmlSerializer
+from tests.fixtures.books import BookForm, Books
+from tests.integration.benchmarks.conftest import context, xsdata_temp_dir
+from xsdata.formats.dataclass.parsers import JsonParser, XmlParser
+from xsdata.formats.dataclass.serializers import JsonSerializer, XmlSerializer
 from xsdata.models.datatype import XmlDate
 
 

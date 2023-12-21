@@ -1,40 +1,19 @@
 exclude: tests/fixtures
 
 repos:
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.15.0
-    hooks:
-      - id: pyupgrade
-        args: [ --py38-plus ]
-  - repo: https://github.com/asottile/reorder_python_imports
-    rev: v3.12.0
-    hooks:
-      - id: reorder-python-imports
-  - repo: https://github.com/ambv/black
-    rev: 23.12.0
-    hooks:
-      - id: black
-  - repo: https://github.com/PyCQA/autoflake
-    rev: v2.2.1
-    hooks:
-      - id: autoflake
-  - repo: https://github.com/PyCQA/flake8
-    rev: 6.1.0
-    hooks:
-      - id: flake8
-        additional_dependencies: [
-          flake8-bugbear,
-          flake8-annotations,
-          flake8-comprehensions,
-        ]
-        args: [ "--suppress-none-returning" ]
-
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: debug-statements
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.8
+    hooks:
+      - id: ruff
+        args: [ --fix ]
+      - id: ruff-format
+
   - repo: https://github.com/PyCQA/docformatter
     rev: v1.7.3
     hooks:
@@ -52,7 +31,7 @@ repos:
           - types-click
           - types-docutils
           - types-toposort
-        args: [ "--check-untyped-defs", "--ignore-missing-imports"]
+        args: [ "--check-untyped-defs", "--ignore-missing-imports" ]
   - repo: https://github.com/PyCQA/doc8
     rev: v1.1.1
     hooks:

@@ -147,23 +147,23 @@ class AttrsType:
 
 @dataclass
 class SequentialType:
-    a0: Optional[str] = field(default=None, metadata=dict(type="Attribute"))
-    a1: Dict[str, str] = field(default_factory=dict, metadata=dict(type="Attributes"))
+    a0: Optional[str] = field(default=None, metadata={"type": "Attribute"})
+    a1: Dict[str, str] = field(default_factory=dict, metadata={"type": "Attributes"})
     a2: List[str] = field(
-        default_factory=list, metadata=dict(type="Attribute", tokens=True)
+        default_factory=list, metadata={"type": "Attribute", "tokens": True}
     )
     x0: Optional[int] = field(default=None)
     x1: List[int] = field(
-        default_factory=list, metadata=dict(type="Element", sequence=1)
+        default_factory=list, metadata={"type": "Element", "sequence": 1}
     )
     x2: List[int] = field(
-        default_factory=list, metadata=dict(type="Element", sequence=1)
+        default_factory=list, metadata={"type": "Element", "sequence": 1}
     )
     x3: List[int] = field(
-        default_factory=list, metadata=dict(type="Element", sequence=2)
+        default_factory=list, metadata={"type": "Element", "sequence": 2}
     )
     x4: Optional[int] = field(
-        default=None, metadata=dict(type="Element", sequence=2)
+        default=None, metadata={"type": "Element", "sequence": 2}
     )
 
 
@@ -182,14 +182,14 @@ class Paragraph:
 
     content: List[object] = field(
         default_factory=list,
-        metadata=dict(
-            type="Wildcard",
-            namespace="##any",
-            mixed=True,
-            choices=(
-                dict(name="span", type=Span),
+        metadata={
+            "type": "Wildcard",
+            "namespace": "##any",
+            "mixed": True,
+            "choices": (
+                {"name": "span", "type": Span},
             ),
-        )
+        }
     )
 
 
@@ -209,7 +209,7 @@ class TypeNS2:
     class Meta:
         namespace = "ns2"
 
-    x1: int = field(metadata=dict(type="Element"))
+    x1: int = field(metadata={"type": "Element"})
 
 @dataclass
 class TypeNS1(TypeNS2):
@@ -217,4 +217,4 @@ class TypeNS1(TypeNS2):
     class Meta:
         namespace = "ns1"
 
-    x2: int = field(metadata=dict(type="Element"))
+    x2: int = field(metadata={"type": "Element"})

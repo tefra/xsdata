@@ -1,15 +1,8 @@
 from collections import Counter
-from typing import Dict
-from typing import List
-from typing import Set
-from typing import Tuple
+from typing import Dict, List, Set, Tuple
 
-from xsdata.codegen.mixins import ContainerInterface
-from xsdata.codegen.mixins import RelativeHandlerInterface
-from xsdata.codegen.models import Attr
-from xsdata.codegen.models import Class
-from xsdata.codegen.models import get_restriction_choice
-from xsdata.codegen.models import Restrictions
+from xsdata.codegen.mixins import ContainerInterface, RelativeHandlerInterface
+from xsdata.codegen.models import Attr, Class, Restrictions, get_restriction_choice
 from xsdata.codegen.utils import ClassUtils
 from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.models.enums import Tag

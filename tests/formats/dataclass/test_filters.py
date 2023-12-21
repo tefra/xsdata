@@ -4,21 +4,23 @@ from unittest import mock
 from tests.fixtures.datatypes import Telephone
 from xsdata.codegen.models import Restrictions
 from xsdata.formats.dataclass.filters import Filters
-from xsdata.models.config import DocstringStyle
-from xsdata.models.config import ExtensionType
-from xsdata.models.config import GeneratorConfig
-from xsdata.models.config import GeneratorExtension
-from xsdata.models.config import GeneratorSubstitution
-from xsdata.models.config import NameCase
-from xsdata.models.config import ObjectType
-from xsdata.models.enums import DataType
-from xsdata.models.enums import Namespace
-from xsdata.models.enums import Tag
-from xsdata.utils.testing import AttrFactory
-from xsdata.utils.testing import AttrTypeFactory
-from xsdata.utils.testing import ClassFactory
-from xsdata.utils.testing import ExtensionFactory
-from xsdata.utils.testing import FactoryTestCase
+from xsdata.models.config import (
+    DocstringStyle,
+    ExtensionType,
+    GeneratorConfig,
+    GeneratorExtension,
+    GeneratorSubstitution,
+    NameCase,
+    ObjectType,
+)
+from xsdata.models.enums import DataType, Namespace, Tag
+from xsdata.utils.testing import (
+    AttrFactory,
+    AttrTypeFactory,
+    ClassFactory,
+    ExtensionFactory,
+    FactoryTestCase,
+)
 
 type_str = AttrTypeFactory.native(DataType.STRING)
 type_int = AttrTypeFactory.native(DataType.INT)
@@ -386,7 +388,7 @@ class FiltersTests(FactoryTestCase):
         self.assertEqual(expected, self.filters.field_default_value(attr))
 
         attr.types[0].qname = "nomatch"  # impossible
-        with self.assertRaises(Exception):
+        with self.assertRaises(StopIteration):
             self.filters.field_default_value(attr)
 
     def test_field_default_value_with_type_qname(self):
@@ -909,21 +911,21 @@ class FiltersTests(FactoryTestCase):
         self.assertEqual(expected, self.filters.default_imports("@dataclass @attrs.s"))
 
     def test_format_metadata(self):
-        data = dict(
-            num=1,
-            text="foo",
-            text_two="fo'o",
-            text_three='fo"o',
-            pattern="foo",
-            custom=Telephone(30, 123, 4567),
-            level_two=dict(a=1),
-            list=[
-                dict(type="Type[object]"),
-                dict(type="Type[object] mpla"),
+        data = {
+            "num": 1,
+            "text": "foo",
+            "text_two": "fo'o",
+            "text_three": 'fo"o',
+            "pattern": "foo",
+            "custom": Telephone(30, 123, 4567),
+            "level_two": {"a": 1},
+            "list": [
+                {"type": "Type[object]"},
+                {"type": "Type[object] mpla"},
             ],
-            default="1",
-            default_factory="list",
-        )
+            "default": "1",
+            "default_factory": "list",
+        }
 
         expected = (
             "{\n"

@@ -3,8 +3,7 @@ from unittest import mock
 from xsdata.formats.converter import ConverterFactory
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
-from xsdata.models.enums import Namespace
-from xsdata.models.enums import QNames
+from xsdata.models.enums import Namespace, QNames
 from xsdata.utils.testing import FactoryTestCase
 
 
@@ -54,7 +53,7 @@ class ParserUtilsTests(FactoryTestCase):
 
     @mock.patch.object(ConverterFactory, "deserialize", return_value=2)
     def test_parse_value_with_ns_map(self, mock_to_python):
-        ns_map = dict(a=1)
+        ns_map = {"a": 1}
         ParserUtils.parse_value(" 1 2 3", [int], list, ns_map, list)
         ParserUtils.parse_value(" 1 2 3", [str], None, ns_map)
 

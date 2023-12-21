@@ -1,20 +1,22 @@
 from typing import Iterator
 from unittest import TestCase
 
-from xsdata.models.xsd import Enumeration
-from xsdata.models.xsd import FractionDigits
-from xsdata.models.xsd import Length
-from xsdata.models.xsd import MaxExclusive
-from xsdata.models.xsd import MaxInclusive
-from xsdata.models.xsd import MaxLength
-from xsdata.models.xsd import MinExclusive
-from xsdata.models.xsd import MinInclusive
-from xsdata.models.xsd import MinLength
-from xsdata.models.xsd import Pattern
-from xsdata.models.xsd import Restriction
-from xsdata.models.xsd import SimpleType
-from xsdata.models.xsd import TotalDigits
-from xsdata.models.xsd import WhiteSpace
+from xsdata.models.xsd import (
+    Enumeration,
+    FractionDigits,
+    Length,
+    MaxExclusive,
+    MaxInclusive,
+    MaxLength,
+    MinExclusive,
+    MinInclusive,
+    MinLength,
+    Pattern,
+    Restriction,
+    SimpleType,
+    TotalDigits,
+    WhiteSpace,
+)
 
 
 class RestrictionTests(TestCase):

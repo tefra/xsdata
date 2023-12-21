@@ -3,10 +3,8 @@ from typing import Type
 
 from lxml import etree
 
-from xsdata.formats.dataclass.parsers import JsonParser
-from xsdata.formats.dataclass.parsers import XmlParser
-from xsdata.formats.dataclass.serializers import JsonSerializer
-from xsdata.formats.dataclass.serializers import XmlSerializer
+from xsdata.formats.dataclass.parsers import JsonParser, XmlParser
+from xsdata.formats.dataclass.serializers import JsonSerializer, XmlSerializer
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
 
 

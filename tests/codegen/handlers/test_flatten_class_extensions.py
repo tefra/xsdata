@@ -3,17 +3,17 @@ from unittest import mock
 
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import FlattenClassExtensions
-from xsdata.codegen.models import Restrictions
-from xsdata.codegen.models import Status
+from xsdata.codegen.models import Restrictions, Status
 from xsdata.codegen.utils import ClassUtils
 from xsdata.models.config import GeneratorConfig
-from xsdata.models.enums import DataType
-from xsdata.models.enums import Tag
-from xsdata.utils.testing import AttrFactory
-from xsdata.utils.testing import AttrTypeFactory
-from xsdata.utils.testing import ClassFactory
-from xsdata.utils.testing import ExtensionFactory
-from xsdata.utils.testing import FactoryTestCase
+from xsdata.models.enums import DataType, Tag
+from xsdata.utils.testing import (
+    AttrFactory,
+    AttrTypeFactory,
+    ClassFactory,
+    ExtensionFactory,
+    FactoryTestCase,
+)
 
 
 class FlattenClassExtensionsTests(FactoryTestCase):

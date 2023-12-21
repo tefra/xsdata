@@ -1,8 +1,7 @@
 from typing import Optional
 
 from xsdata.codegen.mixins import RelativeHandlerInterface
-from xsdata.codegen.models import Attr
-from xsdata.codegen.models import Class
+from xsdata.codegen.models import Attr, Class
 from xsdata.utils.namespaces import build_qname
 
 

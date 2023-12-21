@@ -2,21 +2,18 @@ import datetime
 import operator
 import re
 from collections import UserString
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import NamedTuple
-from typing import Optional
-from typing import Union
+from typing import Any, Callable, Dict, NamedTuple, Optional, Union
 
-from xsdata.utils.dates import calculate_offset
-from xsdata.utils.dates import calculate_timezone
-from xsdata.utils.dates import format_date
-from xsdata.utils.dates import format_offset
-from xsdata.utils.dates import format_time
-from xsdata.utils.dates import parse_date_args
-from xsdata.utils.dates import validate_date
-from xsdata.utils.dates import validate_time
+from xsdata.utils.dates import (
+    calculate_offset,
+    calculate_timezone,
+    format_date,
+    format_offset,
+    format_time,
+    parse_date_args,
+    validate_date,
+    validate_time,
+)
 
 xml_duration_re = re.compile(
     r"^([-]?)P"

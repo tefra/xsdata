@@ -1,8 +1,6 @@
 import functools
 import re
-from typing import Dict
-from typing import Optional
-from typing import Tuple
+from typing import Dict, Optional, Tuple
 
 from xsdata.models.enums import Namespace
 from xsdata.utils import text
@@ -48,11 +46,7 @@ def prefix_exists(uri: str, ns_map: Dict) -> bool:
 
 def is_default(uri: str, ns_map: Dict) -> bool:
     """Check if the uri exists and it has no prefix."""
-    for prefix, ns in ns_map.items():
-        if uri == ns and not prefix:
-            return True
-
-    return False
+    return any(uri == ns and not prefix for prefix, ns in ns_map.items())
 
 
 def clean_prefixes(ns_map: Dict) -> Dict:
@@ -132,7 +126,7 @@ def is_ncname(name: Optional[str]) -> bool:
         return False
 
     char = name[0]
-    if not char.isalpha() and not char == "_":
+    if not char.isalpha() and char != "_":
         return False
 
     for char in name[1:]:

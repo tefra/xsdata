@@ -6,10 +6,12 @@ from xsdata.codegen.models import AttrType
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import Tag
 from xsdata.utils.namespaces import build_qname
-from xsdata.utils.testing import AttrFactory
-from xsdata.utils.testing import AttrTypeFactory
-from xsdata.utils.testing import ClassFactory
-from xsdata.utils.testing import FactoryTestCase
+from xsdata.utils.testing import (
+    AttrFactory,
+    AttrTypeFactory,
+    ClassFactory,
+    FactoryTestCase,
+)
 
 
 class AddAttributeSubstitutionsTests(FactoryTestCase):

@@ -3,8 +3,7 @@ import os
 
 from click.testing import CliRunner
 
-from tests import fixtures_dir
-from tests import root
+from tests import fixtures_dir, root
 from xsdata.cli import cli
 from xsdata.formats.dataclass.parsers import JsonParser
 from xsdata.formats.dataclass.serializers import JsonSerializer

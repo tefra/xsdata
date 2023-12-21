@@ -1,18 +1,10 @@
-from typing import Dict
-from typing import Optional
-from typing import Set
-from typing import Tuple
+from typing import Dict, Optional, Set, Tuple
 
-from xsdata.codegen.mixins import ContainerInterface
-from xsdata.codegen.mixins import RelativeHandlerInterface
-from xsdata.codegen.models import Attr
-from xsdata.codegen.models import AttrType
-from xsdata.codegen.models import Class
-from xsdata.codegen.models import Status
+from xsdata.codegen.mixins import ContainerInterface, RelativeHandlerInterface
+from xsdata.codegen.models import Attr, AttrType, Class, Status
 from xsdata.codegen.utils import ClassUtils
 from xsdata.logger import logger
-from xsdata.models.enums import DataType
-from xsdata.models.enums import Tag
+from xsdata.models.enums import DataType, Tag
 from xsdata.utils import collections
 
 

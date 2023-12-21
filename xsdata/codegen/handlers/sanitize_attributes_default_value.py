@@ -1,7 +1,5 @@
 from xsdata.codegen.mixins import RelativeHandlerInterface
-from xsdata.codegen.models import Attr
-from xsdata.codegen.models import AttrType
-from xsdata.codegen.models import Class
+from xsdata.codegen.models import Attr, AttrType, Class
 from xsdata.formats.converter import converter
 from xsdata.logger import logger
 from xsdata.models.enums import DataType
@@ -143,10 +141,7 @@ class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
         if not types:
             return False
 
-        if attr.restrictions.tokens:
-            tokens = attr.default.split()
-        else:
-            tokens = [attr.default]
+        tokens = attr.default.split() if attr.restrictions.tokens else [attr.default]
 
         if len(tokens) == 1 and attr.is_enumeration and attr.restrictions.tokens:
             attr.restrictions.tokens = False

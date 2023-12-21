@@ -1,14 +1,10 @@
 from unittest import mock
 
-from xsdata.codegen.container import ClassContainer
-from xsdata.codegen.container import Steps
-from xsdata.codegen.models import Class
-from xsdata.codegen.models import Status
+from xsdata.codegen.container import ClassContainer, Steps
+from xsdata.codegen.models import Class, Status
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import Tag
-from xsdata.utils.testing import AttrFactory
-from xsdata.utils.testing import ClassFactory
-from xsdata.utils.testing import FactoryTestCase
+from xsdata.utils.testing import AttrFactory, ClassFactory, FactoryTestCase
 
 
 class ClassContainerTests(FactoryTestCase):
@@ -108,7 +104,7 @@ class ClassContainerTests(FactoryTestCase):
         self.container.add(obj)
         self.assertEqual(obj, self.container.first(obj.qname))
 
-        with self.assertRaises(KeyError) as cm:
+        with self.assertRaises(KeyError):
             self.container.first("aa")
 
     def test_process_class(self):

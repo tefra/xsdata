@@ -2,8 +2,7 @@ import os
 
 from click.testing import CliRunner
 
-from tests import fixtures_dir
-from tests import root
+from tests import fixtures_dir, root
 from tests.conftest import validate_bindings
 from xsdata.cli import cli
 from xsdata.utils.testing import load_class
@@ -23,6 +22,6 @@ def test_primer_schema():
         raise result.exception
 
     clazz = load_class(result.output, "PurchaseOrder")
-    assert "purchaseOrder" == clazz.Meta.name
+    assert clazz.Meta.name == "purchaseOrder"
 
     validate_bindings(schema, clazz)

@@ -3,20 +3,20 @@ from unittest import mock
 from unittest.case import TestCase
 from xml.etree.ElementTree import QName
 
-from tests.fixtures.models import ChoiceType
-from tests.fixtures.models import ExtendedType
-from tests.fixtures.models import Paragraph
-from tests.fixtures.models import TypeA
-from tests.fixtures.models import TypeB
-from tests.fixtures.models import TypeC
-from tests.fixtures.models import TypeD
-from tests.fixtures.models import TypeDuplicate
-from tests.fixtures.models import UnionType
+from tests.fixtures.models import (
+    ChoiceType,
+    ExtendedType,
+    Paragraph,
+    TypeA,
+    TypeB,
+    TypeC,
+    TypeD,
+    TypeDuplicate,
+    UnionType,
+)
 from xsdata.formats.dataclass.context import XmlContext
-from xsdata.formats.dataclass.models.elements import XmlType
-from xsdata.formats.dataclass.models.elements import XmlVar
-from xsdata.utils.testing import XmlMetaFactory
-from xsdata.utils.testing import XmlVarFactory
+from xsdata.formats.dataclass.models.elements import XmlType, XmlVar
+from xsdata.utils.testing import XmlMetaFactory, XmlVarFactory
 
 
 class XmlValTests(TestCase):
@@ -241,7 +241,7 @@ class XmlMetaTests(TestCase):
     def test_find_children(self):
         meta = self.context.build(TypeDuplicate)
         self.assertIsNone(next(meta.find_children("a"), None))
-        self.assertEqual(["x", "x1"], list(el.name for el in meta.find_children("x")))
+        self.assertEqual(["x", "x1"], [el.name for el in meta.find_children("x")])
 
         meta = self.context.build(TypeB)
         self.assertEqual("x", next(meta.find_children("x")).qname)

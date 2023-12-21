@@ -1,10 +1,12 @@
 from xsdata.codegen.handlers import MergeAttributes
 from xsdata.codegen.models import Restrictions
 from xsdata.models.enums import DataType
-from xsdata.utils.testing import AttrFactory
-from xsdata.utils.testing import AttrTypeFactory
-from xsdata.utils.testing import ClassFactory
-from xsdata.utils.testing import FactoryTestCase
+from xsdata.utils.testing import (
+    AttrFactory,
+    AttrTypeFactory,
+    ClassFactory,
+    FactoryTestCase,
+)
 
 
 class MergeAttributesTests(FactoryTestCase):

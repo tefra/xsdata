@@ -1,7 +1,5 @@
 from xsdata.codegen.mixins import HandlerInterface
-from xsdata.codegen.models import Attr
-from xsdata.codegen.models import Class
-
+from xsdata.codegen.models import Attr, Class
 
 ALL = "a"
 GROUP = "g"

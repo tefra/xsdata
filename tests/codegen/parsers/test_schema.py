@@ -1,32 +1,31 @@
 import sys
 from pathlib import Path
-from unittest import mock
-from unittest import TestCase
+from unittest import TestCase, mock
 
 from xsdata.codegen.parsers.schema import SchemaParser
-from xsdata.models.enums import FormType
-from xsdata.models.enums import Mode
-from xsdata.models.enums import Namespace
-from xsdata.models.xsd import All
-from xsdata.models.xsd import Any
-from xsdata.models.xsd import AnyAttribute
-from xsdata.models.xsd import Attribute
-from xsdata.models.xsd import AttributeGroup
-from xsdata.models.xsd import ComplexContent
-from xsdata.models.xsd import ComplexType
-from xsdata.models.xsd import DefaultOpenContent
-from xsdata.models.xsd import Element
-from xsdata.models.xsd import Extension
-from xsdata.models.xsd import Group
-from xsdata.models.xsd import Import
-from xsdata.models.xsd import Include
-from xsdata.models.xsd import OpenContent
-from xsdata.models.xsd import Override
-from xsdata.models.xsd import Redefine
-from xsdata.models.xsd import Restriction
-from xsdata.models.xsd import Schema
-from xsdata.models.xsd import Sequence
-from xsdata.models.xsd import SimpleContent
+from xsdata.models.enums import FormType, Mode, Namespace
+from xsdata.models.xsd import (
+    All,
+    Any,
+    AnyAttribute,
+    Attribute,
+    AttributeGroup,
+    ComplexContent,
+    ComplexType,
+    DefaultOpenContent,
+    Element,
+    Extension,
+    Group,
+    Import,
+    Include,
+    OpenContent,
+    Override,
+    Redefine,
+    Restriction,
+    Schema,
+    Sequence,
+    SimpleContent,
+)
 
 
 class SchemaParserTests(TestCase):

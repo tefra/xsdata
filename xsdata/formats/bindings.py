@@ -1,10 +1,7 @@
 import abc
 import io
 import pathlib
-from typing import Any
-from typing import Optional
-from typing import Type
-from typing import TypeVar
+from typing import Any, Optional, Type, TypeVar
 
 T = TypeVar("T")
 

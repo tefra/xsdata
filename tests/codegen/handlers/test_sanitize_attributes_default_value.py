@@ -4,13 +4,13 @@ from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import SanitizeAttributesDefaultValue
 from xsdata.codegen.models import Restrictions
 from xsdata.models.config import GeneratorConfig
-from xsdata.models.enums import DataType
-from xsdata.models.enums import Namespace
-from xsdata.models.enums import Tag
-from xsdata.utils.testing import AttrFactory
-from xsdata.utils.testing import AttrTypeFactory
-from xsdata.utils.testing import ClassFactory
-from xsdata.utils.testing import FactoryTestCase
+from xsdata.models.enums import DataType, Namespace, Tag
+from xsdata.utils.testing import (
+    AttrFactory,
+    AttrTypeFactory,
+    ClassFactory,
+    FactoryTestCase,
+)
 
 
 class SanitizeAttributesDefaultValueTests(FactoryTestCase):

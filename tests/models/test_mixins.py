@@ -1,15 +1,10 @@
-from typing import Generator
-from typing import Iterator
+from typing import Generator, Iterator
 from unittest import TestCase
 
 from xsdata.exceptions import SchemaValueError
-from xsdata.models.enums import FormType
-from xsdata.models.enums import Namespace
+from xsdata.models.enums import FormType, Namespace
 from xsdata.models.mixins import ElementBase
-from xsdata.models.xsd import Alternative
-from xsdata.models.xsd import ComplexType
-from xsdata.models.xsd import Element
-from xsdata.models.xsd import SimpleType
+from xsdata.models.xsd import Alternative, ComplexType, Element, SimpleType
 
 
 class ElementBaseTests(TestCase):

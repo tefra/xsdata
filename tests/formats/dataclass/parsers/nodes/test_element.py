@@ -3,35 +3,34 @@ from dataclasses import make_dataclass
 from unittest import mock
 
 from tests.fixtures.books import Books
-from tests.fixtures.models import AttrsType
-from tests.fixtures.models import ExtendedListType
-from tests.fixtures.models import ExtendedType
-from tests.fixtures.models import FixedType
-from tests.fixtures.models import NillableType
-from tests.fixtures.models import Paragraph
-from tests.fixtures.models import SequentialType
-from tests.fixtures.models import TypeA
-from tests.fixtures.models import TypeB
-from tests.fixtures.models import TypeC
+from tests.fixtures.models import (
+    AttrsType,
+    ExtendedListType,
+    ExtendedType,
+    FixedType,
+    NillableType,
+    Paragraph,
+    SequentialType,
+    TypeA,
+    TypeB,
+    TypeC,
+)
 from xsdata.exceptions import ParserError
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlType
-from xsdata.formats.dataclass.models.generics import AnyElement
-from xsdata.formats.dataclass.models.generics import DerivedElement
+from xsdata.formats.dataclass.models.generics import AnyElement, DerivedElement
 from xsdata.formats.dataclass.parsers.config import ParserConfig
-from xsdata.formats.dataclass.parsers.nodes import ElementNode
-from xsdata.formats.dataclass.parsers.nodes import PrimitiveNode
-from xsdata.formats.dataclass.parsers.nodes import SkipNode
-from xsdata.formats.dataclass.parsers.nodes import StandardNode
-from xsdata.formats.dataclass.parsers.nodes import UnionNode
-from xsdata.formats.dataclass.parsers.nodes import WildcardNode
+from xsdata.formats.dataclass.parsers.nodes import (
+    ElementNode,
+    PrimitiveNode,
+    SkipNode,
+    StandardNode,
+    UnionNode,
+    WildcardNode,
+)
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
-from xsdata.models.enums import DataType
-from xsdata.models.enums import Namespace
-from xsdata.models.enums import QNames
-from xsdata.utils.testing import FactoryTestCase
-from xsdata.utils.testing import XmlMetaFactory
-from xsdata.utils.testing import XmlVarFactory
+from xsdata.models.enums import DataType, Namespace, QNames
+from xsdata.utils.testing import FactoryTestCase, XmlMetaFactory, XmlVarFactory
 
 
 class ElementNodeTests(FactoryTestCase):

@@ -2,12 +2,10 @@ from unittest import mock
 
 from tests.fixtures.books import Books
 from xsdata.formats.dataclass.models.elements import XmlType
-from xsdata.formats.dataclass.parsers.nodes import PrimitiveNode
-from xsdata.formats.dataclass.parsers.nodes import SkipNode
+from xsdata.formats.dataclass.parsers.nodes import PrimitiveNode, SkipNode
 from xsdata.formats.dataclass.parsers.xml import UserXmlParser
 from xsdata.models.enums import EventType
-from xsdata.utils.testing import FactoryTestCase
-from xsdata.utils.testing import XmlVarFactory
+from xsdata.utils.testing import FactoryTestCase, XmlVarFactory
 
 
 class UserXmlParserTests(FactoryTestCase):

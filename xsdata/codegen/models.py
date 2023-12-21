@@ -1,27 +1,15 @@
 import operator
 import sys
-from dataclasses import asdict
-from dataclasses import dataclass
-from dataclasses import field
-from dataclasses import replace
+from dataclasses import asdict, dataclass, field, replace
 from enum import IntEnum
-from typing import Any
-from typing import Dict
-from typing import Iterator
-from typing import List
-from typing import Optional
-from typing import Tuple
-from typing import Type
+from typing import Any, Dict, Iterator, List, Optional, Tuple, Type
 
 from xsdata.exceptions import CodeGenerationError
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.models.elements import XmlType
-from xsdata.models.enums import DataType
-from xsdata.models.enums import Namespace
-from xsdata.models.enums import Tag
+from xsdata.models.enums import DataType, Namespace, Tag
 from xsdata.models.mixins import ElementBase
-from xsdata.utils import namespaces
-from xsdata.utils import text
+from xsdata.utils import namespaces, text
 
 xml_type_map = {
     Tag.ANY: XmlType.WILDCARD,

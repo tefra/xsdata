@@ -1,5 +1,4 @@
-from typing import Dict
-from typing import TextIO
+from typing import Dict, TextIO
 from xml.sax.saxutils import XMLGenerator
 
 from xsdata.formats.dataclass.serializers.config import SerializerConfig

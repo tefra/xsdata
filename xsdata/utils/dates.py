@@ -1,9 +1,6 @@
 import datetime
 from calendar import isleap
-from typing import Any
-from typing import Generator
-from typing import Optional
-from typing import Union
+from typing import Any, Generator, Optional, Union
 
 
 def parse_date_args(value: Any, fmt: str) -> Generator:
@@ -109,6 +106,9 @@ def validate_time(hour: int, minute: int, second: int, franctional_second: int):
         raise ValueError("Fractional second must be in 0..999999999")
 
 
+SIMPLE_TWO_DIGITS_FORMATS = ("d", "m", "H", "M")
+
+
 class DateTimeParser:
     def __init__(self, value: str, fmt: str):
         self.format = fmt
@@ -155,16 +155,10 @@ class DateTimeParser:
         self.vidx += 1
 
     def parse_var(self, var: str):
-        if var == "d":
-            yield self.parse_digits(2)
-        elif var == "m":
+        if var in SIMPLE_TWO_DIGITS_FORMATS:
             yield self.parse_digits(2)
         elif var == "Y":
             yield self.parse_year()
-        elif var == "H":
-            yield self.parse_digits(2)
-        elif var == "M":
-            yield self.parse_digits(2)
         elif var == "S":
             yield self.parse_digits(2)
 

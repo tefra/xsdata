@@ -1,16 +1,8 @@
-from datetime import date
-from datetime import datetime
-from datetime import time
-from datetime import timedelta
-from datetime import timezone
+from datetime import date, datetime, time, timedelta, timezone
 from typing import Dict
 from unittest import TestCase
 
-from xsdata.models.datatype import XmlDate
-from xsdata.models.datatype import XmlDateTime
-from xsdata.models.datatype import XmlDuration
-from xsdata.models.datatype import XmlPeriod
-from xsdata.models.datatype import XmlTime
+from xsdata.models.datatype import XmlDate, XmlDateTime, XmlDuration, XmlPeriod, XmlTime
 
 
 def filter_none(mapping: Dict) -> Dict:

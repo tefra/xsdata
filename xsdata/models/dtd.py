@@ -1,8 +1,6 @@
 import enum
 from dataclasses import dataclass
-from typing import Dict
-from typing import List
-from typing import Optional
+from typing import Dict, List, Optional
 
 from xsdata.models.enums import DataType
 from xsdata.utils.namespaces import build_qname

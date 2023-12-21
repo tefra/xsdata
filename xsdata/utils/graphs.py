@@ -1,7 +1,4 @@
-from typing import Dict
-from typing import Iterator
-from typing import List
-from typing import Set
+from typing import Dict, Iterator, List, Set
 
 
 def strongly_connected_components(edges: Dict[str, List[str]]) -> Iterator[Set[str]]:

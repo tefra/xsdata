@@ -1,17 +1,9 @@
 import json
 import warnings
-from dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass, field
 from enum import Enum
 from io import StringIO
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import Iterator
-from typing import Optional
-from typing import TextIO
-from typing import Tuple
-from typing import Union
+from typing import Any, Callable, Dict, Iterator, Optional, TextIO, Tuple, Union
 
 from xsdata.formats.bindings import AbstractSerializer
 from xsdata.formats.converter import converter

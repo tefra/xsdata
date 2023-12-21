@@ -1,15 +1,9 @@
 from typing import List
 
 from xsdata.codegen.mixins import ContainerHandlerInterface
-from xsdata.codegen.models import Attr
-from xsdata.codegen.models import Class
-from xsdata.codegen.models import get_location
-from xsdata.codegen.models import get_name
-from xsdata.codegen.models import get_qname
+from xsdata.codegen.models import Attr, Class, get_location, get_name, get_qname
 from xsdata.models.config import StructureStyle
-from xsdata.utils import collections
-from xsdata.utils import namespaces
-from xsdata.utils import text
+from xsdata.utils import collections, namespaces, text
 
 REQUIRE_UNIQUE_NAMES = (StructureStyle.SINGLE_PACKAGE, StructureStyle.CLUSTERS)
 

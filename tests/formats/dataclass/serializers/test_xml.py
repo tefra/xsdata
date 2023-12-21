@@ -1,27 +1,18 @@
 import re
-from dataclasses import dataclass
-from dataclasses import field
-from dataclasses import make_dataclass
-from typing import Generator
-from typing import List
+from dataclasses import dataclass, field, make_dataclass
+from typing import Generator, List
 from unittest import TestCase
 from xml.etree.ElementTree import QName
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.datatypes import Telephone
-from tests.fixtures.models import Paragraph
-from tests.fixtures.models import SequentialType
-from tests.fixtures.models import Span
-from tests.fixtures.models import TypeA
-from xsdata.exceptions import SerializerError
-from xsdata.exceptions import XmlContextError
+from tests.fixtures.models import Paragraph, SequentialType, Span, TypeA
+from xsdata.exceptions import SerializerError, XmlContextError
 from xsdata.formats.dataclass.models.elements import XmlType
-from xsdata.formats.dataclass.models.generics import AnyElement
-from xsdata.formats.dataclass.models.generics import DerivedElement
+from xsdata.formats.dataclass.models.generics import AnyElement, DerivedElement
 from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.formats.dataclass.serializers.mixins import XmlWriterEvent
-from xsdata.models.enums import DataType
-from xsdata.models.enums import QNames
+from xsdata.models.enums import DataType, QNames
 from xsdata.utils.testing import XmlVarFactory
 
 

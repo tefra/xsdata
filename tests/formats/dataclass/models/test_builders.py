@@ -1,43 +1,24 @@
 import sys
 import uuid
-from dataclasses import dataclass
-from dataclasses import field
-from dataclasses import fields
-from dataclasses import make_dataclass
-from typing import Dict
-from typing import get_type_hints
-from typing import Iterator
-from typing import List
-from typing import Tuple
-from typing import Union
-from unittest import mock
-from unittest import TestCase
+from dataclasses import dataclass, field, fields, make_dataclass
+from typing import Dict, Iterator, List, Tuple, Union, get_type_hints
+from unittest import TestCase, mock
 from xml.etree.ElementTree import QName
 
 from tests.fixtures.artists import Artist
 from tests.fixtures.books import BookForm
-from tests.fixtures.models import ChoiceType
-from tests.fixtures.models import Parent
-from tests.fixtures.models import TypeA
-from tests.fixtures.models import TypeB
-from tests.fixtures.models import TypeNS1
-from tests.fixtures.models import UnionType
+from tests.fixtures.models import ChoiceType, Parent, TypeA, TypeB, TypeNS1, UnionType
 from tests.fixtures.series import Country
 from tests.fixtures.submodels import ChoiceTypeChild
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.compat import class_types
-from xsdata.formats.dataclass.models.builders import XmlMetaBuilder
-from xsdata.formats.dataclass.models.builders import XmlVarBuilder
-from xsdata.formats.dataclass.models.elements import XmlMeta
-from xsdata.formats.dataclass.models.elements import XmlType
+from xsdata.formats.dataclass.models.builders import XmlMetaBuilder, XmlVarBuilder
+from xsdata.formats.dataclass.models.elements import XmlMeta, XmlType
 from xsdata.models.datatype import XmlDate
 from xsdata.utils import text
-from xsdata.utils.constants import return_input
-from xsdata.utils.constants import return_true
+from xsdata.utils.constants import return_input, return_true
 from xsdata.utils.namespaces import build_qname
-from xsdata.utils.testing import FactoryTestCase
-from xsdata.utils.testing import XmlMetaFactory
-from xsdata.utils.testing import XmlVarFactory
+from xsdata.utils.testing import FactoryTestCase, XmlMetaFactory, XmlVarFactory
 
 
 class XmlMetaBuilderTests(FactoryTestCase):
@@ -270,12 +251,12 @@ class XmlMetaBuilderTests(FactoryTestCase):
         self.assertEqual(XmlType.ELEMENT, self.builder.default_xml_type(cls))
 
         cls = make_dataclass(
-            "c", [("x", int), ("y", int, field(metadata=dict(type="Text")))]
+            "c", [("x", int), ("y", int, field(metadata={"type": "Text"}))]
         )
         self.assertEqual(XmlType.ELEMENT, self.builder.default_xml_type(cls))
 
         cls = make_dataclass(
-            "d", [("x", int), ("y", int, field(metadata=dict(type="Element")))]
+            "d", [("x", int), ("y", int, field(metadata={"type": "Element"}))]
         )
         self.assertEqual(XmlType.TEXT, self.builder.default_xml_type(cls))
 
@@ -283,8 +264,8 @@ class XmlMetaBuilderTests(FactoryTestCase):
             cls = make_dataclass(
                 "e",
                 [
-                    ("x", int, field(metadata=dict(type="Text"))),
-                    ("y", int, field(metadata=dict(type="Text"))),
+                    ("x", int, field(metadata={"type": "Text"})),
+                    ("y", int, field(metadata={"type": "Text"})),
                 ],
             )
             self.builder.default_xml_type(cls)

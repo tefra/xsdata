@@ -3,37 +3,34 @@ import base64
 import binascii
 import math
 import warnings
-from datetime import date
-from datetime import datetime
-from datetime import time
-from decimal import Decimal
-from decimal import InvalidOperation
-from enum import Enum
-from enum import EnumMeta
-from typing import Any
-from typing import Callable
-from typing import cast
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Sequence
-from typing import Tuple
-from typing import Type
-from typing import Union
+from datetime import date, datetime, time
+from decimal import Decimal, InvalidOperation
+from enum import Enum, EnumMeta
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    Union,
+    cast,
+)
 from xml.etree.ElementTree import QName
 
-from xsdata.exceptions import ConverterError
-from xsdata.exceptions import ConverterWarning
-from xsdata.models.datatype import XmlBase64Binary
-from xsdata.models.datatype import XmlDate
-from xsdata.models.datatype import XmlDateTime
-from xsdata.models.datatype import XmlDuration
-from xsdata.models.datatype import XmlHexBinary
-from xsdata.models.datatype import XmlPeriod
-from xsdata.models.datatype import XmlTime
-from xsdata.utils import collections
-from xsdata.utils import namespaces
-from xsdata.utils import text
+from xsdata.exceptions import ConverterError, ConverterWarning
+from xsdata.models.datatype import (
+    XmlBase64Binary,
+    XmlDate,
+    XmlDateTime,
+    XmlDuration,
+    XmlHexBinary,
+    XmlPeriod,
+    XmlTime,
+)
+from xsdata.utils import collections, namespaces, text
 
 
 class Converter(abc.ABC):

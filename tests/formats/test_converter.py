@@ -1,8 +1,6 @@
 import sys
 import warnings
-from datetime import date
-from datetime import datetime
-from datetime import time
+from datetime import date, datetime, time
 from decimal import Decimal
 from enum import Enum
 from typing import Any
@@ -13,11 +11,8 @@ import pytest
 
 from tests.fixtures.datatypes import Telephone
 from xsdata.exceptions import ConverterError
-from xsdata.formats.converter import Converter
-from xsdata.formats.converter import converter
-from xsdata.formats.converter import ProxyConverter
-from xsdata.models.datatype import XmlDuration
-from xsdata.models.datatype import XmlPeriod
+from xsdata.formats.converter import Converter, ProxyConverter, converter
+from xsdata.models.datatype import XmlDuration, XmlPeriod
 from xsdata.models.enums import UseType
 
 

@@ -2,15 +2,12 @@ from unittest import mock
 
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import FlattenAttributeGroups
-from xsdata.codegen.models import Attr
-from xsdata.codegen.models import Status
+from xsdata.codegen.models import Attr, Status
 from xsdata.codegen.utils import ClassUtils
 from xsdata.exceptions import AnalyzerValueError
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import Tag
-from xsdata.utils.testing import AttrFactory
-from xsdata.utils.testing import ClassFactory
-from xsdata.utils.testing import FactoryTestCase
+from xsdata.utils.testing import AttrFactory, ClassFactory, FactoryTestCase
 
 
 class FlattenAttributeGroupsTests(FactoryTestCase):

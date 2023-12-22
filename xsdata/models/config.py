@@ -173,17 +173,14 @@ class OutputFormat:
     """
     Output format options.
 
-    :param value: Output format name, default: dataclasses
-    :param repr: Generate __repr__ method, default: true
-    :param eq: Generate __eq__ method, default: true
-    :param order: Generate __lt__, __le__, __gt__, and __ge__ methods,
-        default: false
-    :param unsafe_hash: Generate __hash__ method if not frozen, default:
-        false
-    :param frozen: Enable read only properties, default false
-    :param slots: Enable __slots__, default: false, python>=3.10 Only
-    :param kw_only: Enable keyword only arguments, default: false,
-        python>=3.10 Only
+    :param value: Output format name
+    :param repr: Generate __repr__ method
+    :param eq: Generate __eq__ method
+    :param order: Generate __lt__, __le__, __gt__, and __ge__ methods
+    :param unsafe_hash: Generate __hash__ method if not frozen
+    :param frozen: Enable read only properties
+    :param slots: Enable __slots__, python>=3.10 Only
+    :param kw_only: Enable keyword only arguments, python>=3.10 Only
     """
 
     value: str = text_node(default="dataclasses", cli="output")
@@ -223,9 +220,8 @@ class CompoundFields:
     """
     Compound fields options.
 
-    :param enabled: Use compound fields for repeatable elements,
-        default: false
-    :param default_name: Default compound field name, default: choice
+    :param enabled: Use compound fields for repeatable elements
+    :param default_name: Default compound field name
     :param force_default_name: Always use the default compound field,
         otherwise if the number of elements is less than 4 the generator
         will try to dynamically create the field name e.g.
@@ -242,24 +238,23 @@ class GeneratorOutput:
     """
     Main generator output options.
 
-    :param package: Target package, default: generated
+    :param package: Target package
     :param format: Output format
-    :param structure_style: Output structure style, default: filenames
-    :param docstring_style: Docstring style, default: reStructuredText
-    :param filter_strategy: Class filter strategy, default: globals
-    :param relative_imports: Use relative imports, default: false
-    :param compound_fields: Use compound fields for repeatable elements,
-        default: false
-    :param max_line_length: Adjust the maximum line length, default: 79
-    :param subscriptable_types: Use PEP-585 generics for standard collections,
-        default: false, python>=3.9 Only
-    :param union_type: Use PEP-604 union type, default: false, python>=3.10 Only
-    :param postponed_annotations: Enable postponed evaluation of annotations,
-        default: false
-    :param unnest_classes: Move inner classes to upper level, default: false
-    :param ignore_patterns: Ignore pattern restrictions, default: false
-    :param include_header: Include a header with codegen information in the output,
-        default: false
+    :param structure_style: Output structure style
+    :param docstring_style: Docstring style
+    :param filter_strategy: Class filter strategy
+    :param relative_imports: Use relative imports
+    :param compound_fields: Use compound fields for repeatable elements
+    :param max_line_length: Adjust the maximum line length
+    :param subscriptable_types: Use PEP-585 generics for standard
+        collections, python>=3.9 Only
+    :param union_type: Use PEP-604 union type, python>=3.10 Only
+    :param postponed_annotations: Enable postponed evaluation of
+        annotations
+    :param unnest_classes: Move inner classes to upper level
+    :param ignore_patterns: Ignore pattern restrictions
+    :param include_header: Include a header with codegen information in
+        the output
     """
 
     package: str = element(default="generated")

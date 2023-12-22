@@ -70,6 +70,13 @@ def build_options(obj: Any, parent: str) -> Iterator[Callable[[FC], FC]]:
 
             names.append("__".join(qname.split(".")))
 
+            default_value = (
+                field.default.value
+                if isinstance(field.default, enum.Enum)
+                else field.default
+            )
+            doc_hint += f" [default: {default_value}]"
+
             yield click.option(
                 *names,
                 help=doc_hint,

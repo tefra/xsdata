@@ -11,6 +11,7 @@ class DoubleQuotesDescription:
 
     Dont trip on quotes: "A", "B", "C", "D" My\\Ipsum
     """
+
     class Meta:
         namespace = "urn:docs"
 
@@ -18,6 +19,7 @@ class DoubleQuotesDescription:
 @dataclass
 class DoubleQuotesSummary:
     """Dont trip on quotes: "A", "B", "C", "D" My\\Ipsum"""
+
     class Meta:
         namespace = "urn:docs"
 
@@ -32,8 +34,9 @@ class RootEnum(Enum):
         Lorem ipsum dolor '''sit''' amet, consectetur adipiscing elit. Morbi
         dapibus. My\\Ipsum
     """
-    A = 'A'
-    B = 'B'
+
+    A = "A"
+    B = "B"
 
 
 class RootB(Enum):
@@ -46,13 +49,14 @@ class RootB(Enum):
     NO
         Lorem ipsum dolor My\\Ipsum
     """
-    YES = 'Yes'
-    NO = 'No'
+
+    YES = "Yes"
+    NO = "No"
 
 
 class RootD(Enum):
-    TRUE = 'true'
-    FALSE = 'false'
+    TRUE = "true"
+    FALSE = "false"
 
 
 @dataclass
@@ -74,6 +78,7 @@ class Root:
     c
     d
     """
+
     class Meta:
         namespace = "urn:docs"
 
@@ -83,7 +88,7 @@ class Root:
             "type": "Element",
             "namespace": "",
             "required": True,
-        }
+        },
     )
     b: Optional[RootB] = field(
         default=None,
@@ -91,7 +96,7 @@ class Root:
             "type": "Element",
             "namespace": "",
             "required": True,
-        }
+        },
     )
     c: Optional[RootEnum] = field(
         default=None,
@@ -99,7 +104,7 @@ class Root:
             "type": "Element",
             "namespace": "",
             "required": True,
-        }
+        },
     )
     d: Optional[RootD] = field(
         default=None,
@@ -107,7 +112,7 @@ class Root:
             "type": "Element",
             "namespace": "",
             "required": True,
-        }
+        },
     )
 
     @dataclass
@@ -122,11 +127,12 @@ class Root:
             dolor sit amet, consectetur adipiscing elit. Vivamus efficitur.
             My\\Ipsum
         """
+
         sub_a: Optional[str] = field(
             default=None,
             metadata={
                 "type": "Element",
                 "namespace": "",
                 "required": True,
-            }
+            },
         )

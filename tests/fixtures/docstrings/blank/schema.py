@@ -18,18 +18,18 @@ class DoubleQuotesSummary:
 
 
 class RootEnum(Enum):
-    A = 'A'
-    B = 'B'
+    A = "A"
+    B = "B"
 
 
 class RootB(Enum):
-    YES = 'Yes'
-    NO = 'No'
+    YES = "Yes"
+    NO = "No"
 
 
 class RootD(Enum):
-    TRUE = 'true'
-    FALSE = 'false'
+    TRUE = "true"
+    FALSE = "false"
 
 
 @dataclass
@@ -43,7 +43,7 @@ class Root:
             "type": "Element",
             "namespace": "",
             "required": True,
-        }
+        },
     )
     b: Optional[RootB] = field(
         default=None,
@@ -51,7 +51,7 @@ class Root:
             "type": "Element",
             "namespace": "",
             "required": True,
-        }
+        },
     )
     c: Optional[RootEnum] = field(
         default=None,
@@ -59,7 +59,7 @@ class Root:
             "type": "Element",
             "namespace": "",
             "required": True,
-        }
+        },
     )
     d: Optional[RootD] = field(
         default=None,
@@ -67,7 +67,7 @@ class Root:
             "type": "Element",
             "namespace": "",
             "required": True,
-        }
+        },
     )
 
     @dataclass
@@ -78,5 +78,5 @@ class Root:
                 "type": "Element",
                 "namespace": "",
                 "required": True,
-            }
+            },
         )

@@ -20,13 +20,14 @@ class BookForm:
         id: International Standard Book Number
         lang: Language ISO Code
     """
+
     author: Optional[str] = field(
         default=None,
         metadata={
             "type": "Element",
             "namespace": "",
             "required": True,
-        }
+        },
     )
     title: Optional[str] = field(
         default=None,
@@ -34,7 +35,7 @@ class BookForm:
             "type": "Element",
             "namespace": "",
             "required": True,
-        }
+        },
     )
     genre: Optional[str] = field(
         default=None,
@@ -42,7 +43,7 @@ class BookForm:
             "type": "Element",
             "namespace": "",
             "required": True,
-        }
+        },
     )
     price: Optional[float] = field(
         default=None,
@@ -50,7 +51,7 @@ class BookForm:
             "type": "Element",
             "namespace": "",
             "required": True,
-        }
+        },
     )
     pub_date: Optional[XmlDate] = field(
         default=None,
@@ -58,7 +59,7 @@ class BookForm:
             "type": "Element",
             "namespace": "",
             "required": True,
-        }
+        },
     )
     review: Optional[str] = field(
         default=None,
@@ -66,20 +67,20 @@ class BookForm:
             "type": "Element",
             "namespace": "",
             "required": True,
-        }
+        },
     )
     id: Optional[str] = field(
         default=None,
         metadata={
             "type": "Attribute",
-        }
+        },
     )
     lang: str = field(
         init=False,
-        default='en',
+        default="en",
         metadata={
             "type": "Attribute",
-        }
+        },
     )
 
 
@@ -90,7 +91,7 @@ class BooksForm:
         metadata={
             "type": "Element",
             "namespace": "",
-        }
+        },
     )
 
 
@@ -99,6 +100,7 @@ class Books(BooksForm):
     """
     Το βιβλίο.
     """
+
     class Meta:
         name = "books"
         namespace = "urn:books"

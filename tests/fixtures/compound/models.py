@@ -12,7 +12,7 @@ class Alpha:
         default=True,
         metadata={
             "type": "Attribute",
-        }
+        },
     )
 
 
@@ -26,7 +26,7 @@ class Bravo:
         default=True,
         metadata={
             "type": "Attribute",
-        }
+        },
     )
 
 
@@ -49,5 +49,5 @@ class Root:
                     "type": Bravo,
                 },
             ),
-        }
+        },
     )

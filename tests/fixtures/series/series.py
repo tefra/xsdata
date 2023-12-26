@@ -13,20 +13,20 @@ class Country:
         metadata={
             "type": "Element",
             "required": True,
-        }
+        },
     )
     code: Optional[str] = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
-        }
+        },
     )
     timezone: Optional[str] = field(
         default=None,
         metadata={
             "type": "Element",
-        }
+        },
     )
 
 
@@ -40,20 +40,20 @@ class Externals:
         metadata={
             "type": "Element",
             "required": True,
-        }
+        },
     )
     thetvdb: Optional[int] = field(
         default=None,
         metadata={
             "type": "Element",
-        }
+        },
     )
     imdb: Optional[str] = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
-        }
+        },
     )
 
 
@@ -67,14 +67,14 @@ class Image:
         metadata={
             "type": "Element",
             "required": True,
-        }
+        },
     )
     original: Optional[str] = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
-        }
+        },
     )
 
 
@@ -88,7 +88,7 @@ class Previousepisode:
         metadata={
             "type": "Element",
             "required": True,
-        }
+        },
     )
 
 
@@ -102,7 +102,7 @@ class Rating:
         metadata={
             "type": "Element",
             "required": True,
-        }
+        },
     )
 
 
@@ -116,14 +116,14 @@ class Schedule:
         metadata={
             "type": "Element",
             "required": True,
-        }
+        },
     )
     days: List[str] = field(
         default_factory=list,
         metadata={
             "type": "Element",
             "min_occurs": 1,
-        }
+        },
     )
 
 
@@ -137,7 +137,7 @@ class Self:
         metadata={
             "type": "Element",
             "required": True,
-        }
+        },
     )
 
 
@@ -152,14 +152,14 @@ class Links:
             "name": "self",
             "type": "Element",
             "required": True,
-        }
+        },
     )
     previousepisode: Optional[Previousepisode] = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
-        }
+        },
     )
 
 
@@ -172,21 +172,21 @@ class Network:
         default=None,
         metadata={
             "type": "Element",
-        }
+        },
     )
     name: Optional[str] = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
-        }
+        },
     )
     country: Optional[Country] = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
-        }
+        },
     )
 
 
@@ -200,20 +200,20 @@ class Series:
         metadata={
             "type": "Element",
             "required": True,
-        }
+        },
     )
     url: Optional[str] = field(
         default=None,
         metadata={
             "type": "Element",
-        }
+        },
     )
     name: Optional[str] = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
-        }
+        },
     )
     type_value: Optional[str] = field(
         default=None,
@@ -221,42 +221,42 @@ class Series:
             "name": "type",
             "type": "Element",
             "required": True,
-        }
+        },
     )
     language: Optional[str] = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
-        }
+        },
     )
     genres: List[str] = field(
         default_factory=list,
         metadata={
             "type": "Element",
             "min_occurs": 1,
-        }
+        },
     )
     status: Optional[str] = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
-        }
+        },
     )
     runtime: Optional[int] = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
-        }
+        },
     )
     premiered: Optional[XmlDate] = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
-        }
+        },
     )
     official_site: Optional[str] = field(
         default=None,
@@ -264,73 +264,73 @@ class Series:
             "name": "officialSite",
             "type": "Element",
             "required": True,
-        }
+        },
     )
     schedule: Optional[Schedule] = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
-        }
+        },
     )
     rating: Optional[Rating] = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
-        }
+        },
     )
     weight: Optional[int] = field(
         default=None,
         metadata={
             "type": "Element",
-        }
+        },
     )
     network: Optional[Network] = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
-        }
+        },
     )
     web_channel: Optional[object] = field(
         default=None,
         metadata={
             "name": "webChannel",
             "type": "Element",
-        }
+        },
     )
     externals: Optional[Externals] = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
-        }
+        },
     )
     image: Optional[Image] = field(
         default=None,
         metadata={
             "type": "Element",
-        }
+        },
     )
     summary: Optional[str] = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
-        }
+        },
     )
     updated: Optional[int] = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
-        }
+        },
     )
     links: Optional[Links] = field(
         default=None,
         metadata={
             "name": "_links",
             "type": "Element",
-        }
+        },
     )

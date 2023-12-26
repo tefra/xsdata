@@ -11,6 +11,7 @@ class DoubleQuotesDescription:
 
     Dont trip on quotes: "A", "B", "C", "D" My\\Ipsum
     """
+
     class Meta:
         namespace = "urn:docs"
 
@@ -18,13 +19,14 @@ class DoubleQuotesDescription:
 @dataclass
 class DoubleQuotesSummary:
     """Dont trip on quotes: "A", "B", "C", "D" My\\Ipsum"""
+
     class Meta:
         namespace = "urn:docs"
 
 
 class RootEnum(Enum):
-    A = 'A'
-    B = 'B'
+    A = "A"
+    B = "B"
 
 
 RootEnum.A.__doc__ = "Lorem ipsum dolor"
@@ -35,8 +37,8 @@ RootEnum.B.__doc__ = (
 
 
 class RootB(Enum):
-    YES = 'Yes'
-    NO = 'No'
+    YES = "Yes"
+    NO = "No"
 
 
 RootB.YES.__doc__ = (
@@ -47,8 +49,8 @@ RootB.NO.__doc__ = "Lorem ipsum dolor\nMy\\Ipsum"
 
 
 class RootD(Enum):
-    TRUE = 'true'
-    FALSE = 'false'
+    TRUE = "true"
+    FALSE = "false"
 
 
 @dataclass
@@ -60,6 +62,7 @@ class Root:
     Donec imperdiet lacus sed sagittis scelerisque. Ut sodales metus:
     "sit", "amet", "lectus" My\\Ipsum
     """
+
     class Meta:
         namespace = "urn:docs"
 
@@ -74,7 +77,7 @@ class Root:
                 " dolor sit amet, consectetur adipiscing elit. Aliquam "
                 "nec.\nMy\\Ipsum"
             ),
-        }
+        },
     )
     b: Optional[RootB] = field(
         default=None,
@@ -83,7 +86,7 @@ class Root:
             "namespace": "",
             "required": True,
             "doc": "This is a second root type field documentation.",
-        }
+        },
     )
     c: Optional[RootEnum] = field(
         default=None,
@@ -91,7 +94,7 @@ class Root:
             "type": "Element",
             "namespace": "",
             "required": True,
-        }
+        },
     )
     d: Optional[RootD] = field(
         default=None,
@@ -99,7 +102,7 @@ class Root:
             "type": "Element",
             "namespace": "",
             "required": True,
-        }
+        },
     )
 
     @dataclass
@@ -107,6 +110,7 @@ class Root:
         """
         This is an inner type documentation.
         """
+
         sub_a: Optional[str] = field(
             default=None,
             metadata={
@@ -118,5 +122,5 @@ class Root:
                     " dolor sit amet, consectetur adipiscing elit. Vivamus "
                     "efficitur.\nMy\\Ipsum"
                 ),
-            }
+            },
         )

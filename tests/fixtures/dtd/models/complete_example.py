@@ -4,8 +4,8 @@ from typing import List, Optional
 
 
 class PostStatus(Enum):
-    DRAFT = 'draft'
-    PUBLISHED = 'published'
+    DRAFT = "draft"
+    PUBLISHED = "published"
 
 
 @dataclass
@@ -15,7 +15,7 @@ class Tags:
         metadata={
             "name": "Tag",
             "type": "Element",
-        }
+        },
     )
 
 
@@ -26,43 +26,43 @@ class Post:
         metadata={
             "type": "Attribute",
             "required": True,
-        }
+        },
     )
     lang: str = field(
-        default='en',
+        default="en",
         metadata={
             "type": "Attribute",
             "namespace": "http://www.w3.org/XML/1998/namespace",
             "required": True,
-        }
+        },
     )
     created_at: Optional[str] = field(
         default=None,
         metadata={
             "type": "Attribute",
             "required": True,
-        }
+        },
     )
     author: Optional[str] = field(
         default=None,
         metadata={
             "type": "Attribute",
             "required": True,
-        }
+        },
     )
     origin: List[str] = field(
         default_factory=list,
         metadata={
             "name": "Origin",
             "type": "Element",
-        }
+        },
     )
     source: List[str] = field(
         default_factory=list,
         metadata={
             "name": "Source",
             "type": "Element",
-        }
+        },
     )
     title: Optional[str] = field(
         default=None,
@@ -70,7 +70,7 @@ class Post:
             "name": "Title",
             "type": "Element",
             "required": True,
-        }
+        },
     )
     body: Optional[str] = field(
         default=None,
@@ -78,7 +78,7 @@ class Post:
             "name": "Body",
             "type": "Element",
             "required": True,
-        }
+        },
     )
     tags: Optional[Tags] = field(
         default=None,
@@ -86,7 +86,7 @@ class Post:
             "name": "Tags",
             "type": "Element",
             "required": True,
-        }
+        },
     )
 
 
@@ -98,5 +98,5 @@ class Blog:
             "name": "Post",
             "type": "Element",
             "min_occurs": 1,
-        }
+        },
     )

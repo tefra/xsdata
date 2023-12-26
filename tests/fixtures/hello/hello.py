@@ -14,7 +14,7 @@ class HelloByeError:
         metadata={
             "type": "Element",
             "namespace": "",
-        }
+        },
     )
 
 
@@ -28,7 +28,7 @@ class HelloError:
         metadata={
             "type": "Element",
             "namespace": "",
-        }
+        },
     )
 
 
@@ -43,7 +43,7 @@ class GetHelloAsString:
         metadata={
             "type": "Element",
             "namespace": "",
-        }
+        },
     )
 
 
@@ -59,7 +59,7 @@ class GetHelloAsStringResponse:
             "name": "return",
             "type": "Element",
             "namespace": "",
-        }
+        },
     )
 
 
@@ -74,7 +74,7 @@ class HelloGetHelloAsStringInput:
         metadata={
             "name": "Body",
             "type": "Element",
-        }
+        },
     )
 
     @dataclass
@@ -85,7 +85,7 @@ class HelloGetHelloAsStringInput:
                 "name": "getHelloAsString",
                 "type": "Element",
                 "namespace": "http://hello/",
-            }
+            },
         )
 
 
@@ -100,25 +100,27 @@ class HelloGetHelloAsStringOutput:
         metadata={
             "name": "Body",
             "type": "Element",
-        }
+        },
     )
 
     @dataclass
     class Body:
-        get_hello_as_string_response: Optional[GetHelloAsStringResponse] = field(
+        get_hello_as_string_response: Optional[
+            GetHelloAsStringResponse
+        ] = field(
             default=None,
             metadata={
                 "name": "getHelloAsStringResponse",
                 "type": "Element",
                 "namespace": "http://hello/",
-            }
+            },
         )
         fault: Optional["HelloGetHelloAsStringOutput.Body.Fault"] = field(
             default=None,
             metadata={
                 "name": "Fault",
                 "type": "Element",
-            }
+            },
         )
 
         @dataclass
@@ -128,28 +130,30 @@ class HelloGetHelloAsStringOutput:
                 metadata={
                     "type": "Element",
                     "namespace": "",
-                }
+                },
             )
             faultstring: Optional[str] = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
-                }
+                },
             )
             faultactor: Optional[str] = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
-                }
+                },
             )
-            detail: Optional["HelloGetHelloAsStringOutput.Body.Fault.Detail"] = field(
+            detail: Optional[
+                "HelloGetHelloAsStringOutput.Body.Fault.Detail"
+            ] = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
-                }
+                },
             )
 
             @dataclass
@@ -160,7 +164,7 @@ class HelloGetHelloAsStringOutput:
                         "name": "HelloError",
                         "type": "Element",
                         "namespace": "http://hello/",
-                    }
+                    },
                 )
                 hello_bye_error: Optional[HelloByeError] = field(
                     default=None,
@@ -168,7 +172,7 @@ class HelloGetHelloAsStringOutput:
                         "name": "HelloByeError",
                         "type": "Element",
                         "namespace": "http://hello/",
-                    }
+                    },
                 )
 
 

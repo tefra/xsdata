@@ -15,7 +15,7 @@ class Add:
             "name": "intA",
             "type": "Element",
             "required": True,
-        }
+        },
     )
     int_b: Optional[int] = field(
         default=None,
@@ -23,7 +23,7 @@ class Add:
             "name": "intB",
             "type": "Element",
             "required": True,
-        }
+        },
     )
 
 
@@ -38,7 +38,7 @@ class AddResponse:
             "name": "AddResult",
             "type": "Element",
             "required": True,
-        }
+        },
     )
 
 
@@ -53,7 +53,7 @@ class Divide:
             "name": "intA",
             "type": "Element",
             "required": True,
-        }
+        },
     )
     int_b: Optional[int] = field(
         default=None,
@@ -61,7 +61,7 @@ class Divide:
             "name": "intB",
             "type": "Element",
             "required": True,
-        }
+        },
     )
 
 
@@ -76,7 +76,7 @@ class DivideResponse:
             "name": "DivideResult",
             "type": "Element",
             "required": True,
-        }
+        },
     )
 
 
@@ -91,7 +91,7 @@ class Multiply:
             "name": "intA",
             "type": "Element",
             "required": True,
-        }
+        },
     )
     int_b: Optional[int] = field(
         default=None,
@@ -99,7 +99,7 @@ class Multiply:
             "name": "intB",
             "type": "Element",
             "required": True,
-        }
+        },
     )
 
 
@@ -114,7 +114,7 @@ class MultiplyResponse:
             "name": "MultiplyResult",
             "type": "Element",
             "required": True,
-        }
+        },
     )
 
 
@@ -129,7 +129,7 @@ class Subtract:
             "name": "intA",
             "type": "Element",
             "required": True,
-        }
+        },
     )
     int_b: Optional[int] = field(
         default=None,
@@ -137,7 +137,7 @@ class Subtract:
             "name": "intB",
             "type": "Element",
             "required": True,
-        }
+        },
     )
 
 
@@ -152,7 +152,7 @@ class SubtractResponse:
             "name": "SubtractResult",
             "type": "Element",
             "required": True,
-        }
+        },
     )
 
 
@@ -167,7 +167,7 @@ class CalculatorSoapAddInput:
         metadata={
             "name": "Body",
             "type": "Element",
-        }
+        },
     )
 
     @dataclass
@@ -178,7 +178,7 @@ class CalculatorSoapAddInput:
                 "name": "Add",
                 "type": "Element",
                 "namespace": "http://tempuri.org/",
-            }
+            },
         )
 
 
@@ -193,7 +193,7 @@ class CalculatorSoapAddOutput:
         metadata={
             "name": "Body",
             "type": "Element",
-        }
+        },
     )
 
     @dataclass
@@ -204,14 +204,14 @@ class CalculatorSoapAddOutput:
                 "name": "AddResponse",
                 "type": "Element",
                 "namespace": "http://tempuri.org/",
-            }
+            },
         )
         fault: Optional["CalculatorSoapAddOutput.Body.Fault"] = field(
             default=None,
             metadata={
                 "name": "Fault",
                 "type": "Element",
-            }
+            },
         )
 
         @dataclass
@@ -221,28 +221,28 @@ class CalculatorSoapAddOutput:
                 metadata={
                     "type": "Element",
                     "namespace": "",
-                }
+                },
             )
             faultstring: Optional[str] = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
-                }
+                },
             )
             faultactor: Optional[str] = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
-                }
+                },
             )
             detail: Optional[str] = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
-                }
+                },
             )
 
 
@@ -257,7 +257,7 @@ class CalculatorSoapDivideInput:
         metadata={
             "name": "Body",
             "type": "Element",
-        }
+        },
     )
 
     @dataclass
@@ -268,7 +268,7 @@ class CalculatorSoapDivideInput:
                 "name": "Divide",
                 "type": "Element",
                 "namespace": "http://tempuri.org/",
-            }
+            },
         )
 
 
@@ -283,7 +283,7 @@ class CalculatorSoapDivideOutput:
         metadata={
             "name": "Body",
             "type": "Element",
-        }
+        },
     )
 
     @dataclass
@@ -294,14 +294,14 @@ class CalculatorSoapDivideOutput:
                 "name": "DivideResponse",
                 "type": "Element",
                 "namespace": "http://tempuri.org/",
-            }
+            },
         )
         fault: Optional["CalculatorSoapDivideOutput.Body.Fault"] = field(
             default=None,
             metadata={
                 "name": "Fault",
                 "type": "Element",
-            }
+            },
         )
 
         @dataclass
@@ -311,28 +311,28 @@ class CalculatorSoapDivideOutput:
                 metadata={
                     "type": "Element",
                     "namespace": "",
-                }
+                },
             )
             faultstring: Optional[str] = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
-                }
+                },
             )
             faultactor: Optional[str] = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
-                }
+                },
             )
             detail: Optional[str] = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
-                }
+                },
             )
 
 
@@ -347,7 +347,7 @@ class CalculatorSoapMultiplyInput:
         metadata={
             "name": "Body",
             "type": "Element",
-        }
+        },
     )
 
     @dataclass
@@ -358,7 +358,7 @@ class CalculatorSoapMultiplyInput:
                 "name": "Multiply",
                 "type": "Element",
                 "namespace": "http://tempuri.org/",
-            }
+            },
         )
 
 
@@ -373,7 +373,7 @@ class CalculatorSoapMultiplyOutput:
         metadata={
             "name": "Body",
             "type": "Element",
-        }
+        },
     )
 
     @dataclass
@@ -384,14 +384,14 @@ class CalculatorSoapMultiplyOutput:
                 "name": "MultiplyResponse",
                 "type": "Element",
                 "namespace": "http://tempuri.org/",
-            }
+            },
         )
         fault: Optional["CalculatorSoapMultiplyOutput.Body.Fault"] = field(
             default=None,
             metadata={
                 "name": "Fault",
                 "type": "Element",
-            }
+            },
         )
 
         @dataclass
@@ -401,28 +401,28 @@ class CalculatorSoapMultiplyOutput:
                 metadata={
                     "type": "Element",
                     "namespace": "",
-                }
+                },
             )
             faultstring: Optional[str] = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
-                }
+                },
             )
             faultactor: Optional[str] = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
-                }
+                },
             )
             detail: Optional[str] = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
-                }
+                },
             )
 
 
@@ -437,7 +437,7 @@ class CalculatorSoapSubtractInput:
         metadata={
             "name": "Body",
             "type": "Element",
-        }
+        },
     )
 
     @dataclass
@@ -448,7 +448,7 @@ class CalculatorSoapSubtractInput:
                 "name": "Subtract",
                 "type": "Element",
                 "namespace": "http://tempuri.org/",
-            }
+            },
         )
 
 
@@ -463,7 +463,7 @@ class CalculatorSoapSubtractOutput:
         metadata={
             "name": "Body",
             "type": "Element",
-        }
+        },
     )
 
     @dataclass
@@ -474,14 +474,14 @@ class CalculatorSoapSubtractOutput:
                 "name": "SubtractResponse",
                 "type": "Element",
                 "namespace": "http://tempuri.org/",
-            }
+            },
         )
         fault: Optional["CalculatorSoapSubtractOutput.Body.Fault"] = field(
             default=None,
             metadata={
                 "name": "Fault",
                 "type": "Element",
-            }
+            },
         )
 
         @dataclass
@@ -491,28 +491,28 @@ class CalculatorSoapSubtractOutput:
                 metadata={
                     "type": "Element",
                     "namespace": "",
-                }
+                },
             )
             faultstring: Optional[str] = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
-                }
+                },
             )
             faultactor: Optional[str] = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
-                }
+                },
             )
             detail: Optional[str] = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
-                }
+                },
             )
 
 

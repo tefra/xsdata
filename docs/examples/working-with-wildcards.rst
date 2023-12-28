@@ -73,8 +73,9 @@ to generate any custom xml element.
     ...             children=[
     ...                 AnyElement(qname="first", text="1st", attributes={"a": "1"}),
     ...                 AnyElement(qname="second", text="2nd", attributes={"b": "2"}),
+    ...                 AnyElement(qname="{http://xsdata}third", text="2nd", attributes={"b": "2"}),
     ...                 DerivedElement(
-    ...                     qname="third",
+    ...                     qname="fourth",
     ...                     value=MetadataType(other_attributes={"c": "3"})
     ...                 )
     ...             ]
@@ -88,7 +89,8 @@ to generate any custom xml element.
       <bar>
         <first a="1">1st</first>
         <second b="2">2nd</second>
-        <third xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" c="3" xsi:type="MetadataType"/>
+        <ns0:third xmlns:ns0="http://xsdata" b="2">2nd</ns0:third>
+        <fourth xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" c="3" xsi:type="MetadataType"/>
       </bar>
     </MetadataType>
     <BLANKLINE>

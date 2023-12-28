@@ -22,7 +22,9 @@ fields in order to preserve the elements ordering during roundtrip conversions.
         :lines: 33-53
 
 
-All choice elements are grouped into a single list field.
+All choice elements are grouped into a single field. The name of field
+can be manipulated with the :class:`~xsdata.models.config.CompoundFields`
+configuration.
 
 .. testcode::
 

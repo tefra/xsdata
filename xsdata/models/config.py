@@ -222,15 +222,21 @@ class CompoundFields:
 
     :param enabled: Use compound fields for repeatable elements
     :param default_name: Default compound field name
-    :param force_default_name: Always use the default compound field,
-        otherwise if the number of elements is less than 4 the generator
-        will try to dynamically create the field name e.g.
+    :param use_substitution_groups: Use substitution groups if they
+        exist, instead of element names.
+    :param force_default_name: Always use the default compound field
+        name, or try to generate one by the list of element names if
+        they are no longer than the max name parts. e.g.
         hat_or_dress_or_something.
+    :param max_name_parts: Maximum number of element names before using
+        the default name.
     """
 
     enabled: bool = text_node(default=False, cli="compound-fields")
     default_name: str = attribute(default="choice", cli=False)
+    use_substitution_groups: bool = attribute(default=False, cli=False)
     force_default_name: bool = attribute(default=False, cli=False)
+    max_name_parts: int = attribute(default=3, cli=False)
 
 
 @dataclass

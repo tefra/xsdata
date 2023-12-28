@@ -71,17 +71,20 @@ class CreateCompoundFields(RelativeHandlerInterface):
         assert choice is not None
 
         names = []
+        substitutions = []
         choices = []
         counters: Dict = {"min": [], "max": []}
 
         for attr in attrs:
             ClassUtils.remove_attribute(target, attr)
             names.append(attr.local_name)
+            substitutions.append(attr.substitution)
+
             choices.append(self.build_attr_choice(attr))
             self.update_counters(attr, counters)
 
         min_occurs, max_occurs = self.sum_counters(counters)
-        name = self.choose_name(target, names)
+        name = self.choose_name(target, names, list(filter(None, substitutions)))
         types = collections.unique_sequence(t for attr in attrs for t in attr.types)
 
         target.attrs.insert(
@@ -115,12 +118,14 @@ class CreateCompoundFields(RelativeHandlerInterface):
 
         return min_occurs, max_occurs
 
-    def choose_name(self, target: Class, names: List[str]) -> str:
-        if (
-            self.config.force_default_name
-            or len(names) > 3
-            or len(names) != len(set(names))
-        ):
+    def choose_name(
+        self, target: Class, names: List[str], substitutions: List[str]
+    ) -> str:
+        if self.config.use_substitution_groups and substitutions:
+            names = substitutions
+
+        names = collections.unique_sequence(names)
+        if self.config.force_default_name or len(names) > self.config.max_name_parts:
             name = self.config.default_name
         else:
             name = "_Or_".join(names)

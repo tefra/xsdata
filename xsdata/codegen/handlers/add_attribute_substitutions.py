@@ -34,9 +34,9 @@ class AddAttributeSubstitutions(RelativeHandlerInterface):
     def process_attribute(self, target: Class, attr: Attr):
         """
         Check if the given attribute matches any substitution class in order to
-        clone it's attributes to the target class.
+        clone its attributes to the target class.
 
-        The cloned attributes are placed below the attribute the are
+        The cloned attributes are placed below the attribute they are
         supposed to substitute.
 
         Guard against multiple substitutions in case of xs:groups.
@@ -55,6 +55,8 @@ class AddAttributeSubstitutions(RelativeHandlerInterface):
                 clone = ClassUtils.clone_attribute(substitution, attr.restrictions)
                 clone.restrictions.min_occurs = 0
                 clone.restrictions.max_occurs = attr.restrictions.max_occurs
+
+                attr.substitution = clone.substitution = attr_type.name
 
                 pos = collections.find(target.attrs, clone)
                 index = pos + 1 if pos > -1 else index

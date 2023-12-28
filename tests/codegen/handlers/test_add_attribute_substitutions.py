@@ -81,6 +81,11 @@ class AddAttributeSubstitutionsTests(FactoryTestCase):
         self.assertEqual(1, target.attrs[2].restrictions.min_occurs)
         self.assertEqual(0, target.attrs[3].restrictions.min_occurs)
 
+        self.assertEqual("foo", target.attrs[0].substitution)
+        self.assertEqual("foo", target.attrs[1].substitution)
+        self.assertEqual(None, target.attrs[2].substitution)
+        self.assertEqual("foo", target.attrs[3].substitution)
+
         self.processor.process_attribute(target, second_attr)
         self.assertEqual(4, len(target.attrs))
 

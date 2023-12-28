@@ -218,7 +218,7 @@ class XmlContext:
             meta = self.build(clazz)
             local_names = {var.local_name for var in meta.get_all_vars()}
             return not names.difference(local_names)
-        except (XmlContextError, NameError):
+        except (XmlContextError, NameError, TypeError):
             # The dataclass includes unsupported typing annotations
             # Let's remove it from xsi_cache
             builder = self.get_builder()

@@ -144,26 +144,31 @@ class CreateCompoundFieldsTests(FactoryTestCase):
     def test_choose_name(self):
         target = ClassFactory.create()
 
-        actual = self.processor.choose_name(target, ["a", "b", "c"])
+        actual = self.processor.choose_name(target, ["a", "b", "c"], [])
         self.assertEqual("a_Or_b_Or_c", actual)
 
-        actual = self.processor.choose_name(target, ["a", "b", "c", "d"])
+        actual = self.processor.choose_name(target, ["a", "b", "c", "d"], [])
         self.assertEqual("choice", actual)
 
         target.attrs.append(AttrFactory.create(name="choice"))
-        actual = self.processor.choose_name(target, ["a", "b", "c", "d"])
+        actual = self.processor.choose_name(target, ["a", "b", "c", "d"], [])
         self.assertEqual("choice_1", actual)
 
-        actual = self.processor.choose_name(target, ["a", "b", "c", "d"])
+        actual = self.processor.choose_name(target, ["a", "b", "c", "d"], [])
         self.assertEqual("choice_1", actual)
 
         self.processor.config.default_name = "ThisOrThat"
-        actual = self.processor.choose_name(target, ["a", "b", "c", "d"])
+        actual = self.processor.choose_name(target, ["a", "b", "c", "d"], [])
         self.assertEqual("ThisOrThat", actual)
 
         self.processor.config.force_default_name = True
-        actual = self.processor.choose_name(target, ["a", "b", "c"])
+        actual = self.processor.choose_name(target, ["a", "b", "c"], [])
         self.assertEqual("ThisOrThat", actual)
+
+        self.processor.config.force_default_name = False
+        self.processor.config.use_substitution_groups = True
+        actual = self.processor.choose_name(target, ["a", "b", "c"], ["d", "e", "f"])
+        self.assertEqual("d_Or_e_Or_f", actual)
 
     def test_build_reserved_names(self):
         base = ClassFactory.create(

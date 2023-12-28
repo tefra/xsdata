@@ -210,6 +210,7 @@ class Attr:
     help: Optional[str] = field(default=None, compare=False)
     restrictions: Restrictions = field(default_factory=Restrictions, compare=False)
     parent: Optional["Class"] = field(default=None, compare=False)
+    substitution: Optional[str] = field(default=None, compare=False)
 
     def __post_init__(self):
         self.local_name = self.name

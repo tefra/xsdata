@@ -38,7 +38,7 @@ class GeneratorConfigTests(TestCase):
             "    <DocstringStyle>reStructuredText</DocstringStyle>\n"
             "    <FilterStrategy>allGlobals</FilterStrategy>\n"
             "    <RelativeImports>false</RelativeImports>\n"
-            '    <CompoundFields defaultName="choice" forceDefaultName="false">false</CompoundFields>\n'
+            '    <CompoundFields defaultName="choice" useSubstitutionGroups="false" forceDefaultName="false" maxNameParts="3">false</CompoundFields>\n'
             "    <PostponedAnnotations>false</PostponedAnnotations>\n"
             "    <UnnestClasses>false</UnnestClasses>\n"
             "    <IgnorePatterns>false</IgnorePatterns>\n"
@@ -100,7 +100,7 @@ class GeneratorConfigTests(TestCase):
             "    <DocstringStyle>reStructuredText</DocstringStyle>\n"
             "    <FilterStrategy>allGlobals</FilterStrategy>\n"
             "    <RelativeImports>false</RelativeImports>\n"
-            '    <CompoundFields defaultName="choice" forceDefaultName="false">false</CompoundFields>\n'
+            '    <CompoundFields defaultName="choice" useSubstitutionGroups="false" forceDefaultName="false" maxNameParts="3">false</CompoundFields>\n'
             "    <PostponedAnnotations>false</PostponedAnnotations>\n"
             "    <UnnestClasses>false</UnnestClasses>\n"
             "    <IgnorePatterns>false</IgnorePatterns>\n"

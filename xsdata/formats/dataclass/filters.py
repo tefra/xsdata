@@ -663,26 +663,14 @@ class Filters:
         if attr.is_prohibited:
             return "Any"
 
-        type_names = collections.unique_sequence(
-            self.field_type_name(x, parents) for x in attr.types
-        )
+        result = self.field_type_names(attr, parents, choice=False)
 
-        if self.union_type:
-            result = " | ".join(type_names)
-        else:
-            result = ", ".join(type_names)
-            if len(type_names) > 1:
-                result = f"Union[{result}]"
-
-        iterable = "Tuple[{}, ...]" if self.format.frozen else "List[{}]"
-        if self.subscriptable_types:
-            iterable = iterable.lower()
-
+        iterable_fmt = self.get_iterable_format()
         if attr.is_tokens:
-            result = iterable.format(result)
+            result = iterable_fmt.format(result)
 
         if attr.is_list:
-            return iterable.format(result)
+            return iterable_fmt.format(result)
 
         if attr.is_tokens:
             return result
@@ -708,28 +696,35 @@ class Filters:
         compound field that might be a list, that's why list restriction
         is also ignored.
         """
-        type_names = collections.unique_sequence(
-            self.field_type_name(x, parents, choice=True) for x in choice.types
-        )
 
-        if self.union_type:
-            result = " | ".join(type_names)
-        else:
-            result = ", ".join(type_names)
-            if len(type_names) > 1:
-                result = f"Union[{result}]"
+        result = self.field_type_names(choice, parents, choice=True)
 
         if choice.is_tokens:
-            iterable = "Tuple[{}, ...]" if self.format.frozen else "List[{}]"
-            if self.subscriptable_types:
-                iterable = iterable.lower()
-
-            result = iterable.format(result)
+            iterable_fmt = self.get_iterable_format()
+            result = iterable_fmt.format(result)
 
         if self.subscriptable_types:
             return f"type[{result}]"
 
         return f"Type[{result}]"
+
+    def field_type_names(
+        self, attr: Attr, parents: List[str], choice: bool = False
+    ) -> str:
+        type_names = [
+            self.field_type_name(x, parents, choice=choice) for x in attr.types
+        ]
+        return self.join_type_names(type_names)
+
+    def join_type_names(self, type_names: List[str]) -> str:
+        type_names = collections.unique_sequence(type_names)
+        if len(type_names) == 1:
+            return type_names[0]
+
+        if self.union_type:
+            return " | ".join(type_names)
+
+        return f'Union[{", ".join(type_names)}]'
 
     def field_type_name(
         self, attr_type: AttrType, parents: List[str], choice: bool = False
@@ -782,6 +777,10 @@ class Filters:
             imports.insert(0, "from __future__ import annotations")
 
         return "\n".join(imports)
+
+    def get_iterable_format(self):
+        fmt = "Tuple[{}, ...]" if self.format.frozen else "List[{}]"
+        return fmt.lower() if self.subscriptable_types else fmt
 
     @classmethod
     def build_import_patterns(cls) -> Dict[str, Dict]:

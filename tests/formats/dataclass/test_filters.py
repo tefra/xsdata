@@ -921,6 +921,7 @@ class FiltersTests(FactoryTestCase):
             "level_two": {"a": 1},
             "list": [
                 {"type": "Type[object]"},
+                {"type": 'type["something"]'},
                 {"type": "Type[object] mpla"},
             ],
             "default": "1",
@@ -941,6 +942,9 @@ class FiltersTests(FactoryTestCase):
             '    "list": [\n'
             "        {\n"
             '            "type": object,\n'
+            "        },\n"
+            "        {\n"
+            '            "type": type["something"],\n'
             "        },\n"
             "        {\n"
             '            "type": "Type[object] mpla",\n'

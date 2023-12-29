@@ -186,11 +186,16 @@ class XmlSerializerTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertListEqual([], list(result))
 
+        result = self.serializer.write_value([], var, "xsdata")
+        self.assertIsInstance(result, Generator)
+        self.assertListEqual([], list(result))
+
         expected = [
             (XmlWriterEvent.START, "a"),
             (XmlWriterEvent.DATA, []),
             (XmlWriterEvent.END, "a"),
         ]
+        var.required = True
         result = self.serializer.write_value([], var, "xsdata")
         self.assertIsInstance(result, Generator)
         self.assertListEqual(expected, list(result))

@@ -480,7 +480,9 @@ class Filters:
         length and the additional pad is more than the max line length,
         wrap the text into multiple lines, avoiding breaking long words
         """
-        if data.startswith("Type[") and data.endswith("]"):
+        if (data.startswith("Type[") or data.startswith("type[")) and data.endswith(
+            "]"
+        ):
             return data if data[5] == '"' else data[5:-1]
 
         if data.startswith("Literal[") and data.endswith("]"):

@@ -155,6 +155,8 @@ class XmlSerializer(AbstractSerializer):
             yield from self.write_elements(value, var, namespace)
         elif var.list_element and collections.is_array(value):
             yield from self.write_list(value, var, namespace)
+        elif var.list_element and isinstance(value, Generator):
+            yield from self.write_list(value, var, namespace)
         else:
             yield from self.write_any_type(value, var, namespace)
 

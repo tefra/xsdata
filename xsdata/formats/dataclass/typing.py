@@ -1,5 +1,6 @@
 import sys
 from typing import Any, Iterator, Tuple, Type, TypeVar, Union
+from collections.abc import Iterable
 
 from typing_extensions import get_args, get_origin
 
@@ -166,6 +167,7 @@ def _evaluate_typevar(tp: TypeVar):
 
 __evaluations__ = {
     tuple: _evaluate_tuple,
+    Iterable: _evaluate_list,
     list: _evaluate_list,
     dict: _evaluate_mapping,
     Union: _evaluate_union,

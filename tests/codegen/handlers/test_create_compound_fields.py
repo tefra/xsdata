@@ -170,6 +170,9 @@ class CreateCompoundFieldsTests(FactoryTestCase):
         actual = self.processor.choose_name(target, ["a", "b", "c"], ["d", "e", "f"])
         self.assertEqual("d_Or_e_Or_f", actual)
 
+        actual = self.processor.choose_name(target, ["a", "b", "c"], ["d", "f"])
+        self.assertEqual("a_Or_b_Or_c", actual)
+
     def test_build_reserved_names(self):
         base = ClassFactory.create(
             attrs=[

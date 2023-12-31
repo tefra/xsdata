@@ -121,7 +121,7 @@ class CreateCompoundFields(RelativeHandlerInterface):
     def choose_name(
         self, target: Class, names: List[str], substitutions: List[str]
     ) -> str:
-        if self.config.use_substitution_groups and substitutions:
+        if self.config.use_substitution_groups and len(names) == len(substitutions):
             names = substitutions
 
         names = collections.unique_sequence(names)

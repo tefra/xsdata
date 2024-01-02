@@ -25,6 +25,12 @@ class AttrTests(FactoryTestCase):
         attr.namespace = __file__
         self.assertNotEqual(attr, clone)
 
+    def test_can_be_restricted(self):
+        self.assertFalse(AttrFactory.create(tag=Tag.ATTRIBUTE).can_be_restricted())
+        self.assertFalse(AttrFactory.create(tag=Tag.EXTENSION).can_be_restricted())
+        self.assertFalse(AttrFactory.create(tag=Tag.RESTRICTION).can_be_restricted())
+        self.assertTrue(AttrFactory.create(tag=Tag.ELEMENT).can_be_restricted())
+
     def test_property_key(self):
         attr = AttrFactory.attribute(name="a", namespace="b")
         self.assertEqual("Attribute.b.a", attr.key)

@@ -333,6 +333,10 @@ class Attr:
             if datatype:
                 yield datatype.type
 
+    def can_be_restricted(self) -> bool:
+        """Return whether this attribute can be restricted."""
+        return self.xml_type not in (Tag.ATTRIBUTE, None)
+
 
 @dataclass(unsafe_hash=True)
 class Extension:
@@ -459,6 +463,12 @@ class Class:
     def is_mixed(self) -> bool:
         """Return whether this class supports mixed content."""
         return self.mixed or any(x.mixed for x in self.attrs)
+
+    @property
+    def is_restricted(self) -> bool:
+        return any(
+            True for extension in self.extensions if extension.tag == Tag.RESTRICTION
+        )
 
     @property
     def is_service(self) -> bool:

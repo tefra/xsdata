@@ -1,5 +1,5 @@
 import sys
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Set
 
 from xsdata.codegen.mixins import RelativeHandlerInterface
 from xsdata.codegen.models import Attr, Class, get_slug
@@ -9,30 +9,56 @@ from xsdata.utils import collections
 
 
 class ValidateAttributesOverrides(RelativeHandlerInterface):
-    """
-    Check override attributes are valid.
-
-    Steps:
-        1. The attribute is a valid override, leave it alone
-        2. The attribute is unnecessary remove it
-        3. The attribute is an invalid override, rename one of them
-    """
+    """Validate override and restricted attributes."""
 
     __slots__ = ()
 
     def process(self, target: Class):
         base_attrs_map = self.base_attrs_map(target)
+        # We need the original class attrs before validation, in order to
+        # prohibit the rest of the parent attrs later...
+        restricted_attrs = {
+            attr.slug for attr in target.attrs if attr.can_be_restricted()
+        }
+        self.validate_attrs(target, base_attrs_map)
+        if target.is_restricted:
+            self.prohibit_parent_attrs(target, restricted_attrs, base_attrs_map)
+
+    @classmethod
+    def prohibit_parent_attrs(
+        cls,
+        target: Class,
+        restricted_attrs: Set[str],
+        base_attrs_map: Dict[str, List[Attr]],
+    ):
+        """
+        Prepend prohibited parent attrs to the target class.
+
+        Reset the types and default value in order to avoid conflicts
+        later.
+        """
+        for slug, attrs in reversed(base_attrs_map.items()):
+            attr = attrs[0]
+            if attr.can_be_restricted() and slug not in restricted_attrs:
+                attr_restricted = attr.clone()
+                attr_restricted.restrictions.max_occurs = 0
+                attr_restricted.default = None
+                attr_restricted.types.clear()
+                target.attrs.insert(0, attr_restricted)
+
+    @classmethod
+    def validate_attrs(cls, target: Class, base_attrs_map: Dict[str, List[Attr]]):
         for attr in list(target.attrs):
             base_attrs = base_attrs_map.get(attr.slug)
 
             if base_attrs:
                 base_attr = base_attrs[0]
-                if self.overrides(attr, base_attr):
-                    self.validate_override(target, attr, base_attr)
+                if cls.overrides(attr, base_attr):
+                    cls.validate_override(target, attr, base_attr)
                 else:
-                    self.resolve_conflict(attr, base_attr)
+                    cls.resolve_conflict(attr, base_attr)
             elif attr.is_prohibited:
-                self.remove_attribute(target, attr)
+                cls.remove_attribute(target, attr)
 
     @classmethod
     def overrides(cls, a: Attr, b: Attr) -> bool:

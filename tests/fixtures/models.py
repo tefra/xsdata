@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from dataclasses import field
-from typing import Dict
+from typing import Dict, Any
 from typing import List
 from typing import Optional
 from typing import Type
@@ -30,6 +30,7 @@ class TypeC:
     y: str
     z: float
     fixed: str = field(init=False, default="ignored")
+    restricted: Any = field(init=False, metadata={"type": "Ignore"})
 
 
 @dataclass

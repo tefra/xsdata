@@ -21,9 +21,46 @@ class ValidateAttributesOverridesTests(FactoryTestCase):
         self.container = ClassContainer(config=GeneratorConfig())
         self.processor = ValidateAttributesOverrides(container=self.container)
 
+    def test_prohibit_parent_attrs(self):
+        child = ClassFactory.create(
+            status=Status.FLATTENING,
+            attrs=[
+                AttrFactory.create(name="el", tag=Tag.ELEMENT),
+                AttrFactory.create(name="at", tag=Tag.ATTRIBUTE),
+            ],
+        )
+
+        parent = ClassFactory.create(
+            status=Status.FLATTENED,
+            attrs=[
+                AttrFactory.element(default="foo"),
+                AttrFactory.attribute(),
+                AttrFactory.extension(),
+                AttrFactory.element(default="bar"),
+            ],
+        )
+
+        child.extensions.append(
+            ExtensionFactory.reference(parent.qname, tag=Tag.RESTRICTION)
+        )
+        self.container.extend((parent, child))
+        self.processor.process(child)
+
+        self.assertEqual(4, len(child.attrs))
+
+        self.assertEqual(parent.attrs[0].name, child.attrs[0].name)
+        self.assertEqual([], child.attrs[0].types)
+        self.assertIsNone(child.attrs[0].default)
+        self.assertTrue(child.attrs[0].is_prohibited)
+
+        self.assertEqual(parent.attrs[3].name, child.attrs[1].name)
+        self.assertEqual([], child.attrs[1].types)
+        self.assertIsNone(child.attrs[1].default)
+        self.assertTrue(child.attrs[1].is_prohibited)
+
     @mock.patch.object(ValidateAttributesOverrides, "resolve_conflict")
     @mock.patch.object(ValidateAttributesOverrides, "validate_override")
-    def test_process(self, mock_validate_override, mock_resolve_conflict):
+    def test_validate_attrs(self, mock_validate_override, mock_resolve_conflict):
         class_a = ClassFactory.create(
             status=Status.FLATTENING,
             attrs=[
@@ -35,8 +72,12 @@ class ValidateAttributesOverridesTests(FactoryTestCase):
         class_b = ClassFactory.elements(2, status=Status.FLATTENED)
         class_c = ClassFactory.create(status=Status.FLATTENED)
 
-        class_b.extensions.append(ExtensionFactory.reference(class_c.qname))
-        class_a.extensions.append(ExtensionFactory.reference(class_b.qname))
+        class_b.extensions.append(
+            ExtensionFactory.reference(class_c.qname, tag=Tag.EXTENSION)
+        )
+        class_a.extensions.append(
+            ExtensionFactory.reference(class_b.qname, tag=Tag.EXTENSION)
+        )
 
         class_c.attrs.append(class_a.attrs[0].clone())
         class_c.attrs.append(class_a.attrs[1].clone())
@@ -52,7 +93,7 @@ class ValidateAttributesOverridesTests(FactoryTestCase):
             class_a.attrs[1], class_c.attrs[1]
         )
 
-    def test_process_remove_non_overriding_prohibited_attrs(self):
+    def test_validate_attrs_remove_non_overriding_prohibited_attrs(self):
         target = ClassFactory.elements(1)
         target.attrs[0].restrictions.max_occurs = 0
 

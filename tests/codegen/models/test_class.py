@@ -144,6 +144,16 @@ class ClassTests(FactoryTestCase):
         obj.attrs.append(AttrFactory.create(tag=Tag.EXTENSION))
         self.assertFalse(obj.is_global_type)
 
+    def test_property_is_restricted(self):
+        obj = ClassFactory.create()
+        ext = ExtensionFactory.create(tag=Tag.EXTENSION)
+        obj.extensions.append(ext)
+
+        self.assertFalse(obj.is_restricted)
+
+        ext.tag = Tag.RESTRICTION
+        self.assertTrue(obj.is_restricted)
+
     def test_property_is_simple_type(self):
         obj = ClassFactory.elements(2)
 

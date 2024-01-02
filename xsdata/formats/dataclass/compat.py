@@ -85,7 +85,9 @@ class ClassType(abc.ABC):
             return 0.0
 
         if self.is_model(obj):
-            return sum(score(getattr(obj, var.name)) for var in self.get_fields(obj))
+            return sum(
+                score(getattr(obj, var.name, None)) for var in self.get_fields(obj)
+            )
 
         return score(obj)
 

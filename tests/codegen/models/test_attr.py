@@ -53,6 +53,18 @@ class AttrTests(FactoryTestCase):
         element.restrictions.max_occurs = 2
         self.assertTrue(element.is_factory)
 
+    def test_property_is_forward_ref(self):
+        attr = AttrFactory.create()
+        self.assertFalse(attr.is_forward_ref)
+
+        attr.types.append(AttrTypeFactory.create("foo", circular=True))
+        self.assertTrue(attr.is_forward_ref)
+
+        attr.types.clear()
+        self.assertFalse(attr.is_forward_ref)
+        attr.types.append(AttrTypeFactory.create("foo", forward=True))
+        self.assertTrue(attr.is_forward_ref)
+
     def test_property_is_group(self):
         self.assertTrue(AttrFactory.group().is_group)
         self.assertTrue(AttrFactory.attribute_group().is_group)

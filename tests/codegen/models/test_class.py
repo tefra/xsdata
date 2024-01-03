@@ -221,3 +221,26 @@ class ClassTests(FactoryTestCase):
 
         obj = ClassFactory.create(mixed=True)
         self.assertTrue(obj.is_mixed)
+
+    def test_has_forward_ref(self):
+        forward_type = AttrTypeFactory.create("foo", forward=True)
+        circular_type = AttrTypeFactory.create("foo", circular=True)
+
+        obj = ClassFactory.elements(1)
+        self.assertFalse(obj.has_forward_ref())
+
+        obj.attrs[0].types.append(forward_type)
+        self.assertTrue(obj.has_forward_ref())
+
+        obj.attrs[0].types.pop()
+        obj.attrs[0].choices.append(AttrFactory.create())
+        obj.attrs[0].choices.append(AttrFactory.create(types=[circular_type]))
+        self.assertTrue(obj.has_forward_ref())
+
+        obj.attrs.clear()
+        self.assertFalse(obj.has_forward_ref())
+
+        inner = ClassFactory.elements(1)
+        inner.attrs[0].types.append(circular_type)
+        obj.inner.append(inner)
+        self.assertTrue(obj.has_forward_ref())

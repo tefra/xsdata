@@ -241,6 +241,10 @@ class Attr:
         return self.is_list or self.is_dict or self.is_tokens
 
     @property
+    def is_forward_ref(self) -> bool:
+        return any(tp.circular or tp.forward for tp in self.types)
+
+    @property
     def is_group(self) -> bool:
         """Return whether this attribute is derived from a xs:group or
         xs:attributeGroup."""
@@ -549,6 +553,17 @@ class Class:
 
         for inner in self.inner:
             yield from inner.dependencies(allow_circular)
+
+    def has_forward_ref(self) -> bool:
+        """Return whether this class has any forward references."""
+        for attr in self.attrs:
+            if attr.is_forward_ref:
+                return True
+
+            if any(choice for choice in attr.choices if choice.is_forward_ref):
+                return True
+
+        return any(inner.has_forward_ref() for inner in self.inner)
 
 
 @dataclass

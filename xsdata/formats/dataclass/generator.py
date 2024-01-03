@@ -15,16 +15,26 @@ class DataclassGenerator(AbstractGenerator):
 
     __slots__ = ("env", "filters")
 
+    package_template = "package.jinja2"
+    module_template = "module.jinja2"
+    enum_template = "enum.jinja2"
+    service_template = "service.jinja2"
+    class_template = "class.jinja2"
+
     def __init__(self, config: GeneratorConfig):
         """Override generator constructor to set templates directory and
         environment filters."""
 
         super().__init__(config)
-
-        tpl_dir = Path(__file__).parent.joinpath("templates")
-        self.env = Environment(loader=FileSystemLoader(str(tpl_dir)), autoescape=False)
+        template_paths = self.get_template_paths()
+        loader = FileSystemLoader(template_paths)
+        self.env = Environment(loader=loader, autoescape=False)
         self.filters = self.init_filters(config)
         self.filters.register(self.env)
+
+    @classmethod
+    def get_template_paths(cls) -> List[str]:
+        return [str(Path(__file__).parent.joinpath("templates"))]
 
     def render(self, classes: List[Class]) -> Iterator[GeneratorResult]:
         """
@@ -63,7 +73,7 @@ class DataclassGenerator(AbstractGenerator):
         ]
         DependenciesResolver.resolve_conflicts(imports, set())
 
-        output = self.env.get_template("package.jinja2").render(
+        output = self.env.get_template(self.package_template).render(
             imports=imports,
             module=module,
         )
@@ -82,11 +92,13 @@ class DataclassGenerator(AbstractGenerator):
 
         resolver.process(classes)
         imports = resolver.sorted_imports()
-        output = self.render_classes(resolver.sorted_classes(), module_namespace)
+        classes = resolver.sorted_classes()
+        output = self.render_classes(classes, module_namespace)
         module = classes[0].target_module
 
-        return self.env.get_template("module.jinja2").render(
+        return self.env.get_template(self.module_template).render(
             output=output,
+            classes=classes,
             module=module,
             imports=imports,
             namespace=module_namespace,
@@ -96,21 +108,24 @@ class DataclassGenerator(AbstractGenerator):
         self, classes: List[Class], module_namespace: Optional[str]
     ) -> str:
         """Render the source code of the classes."""
-        load = self.env.get_template
 
         def render_class(obj: Class) -> str:
             """Render class or enumeration."""
             if obj.is_enumeration:
-                template = load("enum.jinja2")
+                template = self.enum_template
             elif obj.is_service:
-                template = load("service.jinja2")
+                template = self.service_template
             else:
-                template = load("class.jinja2")
+                template = self.class_template
 
-            return template.render(
-                obj=obj,
-                module_namespace=module_namespace,
-            ).strip()
+            return (
+                self.env.get_template(template)
+                .render(
+                    obj=obj,
+                    module_namespace=module_namespace,
+                )
+                .strip()
+            )
 
         return "\n\n\n".join(map(render_class, classes)) + "\n"
 

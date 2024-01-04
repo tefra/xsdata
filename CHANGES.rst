@@ -1,3 +1,24 @@
+24.1 (2023-01-04)
+-----------------
+- Fixed XmlParser to ignore xsi attrs when fail on unknown attributes is enabled (`#846 <https://github.com/tefra/xsdata/pull/846>`_)
+- Fixed parsing mandatory byte elements with no value (`#873 <https://github.com/tefra/xsdata/pull/873>`_)
+- Fixed issue in json binding with union fields (`#864 <https://github.com/tefra/xsdata/pull/864>`_)
+- Fixed PycodeSerializer to escape unicode characters in string values (`#877 <https://github.com/tefra/xsdata/pull/877>`_)
+- Fixed compound field choices with forward references (`#886 <https://github.com/tefra/xsdata/pull/886>`_)
+- Fixed google style docstrings to add missing colon  (`#884 <https://github.com/tefra/xsdata/pull/884>`_)
+- Fixed deprecation warnings for datetime.datetime.utcnow()
+- Fixed XmlSerializer to ignore empty non-nillable/required tokens (`#902 <https://github.com/tefra/xsdata/pull/902>`_)
+- Fixed issue with invalid variable names when using originalCase naming convention (`#881 <https://github.com/tefra/xsdata/pull/881>`_)
+- Added type hints for compound fields (`#858 <https://github.com/tefra/xsdata/pull/858>`_, `#885 <https://github.com/tefra/xsdata/pull/885>`_)
+- Added http header when loading remote resources (`#867 <https://github.com/tefra/xsdata/pull/867>`_)
+- Added warning when converting parent field to a list (`#871 <https://github.com/tefra/xsdata/pull/871>`_)
+- Added ruff to format generated code (`#892 <https://github.com/tefra/xsdata/pull/892>`_)
+- Added option to use substitution group names for compound field name (`#905 <https://github.com/tefra/xsdata/pull/905>`_)
+- Updated base64 decoding to enable validation (`#875 <https://github.com/tefra/xsdata/pull/875>`_)
+- Updated generator to render prohibited parent fields with restriction extensions (`#908 <https://github.com/tefra/xsdata/pull/908>`_)
+- Updated generator so plugins can easily override templates
+
+
 23.8 (2023-08-12)
 -----------------
 - Removed Python 3.7 support

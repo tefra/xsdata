@@ -99,7 +99,7 @@ Features
 
 
 
-Changelog: 24.1 (2023-01-04)
+Changelog: 24.1 (2024-01-04)
 ----------------------------
 - Fixed XmlParser to ignore xsi attrs when fail on unknown attributes is enabled (`#846 <https://github.com/tefra/xsdata/pull/846>`_)
 - Fixed parsing mandatory byte elements with no value (`#873 <https://github.com/tefra/xsdata/pull/873>`_)

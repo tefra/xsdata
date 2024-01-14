@@ -119,7 +119,6 @@ ignore = [
     "D100",
     "D104",
     "D107"
-
 ]
 
 isort = { known-first-party = ['xsdata', 'tests'] }

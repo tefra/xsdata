@@ -52,6 +52,8 @@ cli = [
     "ruff>=0.1.9"
 ]
 docs = [
+    "mkdocs",
+    "mkdocstrings",
     "furo",
     "sphinx",
     "sphinx-autobuild",
@@ -99,6 +101,8 @@ select = [
     "C4",
     # isort
     "I",
+    # pydocstyle
+    "D",
 ]
 
 ignore = [
@@ -112,13 +116,17 @@ ignore = [
     "E203",
     "B028",
     "B904",
+    "D100",
+    "D107"
 ]
 
 isort = { known-first-party = ['xsdata', 'tests'] }
 
 [tool.ruff.lint.per-file-ignores]
-"**/{tests}/*" = ["ANN001", "ANN002", "ANN003", "E501", "B018"]
+"**/{tests}/*" = ["ANN001", "ANN002", "ANN003", "E501", "B018", "D"]
 
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
 [tool.doc8]
 max-line-length = 88

@@ -43,7 +43,7 @@ Verify installation using the cli entry point.
 Requirements
 ------------
 
-.. admonition:: xsData relies on these awesome libraries and supports `python >= 3.7`
+.. admonition:: xsData relies on these awesome libraries and supports `python >= 3.8`
     :class: hint
 
     * `lxml <https://lxml.de/>`_ - XML parsing

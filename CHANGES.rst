@@ -30,7 +30,7 @@
 23.7 (2023-07-23)
 -----------------
 - Fixed decimal converter to avoid scientific notations (`#826 <https://github.com/tefra/xsdata/pull/826>`_)
-- Fixed nympy paramater docstring format  (`#827 <https://github.com/tefra/xsdata/pull/827>`_)
+- Fixed nympy parameter docstring format  (`#827 <https://github.com/tefra/xsdata/pull/827>`_)
 - Fixed optional/required override validation (`#820 <https://github.com/tefra/xsdata/pull/820>`_)
 - Fixed WSDL mapper to respect the elements original location (`#832 <https://github.com/tefra/xsdata/pull/832>`_)
 - Added Python 3.12 support

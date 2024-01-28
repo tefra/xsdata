@@ -5,7 +5,7 @@ from xsdata.models.xsd import Annotation, AnnotationBase, Documentation
 
 
 class AnnotationBaseTest(TestCase):
-    def test_property_dispaly_help(self):
+    def test_property_display_help(self):
         base = AnnotationBase()
         self.assertIsNone(base.display_help)
 

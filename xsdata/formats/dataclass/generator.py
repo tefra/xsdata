@@ -141,7 +141,7 @@ class DataclassGenerator(AbstractGenerator):
     def ensure_packages(cls, package: Path) -> Iterator[GeneratorResult]:
         """Ensure all the __init__ files exists for the target package path,
         otherwise yield the necessary filepath, name, source output that needs
-        to be crated."""
+        to be created."""
         cwd = Path.cwd()
         while cwd < package:
             init = package.joinpath("__init__.py")

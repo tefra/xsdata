@@ -2,6 +2,7 @@ import sys
 
 
 def main():
+    """Cli entry point."""
     try:
         from xsdata.cli import cli
 

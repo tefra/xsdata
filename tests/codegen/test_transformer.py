@@ -5,14 +5,15 @@ from unittest import mock
 
 from xsdata.codegen.analyzer import ClassAnalyzer
 from xsdata.codegen.container import ClassContainer
-from xsdata.codegen.mappers.definitions import DefinitionsMapper
-from xsdata.codegen.mappers.dict import DictMapper
-from xsdata.codegen.mappers.dtd import DtdMapper
-from xsdata.codegen.mappers.element import ElementMapper
-from xsdata.codegen.mappers.schema import SchemaMapper
-from xsdata.codegen.parsers import DefinitionsParser
-from xsdata.codegen.parsers.dtd import DtdParser
-from xsdata.codegen.transformer import SchemaTransformer
+from xsdata.codegen.mappers import (
+    DefinitionsMapper,
+    DictMapper,
+    DtdMapper,
+    ElementMapper,
+    SchemaMapper,
+)
+from xsdata.codegen.parsers import DefinitionsParser, DtdParser
+from xsdata.codegen.transformer import ResourceTransformer
 from xsdata.codegen.utils import ClassUtils
 from xsdata.codegen.writer import CodeWriter
 from xsdata.exceptions import CodeGenerationError
@@ -24,18 +25,18 @@ from xsdata.models.xsd import Import, Include, Override, Schema
 from xsdata.utils.testing import ClassFactory, DtdFactory, FactoryTestCase
 
 
-class SchemaTransformerTests(FactoryTestCase):
+class ResourceTransformerTests(FactoryTestCase):
     def setUp(self):
         config = GeneratorConfig()
-        self.transformer = SchemaTransformer(print=True, config=config)
+        self.transformer = ResourceTransformer(print=True, config=config)
         super().setUp()
 
-    @mock.patch.object(SchemaTransformer, "process_classes")
-    @mock.patch.object(SchemaTransformer, "process_dtds")
-    @mock.patch.object(SchemaTransformer, "process_json_documents")
-    @mock.patch.object(SchemaTransformer, "process_xml_documents")
-    @mock.patch.object(SchemaTransformer, "process_schemas")
-    @mock.patch.object(SchemaTransformer, "process_definitions")
+    @mock.patch.object(ResourceTransformer, "process_classes")
+    @mock.patch.object(ResourceTransformer, "process_dtds")
+    @mock.patch.object(ResourceTransformer, "process_json_documents")
+    @mock.patch.object(ResourceTransformer, "process_xml_documents")
+    @mock.patch.object(ResourceTransformer, "process_schemas")
+    @mock.patch.object(ResourceTransformer, "process_definitions")
     def test_process(
         self,
         mock_process_definitions,
@@ -65,9 +66,9 @@ class SchemaTransformerTests(FactoryTestCase):
         mock_process_dtds.assert_called_once_with(uris[8:])
         mock_process_classes.assert_called_once_with()
 
-    @mock.patch.object(SchemaTransformer, "process_classes")
-    @mock.patch.object(SchemaTransformer, "process_sources")
-    @mock.patch.object(SchemaTransformer, "get_cache_file")
+    @mock.patch.object(ResourceTransformer, "process_classes")
+    @mock.patch.object(ResourceTransformer, "process_sources")
+    @mock.patch.object(ResourceTransformer, "get_cache_file")
     def test_process_from_cache(
         self, mock_get_cache_file, mock_process_sources, mock_process_classes
     ):
@@ -85,9 +86,9 @@ class SchemaTransformerTests(FactoryTestCase):
             self.assertEqual(0, mock_process_sources.call_count)
             mock_process_classes.assert_called_once_with()
 
-    @mock.patch.object(SchemaTransformer, "process_classes")
-    @mock.patch.object(SchemaTransformer, "process_sources")
-    @mock.patch.object(SchemaTransformer, "get_cache_file")
+    @mock.patch.object(ResourceTransformer, "process_classes")
+    @mock.patch.object(ResourceTransformer, "process_sources")
+    @mock.patch.object(ResourceTransformer, "get_cache_file")
     def test_process_with_cache(
         self, mock_get_cache_file, mock_process_sources, mock_process_classes
     ):
@@ -104,9 +105,9 @@ class SchemaTransformerTests(FactoryTestCase):
             self.assertEqual(classes, pickle.loads(cache.read_bytes()))
             mock_process_classes.assert_called_once_with()
 
-    @mock.patch.object(SchemaTransformer, "convert_schema")
-    @mock.patch.object(SchemaTransformer, "convert_definitions")
-    @mock.patch.object(SchemaTransformer, "parse_definitions")
+    @mock.patch.object(ResourceTransformer, "convert_schema")
+    @mock.patch.object(ResourceTransformer, "convert_definitions")
+    @mock.patch.object(ResourceTransformer, "parse_definitions")
     def test_process_definitions(
         self,
         mock_parse_definitions,
@@ -129,7 +130,7 @@ class SchemaTransformerTests(FactoryTestCase):
         )
         mock_convert_definitions.assert_called_once_with(fist_def)
 
-    @mock.patch.object(SchemaTransformer, "process_schema")
+    @mock.patch.object(ResourceTransformer, "process_schema")
     def test_process_schemas(self, mock_process_schema):
         uris = ["http://xsdata/foo.xsd", "http://xsdata/bar.xsd"]
 
@@ -140,7 +141,7 @@ class SchemaTransformerTests(FactoryTestCase):
     @mock.patch.object(ClassUtils, "reduce_classes")
     @mock.patch.object(ElementMapper, "map")
     @mock.patch.object(TreeParser, "from_bytes")
-    @mock.patch.object(SchemaTransformer, "load_resource")
+    @mock.patch.object(ResourceTransformer, "load_resource")
     def test_process_xml_documents(
         self, mock_load_resource, mock_from_bytes, mock_map, mock_reduce_classes
     ):
@@ -169,7 +170,7 @@ class SchemaTransformerTests(FactoryTestCase):
     @mock.patch("xsdata.codegen.transformer.logger.warning")
     @mock.patch.object(ClassUtils, "reduce_classes")
     @mock.patch.object(DictMapper, "map")
-    @mock.patch.object(SchemaTransformer, "load_resource")
+    @mock.patch.object(ResourceTransformer, "load_resource")
     def test_process_json_documents(
         self, mock_load_resource, mock_map, mock_reduce_classes, mock_warning
     ):
@@ -201,7 +202,7 @@ class SchemaTransformerTests(FactoryTestCase):
 
     @mock.patch.object(DtdMapper, "map")
     @mock.patch.object(DtdParser, "parse")
-    @mock.patch.object(SchemaTransformer, "load_resource")
+    @mock.patch.object(ResourceTransformer, "load_resource")
     def test_process_dtds(self, mock_load_resource, mock_parse, mock_map):
         uris = ["foo/a.dtd", "foo/b.dtd", "foo/c.dtd"]
         resources = [b"a", None, b"c"]
@@ -233,7 +234,7 @@ class SchemaTransformerTests(FactoryTestCase):
 
     @mock.patch("xsdata.codegen.transformer.logger.info")
     @mock.patch.object(CodeWriter, "print")
-    @mock.patch.object(SchemaTransformer, "analyze_classes")
+    @mock.patch.object(ResourceTransformer, "analyze_classes")
     def test_process_classes_with_print_true(
         self,
         mock_analyze_classes,
@@ -258,7 +259,7 @@ class SchemaTransformerTests(FactoryTestCase):
 
     @mock.patch("xsdata.codegen.transformer.logger.info")
     @mock.patch.object(CodeWriter, "write")
-    @mock.patch.object(SchemaTransformer, "analyze_classes")
+    @mock.patch.object(ResourceTransformer, "analyze_classes")
     def test_process_classes_with_print_false(
         self,
         mock_analyze_classes,
@@ -288,8 +289,8 @@ class SchemaTransformerTests(FactoryTestCase):
 
         self.assertEqual("Nothing to generate.", str(cm.exception))
 
-    @mock.patch.object(SchemaTransformer, "convert_schema")
-    @mock.patch.object(SchemaTransformer, "parse_schema")
+    @mock.patch.object(ResourceTransformer, "convert_schema")
+    @mock.patch.object(ResourceTransformer, "parse_schema")
     def test_process_schema(
         self,
         mock_parse_schema,
@@ -304,8 +305,8 @@ class SchemaTransformerTests(FactoryTestCase):
 
         mock_convert_schema.assert_called_once_with(schema)
 
-    @mock.patch.object(SchemaTransformer, "convert_schema")
-    @mock.patch.object(SchemaTransformer, "parse_schema")
+    @mock.patch.object(ResourceTransformer, "convert_schema")
+    @mock.patch.object(ResourceTransformer, "parse_schema")
     def test_process_schema_ignores_empty_schema(
         self,
         mock_parse_schema,
@@ -318,8 +319,8 @@ class SchemaTransformerTests(FactoryTestCase):
         self.transformer.process_schema(uri, namespace)
         self.assertEqual(0, mock_convert_schema.call_count)
 
-    @mock.patch.object(SchemaTransformer, "generate_classes")
-    @mock.patch.object(SchemaTransformer, "process_schema")
+    @mock.patch.object(ResourceTransformer, "generate_classes")
+    @mock.patch.object(ResourceTransformer, "process_schema")
     def test_convert_schema(self, mock_process_schema, mock_generate_classes):
         schema = Schema(target_namespace="thug", location="main")
         schema.includes.append(Include(location="foo"))
@@ -350,7 +351,7 @@ class SchemaTransformerTests(FactoryTestCase):
         self.assertEqual(classes, self.transformer.classes)
 
     @mock.patch("xsdata.codegen.transformer.logger.info")
-    @mock.patch.object(SchemaTransformer, "count_classes")
+    @mock.patch.object(ResourceTransformer, "count_classes")
     @mock.patch.object(SchemaMapper, "map")
     def test_generate_classes(
         self, mock_mapper_map, mock_count_classes, mock_logger_info
@@ -377,10 +378,10 @@ class SchemaTransformerTests(FactoryTestCase):
         self.assertEqual(2, len(schema.complex_types))
         self.assertIsNone(self.transformer.parse_schema(uri, None))  # Once
 
-    @mock.patch.object(SchemaTransformer, "process_schema")
+    @mock.patch.object(ResourceTransformer, "process_schema")
     @mock.patch.object(Definitions, "merge")
     @mock.patch.object(DefinitionsParser, "from_bytes")
-    @mock.patch.object(SchemaTransformer, "load_resource")
+    @mock.patch.object(ResourceTransformer, "load_resource")
     def test_parse_definitions(
         self,
         mock_load_resource,

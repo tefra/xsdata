@@ -14,19 +14,24 @@ from xsdata.utils.namespaces import target_uri
 
 
 class ElementNode(XmlNode):
-    """
-    XmlNode for complex elements and dataclasses.
+    """XmlNode for complex elements.
 
-    :param meta: Model xml metadata
-    :param attrs: Key-value attribute mapping
-    :param ns_map: Namespace prefix-URI map
-    :param config: Parser configuration
-    :param context: Model context provider
-    :param position: The node position of objects cache
-    :param mixed: The node supports mixed content
-    :param derived_factory: Derived element factory
-    :param xsi_type: The xml type substitution
-    :param xsi_nil: The xml type substitution
+    Args:
+        meta: The class binding metadata instance
+        attrs: The element attributes
+        ns_map: The element namespace prefix-URI map
+        config: The parser config instance
+        context: The models context instance
+        position: The current objects length, everything after
+            this position are considered children of this node.
+        mixed: Specifies whether this node supports mixed content.
+        derived_factory: Derived element factory
+        xsi_type: The xml type substitution
+        xsi_nil: Specifies whether element has the xsi:nil attribute
+
+    Attributes:
+        assigned: A set to store the processed sub-nodes
+        tail_processed: Whether the tail process is consumed
     """
 
     __slots__ = (
@@ -71,8 +76,27 @@ class ElementNode(XmlNode):
         self.tail_processed: bool = False
 
     def bind(
-        self, qname: str, text: Optional[str], tail: Optional[str], objects: List
+        self,
+        qname: str,
+        text: Optional[str],
+        tail: Optional[str],
+        objects: List[Any],
     ) -> bool:
+        """Bind the parsed data into an object for the ending element.
+
+        This entry point is called when a xml element ends and is
+        responsible to parse the current element attributes/text, bind
+        any children objects and initialize new object.
+
+        Args:
+            qname: The element qualified name
+            text: The element text content
+            tail: The element tail content
+            objects: The list of intermediate parsed objects
+
+        Returns:
+            Whether the binding process was successful or not.
+        """
         obj: Any = None
         if not self.xsi_nil or self.meta.nillable:
             params: Dict = {}
@@ -93,8 +117,20 @@ class ElementNode(XmlNode):
         return True
 
     def bind_content(
-        self, params: Dict, text: Optional[str], tail: Optional[str], objects: List[Any]
+        self,
+        params: Dict,
+        text: Optional[str],
+        tail: Optional[str],
+        objects: List[Any],
     ):
+        """Parse the text and tail content.
+
+        Args:
+            params: The class parameters
+            text: The element text content
+            tail: The element tail content
+            objects: The list of intermediate parsed objects
+        """
         wild_var = self.meta.find_any_wildcard()
         if wild_var and wild_var.mixed:
             self.bind_mixed_objects(params, wild_var, objects)
@@ -111,11 +147,20 @@ class ElementNode(XmlNode):
             if isinstance(params[key], PendingCollection):
                 params[key] = params[key].evaluate()
 
-    def bind_attrs(self, params: Dict):
-        """Parse the given element's attributes and any text content and return
-        a dictionary of field names and values based on the given class
-        metadata."""
+    def bind_attrs(self, params: Dict[str, Any]):
+        """Parse the element attributes.
 
+        Scenarios:
+            - Each attribute matches a class field
+            - Class has a wildcard field that sucks everything else
+
+        Args:
+            params: The class parameters
+
+        Raises:
+            ParserError: If the document contains an unknown attribute
+                and the configuration is strict.
+        """
         if not self.attrs:
             return
 
@@ -137,6 +182,15 @@ class ElementNode(XmlNode):
                         )
 
     def bind_attr(self, params: Dict, var: XmlVar, value: Any):
+        """Parse an element attribute.
+
+        Ignores fields with init==false!
+
+        Args:
+            params: The class parameters
+            var: The xml var instance
+            value: The attribute value
+        """
         if var.init:
             params[var.name] = ParserUtils.parse_value(
                 value=value,
@@ -148,23 +202,48 @@ class ElementNode(XmlNode):
             )
 
     def bind_any_attr(self, params: Dict, var: XmlVar, qname: str, value: Any):
+        """Parse an element attribute to a wildcard field.
+
+        Args:
+            params: The class parameters
+            var: The xml var instance
+            qname:  The attribute namespace qualified name
+            value: The attribute value
+        """
         if var.name not in params:
             params[var.name] = {}
 
         params[var.name][qname] = ParserUtils.parse_any_attribute(value, self.ns_map)
 
     def bind_objects(self, params: Dict, objects: List):
-        """Return a dictionary of qualified object names and their values for
-        the given queue item."""
+        """Bind children objects.
 
+        Emit a warning if an object doesn't fit in any
+        class parameters.
+
+        Args:
+            params: The class parameters
+            objects: The list of intermediate parsed objects
+        """
         position = self.position
-        for qname, value in objects[position:]:
-            if not self.bind_object(params, qname, value):
+        for qname, obj in objects[position:]:
+            if not self.bind_object(params, qname, obj):
                 logger.warning("Unassigned parsed object %s", qname)
 
         del objects[position:]
 
     def bind_object(self, params: Dict, qname: str, value: Any) -> bool:
+        """Bind a child object.
+
+        Args:
+            params: The class parameters
+            qname: The qualified name of the element
+            value: The parsed object
+
+        Returns:
+            Whether the parsed object can fit in one of class
+            parameters or not.
+        """
         for var in self.meta.find_children(qname):
             if var.is_wildcard:
                 return self.bind_wild_var(params, var, qname, value)
@@ -176,14 +255,16 @@ class ElementNode(XmlNode):
 
     @classmethod
     def bind_var(cls, params: Dict, var: XmlVar, value: Any) -> bool:
-        """
-        Add the given value to the params dictionary with the var name as key.
+        """Bind a child object to an element field.
 
-        Wrap the value to a list if var is a list. If the var name
-        already exists it means we have a name conflict and the parser
-        needs to lookup for any available wildcard fields.
+        Args:
+            params: The class parameters
+            var: The matched xml var instance
+            value: The parsed object
 
-        :return: Whether the binding process was successful or not.
+        Returns:
+            Whether the parsed object can fit in one of class
+            parameters or not.
         """
         if var.init:
             if var.list_element:
@@ -200,15 +281,22 @@ class ElementNode(XmlNode):
         return True
 
     def bind_wild_var(self, params: Dict, var: XmlVar, qname: str, value: Any) -> bool:
-        """
-        Add the given value to the params dictionary with the wildcard var name
-        as key.
+        """Bind a child object to a wildcard field.
 
-        If the key is already present wrap the previous value into a
-        generic AnyElement instance. If the previous value is already a
-        generic instance add the current value as a child object.
+        The wildcard might support one or more values. If it
+        supports only one the values are nested under a parent
+        generic element instance.
+
+        Args:
+            params: The class parameters
+            var: The wildcard var instance
+            qname: The qualified name of the element
+            value: The parsed value
+
+        Returns:
+            Always true, since wildcard fields can absorb any value.
         """
-        value = self.prepare_generic_value(qname, value, var)
+        value = self.prepare_generic_value(qname, value)
 
         if var.list_element:
             items = params.get(var.name)
@@ -230,21 +318,30 @@ class ElementNode(XmlNode):
         return True
 
     def bind_mixed_objects(self, params: Dict, var: XmlVar, objects: List):
-        """Return a dictionary of qualified object names and their values for
-        the given mixed content xml var."""
+        """Bind children objects to a mixed content wildcard field.
 
+        Args:
+            params: The class parameters
+            var: The wildcard var instance
+            objects: The list of intermediate parsed objects
+        """
         pos = self.position
         params[var.name] = [
-            self.prepare_generic_value(qname, value, var)
-            for qname, value in objects[pos:]
+            self.prepare_generic_value(qname, value) for qname, value in objects[pos:]
         ]
         del objects[pos:]
 
-    def prepare_generic_value(
-        self, qname: Optional[str], value: Any, var: XmlVar
-    ) -> Any:
-        """Prepare parsed value before binding to a wildcard field."""
+    def prepare_generic_value(self, qname: Optional[str], value: Any) -> Any:
+        """Wrap primitive text nodes in a generic element.
 
+        Args:
+            qname: The qualified name of the element
+            value: The parsed object
+
+        Returns:
+            The original parsed value if it's a data class, or
+            the wrapped primitive value in a generic element.
+        """
         if qname and not self.context.class_type.is_model(value):
             any_factory = self.context.class_type.any_element
             value = any_factory(qname=qname, text=converter.serialize(value))
@@ -252,11 +349,15 @@ class ElementNode(XmlNode):
         return value
 
     def bind_text(self, params: Dict, text: Optional[str]) -> bool:
-        """
-        Add the given element's text content if any to the params dictionary
-        with the text var name as key.
+        """Bind the element text content.
 
-        Return if any data was bound.
+        Args:
+            params: The class parameters
+            text: The element text content
+
+        Returns:
+            Whether the text content can fit in one of class
+            parameters or not.
         """
         var = self.meta.text
 
@@ -278,20 +379,32 @@ class ElementNode(XmlNode):
         return True
 
     def bind_wild_text(
-        self, params: Dict, var: XmlVar, txt: Optional[str], tail: Optional[str]
+        self,
+        params: Dict,
+        var: XmlVar,
+        text: Optional[str],
+        tail: Optional[str],
     ) -> bool:
-        """
-        Extract the text and tail content and bind it accordingly in the params
-        dictionary. Return if any data was bound.
+        """Bind the element text and tail content to a wildcard field.
 
-        - var is a list prepend the text and append the tail.
-        - var is present in the params assign the text and tail to the generic object.
-        - Otherwise bind the given element to a new generic object.
-        """
+        If the field is a list, prepend the text and append the tail content.
+        Otherwise, build a generic element with the text/tail content
+        and any attributes. If the field is already occupied, then this
+        means the current node is a child, and we need to nested them.
 
-        txt = ParserUtils.normalize_content(txt)
+        Args:
+            params: The class parameters
+            var: The wildcard var instance
+            text: The element text content
+            tail: The element text content
+
+        Returns:
+            Whether the text content can fit in one of class
+            parameters or not.
+        """
+        text = ParserUtils.normalize_content(text)
         tail = ParserUtils.normalize_content(tail)
-        if txt is None and tail is None:
+        if text is None and tail is None:
             return False
 
         if var.list_element:
@@ -299,7 +412,7 @@ class ElementNode(XmlNode):
             if items is None:
                 params[var.name] = items = PendingCollection(None, var.factory)
 
-            items.insert(0, txt)
+            items.insert(0, text)
             if tail:
                 items.append(tail)
 
@@ -307,7 +420,7 @@ class ElementNode(XmlNode):
             previous = params.get(var.name, None)
             factory = self.context.class_type.any_element
             generic = factory(
-                text=txt,
+                text=text,
                 tail=tail,
                 attributes=ParserUtils.parse_any_attributes(self.attrs, self.ns_map),
             )
@@ -319,6 +432,21 @@ class ElementNode(XmlNode):
         return True
 
     def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
+        """Initialize the next child node to be queued, when an element starts.
+
+        This entry point is responsible to create the next node type
+        with all the necessary information on how to bind the incoming
+        input data.
+
+        Args:
+            qname: The element qualified name
+            attrs: The element attributes
+            ns_map: The element namespace prefix-URI map
+            position: The current length of the intermediate objects
+
+        Raises:
+            ParserError: If the child element is unknown
+        """
         for var in self.meta.find_children(qname):
             unique = 0 if not var.is_element or var.list_element else var.index
             if not unique or unique not in self.assigned:
@@ -336,8 +464,26 @@ class ElementNode(XmlNode):
         return nodes.SkipNode()
 
     def build_node(
-        self, qname: str, var: XmlVar, attrs: Dict, ns_map: Dict, position: int
+        self,
+        qname: str,
+        var: XmlVar,
+        attrs: Dict,
+        ns_map: Dict,
+        position: int,
     ) -> Optional[XmlNode]:
+        """Build the next child node based on the xml var instance.
+
+        Args:
+            qname: The element qualified name
+            var: The xml var instance
+            attrs: The element attributes
+            ns_map: The element namespace prefix-URI map
+            position: The current length of the intermediate objects
+
+        Returns:
+            The next child node instance, or None if nothing matched
+            the starting element.
+        """
         if var.is_clazz_union:
             return nodes.UnionNode(
                 var=var,
@@ -436,7 +582,24 @@ class ElementNode(XmlNode):
         derived_factory: Type,
         xsi_type: Optional[str] = None,
         xsi_nil: Optional[bool] = None,
-    ) -> Optional[XmlNode]:
+    ) -> Optional["ElementNode"]:
+        """Build the next element child node.
+
+        Args:
+            clazz: The target class
+            derived: Whether derived elements should wrap the parsed object
+            nillable: Specifies whether nil content is allowed
+            attrs: The element attributes
+            ns_map: The element namespace prefix-URI map
+            position: The current length of the intermediate objects
+            derived_factory: The derived factory
+            xsi_type: The xml type substitution
+            xsi_nil: Specifies whether the node supports nillable content
+
+        Returns:
+            The next child element node instance, or None if the
+            clazz doesn't match the starting element.
+        """
         meta = self.context.fetch(clazz, self.meta.namespace, xsi_type)
         nillable = nillable or meta.nillable
 

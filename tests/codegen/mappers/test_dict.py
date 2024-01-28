@@ -1,7 +1,7 @@
 import sys
 from unittest import mock
 
-from xsdata.codegen.mappers.dict import DictMapper
+from xsdata.codegen.mappers import DictMapper
 from xsdata.codegen.models import Restrictions
 from xsdata.codegen.utils import ClassUtils
 from xsdata.models.enums import DataType, Tag

@@ -287,18 +287,18 @@ class SanitizeAttributesDefaultValueTests(FactoryTestCase):
         self.assertFalse(self.processor.is_valid_enum_type(enumeration, attr))
         self.assertEqual("3", attr.default)
 
-    def test_find_type(self):
+    def test_find_inner_type(self):
         target = ClassFactory.create()
         attr_type = AttrTypeFactory.create("foo")
         foo = ClassFactory.create(qname="foo")
         self.processor.container.add(foo)
 
-        self.assertIs(foo, self.processor.find_type(target, attr_type))
+        self.assertIs(foo, self.processor.find_inner_type(target, attr_type))
 
         attr_type = AttrTypeFactory.create("bar", forward=True)
         bar = ClassFactory.create(qname="bar")
         target.inner.append(bar)
-        self.assertIs(bar, self.processor.find_type(target, attr_type))
+        self.assertIs(bar, self.processor.find_inner_type(target, attr_type))
 
     def test_reset_attribute_types(self):
         attr = AttrFactory.create(

@@ -2,7 +2,7 @@ from types import GeneratorType
 from typing import Iterator
 from unittest import mock
 
-from xsdata.codegen.mappers.schema import SchemaMapper
+from xsdata.codegen.mappers import SchemaMapper
 from xsdata.codegen.models import Class, Restrictions
 from xsdata.models.enums import DataType, FormType, Tag
 from xsdata.models.xsd import (
@@ -268,7 +268,7 @@ class SchemaMapperTests(FactoryTestCase):
         self.assertIsInstance(children, GeneratorType)
         self.assertEqual(expected, list(children))
 
-    @mock.patch.object(SchemaMapper, "build_class_attribute_types")
+    @mock.patch.object(SchemaMapper, "build_attr_types")
     @mock.patch.object(SchemaMapper, "element_namespace")
     @mock.patch.object(Attribute, "get_restrictions")
     @mock.patch.object(Attribute, "is_fixed", new_callable=mock.PropertyMock)
@@ -285,13 +285,11 @@ class SchemaMapperTests(FactoryTestCase):
         mock_is_fixed,
         mock_get_restrictions,
         mock_element_namespace,
-        mock_build_class_attribute_types,
+        mock_build_attr_types,
     ):
         item = ClassFactory.create(ns_map={"bar": "foo"})
 
-        mock_build_class_attribute_types.return_value = AttrTypeFactory.list(
-            1, qname="int"
-        )
+        mock_build_attr_types.return_value = AttrTypeFactory.list(1, qname="int")
         mock_real_name.return_value = item.name
         mock_display_help.return_value = "sos"
         mock_prefix.return_value = "com"
@@ -307,7 +305,7 @@ class SchemaMapperTests(FactoryTestCase):
         SchemaMapper.build_class_attribute(item, attribute, Restrictions())
         expected = AttrFactory.create(
             name=mock_real_name.return_value,
-            types=mock_build_class_attribute_types.return_value,
+            types=mock_build_attr_types.return_value,
             tag=Tag.ATTRIBUTE,
             namespace=mock_element_namespace.return_value,
             help=mock_display_help.return_value,
@@ -318,20 +316,18 @@ class SchemaMapperTests(FactoryTestCase):
         )
         self.assertEqual(expected, item.attrs[0])
         self.assertEqual({"bar": "foo", "foo": "bar"}, item.ns_map)
-        mock_build_class_attribute_types.assert_called_once_with(item, attribute)
+        mock_build_attr_types.assert_called_once_with(item, attribute)
         mock_element_namespace.assert_called_once_with(attribute, item.target_namespace)
 
     @mock.patch.object(Attribute, "attr_types", new_callable=mock.PropertyMock)
     @mock.patch.object(SchemaMapper, "build_inner_classes")
-    def test_build_class_attribute_types(
-        self, mock_build_inner_classes, mock_attr_types
-    ):
+    def test_build_attr_types(self, mock_build_inner_classes, mock_attr_types):
         mock_attr_types.return_value = ["xs:integer", "xs:string"]
         mock_build_inner_classes.return_value = []
 
         item = ClassFactory.create()
         attribute = Attribute(default="false")
-        actual = SchemaMapper.build_class_attribute_types(item, attribute)
+        actual = SchemaMapper.build_attr_types(item, attribute)
 
         expected = [
             AttrTypeFactory.native(DataType.INTEGER),
@@ -342,7 +338,7 @@ class SchemaMapperTests(FactoryTestCase):
 
     @mock.patch.object(Attribute, "attr_types", new_callable=mock.PropertyMock)
     @mock.patch.object(SchemaMapper, "build_inner_classes")
-    def test_build_class_attribute_types_when_obj_has_inner_class(
+    def test_build_attr_types_when_obj_has_inner_class(
         self, mock_build_inner_classes, mock_attr_types
     ):
         inner_class = ClassFactory.create(qname="foo")
@@ -351,7 +347,7 @@ class SchemaMapperTests(FactoryTestCase):
 
         item = ClassFactory.create()
         attribute = Attribute(default="false")
-        actual = SchemaMapper.build_class_attribute_types(item, attribute)
+        actual = SchemaMapper.build_attr_types(item, attribute)
 
         expected = [
             AttrTypeFactory.native(DataType.INTEGER),
@@ -365,7 +361,7 @@ class SchemaMapperTests(FactoryTestCase):
     @mock.patch.object(Attribute, "default_type", new_callable=mock.PropertyMock)
     @mock.patch.object(Attribute, "attr_types", new_callable=mock.PropertyMock)
     @mock.patch.object(SchemaMapper, "build_inner_classes")
-    def test_build_class_attribute_types_when_obj_has_no_types(
+    def test_build_attr_types_when_obj_has_no_types(
         self, mock_build_inner_classes, mock_attr_types, mock_default_type
     ):
         mock_attr_types.return_value = ""
@@ -374,7 +370,7 @@ class SchemaMapperTests(FactoryTestCase):
 
         item = ClassFactory.create()
         attribute = Attribute(default="false", name="attr")
-        actual = SchemaMapper.build_class_attribute_types(item, attribute)
+        actual = SchemaMapper.build_attr_types(item, attribute)
 
         self.assertEqual(1, len(actual))
         self.assertEqual(AttrTypeFactory.native(DataType.STRING), actual[0])

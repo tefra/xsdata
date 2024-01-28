@@ -5,15 +5,24 @@ from xsdata.codegen.models import Class
 
 
 class ResetAttributeSequenceNumbers(RelativeHandlerInterface):
-    """
-    Reset attributes sequence numbers.
+    """Reset attrs sequence numbers.
 
-    Until now all sequence numbers point to the id of sequence class!!!
+    The sequence numbers are the ids of xs:sequence elements, because
+    up until now it was important to determine which child/parent
+    attrs belong to different sequence numbers.
+
+    Before we generate the classes let's reset them to simple auto
+    increment numbers per class.
     """
 
     __slots__ = ()
 
     def process(self, target: Class):
+        """Process entrypoint for classes.
+
+        Args:
+            target: The target class instance
+        """
         groups = defaultdict(list)
         for attr in target.attrs:
             if attr.restrictions.sequence:
@@ -28,10 +37,15 @@ class ResetAttributeSequenceNumbers(RelativeHandlerInterface):
                 next_sequence_number += 1
 
     def find_next_sequence_number(self, target: Class) -> int:
-        return (
-            max(
-                (attr.restrictions.sequence or 0 for attr in self.base_attrs(target)),
-                default=0,
-            )
-            + 1
-        )
+        """Calculate the next sequence number from the base classes.
+
+        Args:
+            target: The target class instance
+
+        Returns:
+            The next sequence number
+        """
+        base_attrs = self.base_attrs(target)
+        sequences = (attr.restrictions.sequence or 0 for attr in base_attrs)
+        max_sequence = max(sequences, default=0)
+        return max_sequence + 1

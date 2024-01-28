@@ -131,12 +131,12 @@ class DependenciesResolverTest(FactoryTestCase):
 
     @mock.patch.object(DependenciesResolver, "set_aliases")
     @mock.patch.object(DependenciesResolver, "resolve_conflicts")
-    @mock.patch.object(DependenciesResolver, "find_package")
+    @mock.patch.object(DependenciesResolver, "get_class_module")
     @mock.patch.object(DependenciesResolver, "import_classes")
     def test_resolve_imports(
         self,
         mock_import_classes,
-        mock_find_package,
+        mock_get_class_module,
         mock_resolve_conflicts,
         mock_set_aliases,
     ):
@@ -150,7 +150,13 @@ class DependenciesResolverTest(FactoryTestCase):
         ]
         self.resolver.class_map = {class_life.qname: class_life}
         mock_import_classes.return_value = import_names
-        mock_find_package.side_effect = ["first", "second", "third", "forth", "fifth"]
+        mock_get_class_module.side_effect = [
+            "first",
+            "second",
+            "third",
+            "forth",
+            "fifth",
+        ]
 
         self.resolver.resolve_imports()
         mock_resolve_conflicts.assert_called_once_with(
@@ -183,13 +189,13 @@ class DependenciesResolverTest(FactoryTestCase):
         self.resolver.set_aliases()
         self.assertEqual({"{a}a": "aa", "{b}a": "ba"}, self.resolver.aliases)
 
-    def test_find_package(self):
+    def test_get_class_module(self):
         class_a = ClassFactory.create()
-        self.resolver.packages[class_a.qname] = "foo.bar"
+        self.resolver.registry[class_a.qname] = "foo.bar"
 
-        self.assertEqual("foo.bar", self.resolver.find_package(class_a.qname))
+        self.assertEqual("foo.bar", self.resolver.get_class_module(class_a.qname))
         with self.assertRaises(ResolverValueError):
-            self.resolver.find_package("nope")
+            self.resolver.get_class_module("nope")
 
     def test_import_classes(self):
         self.resolver.class_list = list("abcdefg")

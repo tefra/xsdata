@@ -275,27 +275,19 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual(expected, params)
 
     def test_prepare_generic_value(self):
-        var = XmlVarFactory.create(
-            index=2,
-            xml_type=XmlType.WILDCARD,
-            qname="a",
-            types=(object,),
-            elements={"known": XmlVarFactory.create()},
-        )
-
-        actual = self.node.prepare_generic_value(None, 1, var)
+        actual = self.node.prepare_generic_value(None, 1)
         self.assertEqual(1, actual)
 
-        actual = self.node.prepare_generic_value("a", 1, var)
+        actual = self.node.prepare_generic_value("a", 1)
         expected = AnyElement(qname="a", text="1")
         self.assertEqual(expected, actual)
 
-        actual = self.node.prepare_generic_value("a", "foo", var)
+        actual = self.node.prepare_generic_value("a", "foo")
         expected = AnyElement(qname="a", text="foo")
         self.assertEqual(expected, actual)
 
         fixture = make_dataclass("Fixture", [("content", str)])
-        actual = self.node.prepare_generic_value("a", fixture("foo"), var)
+        actual = self.node.prepare_generic_value("a", fixture("foo"))
         self.assertEqual(fixture("foo"), actual)
 
     def test_child(self):

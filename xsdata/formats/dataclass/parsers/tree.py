@@ -10,11 +10,7 @@ from xsdata.formats.dataclass.parsers.nodes.wildcard import WildcardNode
 
 @dataclass
 class TreeParser(NodeParser):
-    """
-    Bind xml nodes to a tree of AnyElement objects.
-
-    :param handler: Override default XmlHandler
-    """
+    """Bind xml nodes to a tree of AnyElement objects."""
 
     handler: Type[XmlHandler] = field(default=default_handler())
 
@@ -27,6 +23,16 @@ class TreeParser(NodeParser):
         attrs: Dict,
         ns_map: Dict,
     ):
+        """Build and queue the XmlNode for the starting element.
+
+        Args:
+            clazz: The target class type, auto locate if omitted
+            queue: The XmlNode queue list
+            objects: The list of all intermediate parsed objects
+            qname: The element qualified name
+            attrs: The element attributes
+            ns_map: The element namespace prefix-URI map
+        """
         try:
             item = queue[-1]
             child = item.child(qname, attrs, ns_map, len(objects))

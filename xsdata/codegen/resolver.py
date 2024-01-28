@@ -12,23 +12,38 @@ logger = logging.getLogger(__name__)
 
 
 class DependenciesResolver:
-    __slots__ = "packages", "aliases", "imports", "class_list", "class_map", "package"
+    """The dependencies resolver class.
 
-    def __init__(self, packages: Dict[str, str]):
-        self.packages = packages
+    Calculate what classes need to be imported
+    per package, with aliases support.
 
+    Args:
+        registry: The full class qname-module map.
+
+    Attributes:
+        aliases: The generated aliases dictionary
+        imports: The list of generated imports
+        class_list: The topo-sorted list of class qnames
+        class_map: A qname-class map
+
+    """
+
+    __slots__ = "registry", "aliases", "imports", "class_list", "class_map"
+
+    def __init__(self, registry: Dict[str, str]):
+        self.registry = registry
         self.aliases: Dict[str, str] = {}
         self.imports: List[Import] = []
         self.class_list: List[str] = []
         self.class_map: Dict[str, Class] = {}
 
     def process(self, classes: List[Class]):
-        """
-        Resolve the dependencies for the given list of classes and the target
-        package.
+        """Resolve the dependencies for the given class list.
 
-        Reset aliases and imports from any previous runs keep the record
-        of the processed class names
+        Reset previously resolved imports and aliases.
+
+        Args:
+            classes: A list of classes that belong to the same target module
         """
         self.imports.clear()
         self.aliases.clear()
@@ -37,13 +52,11 @@ class DependenciesResolver:
         self.resolve_imports()
 
     def sorted_imports(self) -> List[Import]:
-        """Return a new sorted by name list of import packages."""
+        """Return a new sorted by name list of import instances."""
         return sorted(self.imports, key=lambda x: x.name)
 
     def sorted_classes(self) -> List[Class]:
-        """Return an iterator of classes property sorted for generation and
-        apply import aliases."""
-
+        """Apply aliases and return the sorted the generated class list."""
         result = []
         for name in self.class_list:
             obj = self.class_map.get(name)
@@ -53,8 +66,14 @@ class DependenciesResolver:
         return result
 
     def apply_aliases(self, target: Class):
-        """Iterate over the target class dependencies and set the type
-        aliases."""
+        """Apply import aliases to the target class.
+
+        Update attr and extension types to point to the
+        new class aliases. Process inner classes too!
+
+        Args:
+            target: The target class instance to process
+        """
         for attr in target.attrs:
             for attr_type in attr.types:
                 attr_type.alias = self.aliases.get(attr_type.qname)
@@ -69,10 +88,9 @@ class DependenciesResolver:
         collections.apply(target.inner, self.apply_aliases)
 
     def resolve_imports(self):
-        """Walk the import qualified names, check for naming collisions and add
-        the necessary code generator import instance."""
+        """Build the list of class imports and set aliases if necessary."""
         self.imports = [
-            Import(qname=qname, source=self.find_package(qname))
+            Import(qname=qname, source=self.get_class_module(qname))
             for qname in self.import_classes()
         ]
         protected = {obj.slug for obj in self.class_map.values()}
@@ -80,10 +98,21 @@ class DependenciesResolver:
         self.set_aliases()
 
     def set_aliases(self):
+        """Store generated aliases."""
         self.aliases = {imp.qname: imp.alias for imp in self.imports if imp.alias}
 
     @classmethod
     def resolve_conflicts(cls, imports: List[Import], protected: set):
+        """Find naming conflicts between imports and generate aliases.
+
+        Example:
+            from foo.bar import MyType as BarMyType
+            from bar.foo import MyType as FooMyType
+
+        Args:
+            imports: The list of class import instances
+            protected: The set of protected class names from the module
+        """
         for slug, group in collections.group_by(imports, key=get_slug).items():
             if len(group) == 1:
                 if slug in protected:
@@ -100,18 +129,21 @@ class DependenciesResolver:
                 add = "_".join(part for part in parts if part in diff)
                 cur.alias = f"{add}:{cur.name}"
 
-    def find_package(self, qname: str) -> str:
-        """
-        Return the package name for the given qualified class name.
+    def get_class_module(self, qname: str) -> str:
+        """Return the module for the given qualified class name.
 
-        :raises ResolverValueError: if name doesn't exist.
+        Args:
+            qname: The namespace qualified name of the class
+
+        Raises:
+            ResolverValueError: if name doesn't exist.
         """
-        if qname not in self.packages:
+        if qname not in self.registry:
             raise ResolverValueError(f"Unknown dependency: {qname}")
-        return self.packages[qname]
+        return self.registry[qname]
 
     def import_classes(self) -> List[str]:
-        """Return a list of class that need to be imported."""
+        """Return a list of class qnames that need to be imported."""
         return [qname for qname in self.class_list if qname not in self.class_map]
 
     @staticmethod
@@ -121,7 +153,14 @@ class DependenciesResolver:
 
     @staticmethod
     def create_class_map(classes: List[Class]) -> Dict[str, Class]:
-        """Index the list of classes by name."""
+        """Index the list of classes by their qualified names.
+
+        Raises:
+            ResolverValueError: If two classes have the same qname.
+
+        Returns:
+            A qname-class map.
+        """
         result: Dict[str, Class] = {}
         for obj in classes:
             if obj.qname in result:

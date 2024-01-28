@@ -1,36 +1,53 @@
-from typing import Dict, Generator, TextIO
+from typing import Iterator
 
 from lxml.etree import indent, tostring
 from lxml.sax import ElementTreeContentHandler
 
-from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.formats.dataclass.serializers.mixins import XmlWriter
 
 
 class LxmlEventWriter(XmlWriter):
+    """Xml event writer based on `lxml.sax.ElementTreeContentHandler`.
+
+    The writer converts the events to an lxml tree which is
+    then converted to string.
+
+    Args:
+        config: The serializer config instance
+        output: The output stream to write the result
+        ns_map: A user defined namespace prefix-URI map
+
+    Attributes:
+        handler: The content handler instance
+        in_tail: Specifies whether the text content has been written
+        tail: The current element tail content
+        attrs: The current element attributes
+        ns_context: The namespace context queue
+        pending_tag: The pending element namespace, name tuple
+        pending_prefixes: The pending element namespace prefixes
     """
-    :class:`~xsdata.formats.dataclass.serializers.mixins.XmlWriter`
-    implementation based on lxml package.
 
-    Based on the :class:`lxml.sax.ElementTreeContentHandler`, converts
-    sax events to an lxml ElementTree, serialize and write the result
-    to the output stream. Despite that since it's lxml it's still
-    pretty fast and has better support for special characters and
-    encodings than native python.
+    def build_handler(self) -> ElementTreeContentHandler:
+        """Build the content handler instance.
 
-    :param config: Configuration instance
-    :param output: Output text stream
-    :param ns_map: User defined namespace prefix-URI map
-    """
+        Returns:
+            An element tree content handler instance.
+        """
+        return ElementTreeContentHandler()
 
-    __slots__ = ()
+    def write(self, events: Iterator):
+        """Feed the sax content handler with events.
 
-    def __init__(self, config: SerializerConfig, output: TextIO, ns_map: Dict):
-        super().__init__(config, output, ns_map)
+        The receiver will also add additional root attributes
+        like xsi or no namespace location. In the end convert
+        the handler etree to string based on the configuration.
 
-        self.handler = ElementTreeContentHandler()
+        Args:
+            events: An iterator of sax events
 
-    def write(self, events: Generator):
+        Raises:
+            XmlWriterError: On unknown events.
+        """
         super().write(events)
 
         assert isinstance(self.handler, ElementTreeContentHandler)

@@ -1,6 +1,6 @@
 from io import StringIO
-from typing import Dict, TextIO
 from unittest import TestCase
+from xml.sax import ContentHandler
 from xml.sax.saxutils import XMLGenerator
 
 from xsdata.exceptions import XmlWriterError
@@ -10,12 +10,8 @@ from xsdata.models.enums import DataType, QNames
 
 
 class XmlWriterImpl(XmlWriter):
-    __slots__ = ()
-
-    def __init__(self, config: SerializerConfig, output: TextIO, ns_map: Dict):
-        super().__init__(config, output, ns_map)
-
-        self.handler = XMLGenerator(
+    def build_handler(self) -> ContentHandler:
+        return XMLGenerator(
             self.output,
             encoding="UTF-8",
             short_empty_elements=True,

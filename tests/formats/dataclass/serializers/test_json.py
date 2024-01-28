@@ -1,7 +1,5 @@
 import json
-import warnings
 from unittest.case import TestCase
-from unittest.mock import ANY, Mock, call
 
 from tests.fixtures.books import BookForm, Books
 from tests.fixtures.datatypes import Telephone
@@ -86,32 +84,6 @@ class JsonSerializerTests(TestCase):
         serializer = JsonSerializer(dict_factory=DictFactory.FILTER_NONE)
         actual = serializer.convert(Telephone(30, 234, 56783), var)
         self.assertEqual("30-234-56783", actual)
-
-    def test_indent_deprecation(self):
-        dump_factory = Mock(json.dump)
-
-        with warnings.catch_warnings(record=True) as w:
-            serializer = JsonSerializer(dump_factory=dump_factory)
-            serializer.render(self.books)
-
-            serializer.config.pretty_print = True
-            serializer.render(self.books)
-
-            serializer.indent = 4
-            serializer.render(self.books)
-
-        dump_factory.assert_has_calls(
-            [
-                call(ANY, ANY, indent=None),
-                call(ANY, ANY, indent=2),
-                call(ANY, ANY, indent=4),
-            ]
-        )
-
-        self.assertEqual(
-            "JsonSerializer indent property is deprecated, use SerializerConfig",
-            str(w[-1].message),
-        )
 
     def test_next_value(self):
         book = self.books.book[0]

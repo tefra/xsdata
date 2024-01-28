@@ -8,12 +8,9 @@ from xsdata import __version__
 from xsdata.exceptions import GeneratorConfigError, ParserError
 from xsdata.models.config import (
     ExtensionType,
-    GeneratorAlias,
-    GeneratorAliases,
     GeneratorConfig,
     GeneratorExtension,
     GeneratorOutput,
-    ObjectType,
     OutputFormat,
 )
 
@@ -79,7 +76,6 @@ class GeneratorConfigTests(TestCase):
             "  <Conventions>\n"
             '    <ClassName case="pascalCase" safePrefix="type"/>\n'
             "  </Conventions>\n"
-            "  <Aliases/>\n"
             "  <Substitutions/>\n"
             "</Config>\n"
         )
@@ -113,7 +109,6 @@ class GeneratorConfigTests(TestCase):
             '    <ModuleName case="snakeCase" safePrefix="mod"/>\n'
             '    <PackageName case="snakeCase" safePrefix="pkg"/>\n'
             "  </Conventions>\n"
-            "  <Aliases/>\n"
             "  <Substitutions/>\n"
             "  <Extensions/>\n"
             "</Config>\n"
@@ -203,32 +198,6 @@ class GeneratorConfigTests(TestCase):
 
         else:
             self.assertIsNotNone(OutputFormat(kw_only=True))
-
-    def test_init_config_with_aliases(self):
-        config = GeneratorConfig(
-            aliases=GeneratorAliases(
-                class_name=[GeneratorAlias(source="a", target="b")],
-                field_name=[GeneratorAlias(source="c", target="d")],
-                package_name=[GeneratorAlias(source="e", target="f")],
-                module_name=[GeneratorAlias(source="g", target="h")],
-            )
-        )
-
-        self.assertEqual(4, len(config.substitutions.substitution))
-        self.assertEqual(ObjectType.CLASS, config.substitutions.substitution[0].type)
-        self.assertEqual(ObjectType.FIELD, config.substitutions.substitution[1].type)
-        self.assertEqual(ObjectType.PACKAGE, config.substitutions.substitution[2].type)
-        self.assertEqual(ObjectType.MODULE, config.substitutions.substitution[3].type)
-
-        output = tempfile.mktemp()
-        output_path = Path(output)
-        config.substitutions = None
-        with output_path.open("w") as fp:
-            config.write(fp, config)
-
-        config = GeneratorConfig.read(output_path)
-        self.assertIsNone(config.aliases)
-        self.assertEqual(4, len(config.substitutions.substitution))
 
     def test_extension_with_invalid_import_string(self):
         cases = [None, "", "bar"]

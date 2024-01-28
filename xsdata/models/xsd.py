@@ -35,30 +35,32 @@ docstring_serializer = XmlSerializer(
 
 @dataclass(frozen=True)
 class Docstring:
+    """Docstring model representation.
+
+    Args:
+        content: A list of mixed content elements
+    """
+
     class Meta:
+        """Metadata options."""
+
         namespace = "http://www.w3.org/1999/xhtml"
 
-    elements: Array[object] = array_any_element()
+    content: Array[object] = array_any_element()
 
 
 @dataclass
 class Documentation(ElementBase):
-    """
-    Model representation of a schema xs:documentation element.
-
-    :param lang: language
-    :param source: anyURI
-    :param elements: ({any})*
-    :param attributes: any attributes with non-schema namespace
-    """
+    """XSD MinLength model representation."""
 
     lang: Optional[str] = attribute()
     source: Optional[str] = attribute()
-    elements: Array[object] = array_any_element(mixed=True)
     attributes: Optional["AnyAttribute"] = element()
+    content: Array[object] = array_any_element(mixed=True)
 
     def tostring(self) -> Optional[str]:
-        obj = Docstring(self.elements)
+        """Convert the content to a help string."""
+        obj = Docstring(self.content)
         ns_map = {None: "http://www.w3.org/1999/xhtml"}
         xml = docstring_serializer.render(obj, ns_map=ns_map)
         start = xml.find(">") + 1
@@ -68,46 +70,30 @@ class Documentation(ElementBase):
 
 @dataclass
 class Appinfo(ElementBase):
-    """
-    Model representation of a schema xs:appinfo element.
-
-    :param lang: language
-    :param source: anyURI
-    :param attributes: any attributes with non-schema namespace
-    """
+    """XSD Appinfo model representation."""
 
     class Meta:
+        """Metadata options."""
+
         mixed = True
 
     source: Optional[str] = attribute()
-    elements: Array[object] = array_any_element()
     any_attribute: Optional["AnyAttribute"] = element(name="anyAttribute")
+    content: Array[object] = array_any_element(mixed=True)
 
 
 @dataclass
 class Annotation(ElementBase):
-    """
-    Model representation of a schema xs:annotation element.
+    """XSD Annotation model representation."""
 
-    :param appinfos:
-    :param documentations:
-    :param any_attribute: any attributes with non-schema namespace
-    """
-
-    appinfos: Array[Appinfo] = array_element(name="appinfo")
+    app_infos: Array[Appinfo] = array_element(name="appinfo")
     documentations: Array[Documentation] = array_element(name="documentation")
     any_attribute: Optional["AnyAttribute"] = element(name="anyAttribute")
 
 
 @dataclass
 class AnnotationBase(ElementBase):
-    """
-    Base Class for elements that can contain annotations.
-
-    :param id: ID
-    :param annotations:
-    :param any_attribute: any attributes with non-schema namespace
-    """
+    """XSD AnnotationBase model representation."""
 
     id: Optional[str] = attribute()
     annotations: Array[Annotation] = array_element(name="annotation")
@@ -115,6 +101,7 @@ class AnnotationBase(ElementBase):
 
     @property
     def display_help(self) -> Optional[str]:
+        """Return all annotation documentations concatenated."""
         help_str = "\n".join(
             documentation.tostring() or ""
             for annotation in self.annotations
@@ -126,59 +113,49 @@ class AnnotationBase(ElementBase):
 
 @dataclass
 class AnyAttribute(AnnotationBase):
-    """
-    Model representation of a schema xs:anyAttribute element.
-
-    :param namespace: ##any | ##other) | List of anyURI |
-        (##targetNamespace | ##local)
-    :param process_contents: (lax | skip | strict) : strict
-    """
+    """XSD AnyAttribute model representation."""
 
     namespace: str = attribute(default="##any")
-    process_contents: Optional[ProcessType] = attribute(name="processContents")
+    process_contents: Optional[ProcessType] = attribute(
+        name="processContents", default="strict"
+    )
 
     def __post_init__(self):
+        """Clean the namespace value."""
         self.namespace = " ".join(unique_sequence(self.namespace.split()))
 
     @property
     def is_property(self) -> bool:
+        """Specify it is qualified to be a class property."""
         return True
 
     @property
     def raw_namespace(self) -> Optional[str]:
+        """The element explicit namespace."""
         return self.namespace
 
     @property
     def real_name(self) -> str:
+        """Return the real name for this element."""
         clean_ns = "_".join(map(clean_uri, self.namespace.split()))
         return f"@{clean_ns}_attributes"
 
     @property
     def attr_types(self) -> Iterator[str]:
+        """Yields the attr types for this element."""
         yield DataType.ANY_TYPE.prefixed(self.xs_prefix)
 
 
 @dataclass
 class Assertion(AnnotationBase):
-    """
-    Model representation of a schema xs:assertion element.
-
-    :param test: an XPath expression
-    """
+    """XSD Assertion model representation."""
 
     test: Optional[str] = attribute()
 
 
 @dataclass
 class SimpleType(AnnotationBase):
-    """
-    Model representation of a schema xs:simpleType element.
-
-    :param name: NCName
-    :param restriction:
-    :param list:
-    :param union:
-    """
+    """XSD SimpleType model representation."""
 
     name: Optional[str] = attribute()
     restriction: Optional["Restriction"] = element()
@@ -187,20 +164,24 @@ class SimpleType(AnnotationBase):
 
     @property
     def is_property(self) -> bool:
+        """Specify it is qualified to be a class property."""
         return True
 
     @property
     def is_enumeration(self) -> bool:
+        """Return whether it is an enumeration restriction."""
         return self.restriction is not None and len(self.restriction.enumerations) > 0
 
     @property
     def real_name(self) -> str:
+        """Return the real name for this element."""
         if self.name:
             return self.name
         return DEFAULT_ATTR_NAME
 
     @property
     def attr_types(self) -> Iterator[str]:
+        """Return the attr types for this element."""
         if not self.is_enumeration and self.restriction:
             yield from self.restriction.attr_types
         elif self.list:
@@ -209,6 +190,7 @@ class SimpleType(AnnotationBase):
             yield from self.union.bases
 
     def get_restrictions(self) -> Dict[str, Anything]:
+        """Return the restrictions dictionary of this element."""
         if self.restriction:
             return self.restriction.get_restrictions()
         if self.list:
@@ -218,60 +200,58 @@ class SimpleType(AnnotationBase):
 
 @dataclass
 class List(AnnotationBase):
-    """
-    Model representation of a schema xs:list element.
-
-    :param simple_type:
-    :param item_type: QName
-    """
+    """XSD List model representation."""
 
     simple_type: Optional[SimpleType] = element(name="simpleType")
     item_type: str = attribute(name="itemType", default="")
 
     @property
     def is_property(self) -> bool:
+        """Specify it is qualified to be a class property."""
         return True
 
     @property
     def real_name(self) -> str:
+        """Return the real name for this element."""
         return DEFAULT_ATTR_NAME
 
     @property
     def attr_types(self) -> Iterator[str]:
+        """Return the attr types for this element."""
         if self.item_type:
             yield self.item_type
 
     def get_restrictions(self) -> Dict[str, Anything]:
+        """Return the restrictions dictionary of this element."""
         return {"tokens": True}
 
 
 @dataclass
 class Union(AnnotationBase):
-    """
-    Model representation of a schema xs:union element.
-
-    :param member_types: List of QName
-    :param simple_types:
-    """
+    """XSD Union model representation."""
 
     member_types: Optional[str] = attribute(name="memberTypes")
     simple_types: Array[SimpleType] = array_element(name="simpleType")
 
     @property
     def bases(self) -> Iterator[str]:
+        """Return an iterator of all the base types."""
         if self.member_types:
             yield from self.member_types.split()
 
     @property
     def is_property(self) -> bool:
+        """Specify it is qualified to be a class property."""
         return True
 
     @property
     def real_name(self) -> str:
+        """Return the real name for this element."""
         return DEFAULT_ATTR_NAME
 
     @property
     def attr_types(self) -> Iterator[str]:
+        """Return the attr types for this element."""
         for simple_type in self.simple_types:
             yield from simple_type.attr_types
 
@@ -279,6 +259,7 @@ class Union(AnnotationBase):
             yield from self.member_types.split()
 
     def get_restrictions(self) -> Dict[str, Anything]:
+        """Return the restrictions dictionary of this element."""
         restrictions = {}
         for simple_type in self.simple_types:
             restrictions.update(simple_type.get_restrictions())
@@ -287,19 +268,7 @@ class Union(AnnotationBase):
 
 @dataclass
 class Attribute(AnnotationBase):
-    """
-    Model representation of a schema xs:attribute element.
-
-    :param default: string
-    :param fixed: string
-    :param form: qualified | unqualified
-    :param name: NCName
-    :param ref: QName
-    :param type: QName
-    :param target_namespace: anyURI
-    :param simple_type:
-    :param use: (optional | prohibited | required) : optional
-    """
+    """XSD Attribute model representation."""
 
     default: Optional[str] = attribute()
     fixed: Optional[str] = attribute()
@@ -313,6 +282,7 @@ class Attribute(AnnotationBase):
 
     @property
     def bases(self) -> Iterator[str]:
+        """Return an iterator of all the base types."""
         if self.type:
             yield self.type
         elif not self.has_children:
@@ -320,10 +290,12 @@ class Attribute(AnnotationBase):
 
     @property
     def is_property(self) -> bool:
+        """Specify it is qualified to be a class property."""
         return True
 
     @property
     def attr_types(self) -> Iterator[str]:
+        """Return the attr types for this element."""
         if self.simple_type:
             yield from self.simple_type.attr_types
         elif self.type:
@@ -333,10 +305,12 @@ class Attribute(AnnotationBase):
 
     @property
     def default_type(self) -> str:
+        """Returned the inferred default type qname."""
         datatype = DataType.STRING if self.fixed else DataType.ANY_SIMPLE_TYPE
         return datatype.prefixed(self.xs_prefix)
 
     def get_restrictions(self) -> Dict[str, Anything]:
+        """Return the restrictions dictionary of this element."""
         if self.use == UseType.REQUIRED:
             restrictions = {"min_occurs": 1, "max_occurs": 1}
         elif self.use == UseType.PROHIBITED:
@@ -352,14 +326,7 @@ class Attribute(AnnotationBase):
 
 @dataclass
 class AttributeGroup(AnnotationBase):
-    """
-    Model representation of a schema xs:attributeGroup element.
-
-    :param name: NCName
-    :param ref: QName
-    :param attributes: any attributes with non-schema namespace
-    :param attribute_groups:
-    """
+    """XSD AttributeGroup model representation."""
 
     ref: str = attribute(default="")
     name: Optional[str] = attribute()
@@ -368,24 +335,19 @@ class AttributeGroup(AnnotationBase):
 
     @property
     def is_property(self) -> bool:
+        """Specify it is qualified to be a class property."""
         return True
 
     @property
     def attr_types(self) -> Iterator[str]:
+        """Return the attr types for this element."""
         if self.ref:
             yield self.ref
 
 
 @dataclass
 class Any(AnnotationBase):
-    """
-    Model representation of a schema xs:any element.
-
-    :param min_occurs: nonNegativeInteger : 1
-    :param max_occurs: (nonNegativeInteger | unbounded)  : 1
-    :param namespace: List of (anyURI | (##targetNamespace | ##local))
-    :param process_contents: (lax | skip | strict) : strict
-    """
+    """XSD Any model representation."""
 
     namespace: str = attribute(default="##any")
     min_occurs: int = attribute(default=1, name="minOccurs")
@@ -395,26 +357,32 @@ class Any(AnnotationBase):
     )
 
     def __post_init__(self):
+        """Clean the namespace value."""
         self.namespace = " ".join(unique_sequence(self.namespace.split()))
 
     @property
     def is_property(self) -> bool:
+        """Specify it is qualified to be a class property."""
         return True
 
     @property
     def real_name(self) -> str:
+        """Return the real name for this element."""
         clean_ns = "_".join(map(clean_uri, self.namespace.split()))
         return f"@{clean_ns}_element"
 
     @property
     def raw_namespace(self) -> Optional[str]:
+        """The element explicit namespace."""
         return self.namespace
 
     @property
     def attr_types(self) -> Iterator[str]:
+        """Return the attr types for this element."""
         yield DataType.ANY_TYPE.prefixed(self.xs_prefix)
 
     def get_restrictions(self) -> Dict[str, Anything]:
+        """Return the restrictions dictionary of this element."""
         max_occurs = sys.maxsize if self.max_occurs == "unbounded" else self.max_occurs
 
         return {
@@ -426,15 +394,7 @@ class Any(AnnotationBase):
 
 @dataclass
 class All(AnnotationBase):
-    """
-    Model representation of a schema xs:all element.
-
-    :param min_occurs: nonNegativeInteger : 1
-    :param max_occurs: (nonNegativeInteger | unbounded)  : 1
-    :param any:
-    :param elements:
-    :param groups:
-    """
+    """XSD All model representation."""
 
     min_occurs: int = attribute(default=1, name="minOccurs")
     max_occurs: UnionType[int, str] = attribute(default=1, name="maxOccurs")
@@ -443,6 +403,7 @@ class All(AnnotationBase):
     groups: Array["Group"] = array_element(name="group")
 
     def get_restrictions(self) -> Dict[str, Anything]:
+        """Return the restrictions dictionary of this element."""
         max_occurs = sys.maxsize if self.max_occurs == "unbounded" else self.max_occurs
 
         return {
@@ -452,17 +413,7 @@ class All(AnnotationBase):
 
 @dataclass
 class Sequence(AnnotationBase):
-    """
-    Model representation of a schema xs:sequence element.
-
-    :param min_occurs: nonNegativeInteger : 1
-    :param max_occurs: (nonNegativeInteger | unbounded)  : 1
-    :param elements:
-    :param groups:
-    :param choices:
-    :param sequences:
-    :param any:
-    """
+    """XSD Sequence model representation."""
 
     min_occurs: int = attribute(default=1, name="minOccurs")
     max_occurs: UnionType[int, str] = attribute(default=1, name="maxOccurs")
@@ -473,6 +424,7 @@ class Sequence(AnnotationBase):
     any: Array["Any"] = array_element()
 
     def get_restrictions(self) -> Dict[str, Anything]:
+        """Return the restrictions dictionary of this element."""
         max_occurs = sys.maxsize if self.max_occurs == "unbounded" else self.max_occurs
 
         return {
@@ -482,17 +434,7 @@ class Sequence(AnnotationBase):
 
 @dataclass
 class Choice(AnnotationBase):
-    """
-    Model representation of a schema xs:choice element.
-
-    :param min_occurs: nonNegativeInteger : 1
-    :param max_occurs: (nonNegativeInteger | unbounded)  : 1
-    :param elements:
-    :param groups:
-    :param choices:
-    :param sequences:
-    :param any:
-    """
+    """XSD Choice model representation."""
 
     min_occurs: int = attribute(default=1, name="minOccurs")
     max_occurs: UnionType[int, str] = attribute(default=1, name="maxOccurs")
@@ -503,6 +445,7 @@ class Choice(AnnotationBase):
     any: Array["Any"] = array_element()
 
     def get_restrictions(self) -> Dict[str, Anything]:
+        """Return the restrictions dictionary of this element."""
         max_occurs = sys.maxsize if self.max_occurs == "unbounded" else self.max_occurs
 
         return {
@@ -512,17 +455,7 @@ class Choice(AnnotationBase):
 
 @dataclass
 class Group(AnnotationBase):
-    """
-    Model representation of a schema xs:group element.
-
-    :param name: NCName
-    :param ref: QName
-    :param min_occurs: nonNegativeInteger : 1
-    :param max_occurs: (nonNegativeInteger | unbounded)  : 1
-    :param all:
-    :param choice:
-    :param sequence:
-    """
+    """XSD Group model representation."""
 
     name: Optional[str] = attribute()
     ref: str = attribute(default="")
@@ -534,14 +467,17 @@ class Group(AnnotationBase):
 
     @property
     def is_property(self) -> bool:
+        """Specify it is qualified to be a class property."""
         return True
 
     @property
     def attr_types(self) -> Iterator[str]:
+        """Return the attr types for this element."""
         if self.ref:
             yield self.ref
 
     def get_restrictions(self) -> Dict[str, Anything]:
+        """Return the restrictions dictionary of this element."""
         max_occurs = sys.maxsize if self.max_occurs == "unbounded" else self.max_occurs
 
         return {
@@ -551,13 +487,7 @@ class Group(AnnotationBase):
 
 @dataclass
 class OpenContent(AnnotationBase):
-    """
-    Model representation of a schema xs:openContent element.
-
-    :param applies_to_empty: default false
-    :param mode: (none | interleave | suffix) : interleave
-    :param any:
-    """
+    """XSD OpenContent model representation."""
 
     applies_to_empty: bool = attribute(default=False, name="appliesToEmpty")
     mode: Mode = attribute(default=Mode.INTERLEAVE)
@@ -566,25 +496,12 @@ class OpenContent(AnnotationBase):
 
 @dataclass
 class DefaultOpenContent(OpenContent):
-    """Model representation of a schema xs:defaultOpenContent element."""
+    """XSD DefaultOpenContent model representation."""
 
 
 @dataclass
 class Extension(AnnotationBase):
-    """
-    Model representation of a schema xs:extension element.
-
-    :param base: QName
-    :param group:
-    :param all:
-    :param choice:
-    :param sequence:
-    :param any_attribute: any attributes with non-schema namespace
-    :param open_content:
-    :param attributes:
-    :param attribute_groups:
-    :param assertions:
-    """
+    """XSD Extension model representation."""
 
     base: Optional[str] = attribute()
     group: Optional[Group] = element()
@@ -599,166 +516,118 @@ class Extension(AnnotationBase):
 
     @property
     def bases(self) -> Iterator[str]:
+        """Return an iterator of all the base types."""
         if self.base:
             yield self.base
 
 
 @dataclass
 class Enumeration(AnnotationBase):
-    """
-    Model representation of a schema xs:enumeration element.
-
-    :param value: anySimpleType
-    """
+    """XSD Enumeration model representation."""
 
     value: str = attribute()
 
     @property
     def is_property(self) -> bool:
+        """Specify it is qualified to be a class property."""
         return True
 
     @property
     def real_name(self) -> str:
+        """Return the enumeration value as its name."""
         return self.value
 
     @property
     def default(self) -> str:
+        """Return the enumeration value as its default value."""
         return self.value
 
     @property
     def is_fixed(self) -> bool:
+        """Specify this element has a fixed value."""
         return True
 
 
 @dataclass
 class FractionDigits(AnnotationBase):
-    """
-    Model representation of a schema xs:fractionDigits element.
-
-    :param value: nonNegativeInteger
-    """
+    """XSD FractionDigits model representation."""
 
     value: int = attribute()
 
 
 @dataclass
 class Length(AnnotationBase):
-    """
-    Model representation of a schema xs:length element.
-
-    :param value: nonNegativeInteger
-    """
+    """XSD Length model representation."""
 
     value: int = attribute()
 
 
 @dataclass
 class MaxExclusive(AnnotationBase):
-    """
-    Model representation of a schema xs:maxExclusive element.
-
-    :param value: anySimpleType
-    """
+    """XSD MaxExclusive model representation."""
 
     value: str = attribute()
 
 
 @dataclass
 class MaxInclusive(AnnotationBase):
-    """
-    Model representation of a schema xs:maxInclusive element.
-
-    :param value: anySimpleType
-    """
+    """XSD MaxInclusive model representation."""
 
     value: str = attribute()
 
 
 @dataclass
 class MaxLength(AnnotationBase):
-    """
-    Model representation of a schema xs:maxLength element.
-
-    :param value: nonNegativeInteger
-    """
+    """XSD MaxLength model representation."""
 
     value: int = attribute()
 
 
 @dataclass
 class MinExclusive(AnnotationBase):
-    """
-    Model representation of a schema xs:minExclusive element.
-
-    :param value: anySimpleType
-    """
+    """XSD MinExclusive model representation."""
 
     value: str = attribute()
 
 
 @dataclass
 class MinInclusive(AnnotationBase):
-    """
-    Model representation of a schema xs:minInclusive element.
-
-    :param value: anySimpleType
-    """
+    """XSD MinInclusive model representation."""
 
     value: str = attribute()
 
 
 @dataclass
 class MinLength(AnnotationBase):
-    """
-    Model representation of a schema xs:minLength element.
-
-    :param value: nonNegativeInteger
-    """
+    """XSD MinLength model representation."""
 
     value: int = attribute()
 
 
 @dataclass
 class Pattern(AnnotationBase):
-    """
-    Model representation of a schema xs:pattern element.
-
-    :param value: string
-    """
+    """XSD Pattern model representation."""
 
     value: str = attribute()
 
 
 @dataclass
 class TotalDigits(AnnotationBase):
-    """
-    Model representation of a schema xs:totalDigits element.
-
-    :param value: positiveInteger
-    """
+    """XSD TotalDigits model representation."""
 
     value: int = attribute()
 
 
 @dataclass
 class WhiteSpace(AnnotationBase):
-    """
-    Model representation of a schema xs:whiteSpace element.
-
-    :param value: (collapse | preserve | replace)
-    """
+    """XSD WhiteSpace model representation."""
 
     value: str = attribute()
 
 
 @dataclass
 class ExplicitTimezone(AnnotationBase):
-    """
-    Model representation of a schema xs:explicitTimezone element.
-
-    :param value: NCName
-    :param fixed: default false
-    """
+    """XSD ExplicitTimezone model representation."""
 
     value: str = attribute()
     fixed: bool = attribute(default=False)
@@ -766,35 +635,7 @@ class ExplicitTimezone(AnnotationBase):
 
 @dataclass
 class Restriction(AnnotationBase):
-    """
-    Model representation of a schema xs:restriction element.
-
-    :param base: QName
-    :param group:
-    :param all:
-    :param choice:
-    :param sequence:
-    :param open_content:
-    :param attributes:
-    :param attribute_groups:
-    :param enumerations:
-    :param asserts:
-    :param assertions:
-    :param any_element:
-    :param min_exclusive:
-    :param min_inclusive:
-    :param min_length:
-    :param max_exclusive:
-    :param max_inclusive:
-    :param max_length:
-    :param total_digits:
-    :param fraction_digits:
-    :param length:
-    :param white_space:
-    :param patterns:
-    :param explicit_timezone:
-    :param simple_type:
-    """
+    """XSD Restriction model representation."""
 
     base: Optional[str] = attribute()
     group: Optional[Group] = element()
@@ -824,6 +665,7 @@ class Restriction(AnnotationBase):
 
     @property
     def attr_types(self) -> Iterator[str]:
+        """Return the attr types for this element."""
         if self.simple_type:
             yield from self.simple_type.attr_types
         elif self.base and not self.enumerations:
@@ -831,14 +673,17 @@ class Restriction(AnnotationBase):
 
     @property
     def real_name(self) -> str:
+        """Return the real name for this element."""
         return DEFAULT_ATTR_NAME
 
     @property
     def bases(self) -> Iterator[str]:
+        """Return an iterator of all the base types."""
         if self.base:
             yield self.base
 
     def get_restrictions(self) -> Dict[str, Anything]:
+        """Return the restrictions dictionary of this element."""
         restrictions = {}
         if self.simple_type:
             restrictions.update(self.simple_type.get_restrictions())
@@ -874,12 +719,7 @@ class Restriction(AnnotationBase):
 
 @dataclass
 class SimpleContent(AnnotationBase):
-    """
-    Model representation of a schema xs:simpleContent element.
-
-    :param restriction:
-    :param extension:
-    """
+    """XSD SimpleContent model representation."""
 
     restriction: Optional[Restriction] = element()
     extension: Optional[Extension] = element()
@@ -887,38 +727,14 @@ class SimpleContent(AnnotationBase):
 
 @dataclass
 class ComplexContent(SimpleContent):
-    """
-    Model representation of a schema xs:complexContent element.
-
-    :param fixed:
-    """
+    """XSD ComplexContent model representation."""
 
     mixed: bool = attribute(default=False)
 
 
 @dataclass
 class ComplexType(AnnotationBase):
-    """
-    Model representation of a schema xs:complexType element.
-
-    :param name: NCName
-    :param block: (#all | List of (extension | restriction))
-    :param final: (#all | List of (extension | restriction))
-    :param simple_content:
-    :param complex_content:
-    :param group:
-    :param all:
-    :param choice:
-    :param sequence:
-    :param any_attribute:
-    :param open_content:
-    :param attributes:
-    :param attribute_groups:
-    :param assertion:
-    :param abstract:
-    :param mixed:
-    :param default_attributes_apply:
-    """
+    """XSD ComplexType model representation."""
 
     name: Optional[str] = attribute()
     block: Optional[str] = attribute()
@@ -942,6 +758,7 @@ class ComplexType(AnnotationBase):
 
     @property
     def is_mixed(self) -> bool:
+        """Return whether this element accepts mixed content value."""
         if self.mixed:
             return True
 
@@ -953,30 +770,19 @@ class ComplexType(AnnotationBase):
 
 @dataclass
 class Field(AnnotationBase):
-    """
-    Model representation of a schema xs:field element.
-
-    :param xpath: a subset of XPath expression
-    """
+    """XSD Field model representation."""
 
     xpath: Optional[str] = attribute()
 
 
 @dataclass
 class Selector(Field):
-    """Schema Model representation of a schema xs:selectorModel element.."""
+    """XSD Selector model representation."""
 
 
 @dataclass
 class Unique(AnnotationBase):
-    """
-    Model representation of a schema xs:unique element.
-
-    :param name: NCName
-    :param ref: QName
-    :param selector:
-    :param fields:
-    """
+    """XSD Unique model representation."""
 
     name: Optional[str] = attribute()
     ref: Optional[str] = attribute()
@@ -986,14 +792,7 @@ class Unique(AnnotationBase):
 
 @dataclass
 class Key(AnnotationBase):
-    """
-    Model representation of a schema xs:key element.
-
-    :param name: NCName
-    :param ref: QName
-    :param selector:
-    :param fields:
-    """
+    """XSD Key model representation."""
 
     name: Optional[str] = attribute()
     ref: Optional[str] = attribute()
@@ -1003,15 +802,7 @@ class Key(AnnotationBase):
 
 @dataclass
 class Keyref(AnnotationBase):
-    """
-    Model representation of a schema xs:keyref element.
-
-    :param name: NCName
-    :param ref: QName
-    :param refer: QName
-    :param selector:
-    :param fields:
-    """
+    """XSD Keyref model representation."""
 
     name: Optional[str] = attribute()
     ref: Optional[str] = attribute()
@@ -1022,14 +813,7 @@ class Keyref(AnnotationBase):
 
 @dataclass
 class Alternative(AnnotationBase):
-    """
-    Model representation of a schema xs:alternative element.
-
-    :param type: QName
-    :param test: an XPath expression
-    :param simple_type:
-    :param complex_type:
-    """
+    """XSD Alternative model representation."""
 
     type: Optional[str] = attribute()
     test: Optional[str] = attribute()
@@ -1038,6 +822,7 @@ class Alternative(AnnotationBase):
 
     @property
     def real_name(self) -> str:
+        """Return the real name for this element."""
         if self.test:
             return text.snake_case(self.test)
         if self.id:
@@ -1046,10 +831,12 @@ class Alternative(AnnotationBase):
 
     @property
     def bases(self) -> Iterator[str]:
+        """Return an iterator of all the base types."""
         if self.type:
             yield self.type
 
     def get_restrictions(self) -> Dict[str, Anything]:
+        """Return the restrictions dictionary of this element."""
         return {
             "path": [("alt", id(self), 0, 1)],
         }
@@ -1057,31 +844,7 @@ class Alternative(AnnotationBase):
 
 @dataclass
 class Element(AnnotationBase):
-    """
-    Model representation of a schema xs:element element.
-
-    :param name: NCName
-    :param ref: QName
-    :param type: QName
-    :param substitution_group: List of QName
-    :param default:
-    :param fixed:
-    :param form: qualified | unqualified
-    :param block: (#all | List of (extension | restriction |
-        substitution))
-    :param final: (#all | List of (extension | restriction))
-    :param target_namespace: anyURI
-    :param simple_type:
-    :param complex_type:
-    :param alternatives:
-    :param uniques:
-    :param keys:
-    :param keyrefs:
-    :param min_occurs: nonNegativeInteger : 1
-    :param max_occurs: (nonNegativeInteger | unbounded)  : 1
-    :param nillable:
-    :param abstract:
-    """
+    """XSD Element model representation."""
 
     name: Optional[str] = attribute()
     ref: Optional[str] = attribute()
@@ -1106,6 +869,7 @@ class Element(AnnotationBase):
 
     @property
     def bases(self) -> Iterator[str]:
+        """Return an iterator of all the base types."""
         if self.type:
             yield self.type
         elif not self.has_children:
@@ -1113,19 +877,23 @@ class Element(AnnotationBase):
 
     @property
     def is_property(self) -> bool:
+        """Specify it is qualified to be a class property."""
         return True
 
     @property
     def is_mixed(self) -> bool:
+        """Return whether this element accepts mixed content value."""
         return self.complex_type.is_mixed if self.complex_type else False
 
     @property
     def default_type(self) -> str:
+        """Returned the inferred default type qname."""
         datatype = DataType.STRING if self.fixed else DataType.ANY_TYPE
         return datatype.prefixed(self.xs_prefix)
 
     @property
     def attr_types(self) -> Iterator[str]:
+        """Return the attr types for this element."""
         if self.type:
             yield self.type
         elif self.ref:
@@ -1137,9 +905,11 @@ class Element(AnnotationBase):
 
     @property
     def substitutions(self) -> Array[str]:
+        """Return a list of the substitution groups."""
         return self.substitution_group.split() if self.substitution_group else []
 
     def get_restrictions(self) -> Dict[str, Anything]:
+        """Return the restrictions dictionary of this element."""
         max_occurs = sys.maxsize if self.max_occurs == "unbounded" else self.max_occurs
 
         restrictions = {
@@ -1158,13 +928,7 @@ class Element(AnnotationBase):
 
 @dataclass
 class Notation(AnnotationBase):
-    """
-    Model representation of a schema xs:notation element.
-
-    :param name: NCName
-    :param public: token
-    :param system: anyURI
-    """
+    """XSD Notation model representation."""
 
     name: Optional[str] = attribute()
     public: Optional[str] = attribute()
@@ -1172,75 +936,37 @@ class Notation(AnnotationBase):
 
 
 @dataclass
-class SchemaLocation(AnnotationBase):
-    """
-    Model representation of a schema xs:schemaLocation element. Base schema
-    location.
-
-    :param location: any url with a urllib supported scheme file
-    : http:
-    """
-
-    location: Optional[str] = field(default=None)
-
-
-@dataclass
-class Import(SchemaLocation):
-    """
-    Model representation of a schema xs:import element.
-
-    :param namespace: anyURI
-    :param schema_location: anyURI
-    """
+class Import(AnnotationBase):
+    """XSD Import model representation."""
 
     namespace: Optional[str] = attribute()
     schema_location: Optional[str] = attribute(name="schemaLocation")
+    location: Optional[str] = field(default=None, metadata={"type": "ignore"})
 
 
 @dataclass
-class Include(SchemaLocation):
-    """
-    Model representation of a schema xs:include element.
-
-    :param schema_location: anyURI
-    """
+class Include(AnnotationBase):
+    """XSD Include model representation."""
 
     schema_location: Optional[str] = attribute(name="schemaLocation")
+    location: Optional[str] = field(default=None, metadata={"type": "ignore"})
 
 
 @dataclass
-class Redefine(SchemaLocation):
-    """
-    Model representation of a schema xs:redefine element.
-
-    :param schema_location: anyURI
-    :param simple_types:
-    :param complex_types:
-    :param groups:
-    :param attribute_groups:
-    """
+class Redefine(AnnotationBase):
+    """XSD Redefine model representation."""
 
     schema_location: Optional[str] = attribute(name="schemaLocation")
     simple_types: Array[SimpleType] = array_element(name="simpleType")
     complex_types: Array[ComplexType] = array_element(name="complexType")
     groups: Array[Group] = array_element(name="group")
     attribute_groups: Array[AttributeGroup] = array_element(name="attributeGroup")
+    location: Optional[str] = field(default=None, metadata={"type": "ignore"})
 
 
 @dataclass
-class Override(SchemaLocation):
-    """
-    Model representation of a schema xs:override element.
-
-    :param schema_location: anyURI
-    :param simple_types:
-    :param complex_types:
-    :param groups:
-    :param attribute_groups:
-    :param elements:
-    :param attributes:
-    :param notations:
-    """
+class Override(AnnotationBase):
+    """XSD Override model representation."""
 
     schema_location: Optional[str] = attribute(name="schemaLocation")
     simple_types: Array[SimpleType] = array_element(name="simpleType")
@@ -1250,40 +976,16 @@ class Override(SchemaLocation):
     elements: Array[Element] = array_element(name="element")
     attributes: Array[Attribute] = array_element(name="attribute")
     notations: Array[Notation] = array_element(name="notation")
+    location: Optional[str] = field(default=None, metadata={"type": "ignore"})
 
 
 @dataclass
-class Schema(SchemaLocation):
-    """
-    Model representation of a schema xs:schema element.
-
-    :param target:
-    :param block_default: (#all | List of (extension | restriction |
-        substitution))
-    :param default_attributes: QName
-    :param final_default: (#all | List of extension | restriction | list
-        | union) : ''
-    :param target_namespace: anyURI
-    :param version: token
-    :param xmlns:
-    :param element_form_default: (qualified | unqualified) : unqualified
-    :param attribute_form_default: (qualified | unqualified) :
-        unqualified
-    :param default_open_content:
-    :param imports:
-    :param redefines:
-    :param overrides:
-    :param annotations:
-    :param simple_types:
-    :param complex_types:
-    :param groups:
-    :param attribute_groups:
-    :param elements:
-    :param attributes:
-    :param notations:
-    """
+class Schema(AnnotationBase):
+    """XSD Schema model representation."""
 
     class Meta:
+        """Metadata options."""
+
         name = "schema"
         namespace = Namespace.XS.uri
 
@@ -1295,10 +997,12 @@ class Schema(SchemaLocation):
     version: Optional[str] = attribute()
     xmlns: Optional[str] = attribute()
     element_form_default: FormType = attribute(
-        default=FormType.UNQUALIFIED, name="elementFormDefault"
+        default=FormType.UNQUALIFIED,
+        name="elementFormDefault",
     )
     attribute_form_default: FormType = attribute(
-        default=FormType.UNQUALIFIED, name="attributeFormDefault"
+        default=FormType.UNQUALIFIED,
+        name="attributeFormDefault",
     )
     default_open_content: Optional[DefaultOpenContent] = element(
         name="defaultOpenContent"
@@ -1315,8 +1019,10 @@ class Schema(SchemaLocation):
     elements: Array[Element] = array_element(name="element")
     attributes: Array[Attribute] = array_element(name="attribute")
     notations: Array[Notation] = array_element(name="notation")
+    location: Optional[str] = field(default=None, metadata={"type": "ignore"})
 
     def included(self) -> Iterator[UnionType[Import, Include, Redefine, Override]]:
+        """Yields an iterator of included resources."""
         yield from self.imports
 
         yield from self.includes

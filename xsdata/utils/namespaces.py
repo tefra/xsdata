@@ -15,8 +15,7 @@ URI_REGEX = re.compile(
 
 
 def load_prefix(uri: str, ns_map: Dict) -> Optional[str]:
-    """Get or create a prefix for the given uri in the prefix-URI namespace
-    mapping."""
+    """Get or create a prefix for the uri in the prefix-URI map."""
     for prefix, ns in ns_map.items():
         if ns == uri:
             return prefix
@@ -25,8 +24,7 @@ def load_prefix(uri: str, ns_map: Dict) -> Optional[str]:
 
 
 def generate_prefix(uri: str, ns_map: Dict) -> str:
-    """Generate and add a prefix for the given uri in the prefix-URI namespace
-    mapping."""
+    """Generate a prefix for the given uri and append it in the prefix-URI map."""
     namespace = Namespace.get_enum(uri)
     if namespace:
         prefix = namespace.prefix
@@ -66,7 +64,7 @@ def clean_prefixes(ns_map: Dict) -> Dict:
 
 
 def clean_uri(namespace: str) -> str:
-    """Remove common prefixes and suffixes from a uri string."""
+    """Remove common prefixes and suffixes from an URI string."""
     if namespace[:2] == "##":
         namespace = namespace[2:]
 
@@ -78,12 +76,6 @@ def clean_uri(namespace: str) -> str:
         namespace = right[2:]
 
     return "_".join(x for x in namespace.split(".") if x not in __uri_ignore__)
-
-
-def real_xsi_type(qname: str, target_qname: Optional[str]) -> Optional[str]:
-    """Determine if the given target qualified name should be used to define a
-    derived type."""
-    return target_qname if target_qname != qname else None
 
 
 @functools.lru_cache(maxsize=50)
@@ -99,22 +91,24 @@ def build_qname(tag_or_uri: Optional[str], tag: Optional[str] = None) -> str:
 
 
 @functools.lru_cache(maxsize=50)
-def split_qname(tag: str) -> Tuple:
+def split_qname(qname: str) -> Tuple:
     """Split namespace qualified strings."""
-    if tag[0] == "{":
-        left, right = text.split(tag[1:], "}")
+    if qname[0] == "{":
+        left, right = text.split(qname[1:], "}")
         if left:
             return left, right
 
-    return None, tag
+    return None, qname
 
 
-def target_uri(tag: str) -> Optional[str]:
-    return split_qname(tag)[0]
+def target_uri(qname: str) -> Optional[str]:
+    """Return the URI namespace of the qname."""
+    return split_qname(qname)[0]
 
 
-def local_name(tag: str) -> str:
-    return split_qname(tag)[1]
+def local_name(qname: str) -> str:
+    """Return the local name of the qname."""
+    return split_qname(qname)[1]
 
 
 NCNAME_PUNCTUATION = {"\u00B7", "\u0387", ".", "-", "_"}

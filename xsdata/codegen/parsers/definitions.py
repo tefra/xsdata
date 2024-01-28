@@ -10,8 +10,7 @@ from xsdata.models import wsdl
 
 @dataclass
 class DefinitionsParser(SchemaParser):
-    """A simple parser to convert a wsdl to an easy to handle data structure
-    based on dataclasses."""
+    """Parse a wsdl document into data models."""
 
     def end(
         self,
@@ -21,7 +20,21 @@ class DefinitionsParser(SchemaParser):
         text: Optional[str],
         tail: Optional[str],
     ) -> Any:
-        """Override parent method to set element location."""
+        """Parse the last xml node and bind any intermediate objects.
+
+        Override parent method to set source location in every
+        wsdl element.
+
+        Args:
+            queue: The XmlNode queue list
+            objects: The list of all intermediate parsed objects
+            qname: The element qualified name
+            text: The element text content
+            tail: The element tail content
+
+        Returns:
+            Whether the binding process was successful.
+        """
         obj = super().end(queue, objects, qname, text, tail)
         if isinstance(obj, wsdl.WsdlElement):
             obj.location = self.location
@@ -29,5 +42,12 @@ class DefinitionsParser(SchemaParser):
         return obj
 
     def end_import(self, obj: T):
+        """End import element entrypoint.
+
+        Resolve the location path of import elements.
+
+        Args:
+            obj: The wsdl import element.
+        """
         if isinstance(obj, wsdl.Import) and self.location:
             obj.location = self.resolve_path(obj.location)

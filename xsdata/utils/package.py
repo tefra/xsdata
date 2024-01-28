@@ -16,7 +16,15 @@ def module_path(module: str) -> Path:
 
 
 @functools.lru_cache(maxsize=50)
-def module_name(source: str) -> str:
-    module = source.split("/")[-1]
+def module_name(uri: str) -> str:
+    """Convert a file uri to a module name.
+
+    Args:
+        uri: A file URI location
+
+    Returns:
+        The last part of the URI path stripped from known extensions.
+    """
+    module = uri.split("/")[-1]
     name, extension = os.path.splitext(module)
     return name if extension in (".xsd", ".dtd", ".wsdl", ".xml", ".json") else module

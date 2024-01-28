@@ -48,7 +48,7 @@ stop_words = {
     "list",
     "nonlocal",
     "not",
-    "object",  # py36 specific
+    "object",
     "or",
     "pass",
     "raise",
@@ -76,12 +76,7 @@ def suffix(value: str, sep: str = ":") -> str:
 
 
 def split(value: str, sep: str = ":") -> Tuple:
-    """
-    Separate the given string with the given separator and return a tuple of
-    the prefix and suffix.
-
-    If the separator isn't present in the string return None as prefix.
-    """
+    """Split the given value with the given separator once."""
     left, _, right = value.partition(sep)
     return (left, right) if right else (None, left)
 
@@ -138,8 +133,7 @@ def kebab_case(value: str, **kwargs: Any) -> str:
 
 
 def split_words(value: str) -> List[str]:
-    """Split a string on new capital letters and not alphanumeric
-    characters."""
+    """Split a string on capital letters and not alphanumeric characters."""
     words: List[str] = []
     buffer: List[str] = []
     previous = None
@@ -151,11 +145,11 @@ def split_words(value: str) -> List[str]:
 
     for char in value:
         tp = classify(char)
-        if tp == StringType.OTHER:
+        if tp == CharType.OTHER:
             flush()
         elif not previous or tp == previous:
             buffer.append(char)
-        elif tp == StringType.UPPER and previous != StringType.UPPER:
+        elif tp == CharType.UPPER and previous != CharType.UPPER:
             flush()
             buffer.append(char)
         else:
@@ -167,7 +161,9 @@ def split_words(value: str) -> List[str]:
     return words
 
 
-class StringType:
+class CharType:
+    """Character types."""
+
     UPPER = 1
     LOWER = 2
     NUMERIC = 3
@@ -178,15 +174,15 @@ def classify(character: str) -> int:
     """String classifier."""
     code_point = ord(character)
     if 64 < code_point < 91:
-        return StringType.UPPER
+        return CharType.UPPER
 
     if 96 < code_point < 123:
-        return StringType.LOWER
+        return CharType.LOWER
 
     if 47 < code_point < 58:
-        return StringType.NUMERIC
+        return CharType.NUMERIC
 
-    return StringType.OTHER
+    return CharType.OTHER
 
 
 ESCAPE = re.compile(r'[\x00-\x1f\\"\b\f\n\r\t]')
@@ -204,11 +200,7 @@ for i in range(0x20):
 
 
 def escape_string(value: str) -> str:
-    """
-    Escape a string for code generation.
-
-    Source: json.encoder.py_encode_basestring
-    """
+    """Escape a string for code generation."""
 
     def replace(match: Match) -> str:
         return ESCAPE_DCT[match.group(0)]
@@ -220,8 +212,7 @@ __alnum_ascii__ = set(string.digits + string.ascii_letters)
 
 
 def alnum(value: str) -> str:
-    """Return a lower case version of the string only with ascii alphanumerical
-    characters."""
+    """Return the ascii alphanumerical characters in lower case."""
     return "".join(filter(__alnum_ascii__.__contains__, value)).lower()
 
 

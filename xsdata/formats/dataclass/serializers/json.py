@@ -1,5 +1,4 @@
 import json
-import warnings
 from dataclasses import dataclass, field
 from enum import Enum
 from io import StringIO
@@ -14,6 +13,14 @@ from xsdata.utils import collections
 
 
 def filter_none(x: Tuple) -> Dict:
+    """Convert a key-value pairs to dict, ignoring None values.
+
+    Args:
+        x: Key-value pairs
+
+    Returns:
+        The filtered dictionary.
+    """
     return {k: v for k, v in x if v is not None}
 
 
@@ -25,75 +32,90 @@ class DictFactory:
 
 @dataclass
 class JsonSerializer(AbstractSerializer):
-    """
-    Json serializer for dataclasses.
+    """Json serializer for data classes.
 
-    :param config: Serializer configuration
-    :param context: Model context provider
-    :param dict_factory: Override default dict factory to add further
-        logic
-    :param dump_factory: Override default json.dump call with another
-        implementation
-    :param indent: Output indentation level
+    Args:
+        config: The serializer config instance
+        context: The models context instance
+        dict_factory: Dictionary factory
+        dump_factory: Json dump factory e.g. json.dump
     """
 
     config: SerializerConfig = field(default_factory=SerializerConfig)
     context: XmlContext = field(default_factory=XmlContext)
     dict_factory: Callable = field(default=dict)
     dump_factory: Callable = field(default=json.dump)
-    indent: Optional[int] = field(default=None)
 
-    def render(self, obj: object) -> str:
-        """Convert the given object tree to json string."""
+    def render(self, obj: Any) -> str:
+        """Serialize the input model instance to json string.
+
+        Args:
+            obj: The input model instance
+
+        Returns:
+            The serialized json string output.
+        """
         output = StringIO()
         self.write(output, obj)
         return output.getvalue()
 
     def write(self, out: TextIO, obj: Any):
-        """
-        Write the given object tree to the output text stream.
+        """Serialize the given object to the output text stream.
 
-        :param out: The output stream
-        :param obj: The input dataclass instance
+        Args:
+            out: The output text stream
+            obj: The input model instance to serialize
         """
         indent: Optional[Union[int, str]] = None
-        if self.indent:
-            warnings.warn(
-                "JsonSerializer indent property is deprecated, use SerializerConfig",
-                DeprecationWarning,
-            )
-            indent = self.indent
-        elif self.config.pretty_print:
+        if self.config.pretty_print:
             indent = self.config.pretty_print_indent or 2
 
         self.dump_factory(self.convert(obj), out, indent=indent)
 
-    def convert(self, obj: Any, var: Optional[XmlVar] = None) -> Any:
-        if var is None or self.context.class_type.is_model(obj):
-            if collections.is_array(obj):
-                return [self.convert(o) for o in obj]
+    def convert(self, value: Any, var: Optional[XmlVar] = None) -> Any:
+        """Convert a value to json serializable object.
 
-            return self.dict_factory(self.next_value(obj))
+        Args:
+            value: The input value
+            var: The xml var instance
 
-        if collections.is_array(obj):
-            return type(obj)(self.convert(v, var) for v in obj)
+        Returns:
+            The converted json serializable value.
+        """
+        if var is None or self.context.class_type.is_model(value):
+            if collections.is_array(value):
+                return list(map(self.convert, value))
 
-        if isinstance(obj, (dict, int, float, str, bool)):
-            return obj
+            return self.dict_factory(self.next_value(value))
 
-        if isinstance(obj, Enum):
-            return self.convert(obj.value, var)
+        if collections.is_array(value):
+            return type(value)(self.convert(val, var) for val in value)
 
-        return converter.serialize(obj, format=var.format)
+        if isinstance(value, (dict, int, float, str, bool)):
+            return value
+
+        if isinstance(value, Enum):
+            return self.convert(value.value, var)
+
+        return converter.serialize(value, format=var.format)
 
     def next_value(self, obj: Any) -> Iterator[Tuple[str, Any]]:
+        """Fetch the next value of a model instance to convert.
+
+        Args:
+            obj: The input model instance
+
+        Yields:
+            An iterator of field name and value tuples.
+        """
         ignore_optionals = self.config.ignore_default_attributes
+        meta = self.context.build(obj.__class__, globalns=self.config.globalns)
 
-        for var in self.context.build(
-            obj.__class__, globalns=self.config.globalns
-        ).get_all_vars():
+        for var in meta.get_all_vars():
             value = getattr(obj, var.name)
-            if var.is_attribute and ignore_optionals and var.is_optional(value):
-                continue
-
-            yield var.local_name, self.convert(value, var)
+            if (
+                not var.is_attribute
+                or not ignore_optionals
+                or not var.is_optional(value)
+            ):
+                yield var.local_name, self.convert(value, var)

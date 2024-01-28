@@ -6,18 +6,18 @@ from xsdata.models.enums import DataType, NamespaceType, Tag
 
 
 class ProcessMixedContentClass(HandlerInterface):
-    """
-    Mixed content handler.
-
-    If the target class supports mixed content, a new wildcard attr will
-    replace the originals except any attributes. All the previous attrs
-    derived from  xs:element will be moved as choices for the new
-    content attr.
-    """
+    """Mixed content handler."""
 
     __slots__ = ()
 
     def process(self, target: Class):
+        """Add a wildcard attr if the class supports mixed content.
+
+        All other elements will be moved as the wildcard attr choices.
+
+        Args:
+            target: Tha target class instance
+        """
         if not target.is_mixed:
             return
 

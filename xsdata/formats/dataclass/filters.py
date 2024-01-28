@@ -2,7 +2,18 @@ import re
 import sys
 import textwrap
 from collections import defaultdict
-from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Tuple, Type
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+)
 
 from docformatter import configuration, format
 from jinja2 import Environment
@@ -23,6 +34,8 @@ from xsdata.utils.objects import literal_value
 
 
 class Filters:
+    """Jinja filters for code generation."""
+
     DEFAULT_KEY = "default"
     FACTORY_KEY = "default_factory"
     UNESCAPED_DBL_QUOTE_REGEX = re.compile(r"([^\\])\"")
@@ -104,6 +117,7 @@ class Filters:
         self.default_class_annotation = self.build_class_annotation(self.format)
 
     def register(self, env: Environment):
+        """Register the template filters to the jinja environment."""
         env.globals.update(
             {
                 "docstring_name": self.docstring_style.name.lower(),
@@ -137,6 +151,7 @@ class Filters:
 
     @classmethod
     def build_class_annotation(cls, fmt: OutputFormat) -> str:
+        """Build the class annotations."""
         args = []
         if not fmt.repr:
             args.append("repr=False")
@@ -155,7 +170,8 @@ class Filters:
 
         return f"@dataclass({', '.join(args)})" if args else "@dataclass"
 
-    def class_params(self, obj: Class):
+    def class_params(self, obj: Class) -> Iterator[Tuple[str, str]]:
+        """Yield the class variables with their docstring text."""
         is_enum = obj.is_enumeration
         for attr in obj.attrs:
             name = attr.name
@@ -166,8 +182,19 @@ class Filters:
                 yield self.field_name(name, obj.name), docstring
 
     def class_name(self, name: str) -> str:
-        """Convert the given string to a class name according to the selected
-        conventions or use an existing alias."""
+        """Class name filter.
+
+        Steps:
+            - Apply substitutions before naming conventions
+            - Apply naming convention
+            - Apply substitutions after naming conventions
+
+        Args:
+            name: The original class name
+
+        Returns:
+            The final class name
+        """
         name = self.apply_substitutions(name, ObjectType.CLASS)
         name = self.safe_name(name, self.class_safe_prefix, self.class_case)
         return self.apply_substitutions(name, ObjectType.CLASS)
@@ -207,6 +234,7 @@ class Filters:
         return collections.unique_sequence(annotations)
 
     def apply_substitutions(self, name: str, obj_type: ObjectType) -> str:
+        """Apply name substitutions by obj type."""
         for search, replace in self.substitutions[obj_type].items():
             name = re.sub(rf"{search}", rf"{replace}", name)
 
@@ -237,11 +265,19 @@ class Filters:
         return f"field({self.format_arguments(kwargs, 4)})"
 
     def field_name(self, name: str, class_name: str) -> str:
-        """
-        Convert the given name to a field name according to the selected
-        conventions or use an existing alias.
+        """Field name filter.
 
-        Provide the class name as context for the naming schemes.
+        Steps:
+            - Apply substitutions before naming conventions
+            - Apply naming convention
+            - Apply substitutions after naming conventions
+
+        Args:
+            name: The original field name
+            class_name: The class name, some naming conventions require it
+
+        Returns:
+            The final field name
         """
         prefix = self.field_safe_prefix
         name = self.apply_substitutions(name, ObjectType.FIELD)
@@ -249,11 +285,19 @@ class Filters:
         return self.apply_substitutions(name, ObjectType.FIELD)
 
     def constant_name(self, name: str, class_name: str) -> str:
-        """
-        Convert the given name to a constant name according to the selected
-        conventions or use an existing alias.
+        """Constant name filter.
 
-        Provide the class name as context for the naming schemes.
+        Steps:
+            - Apply substitutions before naming conventions
+            - Apply naming convention
+            - Apply substitutions after naming conventions
+
+        Args:
+            name: The original constant name
+            class_name: The class name, some naming conventions require it
+
+        Returns:
+            The final constant name
         """
         prefix = self.field_safe_prefix
         name = self.apply_substitutions(name, ObjectType.FIELD)
@@ -261,17 +305,38 @@ class Filters:
         return self.apply_substitutions(name, ObjectType.FIELD)
 
     def module_name(self, name: str) -> str:
-        """Convert the given string to a module name according to the selected
-        conventions or use an existing alias."""
+        """Module name filter.
+
+        Steps:
+            - Apply substitutions before naming conventions
+            - Apply naming convention
+            - Apply substitutions after naming conventions
+
+        Args:
+            name: The original module name
+
+        Returns:
+            The final module name
+        """
         prefix = self.module_safe_prefix
         name = self.apply_substitutions(name, ObjectType.MODULE)
         name = self.safe_name(namespaces.clean_uri(name), prefix, self.module_case)
         return self.apply_substitutions(name, ObjectType.MODULE)
 
     def package_name(self, name: str) -> str:
-        """Convert the given string to a package name according to the selected
-        conventions or use an existing alias."""
+        """Package name filter.
 
+        Steps:
+            - Apply substitutions before naming conventions
+            - Apply naming convention
+            - Apply substitutions after naming conventions
+
+        Args:
+            name: The original package name
+
+        Returns:
+            The final package name
+        """
         name = self.apply_substitutions(name, ObjectType.PACKAGE)
 
         if not name:
@@ -287,7 +352,14 @@ class Filters:
         return self.apply_substitutions(name, ObjectType.PACKAGE)
 
     def type_name(self, attr_type: AttrType) -> str:
-        """Return native python type name or apply class name conventions."""
+        """Field type filter.
+
+        Args:
+            attr_type: The attr type instance.
+
+        Returns:
+            The python type name or the user type final name
+        """
         datatype = attr_type.datatype
         if datatype:
             return datatype.type.__name__
@@ -295,7 +367,11 @@ class Filters:
         return self.class_name(attr_type.alias or attr_type.name)
 
     def safe_name(
-        self, name: str, prefix: str, name_case: Callable, **kwargs: Any
+        self,
+        name: str,
+        prefix: str,
+        name_case: Callable,
+        **kwargs: Any,
     ) -> str:
         """Sanitize names for safe generation."""
         if not name:
@@ -339,15 +415,16 @@ class Filters:
         return self.class_name(name)
 
     def post_meta_hook(self, obj: Class) -> Optional[str]:
-        """Plugin hook to render additional information after the xsdata meta
-        class."""
+        """Plugin hook to render additional information after the xsdata meta class."""
         return None
 
     def field_metadata(
-        self, attr: Attr, parent_namespace: Optional[str], parents: List[str]
+        self,
+        attr: Attr,
+        parent_namespace: Optional[str],
+        parents: List[str],
     ) -> Dict:
         """Return a metadata dictionary for the given attribute."""
-
         if attr.is_prohibited:
             return {"type": XmlType.IGNORE}
 
@@ -380,13 +457,7 @@ class Filters:
     def field_choices(
         self, attr: Attr, parent_namespace: Optional[str], parents: List[str]
     ) -> Optional[Tuple]:
-        """
-        Return a list of metadata dictionaries for the choices of the given
-        attribute.
-
-        Return None if attribute has no choices.
-        """
-
+        """Return a tuple of field metadata if the attr has choices."""
         if not attr.choices:
             return None
 
@@ -421,6 +492,7 @@ class Filters:
 
     @classmethod
     def filter_metadata(cls, data: Dict) -> Dict:
+        """Filter out false,none keys from the given dict."""
         return {
             key: value
             for key, value in data.items()
@@ -473,8 +545,7 @@ class Filters:
         return wrap.format("\n".join(lines), ind)
 
     def format_string(self, data: str, indent: int, key: str = "", pad: int = 0) -> str:
-        """
-        Return a pretty string representation of a string.
+        """Return a pretty string representation of a string.
 
         If the total length of the input string plus indent plus the key
         length and the additional pad is more than the max line length,
@@ -538,16 +609,19 @@ class Filters:
 
     @classmethod
     def clean_docstring(cls, string: Optional[str], escape: bool = True) -> str:
-        """
-        Prepare string for docstring generation.
+        """Prepare string for docstring generation.
 
         - Strip whitespace from each line
         - Replace triple double quotes with single quotes
         - Escape backslashes
 
-        :param string: input value
-        :param escape: skip backslashes escape, if string is going to
-            pass through formatting.
+        Args:
+            string: input value
+            escape: skip backslashes escape, if string is going to
+                pass through formatting.
+
+        Returns:
+            The cleaned docstring text.
         """
         if not string:
             return ""
@@ -626,6 +700,7 @@ class Filters:
         )
 
     def field_default_enum(self, attr: Attr) -> str:
+        """Generate the default value for enum fields."""
         assert attr.default is not None
 
         qname, reference = attr.default[6:].split("::", 1)
@@ -645,6 +720,7 @@ class Filters:
     def field_default_tokens(
         self, attr: Attr, types: List[Type], ns_map: Optional[Dict]
     ) -> str:
+        """Generate the default value for tokens fields."""
         assert isinstance(attr.default, str)
 
         fmt = attr.restrictions.format
@@ -660,14 +736,13 @@ class Filters:
         return f"lambda: {self.format_metadata(tokens, indent=8)}"
 
     def field_type(self, attr: Attr, parents: List[str]) -> str:
-        """Generate type hints for the given attribute."""
-
+        """Generate type hints for the given attr."""
         if attr.is_prohibited:
             return "Any"
 
-        result = self.field_type_names(attr, parents, choice=False)
+        result = self._field_type_names(attr, parents, choice=False)
 
-        iterable_fmt = self.get_iterable_format()
+        iterable_fmt = self._get_iterable_format()
         if attr.is_tokens:
             result = iterable_fmt.format(result)
 
@@ -688,8 +763,7 @@ class Filters:
         return result
 
     def choice_type(self, choice: Attr, parents: List[str]) -> str:
-        """
-        Generate type hints for the given choice.
+        """Generate type hints for the given choice.
 
         Choices support a subset of features from normal attributes.
         First of all we don't have a proper type hint but a type
@@ -697,12 +771,18 @@ class Filters:
         The second big difference is that our choice belongs to a
         compound field that might be a list, that's why list restriction
         is also ignored.
-        """
 
-        result = self.field_type_names(choice, parents, choice=True)
+        Args:
+            choice: The choice instance
+            parents: A list of the parent class names
+
+        Returns:
+            The string representation of the type hint.
+        """
+        result = self._field_type_names(choice, parents, choice=True)
 
         if choice.is_tokens:
-            iterable_fmt = self.get_iterable_format()
+            iterable_fmt = self._get_iterable_format()
             result = iterable_fmt.format(result)
 
         if self.subscriptable_types:
@@ -710,15 +790,18 @@ class Filters:
 
         return f"Type[{result}]"
 
-    def field_type_names(
-        self, attr: Attr, parents: List[str], choice: bool = False
+    def _field_type_names(
+        self,
+        attr: Attr,
+        parents: List[str],
+        choice: bool = False,
     ) -> str:
         type_names = [
-            self.field_type_name(x, parents, choice=choice) for x in attr.types
+            self._field_type_name(x, parents, choice=choice) for x in attr.types
         ]
-        return self.join_type_names(type_names)
+        return self._join_type_names(type_names)
 
-    def join_type_names(self, type_names: List[str]) -> str:
+    def _join_type_names(self, type_names: List[str]) -> str:
         type_names = collections.unique_sequence(type_names)
         if len(type_names) == 1:
             return type_names[0]
@@ -728,7 +811,7 @@ class Filters:
 
         return f'Union[{", ".join(type_names)}]'
 
-    def field_type_name(
+    def _field_type_name(
         self, attr_type: AttrType, parents: List[str], choice: bool = False
     ) -> str:
         name = self.type_name(attr_type)
@@ -780,12 +863,13 @@ class Filters:
 
         return "\n".join(imports)
 
-    def get_iterable_format(self):
+    def _get_iterable_format(self):
         fmt = "Tuple[{}, ...]" if self.format.frozen else "List[{}]"
         return fmt.lower() if self.subscriptable_types else fmt
 
     @classmethod
     def build_import_patterns(cls) -> Dict[str, Dict]:
+        """Build import search patterns."""
         type_patterns = cls.build_type_patterns
         return {
             "dataclasses": {"dataclass": ["@dataclass"], "field": [" = field("]},
@@ -812,6 +896,7 @@ class Filters:
 
     @classmethod
     def build_type_patterns(cls, x: str) -> Tuple:
+        """Return all possible type occurrences in the generated code."""
         return (
             f": {x} =",
             f"[{x}]",

@@ -2,7 +2,7 @@ import string
 from unittest import TestCase
 
 from xsdata.utils.text import (
-    StringType,
+    CharType,
     alnum,
     camel_case,
     capitalize,
@@ -155,13 +155,13 @@ class TextTests(TestCase):
 
     def test_classify(self):
         for ltr in string.ascii_uppercase:
-            self.assertEqual(StringType.UPPER, classify(ltr))
+            self.assertEqual(CharType.UPPER, classify(ltr))
 
         for ltr in string.ascii_lowercase:
-            self.assertEqual(StringType.LOWER, classify(ltr))
+            self.assertEqual(CharType.LOWER, classify(ltr))
 
         for ltr in string.digits:
-            self.assertEqual(StringType.NUMERIC, classify(ltr))
+            self.assertEqual(CharType.NUMERIC, classify(ltr))
 
         for ltr in "~!@#$%^&*()_+β":
-            self.assertEqual(StringType.OTHER, classify(ltr))
+            self.assertEqual(CharType.OTHER, classify(ltr))

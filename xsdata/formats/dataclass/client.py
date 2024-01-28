@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, Dict, NamedTuple, Optional, Type
+from typing import Any, Dict, NamedTuple, Optional, Type, Union
 
 from xsdata.exceptions import ClientValueError
 from xsdata.formats.dataclass.parsers import XmlParser
@@ -9,15 +9,15 @@ from xsdata.formats.dataclass.transports import DefaultTransport, Transport
 
 
 class Config(NamedTuple):
-    """
-    Service configuration class.
+    """Service configuration class.
 
-    :param style: binding style
-    :param location: service endpoint url
-    :param transport: transport namespace
-    :param soap_action: soap action
-    :param input: input object type
-    :param output: output object type
+    Args:
+        style: The binding style
+        location: The service endpoint url
+        transport: The transport namespace
+        soap_action: The soap action
+        input: The input class
+        output: The output class
     """
 
     style: str
@@ -30,7 +30,21 @@ class Config(NamedTuple):
 
     @classmethod
     def from_service(cls, obj: Any, **kwargs: Any) -> "Config":
-        """Instantiate from a generated service class."""
+        """Instantiate from a generated service class.
+
+        Args:
+            obj: The service class
+            **kwargs: Override the service class properties
+                style: The binding style
+                location: The service endpoint url
+                transport: The transport namespace
+                soap_action: The soap action
+                input: The input class
+                output: The output class
+
+        Returns:
+            A new config instance.
+        """
         params = {
             key: kwargs[key] if key in kwargs else getattr(obj, key, None)
             for key in cls._fields
@@ -40,16 +54,20 @@ class Config(NamedTuple):
 
 
 class TransportTypes:
+    """Transport types."""
+
     SOAP = "http://schemas.xmlsoap.org/soap/http"
 
 
 @dataclass
 class Client:
-    """
-    :param config: service configuration
-    :param transport: transport instance to handle requests
-    :param parser: xml parser instance to handle xml response parsing
-    :param serializer: xml serializer instance to handle xml response parsing
+    """A wsdl client.
+
+    Args:
+        config: The service config instance
+        transport: The transport instance
+        parser: The xml parser instance
+        serializer: The xml serializer instance
     """
 
     config: Config
@@ -59,16 +77,26 @@ class Client:
     dict_converter: DictConverter = field(init=False, default_factory=DictConverter)
 
     @classmethod
-    def from_service(cls, obj: Type, **kwargs: str) -> "Client":
-        """Instantiate client from a service definition."""
+    def from_service(cls, obj: Type, **kwargs: Any) -> "Client":
+        """Instantiate client from a service class.
+
+        Args:
+            obj: The service class
+            **kwargs: Override the service class properties
+                style: The binding style
+                location: The service endpoint url
+                transport: The transport namespace
+                soap_action: The soap action
+                input: The input class
+                output: The output class
+
+        Returns:
+            A new client instance.
+        """
         return cls(config=Config.from_service(obj, **kwargs))
 
     def send(self, obj: Any, headers: Optional[Dict] = None) -> Any:
-        """
-        Send a request and parse the response according to the service
-        configuration.
-
-        The input object can be a dictionary, or the input type instance directly
+        """Build and send a request for the input object.
 
         >>> params = {"body": {"add": {"int_a": 3, "int_b": 4}}}
         >>> res = client.send(params)
@@ -79,8 +107,12 @@ class Client:
         >>> body=CalculatorSoapAddInput.Body(add=Add(3, 4)))
         >>> res = client.send(req)
 
-        :param obj: a params dictionary or the input type instance
-        :param headers: a dictionary of any additional headers.
+        Args:
+            obj: The request model instance or a pure dictionary
+            headers: Additional headers to pass to the transport
+
+        Returns:
+            The response model instance.
         """
         data = self.prepare_payload(obj)
         headers = self.prepare_headers(headers or {})
@@ -88,13 +120,13 @@ class Client:
         return self.parser.from_bytes(response, self.config.output)
 
     def prepare_headers(self, headers: Dict) -> Dict:
-        """
-        Prepare request headers according to the service configuration.
+        """Prepare the request headers.
 
-        Don't mutate input headers dictionary.
+        It merges the custom user headers with the necessary headers
+        to accommodate the service class configuration.
 
-        :raises ClientValueError: If the service transport type is
-            unsupported.
+        Raises:
+            ClientValueError: If the service transport type is not supported.
         """
         result = headers.copy()
         if self.config.transport == TransportTypes.SOAP:
@@ -108,12 +140,20 @@ class Client:
 
         return result
 
-    def prepare_payload(self, obj: Any) -> Any:
-        """
-        Prepare and serialize payload to be sent.
+    def prepare_payload(self, obj: Any) -> Union[str, bytes]:
+        """Prepare and serialize the payload to be sent.
 
-        :raises ClientValueError: If the config input type doesn't match
-            the given input.
+        If the obj is a pure dictionary, it will be converted
+        first to a request model instance.
+
+        Args:
+            obj: The request model instance or a pure dictionary
+
+        Returns:
+            The serialized request body content as string or bytes.
+
+        Raises:
+            ClientValueError: If the config input type doesn't match the given object.
         """
         if isinstance(obj, Dict):
             obj = self.dict_converter.convert(obj, self.config.input)

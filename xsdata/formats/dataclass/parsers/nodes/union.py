@@ -14,20 +14,20 @@ from xsdata.utils.namespaces import target_uri
 
 
 class UnionNode(XmlNode):
-    """
-    XmlNode for fields with multiple possible types where at least one of them
-    is a dataclass.
+    """XmlNode for union fields with at least one data class.
 
     The node will record all child events and in the end will replay
     them and try to build all possible objects and sort them by score
     before deciding the winner.
 
-    :param var: Class field xml var instance
-    :param attrs: Key-value attribute mapping
-    :param ns_map: Namespace prefix-URI map
-    :param position: The node position of objects cache
-    :param config: Parser configuration
-    :param context: Model context provider
+    Args:
+        var: The xml var instance
+        attrs: The element attributes
+        ns_map: The element namespace prefix-URI map
+        position: The current objects length, everything after
+            this position are considered children of this node.
+        config: The parser config instance
+        context: The xml context instance
     """
 
     __slots__ = (
@@ -60,13 +60,50 @@ class UnionNode(XmlNode):
         self.events: List[Tuple[str, str, Any, Any]] = []
 
     def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
+        """Record the event for the child element.
+
+        This entry point records all events, as it's not possible
+        to detect the target parsed object type just yet. When
+        this node ends, it will replay all events and attempt
+        to find the best matching type for the parsed object.
+
+        Args:
+            qname: The element qualified name
+            attrs: The element attributes
+            ns_map: The element namespace prefix-URI map
+            position: The current length of the intermediate objects
+        """
         self.level += 1
         self.events.append(("start", qname, copy.deepcopy(attrs), ns_map))
         return self
 
     def bind(
-        self, qname: str, text: Optional[str], tail: Optional[str], objects: List
+        self,
+        qname: str,
+        text: Optional[str],
+        tail: Optional[str],
+        objects: List,
     ) -> bool:
+        """Bind the parsed data into an object for the ending element.
+
+        This entry point is called when a xml element ends and is
+        responsible to replay all xml events and parse/bind all
+        the children objects.
+
+        Args:
+            qname: The element qualified name
+            text: The element text content
+            tail: The element tail content
+            objects: The list of intermediate parsed objects
+
+        Returns:
+            Always returns true, if the binding process fails
+            it raises an exception.
+
+        Raises:
+            ParserError: If none of the candidate types matched
+                the replayed events.
+        """
         self.events.append(("end", qname, text, tail))
 
         if self.level > 0:
@@ -98,8 +135,15 @@ class UnionNode(XmlNode):
         raise ParserError(f"Failed to parse union node: {self.var.qname}")
 
     def parse_class(self, clazz: Type[T]) -> Optional[T]:
-        """Initialize a new XmlParser and try to parse the given element, treat
-        converter warnings as errors and return None."""
+        """Replay the recorded events and attempt to build the target class.
+
+        Args:
+            clazz: The target class
+
+        Returns:
+             The target class instance or None if the recorded
+             xml events didn't fit the class.
+        """
         try:
             with warnings.catch_warnings():
                 warnings.filterwarnings("error", category=ConverterWarning)
@@ -112,7 +156,16 @@ class UnionNode(XmlNode):
             return None
 
     def parse_value(self, value: Any, types: List[Type]) -> Any:
-        """Parse simple values, treat warnings as errors and return None."""
+        """Parse simple values.
+
+        Args:
+            value: The xml value
+            types: The list of the candidate simple types
+
+        Returns:
+            The parsed value or None if value didn't match
+            with any of the given types.
+        """
         try:
             with warnings.catch_warnings():
                 warnings.filterwarnings("error", category=ConverterWarning)

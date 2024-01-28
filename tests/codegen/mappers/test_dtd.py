@@ -2,7 +2,7 @@ import sys
 from typing import Iterator
 from unittest import mock
 
-from xsdata.codegen.mappers.dtd import DtdMapper
+from xsdata.codegen.mappers import DtdMapper
 from xsdata.codegen.models import Class, Restrictions
 from xsdata.models.dtd import (
     DtdAttributeDefault,

@@ -15,13 +15,25 @@ from xsdata.models.xsd import (
 from xsdata.utils import collections, text
 from xsdata.utils.namespaces import build_qname, is_default, prefix_exists
 
+ROOT_CLASSES = (SimpleType, ComplexType, Group, AttributeGroup, Element, Attribute)
+
 
 class SchemaMapper:
-    """Map a schema instance to classes, extensions and attributes."""
+    """Map a schema instance to classes.
+
+    This mapper is used to build classes from xsd documents.
+    """
 
     @classmethod
     def map(cls, schema: Schema) -> List[Class]:
-        """Map schema children elements to classes."""
+        """Map schema children elements to classes.
+
+        Args:
+            schema: The schema instance
+
+        Returns:
+            A list of classes.
+        """
         assert schema.location is not None
 
         location = schema.location
@@ -33,19 +45,36 @@ class SchemaMapper:
         ]
 
     @classmethod
-    def root_elements(cls, schema: Schema):
-        """Return all valid schema elements that can be converted to
-        classes."""
+    def root_elements(cls, schema: Schema) -> Iterator[Tuple[str, ElementBase]]:
+        """Return the schema root elements.
+
+        Qualified Elements:
+            - SimpleType
+            - ComplexType
+            - Group
+            - AttributeGroup
+            - Element
+            - Attribute
+
+        Args:
+            schema: The schema instance
+
+        Yields:
+            An iterator of element base instances.
+        """
+
+        def condition(item: ElementBase) -> bool:
+            return isinstance(item, ROOT_CLASSES)
 
         for override in schema.overrides:
-            for child in override.children(condition=cls.is_class):
+            for child in override.children(condition=condition):
                 yield Tag.OVERRIDE, child
 
         for redefine in schema.redefines:
-            for child in redefine.children(condition=cls.is_class):
+            for child in redefine.children(condition=condition):
                 yield Tag.REDEFINE, child
 
-        for child in schema.children(condition=cls.is_class):
+        for child in schema.children(condition=condition):
             yield Tag.SCHEMA, child
 
     @classmethod
@@ -56,7 +85,17 @@ class SchemaMapper:
         location: str,
         target_namespace: Optional[str],
     ) -> Class:
-        """Build and return a class instance."""
+        """Build and return a class instance.
+
+        Args:
+            obj: The element base instance
+            container: The container name
+            location: The schema location
+            target_namespace: The schema target namespace
+
+        Returns:
+            The new class instance.
+        """
         instance = Class(
             qname=build_qname(target_namespace, obj.real_name),
             abstract=obj.is_abstract,
@@ -79,8 +118,19 @@ class SchemaMapper:
 
     @classmethod
     def build_substitutions(
-        cls, obj: ElementBase, target_namespace: Optional[str]
+        cls,
+        obj: ElementBase,
+        target_namespace: Optional[str],
     ) -> List[str]:
+        """Builds a list of qualified substitution group names.
+
+        Args:
+            obj: The element base instance
+            target_namespace: The schema target namespace
+
+        Returns:
+            A list of qualified substitution group names.
+        """
         return [
             build_qname(obj.ns_map.get(prefix, target_namespace), suffix)
             for prefix, suffix in map(text.split, obj.substitutions)
@@ -88,9 +138,12 @@ class SchemaMapper:
 
     @classmethod
     def build_class_attributes(cls, obj: ElementBase, target: Class):
-        """Build the target class attributes from the given ElementBase
-        children."""
+        """Build the target class attrs from the element children.
 
+        Args:
+            obj: The element base instance
+            target: The target class instance
+        """
         base_restrictions = Restrictions.from_element(obj)
         for child, restrictions in cls.element_children(obj, base_restrictions):
             cls.build_class_attribute(target, child, restrictions)
@@ -99,9 +152,12 @@ class SchemaMapper:
 
     @classmethod
     def build_class_extensions(cls, obj: ElementBase, target: Class):
-        """Build the item class extensions from the given ElementBase
-        children."""
+        """Build the target class extensions from the element children.
 
+        Args:
+            obj: The element base instance
+            target: The target class instance
+        """
         restrictions = obj.get_restrictions()
         extensions = [
             cls.build_class_extension(obj.class_name, target, base, restrictions)
@@ -111,10 +167,22 @@ class SchemaMapper:
         target.extensions = collections.unique_sequence(extensions)
 
     @classmethod
-    def build_data_type(
-        cls, target: Class, name: str, forward: bool = False
+    def build_attr_type(
+        cls,
+        target: Class,
+        name: str,
+        forward: bool = False,
     ) -> AttrType:
-        """Create an attribute type for the target class."""
+        """Create a reference attr type for the target class.
+
+        Args:
+            target: The target class instance
+            name: the qualified name of the attr
+            forward: Whether the reference is for an inner class
+
+        Returns:
+            The new attr type instance.
+        """
         prefix, suffix = text.split(name)
         namespace = target.ns_map.get(prefix, target.target_namespace)
         qname = build_qname(namespace, suffix)
@@ -128,11 +196,19 @@ class SchemaMapper:
 
     @classmethod
     def element_children(
-        cls, obj: ElementBase, parent_restrictions: Restrictions
+        cls,
+        obj: ElementBase,
+        parent_restrictions: Restrictions,
     ) -> Iterator[Tuple[ElementBase, Restrictions]]:
-        """Recursively find and return all child elements that are qualified to
-        be class attributes, with all their restrictions."""
+        """Recursively find and return all child elements.
 
+        Args:
+            obj: The element base instance.
+            parent_restrictions: The parent element restrictions instance
+
+        Yields:
+            An iterator of elements and their parent restrictions.
+        """
         for child in obj.children():
             if child.is_property:
                 yield child, parent_restrictions
@@ -143,19 +219,26 @@ class SchemaMapper:
 
     @classmethod
     def element_namespace(
-        cls, obj: ElementBase, target_namespace: Optional[str]
+        cls,
+        obj: ElementBase,
+        target_namespace: Optional[str],
     ) -> Optional[str]:
-        """
-        Return the target namespace for the given schema element.
+        """Return the target namespace for the given schema element.
 
-        In order:
+        Rules:
             - elements/attributes with specific target namespace
             - prefixed elements returns the namespace from schema ns_map
             - qualified elements returns the schema target namespace
             - unqualified elements return an empty string
             - unqualified attributes return None
-        """
 
+        Args:
+            obj: The element base instance
+            target_namespace: The schema target namespace
+
+        Returns:
+            The element real namespace or None if no namespace
+        """
         raw_namespace = obj.raw_namespace
         if raw_namespace:
             return raw_namespace
@@ -176,13 +259,18 @@ class SchemaMapper:
 
     @classmethod
     def children_extensions(
-        cls, obj: ElementBase, target: Class
+        cls,
+        obj: ElementBase,
+        target: Class,
     ) -> Iterator[Extension]:
-        """
-        Recursively find and return all target's Extension classes.
+        """Recursively find and return all target's extension instances.
 
-        If the initial given obj has a type attribute include it in
-        result.
+        Args:
+            obj: The element base instance
+            target: The target class instance
+
+        Yields:
+            An iterator of extension instances.
         """
         for child in obj.children():
             if child.is_property:
@@ -197,11 +285,25 @@ class SchemaMapper:
 
     @classmethod
     def build_class_extension(
-        cls, tag: str, target: Class, name: str, restrictions: Dict
+        cls,
+        tag: str,
+        target: Class,
+        name: str,
+        restrictions: Dict,
     ) -> Extension:
-        """Create an extension for the target class."""
+        """Create a reference extension for the target class.
+
+        Args:
+            tag: The tag name
+            target: The target class instance
+            name: The qualified name of the extension
+            restrictions: A key-value restrictions mapping
+
+        Returns:
+            The new extension instance.
+        """
         return Extension(
-            type=cls.build_data_type(target, name),
+            type=cls.build_attr_type(target, name),
             tag=tag,
             restrictions=Restrictions(**restrictions),
         )
@@ -213,10 +315,15 @@ class SchemaMapper:
         obj: ElementBase,
         parent_restrictions: Restrictions,
     ):
-        """Generate and append an attribute field to the target class."""
+        """Build and append a new attr to the target class.
 
+        Args:
+            target: The target class instance
+            obj: The element base instance to map to an attr
+            parent_restrictions: The parent element restrictions
+        """
         target.ns_map.update(obj.ns_map)
-        types = cls.build_class_attribute_types(target, obj)
+        types = cls.build_attr_types(target, obj)
         restrictions = Restrictions.from_element(obj)
 
         if obj.class_name in (Tag.ELEMENT, Tag.ANY, Tag.GROUP):
@@ -238,13 +345,17 @@ class SchemaMapper:
         )
 
     @classmethod
-    def build_class_attribute_types(
-        cls, target: Class, obj: ElementBase
-    ) -> List[AttrType]:
-        """Convert real type and anonymous inner types to an attribute type
-        list."""
+    def build_attr_types(cls, target: Class, obj: ElementBase) -> List[AttrType]:
+        """Convert the element types and inner types to an attr types.
 
-        types = [cls.build_data_type(target, tp) for tp in obj.attr_types]
+        Args:
+            target: The target class instance
+            obj: The element base instance to extract the types from
+
+        Returns:
+            A list of attr type instances.
+        """
+        types = [cls.build_attr_type(target, tp) for tp in obj.attr_types]
 
         location = target.location
         namespace = target.target_namespace
@@ -253,15 +364,27 @@ class SchemaMapper:
             types.append(AttrType(qname=inner.qname, forward=True))
 
         if len(types) == 0:
-            types.append(cls.build_data_type(target, name=obj.default_type))
+            types.append(cls.build_attr_type(target, name=obj.default_type))
 
         return collections.unique_sequence(types)
 
     @classmethod
     def build_inner_classes(
-        cls, obj: ElementBase, location: str, namespace: Optional[str]
+        cls,
+        obj: ElementBase,
+        location: str,
+        namespace: Optional[str],
     ) -> Iterator[Class]:
-        """Find and convert anonymous types to a class instances."""
+        """Find and convert anonymous types to a class instances.
+
+        Args:
+            obj: The element base instance
+            location: The schema location
+            namespace: The parent element namespace
+
+        Yields:
+            An iterator of class instances.
+        """
         if isinstance(obj, SimpleType) and obj.is_enumeration:
             yield cls.build_class(obj, obj.class_name, location, namespace)
         else:
@@ -273,9 +396,3 @@ class SchemaMapper:
                     yield cls.build_class(child, obj.class_name, location, namespace)
                 else:
                     yield from cls.build_inner_classes(child, location, namespace)
-
-    @classmethod
-    def is_class(cls, item: ElementBase) -> bool:
-        return isinstance(
-            item, (SimpleType, ComplexType, Group, AttributeGroup, Element, Attribute)
-        )

@@ -295,8 +295,8 @@ class ProcessAttributeTypesTests(FactoryTestCase):
         )
         mock_copy_inner_class.assert_has_calls(
             [
-                mock.call(source, target, attr, source.attrs[0].types[0]),
-                mock.call(source, target, attr, source.attrs[0].types[1]),
+                mock.call(source, target, source.attrs[0].types[0]),
+                mock.call(source, target, source.attrs[0].types[1]),
             ]
         )
 

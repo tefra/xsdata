@@ -24,7 +24,7 @@ class TypeMappingTests(TestCase):
 
         json_serializer = JsonSerializer(config=serializer_config)
         xml_serializer = XmlSerializer(config=serializer_config)
-        pycode_serializer = PycodeSerializer(config=serializer_config)
+        pycode_serializer = PycodeSerializer()
 
         for model in (city1, street1, house1):
             json_serializer.render(model)

@@ -9,8 +9,14 @@ from xsdata.utils import collections
 
 
 class ProcessAttributeTypes(RelativeHandlerInterface):
-    """Minimize class attributes complexity by filtering and flattening
-    types."""
+    """Minimize class attrs complexity by filtering and flattening types.
+
+    Args:
+        container: The container instance
+
+    Attributes:
+        dependencies: Class qname dependencies mapping
+    """
 
     __slots__ = "dependencies"
 
@@ -19,13 +25,24 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
         self.dependencies: Dict = {}
 
     def process(self, target: Class):
-        """Process the given class attributes and their types."""
+        """Process the given class attrs and their types.
+
+        Cascades class restrictions to class attrs.
+
+        Args:
+            target: The target class instance
+        """
         for attr in list(target.attrs):
             self.process_types(target, attr)
             self.cascade_properties(target, attr)
 
     def process_types(self, target: Class, attr: Attr):
-        """Process every attr type and filter out duplicates."""
+        """Process every attr type and filter out duplicates.
+
+        Args:
+            target: The target class instance
+            attr: The attr instance
+        """
         if self.container.config.output.ignore_patterns:
             attr.restrictions.pattern = None
 
@@ -36,8 +53,17 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
 
     @classmethod
     def cascade_properties(cls, target: Class, attr: Attr):
-        """Cascade target class default/fixed/nillable properties to the given
-        attr if it's a text node."""
+        """Cascade class properties to the attr if it's a text node.
+
+        Properties:
+            - Default value
+            - Fixed flag
+            - Nillable flag
+
+        Args:
+            target: The target class instance
+            attr: The attr instance
+        """
         if attr.xml_type is None:
             if target.default is not None and attr.default is None:
                 attr.default = target.default
@@ -47,8 +73,18 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
                 attr.restrictions.nillable = True
 
     def process_type(self, target: Class, attr: Attr, attr_type: AttrType):
-        """Process attribute type, split process for xml schema and user
-        defined types."""
+        """Process attr type.
+
+        Cases:
+            - Attr type is a native xsd type
+            - Attr type is a forward reference (inner class)
+            - Attr type is a complex user defined type
+
+        Args:
+            target: The target class instance
+            attr: The attr instance
+            attr_type: The attr type instance
+        """
         if attr_type.native:
             self.process_native_type(attr, attr_type)
         elif attr_type.forward:
@@ -58,11 +94,15 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
 
     @classmethod
     def process_native_type(cls, attr: Attr, attr_type: AttrType):
-        """
-        Process native attribute types.
+        """Process native xsd types.
 
-        - Update restrictions from the datatype
-        - Reset attribute type if there is a pattern restriction
+        Cascade the datatype restrictions to the attr and also
+        resets the type to a simple xsd:string if there is a pattern
+        restriction.
+
+        Args:
+            attr: The attr instance
+            attr_type: The attr type instance
         """
         datatype = attr_type.datatype
 
@@ -74,14 +114,20 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
             cls.reset_attribute_type(attr_type)
 
     def find_dependency(self, attr_type: AttrType, tag: str) -> Optional[Class]:
-        """
-        Find dependency for the given attribute and tag.
+        """Find the source type from the attr type and tag.
 
         Avoid conflicts by selecting any matching type by qname and preferably:
             1. Match the candidate object tag
             2. Match element again complexType
             3. Match non element and complexType
             4. Anything
+
+        Args:
+            attr_type: The attr type instance
+            tag: The xml tag name, e.g. Element, Attribute, ComplexType
+
+        Returns:
+            The source class or None if no match is found
         """
         conditions = (
             lambda obj: obj.tag == tag,
@@ -98,10 +144,14 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
         return None
 
     def process_inner_type(self, target: Class, attr: Attr, attr_type: AttrType):
-        """
-        Process an attributes type that depends on an inner type.
+        """Process an attr type that depends on a simple inner type.
 
-        Ignore inner circular references.
+        Skip If the source class is not simple type, or it's a circular reference.
+
+        Args:
+            target: The target class instance
+            attr: The attr instance
+            attr_type: The attr type instance
         """
         if attr_type.circular:
             return
@@ -112,14 +162,18 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
             target.inner.remove(inner)
 
     def process_dependency_type(self, target: Class, attr: Attr, attr_type: AttrType):
-        """
-        Process an attributes type that depends on any global type.
+        """Process an attr type that depends on any global type.
 
         Strategies:
             1. Reset absent types with a warning
             2. Copy attribute properties from a simple type
             3. Copy format restriction from an enumeration
             4. Set circular flag for the rest
+
+        Args:
+            target: The target class instance
+            attr: The attr instance
+            attr_type: The attr type instance
         """
         source = self.find_dependency(attr_type, attr.tag)
         if not source:
@@ -147,17 +201,25 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
 
     @classmethod
     def copy_attribute_properties(
-        cls, source: Class, target: Class, attr: Attr, attr_type: AttrType
+        cls,
+        source: Class,
+        target: Class,
+        attr: Attr,
+        attr_type: AttrType,
     ):
-        """
-        Replace the given attribute type with the types of the single field
-        source class.
+        """Replace the attr type with the types of the first attr in the source class.
 
         Ignore enumerations and gracefully handle dump types with no
-        attributes.
+        attrs.
 
-        :raises: AnalyzerValueError if the source class has more than
-            one attributes
+        Args:
+            source: The source class instance
+            target: The target class instance
+            attr: The attr instance
+            attr_type: The attr type instance
+
+        Raises:
+            AnalyzerValueError: if the source class has more than one attributes
         """
         source_attr = source.attrs[0]
         index = attr.types.index(attr_type)
@@ -168,7 +230,7 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
             attr.types.insert(index, clone_type)
             index += 1
 
-            ClassUtils.copy_inner_class(source, target, attr, clone_type)
+            ClassUtils.copy_inner_class(source, target, clone_type)
 
         restrictions = source_attr.restrictions.clone()
         restrictions.merge(attr.restrictions)
@@ -186,7 +248,13 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
         attr.default = attr.default or source_attr.default
 
     def set_circular_flag(self, source: Class, target: Class, attr_type: AttrType):
-        """Update circular reference flag."""
+        """Detect circular references and set the type flag.
+
+        Args:
+            source: The source class instance
+            target: The target class instance
+            attr_type: The attr type instance
+        """
         attr_type.reference = id(source)
         attr_type.circular = self.is_circular_dependency(source, target, set())
 
@@ -194,9 +262,16 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
             logger.debug("Possible circular reference %s, %s", target.name, source.name)
 
     def is_circular_dependency(self, source: Class, target: Class, seen: Set) -> bool:
-        """Check if any source dependencies recursively match the target
-        class."""
+        """Check if any source dependencies recursively match the target class.
 
+        Args:
+            source: The source class instance
+            target: The target class instance
+            seen: A set of qualified names, to guard against recursive runs
+
+        Returns:
+            The bool result
+        """
         if source is target or source.status == Status.FLATTENING:
             return True
 
@@ -210,8 +285,14 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
         return False
 
     def cached_dependencies(self, source: Class) -> Tuple[str]:
-        """Returns from cache the source class dependencies as a collection of
-        qualified names."""
+        """Returns from cache the source class dependencies.
+
+        Args:
+            source: The source class instance
+
+        Returns:
+            A tuple containing the qualified names of the class dependencies.
+        """
         cache_key = id(source)
         if cache_key not in self.dependencies:
             self.dependencies[cache_key] = tuple(source.dependencies())
@@ -220,7 +301,15 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
 
     @classmethod
     def reset_attribute_type(cls, attr_type: AttrType, use_str: bool = True):
-        """Reset the attribute type to string or any simple type."""
+        """Reset the attribute type to string or any simple type.
+
+        The method will also unset the circular/forward flags, as native
+        types only depend on python builtin types.
+
+        Args:
+            attr_type: The attr type instance to reset
+            use_str: Whether to use xs:string or xs:anySimpleType
+        """
         attr_type.qname = str(DataType.STRING if use_str else DataType.ANY_SIMPLE_TYPE)
         attr_type.native = True
         attr_type.circular = False
@@ -228,6 +317,16 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
 
     @classmethod
     def update_restrictions(cls, attr: Attr, datatype: DataType):
+        """Helper method to copy the native datatype restriction to the attr.
+
+        Sets:
+            - The format restriction, e.g. hexBinary, base64Binary
+            - The tokens flag for xs:NMTOKENS and xs:IDREFS
+
+        Args:
+            attr: The attr to update
+            datatype: The datatype to extract the restrictions.
+        """
         attr.restrictions.format = datatype.format
 
         if datatype in (DataType.NMTOKENS, DataType.IDREFS):
@@ -235,13 +334,17 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
 
     @classmethod
     def detect_lazy_namespace(cls, source: Class, target: Class, attr: Attr):
-        """
-        Override attr namespace with the source namespace when during the
-        initial mapping the namespace detection wasn't possible.
+        """Set the attr namespace if the current is marked as lazy.
 
-        Case 1: WSDL message part type can be an element, complex or
-        simple type, we can't do the detection during the initial
-        mapping to class objects.
+        Cases:
+            WSDL message part type can be an element, complex or
+            simple type, we can't do the detection during the initial
+            mapping to class objects.
+
+        Args:
+            source: The source class instance
+            target: The target class instance
+            attr: The target class attr instance
         """
         if attr.namespace == "##lazy":
             logger.warning(

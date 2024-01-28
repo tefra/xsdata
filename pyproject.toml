@@ -117,13 +117,17 @@ ignore = [
     "B028",
     "B904",
     "D100",
+    "D104",
     "D107"
+
 ]
 
 isort = { known-first-party = ['xsdata', 'tests'] }
 
 [tool.ruff.lint.per-file-ignores]
 "**/{tests}/*" = ["ANN001", "ANN002", "ANN003", "E501", "B018", "D"]
+"**/utils/testing.py" = ["D"]
+"docs/*" = ["D"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"

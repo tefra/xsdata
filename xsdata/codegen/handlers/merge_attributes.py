@@ -7,17 +7,20 @@ from xsdata.utils import collections
 
 
 class MergeAttributes(HandlerInterface):
-    """Merge same type attributes and their restrictions."""
+    """Merge same type attr and their restrictions."""
 
     __slots__ = ()
 
     @classmethod
     def process(cls, target: Class):
-        """
-        Detect and process duplicate attributes.
+        """Detect and process duplicate attributes.
 
-        - Remove duplicates for enumerations.
-        - Merge duplicates with restrictions and types.
+        Cases:
+            - Enumeration: remove duplicates
+            - Otherwise: merge attrs and
+
+        Args:
+            target: The target class instance
         """
         if target.is_enumeration:
             cls.filter_duplicate_attrs(target)
@@ -26,11 +29,24 @@ class MergeAttributes(HandlerInterface):
 
     @classmethod
     def filter_duplicate_attrs(cls, target: Class):
+        """Removes duplicate attrs.
+
+        Args:
+            target: The target class instance
+        """
         attrs = collections.unique_sequence(target.attrs, key="default")
         target.attrs = attrs
 
     @classmethod
-    def merge_duplicate_attrs(self, target: Class):
+    def merge_duplicate_attrs(cls, target: Class):
+        """Find duplicate attrs and merge them.
+
+        In order for two attrs to be considered duplicates,
+        they must have the same name, namespace and tag.
+
+        Args:
+            target: The target class instance
+        """
         result: List[Attr] = []
         for attr in target.attrs:
             pos = collections.find(result, attr)

@@ -18,13 +18,32 @@ from xsdata.utils.constants import DEFAULT_ATTR_NAME
 
 
 class DtdMapper:
+    """Maps a Dtd instance to a list of class instances."""
+
     @classmethod
     def map(cls, dtd: Dtd) -> Iterator[Class]:
+        """Map the given Dtd instance to a list of classes.
+
+        Args:
+            dtd: The Dtd instance to be mapped
+
+        Yields:
+            An iterator of mapped classes.
+        """
         for element in dtd.elements:
             yield cls.build_class(element, dtd.location)
 
     @classmethod
     def build_class(cls, element: DtdElement, location: str) -> Class:
+        """Build a clas for the given element.
+
+        Args:
+            element: The dtd element to be mapped
+            location: The location of dtd resource
+
+        Returns:
+            The mapped class instance.
+        """
         target = Class(
             qname=element.qname,
             ns_map=element.ns_map,
@@ -39,11 +58,23 @@ class DtdMapper:
 
     @classmethod
     def build_attributes(cls, target: Class, element: DtdElement):
+        """Build attributes from the dtd element attributes.
+
+        Args:
+            target: The target class instance
+            element: The dtd element containing attributes
+        """
         for attribute in element.attributes:
             cls.build_attribute(target, attribute)
 
     @classmethod
     def build_attribute(cls, target: Class, attribute: DtdAttribute):
+        """Build an attr from a dtd attribute.
+
+        Args:
+            target: The target class instance
+            attribute: The dtd attribute to be mapped
+        """
         attr_type = cls.build_attribute_type(target, attribute)
         attr = Attr(
             name=attribute.name,
@@ -61,8 +92,18 @@ class DtdMapper:
 
     @classmethod
     def build_attribute_restrictions(
-        cls, attr: Attr, default: DtdAttributeDefault, default_value: Optional[str]
+        cls,
+        attr: Attr,
+        default: DtdAttributeDefault,
+        default_value: Optional[str],
     ):
+        """Build attribute restrictions based on DtdAttributeDefault.
+
+        Args:
+            attr: The target attr instance
+            default: The default attribute type
+            default_value: The default value
+        """
         attr.restrictions.max_occurs = 1
         if default == DtdAttributeDefault.REQUIRED:
             attr.restrictions.min_occurs = 1
@@ -80,6 +121,15 @@ class DtdMapper:
 
     @classmethod
     def build_attribute_type(cls, target: Class, attribute: DtdAttribute) -> AttrType:
+        """Build attribute type based on the dtd attribute.
+
+        Args:
+            target: The target class instance
+            attribute: The dtd attribute to be mapped
+
+        Returns:
+            The mapped attr type instance.
+        """
         if attribute.type == DtdAttributeType.ENUMERATION:
             cls.build_enumeration(target, attribute.name, attribute.values)
             return AttrType(qname=attribute.name, forward=True)
@@ -88,7 +138,12 @@ class DtdMapper:
 
     @classmethod
     def build_elements(cls, target: Class, element: DtdElement):
-        # "undefined", "empty", "any", "mixed", or "element";
+        """Build attrs from the dtd element.
+
+        Args:
+            target: The target class instance
+            element: The dtd containing elements.
+        """
         if element.type == DtdElementType.ELEMENT and element.content:
             cls.build_content(target, element.content)
         elif element.type == DtdElementType.MIXED and element.content:
@@ -98,6 +153,12 @@ class DtdMapper:
 
     @classmethod
     def build_mixed_content(cls, target: Class, content: DtdContent):
+        """Mark class to support mixed content.
+
+        Args:
+            target: The target class instance
+            content: The dtd content instance
+        """
         if content.left and content.left.type == DtdContentType.PCDATA:
             target.mixed = True
             content.left = None
@@ -110,6 +171,12 @@ class DtdMapper:
 
     @classmethod
     def build_extension(cls, target: Class, data_type: DataType):
+        """Add a xsd native type as class extension.
+
+        Args:
+            target: The target class instance
+            data_type: The data type instance
+        """
         ext_type = AttrType(qname=str(data_type), native=True)
         extension = Extension(
             tag=Tag.EXTENSION, type=ext_type, restrictions=Restrictions()
@@ -118,6 +185,13 @@ class DtdMapper:
 
     @classmethod
     def build_content(cls, target: Class, content: DtdContent, **kwargs: Any):
+        """Build class content.
+
+        Args:
+            target: The target class instance
+            content: The dtd content instance.
+            **kwargs: Additional restriction arguments.
+        """
         content_type = content.type
         if content_type == DtdContentType.ELEMENT:
             restrictions = cls.build_restrictions(content.occur, **kwargs)
@@ -140,6 +214,13 @@ class DtdMapper:
 
     @classmethod
     def build_content_tree(cls, target: Class, content: DtdContent, **kwargs: Any):
+        """Build the class content tree.
+
+        Args:
+            target: The target class instance
+            content: The dtd content instance
+            **kwargs: Additional restriction arguments
+        """
         if content.left:
             cls.build_content(target, content.left, **kwargs)
 
@@ -148,6 +229,14 @@ class DtdMapper:
 
     @classmethod
     def build_occurs(cls, occur: DtdContentOccur) -> Dict:
+        """Calculate min/max occurs from the dtd content occur instance.
+
+        Args:
+            occur: The dtd content occur instance.
+
+        Returns:
+            The min/max occurs restrictions dictionary
+        """
         if occur == DtdContentOccur.ONCE:
             min_occurs = 1
             max_occurs = 1
@@ -168,6 +257,15 @@ class DtdMapper:
 
     @classmethod
     def build_restrictions(cls, occur: DtdContentOccur, **kwargs: Any) -> Restrictions:
+        """Map the dtd content occur instance to a restriction instance.
+
+        Args:
+            occur: The DtdContentOccur to be mapped
+            **kwargs: Additional restriction arguments
+
+        Returns:
+            The mapped restrictions instance.
+        """
         params = cls.build_occurs(occur)
         params.update(kwargs)
 
@@ -175,6 +273,13 @@ class DtdMapper:
 
     @classmethod
     def build_element(cls, target: Class, name: str, restrictions: Restrictions):
+        """Build an element attr for the target class instance.
+
+        Args:
+            target: The target class instance
+            name: The attr name
+            restrictions: The attr restrictions
+        """
         types = AttrType(qname=name, native=False)
         attr = Attr(
             name=name, tag=Tag.ELEMENT, types=[types], restrictions=restrictions.clone()
@@ -184,6 +289,12 @@ class DtdMapper:
 
     @classmethod
     def build_value(cls, target: Class, restrictions: Restrictions):
+        """Build a value attr for the target class instance.
+
+        Args:
+            target: The target class instance
+            restrictions: The attr restrictions
+        """
         types = AttrType(qname=str(DataType.STRING), native=True)
         attr = Attr(
             name=DEFAULT_ATTR_NAME,
@@ -196,6 +307,13 @@ class DtdMapper:
 
     @classmethod
     def build_enumeration(cls, target: Class, name: str, values: List[str]):
+        """Build a nested enumeration class from the given values list.
+
+        Args:
+            target: The target class instance
+            name: The attr/enum class name
+            values: The enumeration values
+        """
         inner = Class(qname=name, tag=Tag.SIMPLE_TYPE, location=target.location)
         attr_type = AttrType(qname=str(DataType.STRING), native=True)
 

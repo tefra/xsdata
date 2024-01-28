@@ -173,9 +173,9 @@ class ClassUtilsTests(FactoryTestCase):
 
         mock_copy_inner_class.assert_has_calls(
             [
-                mock.call(source, target, attr, attr.types[0]),
-                mock.call(source, target, attr, attr.types[1]),
-                mock.call(source, target, attr, attr.types[2]),
+                mock.call(source, target, attr.types[0]),
+                mock.call(source, target, attr.types[1]),
+                mock.call(source, target, attr.types[2]),
             ]
         )
 
@@ -185,11 +185,10 @@ class ClassUtilsTests(FactoryTestCase):
             qname="a", module="b", package="c", status=Status.FLATTENED
         )
         target = ClassFactory.create()
-        attr = AttrFactory.create()
         attr_type = AttrTypeFactory.create(forward=True, qname=inner.qname)
 
         source.inner.append(inner)
-        ClassUtils.copy_inner_class(source, target, attr, attr_type)
+        ClassUtils.copy_inner_class(source, target, attr_type)
 
         self.assertEqual(1, len(target.inner))
         self.assertIsNot(inner, target.inner[0])
@@ -202,22 +201,20 @@ class ClassUtilsTests(FactoryTestCase):
     def test_copy_inner_class_check_circular_reference(self):
         source = ClassFactory.create()
         target = ClassFactory.create()
-        attr = AttrFactory.create()
         attr_type = AttrTypeFactory.create(forward=True, qname=target.qname)
         source.inner.append(target)
 
-        ClassUtils.copy_inner_class(source, target, attr, attr_type)
+        ClassUtils.copy_inner_class(source, target, attr_type)
         self.assertTrue(attr_type.circular)
         self.assertEqual(0, len(target.inner))
 
     def test_copy_inner_class_with_missing_inner(self):
         source = ClassFactory.create()
         target = ClassFactory.create()
-        attr = AttrFactory.create()
         attr_type = AttrTypeFactory.create(forward=True, qname=target.qname)
 
         with self.assertRaises(CodeGenerationError):
-            ClassUtils.copy_inner_class(source, target, attr, attr_type)
+            ClassUtils.copy_inner_class(source, target, attr_type)
 
     def test_find_inner(self):
         obj = ClassFactory.create(qname="{a}parent")

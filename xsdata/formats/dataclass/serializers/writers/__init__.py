@@ -7,12 +7,18 @@ try:
     from xsdata.formats.dataclass.serializers.writers.lxml import LxmlEventWriter
 
     def default_writer() -> Type[XmlWriter]:
+        """Return the default xml writer."""
         return LxmlEventWriter
 
 except ImportError:  # pragma: no cover
 
     def default_writer() -> Type[XmlWriter]:
+        """Return the default xml writer."""
         return XmlEventWriter
 
 
-__all__ = ["LxmlEventWriter", "XmlEventWriter", "default_writer"]
+__all__ = [
+    "LxmlEventWriter",
+    "XmlEventWriter",
+    "default_writer",
+]

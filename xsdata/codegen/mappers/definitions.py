@@ -20,8 +20,7 @@ from xsdata.utils import collections, namespaces, text
 
 
 class DefinitionsMapper:
-    """
-    Map a definitions instance to message and service classes.
+    """Map a definitions instance to message and service classes.
 
     Currently, only SOAP 1.1 bindings with rpc/document style is
     supported.
@@ -29,7 +28,17 @@ class DefinitionsMapper:
 
     @classmethod
     def map(cls, definitions: Definitions) -> List[Class]:
-        """Step 1: Main mapper entry point."""
+        """Main entrypoint for this mapper.
+
+        Iterates over their services and their ports and build
+        the binding and service classes.
+
+        Args:
+            definitions: The definitions instance to map.
+
+        Returns:
+            The generated class instances
+        """
         return [
             obj
             for service in definitions.services
@@ -39,9 +48,18 @@ class DefinitionsMapper:
 
     @classmethod
     def map_port(cls, definitions: Definitions, port: ServicePort) -> Iterator[Class]:
-        """Step 2: Match a ServicePort to a Binding and PortType object and
-        delegate the process to the next entry point."""
+        """Map a service port into binding and service classes.
 
+        Match a ServicePort to a Binding and PortType object and
+        delegate the process to the next entry point.
+
+        Args:
+            definitions: The definitions instance
+            port: The service port instance
+
+        Yields:
+            An iterator of class instances.
+        """
         binding = definitions.find_binding(text.suffix(port.binding))
         port_type = definitions.find_port_type(text.suffix(binding.type))
 
@@ -58,8 +76,20 @@ class DefinitionsMapper:
         port_type: PortType,
         config: Dict,
     ) -> Iterator[Class]:
-        """Step 3: Match every BindingOperation to a PortTypeOperation and
-        delegate the process for each operation to the next entry point."""
+        """Map binding operations into binding and service classes.
+
+        Match every BindingOperation to a PortTypeOperation and
+        delegate the process for each operation to the next entry point.
+
+        Args:
+            definitions: The definitions instance
+            binding: The binding instance
+            port_type: The port type instance
+            config: Configuration dictionary
+
+        Yields:
+            An iterator of class instances.
+        """
         for operation in binding.unique_operations():
             cfg = config.copy()
             cfg.update(cls.attributes(operation.extended_elements))
@@ -78,9 +108,21 @@ class DefinitionsMapper:
         config: Dict,
         name: str,
     ) -> Iterator[Class]:
-        """Step 4: Convert a BindingOperation to a service class and delegate
-        the process of all the message classes to the next entry point."""
+        """Map a binding operation to a service and binding classes.
 
+        Convert a BindingOperation to a service class and delegate
+        the process of all the message classes to the next entry point.
+
+        Args:
+            definitions: The definitions instance
+            binding_operation: The binding operation instance
+            port_type_operation: The port type operation instance
+            config: Configuration dictionary
+            name: The operation name
+
+        Yields:
+            An iterator of class instances.
+        """
         attrs = [
             cls.build_attr(key, str(DataType.STRING), native=True, default=config[key])
             for key in sorted(config.keys(), key=len)
@@ -91,7 +133,12 @@ class DefinitionsMapper:
         name = f"{name}_{binding_operation.name}"
         namespace = cls.operation_namespace(config)
         operation_messages = cls.map_binding_operation_messages(
-            definitions, binding_operation, port_type_operation, name, style, namespace
+            definitions,
+            binding_operation,
+            port_type_operation,
+            name,
+            style,
+            namespace,
         )
         for message_class in operation_messages:
             yield message_class
@@ -115,24 +162,40 @@ class DefinitionsMapper:
     def map_binding_operation_messages(
         cls,
         definitions: Definitions,
-        operation: BindingOperation,
+        binding_operation: BindingOperation,
         port_type_operation: PortTypeOperation,
         name: str,
         style: str,
         namespace: Optional[str],
     ) -> Iterator[Class]:
-        """Step 5: Map the BindingOperation messages to classes."""
+        """Map the binding operation messages to binding classes.
 
+        Args:
+            definitions: The definitions instance
+            binding_operation: The binding operation instance
+            port_type_operation: The port type operation instance
+            name: The operation name
+            style: The operation style
+            namespace: The operation namespace
+
+        Yields:
+            An iterator of class instances.
+        """
         messages: List[Tuple[str, BindingMessage, PortTypeMessage, Optional[str]]] = []
 
-        if operation.input:
+        if binding_operation.input:
             messages.append(
-                ("input", operation.input, port_type_operation.input, operation.name)
+                (
+                    "input",
+                    binding_operation.input,
+                    port_type_operation.input,
+                    binding_operation.name,
+                )
             )
 
-        if operation.output:
+        if binding_operation.output:
             messages.append(
-                ("output", operation.output, port_type_operation.output, None)
+                ("output", binding_operation.output, port_type_operation.output, None)
             )
 
         for suffix, binding_message, port_type_message, operation_name in messages:
@@ -161,7 +224,13 @@ class DefinitionsMapper:
         port_type_operation: PortTypeOperation,
         target: Class,
     ):
-        """Build inner fault class with default fields."""
+        """Add an inner message fault class with default fields.
+
+        Args:
+            definitions: The definitions instance
+            port_type_operation: The port type operation instance
+            target: The target class instance
+        """
         ns_map: Dict = {}
         body = next(inner for inner in target.inner if inner.name == "Body")
         fault_class = cls.build_inner_class(body, "Fault", target.namespace)
@@ -197,9 +266,21 @@ class DefinitionsMapper:
         namespace: Optional[str],
         operation: Optional[str],
     ) -> Class:
-        """Step 6.1: Build Envelope class for the given binding message with
-        attributes from the port type message."""
+        """Map the binding message to an envelope class.
 
+        Args:
+            definitions: The definitions instance
+            binding_message: The port type message instance
+            port_type_message: The port type message instance
+            name: The class name
+            style: The operation style e.g. rpc
+            namespace: The operation namespace
+            operation: The custom operation name, if it's empty
+                the message name will be used instead
+
+        Returns:
+            The class instance.
+        """
         assert binding_message.location is not None
 
         target = Class(
@@ -233,10 +314,19 @@ class DefinitionsMapper:
 
     @classmethod
     def build_message_class(
-        cls, definitions: Definitions, port_type_message: PortTypeMessage
+        cls,
+        definitions: Definitions,
+        port_type_message: PortTypeMessage,
     ) -> Class:
-        """Step 6.2: Build the input/output message class of an rpc style
-        operation."""
+        """Map the input/output message of a rpc style operation.
+
+        Args:
+            definitions: The definitions instance
+            port_type_message: The port type message instance
+
+        Returns:
+            The class instance.
+        """
         prefix, name = text.split(port_type_message.message)
 
         definition_message = definitions.find_message(name)
@@ -259,12 +349,18 @@ class DefinitionsMapper:
     def build_inner_class(
         cls, target: Class, name: str, namespace: Optional[str] = None
     ) -> Class:
-        """
-        Build or retrieve an inner class for the given target class by the
-        given name.
+        """Build or retrieve an inner class.
 
         This helper will also create a forward reference attribute for
         the parent class.
+
+        Args:
+            target: The parent class instance
+            name: The inner class name
+            namespace: The inner class namespace
+
+        Returns:
+            The inner class instance.
         """
         inner = collections.first(inner for inner in target.inner if inner.name == name)
         if not inner:
@@ -288,7 +384,17 @@ class DefinitionsMapper:
         message: PortTypeMessage,
         namespace: Optional[str],
     ) -> Iterator[Attr]:
-        """Build an attribute for the given port type message."""
+        """Build an attribute for the given port type message.
+
+        Args:
+            operation: The operation name, use the message name
+                if it's empty
+            message: The port type message instance
+            namespace: The operation namespace
+
+        Yields:
+            An iterator of class attrs.
+        """
         prefix, name = text.split(message.message)
         source_namespace = message.ns_map.get(prefix)
 
@@ -305,8 +411,17 @@ class DefinitionsMapper:
     def map_binding_message_parts(
         cls, definitions: Definitions, message: str, extended: AnyElement, ns_map: Dict
     ) -> Iterator[Attr]:
-        """Find a Message instance and map its parts to attributes according to
-        the extensible element.."""
+        """Find a Message instance and map its parts to attrs.
+
+        Args:
+            definitions: The definitions instance
+            message: The message qualified name
+            extended: The related extended element
+            ns_map: The namespace prefix-URI map
+
+        Yields:
+            An iterator of class attrs.
+        """
         parts = []
         if "part" in extended.attributes:
             parts.append(extended.attributes["part"])
@@ -328,11 +443,14 @@ class DefinitionsMapper:
 
     @classmethod
     def build_parts_attributes(cls, parts: List[Part], ns_map: Dict) -> Iterator[Attr]:
-        """
-        Build attributes for the given list of parts.
+        """Build attributes for the given list of parts.
 
-        :param parts: List of parts
-        :param ns_map: Namespace prefix-URI map
+        Args:
+            parts: A list of part instances
+            ns_map: The namespace prefix-URI map
+
+        Yields:
+            An iterator of class attrs.
         """
         for part in parts:
             if part.element:
@@ -357,6 +475,14 @@ class DefinitionsMapper:
 
     @classmethod
     def operation_namespace(cls, config: Dict) -> Optional[str]:
+        """Return the operation namespace by the operation transport.
+
+        Args:
+            config: The operation configuration
+
+        Returns:
+            The operation namespace string or None if transport is not soap.
+        """
         transport = config.get("transport")
         namespace = None
         if transport == "http://schemas.xmlsoap.org/soap/http":
@@ -366,7 +492,14 @@ class DefinitionsMapper:
 
     @classmethod
     def attributes(cls, elements: Iterator[AnyElement]) -> Dict:
-        """Return all attributes from all extended elements as a dictionary."""
+        """Return all attributes from all extended elements as a dictionary.
+
+        Args:
+            elements: An iterator of generic elements
+
+        Returns:
+            A key-value mapping of the xml attributes.
+        """
         return {
             namespaces.local_name(qname): value
             for element in elements
@@ -384,7 +517,19 @@ class DefinitionsMapper:
         namespace: Optional[str] = None,
         default: Optional[str] = None,
     ) -> Attr:
-        """Builder method for attributes."""
+        """Helper method to build an attr instance.
+
+        Args:
+            name: The attr name
+            qname: The attr qualified name
+            native: Whether the type is native
+            forward: Whether the type is a forward reference
+            namespace: The attr namespace
+            default: The attr default value
+
+        Returns:
+            The new attr instance.
+        """
         occurs = 1 if default is not None else None
         if native:
             namespace = ""

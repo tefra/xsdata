@@ -8,15 +8,14 @@ from xsdata.utils.namespaces import build_qname
 
 
 class VacuumInnerClasses(HandlerInterface):
-    """
-    Cleanup nested classes.
+    """Cleanup nested classes.
 
     Search and vacuum inner classes with no attributes or a single extension or
     rename inner classes that have the same name as the outer/parent class.
 
     Cases:
         1. Filter duplicate inner classes
-        2. Removing identical overriding fields can some times leave a class
+        2. Removing identical overriding fields can sometimes leave a class
            bare with just an extension. For inner classes we can safely
            replace the forward reference with the inner extension reference.
         3. Empty nested complexContent with no restrictions or extensions,
@@ -26,6 +25,11 @@ class VacuumInnerClasses(HandlerInterface):
     __slots__ = ()
 
     def process(self, target: Class):
+        """Process entrypoint for classes.
+
+        Args:
+            target: The target class instance
+        """
         target.inner = collections.unique_sequence(target.inner, key="qname")
         for inner in list(target.inner):
             if not inner.attrs and len(inner.extensions) < 2:
@@ -35,6 +39,12 @@ class VacuumInnerClasses(HandlerInterface):
 
     @classmethod
     def remove_inner(cls, target: Class, inner: Class):
+        """Remove inner class and update the target class attrs.
+
+        Args:
+            target: The target class instance
+            inner: The nested class instance
+        """
         target.inner.remove(inner)
 
         for attr_type in cls.find_attr_types(target, inner.qname):
@@ -53,6 +63,14 @@ class VacuumInnerClasses(HandlerInterface):
 
     @classmethod
     def rename_inner(cls, target: Class, inner: Class):
+        """Rename the inner class and update the target class attrs.
+
+        The inner class will get the `Inner suffix`.
+
+        Args:
+            target: The target class instance
+            inner: The nested class instance
+        """
         namespace = inner.target_namespace
         old_qname = inner.qname
         inner.qname = build_qname(namespace, f"{inner.name}_Inner")
@@ -62,6 +80,12 @@ class VacuumInnerClasses(HandlerInterface):
 
     @classmethod
     def find_attr_types(cls, target: Class, qname: str) -> Iterator[AttrType]:
+        """Find attr and choice types by the qualified name.
+
+        Args:
+            target: The target class instance
+            qname: The qualified name
+        """
         for attr in target.attrs:
             for attr_type in attr.types:
                 if attr_type.forward and attr_type.qname == qname:

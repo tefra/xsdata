@@ -1,4 +1,4 @@
-from typing import Any, Iterable
+from typing import Any, Iterable, Tuple
 
 from lxml import etree
 
@@ -10,28 +10,17 @@ EVENTS = (EventType.START, EventType.END, EventType.START_NS)
 
 
 class LxmlEventHandler(XmlHandler):
-    """
-    Event handler based on :class:`lxml.etree.iterparse` api.
-
-    :param parser: The parser instance to feed with events
-    :param clazz: The target binding model, auto located if omitted.
-    """
-
-    __slots__ = ()
+    """An lxml event handler."""
 
     def parse(self, source: Any) -> Any:
-        """
-        Parse an XML document from a system identifier or an InputSource or
-        directly from a lxml Element or Tree.
+        """Parse the source XML document.
 
-        When Source is a lxml Element or Tree the handler will switch to
-        the :class:`lxml.etree.iterwalk` api.
+        Args:
+            source: The xml source, can be a file resource or an input stream,
+                or a lxml tree/element.
 
-        When source is a system identifier or an InputSource the parser
-        will ignore comments and recover from errors.
-
-        When config process_xinclude is enabled the handler will parse
-        the whole document and then walk down the element tree.
+        Returns:
+            An instance of the class type representing the parsed content.
         """
         if isinstance(source, (etree._ElementTree, etree._Element)):
             ctx = etree.iterwalk(source, EVENTS)
@@ -50,8 +39,15 @@ class LxmlEventHandler(XmlHandler):
 
         return self.process_context(ctx)
 
-    def process_context(self, context: Iterable) -> Any:
-        """Iterate context and push the events to main parser."""
+    def process_context(self, context: Iterable[Tuple[str, Any]]) -> Any:
+        """Iterate context and push events to main parser.
+
+        Args:
+            context: The iterable lxml context
+
+        Returns:
+            An instance of the class type representing the parsed content.
+        """
         for event, element in context:
             if event == EventType.START:
                 self.parser.start(

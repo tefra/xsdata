@@ -8,7 +8,6 @@ from typing import (
     Iterator,
     List,
     Mapping,
-    NamedTuple,
     Optional,
     Sequence,
     Set,
@@ -28,17 +27,58 @@ from xsdata.utils.constants import EMPTY_SEQUENCE, return_input
 from xsdata.utils.namespaces import build_qname
 
 
-class ClassMeta(NamedTuple):
-    element_name_generator: Callable
-    attribute_name_generator: Callable
-    qname: str
-    local_name: str
-    nillable: bool
-    namespace: Optional[str]
-    target_qname: Optional[str]
+class ClassMeta:
+    """The binding model combined metadata.
+
+    Args:
+        element_name_generator: The element name generator
+        attribute_name_generator: The attribute name generator
+        qname: The namespace qualified name of the class
+        local_name: The name of the element this class represents
+        nillable: Specifies whether this class supports nillable content
+        namespace: The class namespace
+        target_qname: The class target namespace qualified name
+    """
+
+    __slots__ = (
+        "element_name_generator",
+        "attribute_name_generator",
+        "qname",
+        "local_name",
+        "nillable",
+        "namespace",
+        "target_qname",
+    )
+
+    def __init__(
+        self,
+        element_name_generator: Callable,
+        attribute_name_generator: Callable,
+        qname: str,
+        local_name: str,
+        nillable: bool,
+        namespace: Optional[str],
+        target_qname: Optional[str],
+    ):
+        self.element_name_generator = element_name_generator
+        self.attribute_name_generator = attribute_name_generator
+        self.qname = qname
+        self.local_name = local_name
+        self.nillable = nillable
+        self.namespace = namespace
+        self.target_qname = target_qname
 
 
 class XmlMetaBuilder:
+    """Binding class metadata builder.
+
+    Args:
+        class_type: The supported class type, e.g. dataclass, attr, pydantic
+        element_name_generator: The default element name generator
+        attribute_name_generator: The default attribute name generator
+        globalns: The global namespace
+    """
+
     __slots__ = (
         "class_type",
         "element_name_generator",
@@ -59,7 +99,15 @@ class XmlMetaBuilder:
         self.globalns = globalns
 
     def build(self, clazz: Type, parent_namespace: Optional[str]) -> XmlMeta:
-        """Build the binding metadata for a dataclass and its fields."""
+        """Build the binding metadata for a dataclass and its fields.
+
+        Args:
+            clazz: The target class
+            parent_namespace: The parent class namespace
+
+        Returns:
+            The binding metadata instance.
+        """
         self.class_type.verify_model(clazz)
 
         meta = self.build_class_meta(clazz, parent_namespace)
@@ -114,8 +162,18 @@ class XmlMetaBuilder:
         namespace: Optional[str],
         element_name_generator: Callable,
         attribute_name_generator: Callable,
-    ):
-        """Build the binding metadata for the given dataclass fields."""
+    ) -> Iterator[XmlVar]:
+        """Build the binding metadata for the given dataclass fields.
+
+        Args:
+            clazz: The target class
+            namespace: The target class namespace
+            element_name_generator: The class element name generator
+            attribute_name_generator: The class attribute name generator
+
+        Yields:
+            An iterator of the field binding metadata instances.
+        """
         type_hints = get_type_hints(clazz, globalns=self.globalns)
         builder = XmlVarBuilder(
             class_type=self.class_type,
@@ -144,12 +202,20 @@ class XmlMetaBuilder:
                 yield var
 
     def build_class_meta(
-        self, clazz: Type, parent_namespace: Optional[str] = None
+        self,
+        clazz: Type,
+        parent_namespace: Optional[str] = None,
     ) -> ClassMeta:
-        """
-        Fetch the class meta options and merge defaults.
+        """Build the class meta options and merge with the defaults.
 
-        Metaclass is not inheritable
+        The class metaclass is not inheritable.
+
+        Args:
+            clazz: The target class
+            parent_namespace: The parent class namespace
+
+        Returns:
+            A class meta instance.
         """
         meta = clazz.Meta if "Meta" in clazz.__dict__ else None
         element_name_generator = getattr(
@@ -184,6 +250,10 @@ class XmlMetaBuilder:
 
     @classmethod
     def find_declared_class(cls, clazz: Type, name: str) -> Type:
+        """Find the user class that matches the name.
+
+        Todo: Honestly I have no idea why we needed this.
+        """
         for base in clazz.__mro__:
             ann = base.__dict__.get("__annotations__")
             if ann and name in ann:
@@ -210,8 +280,14 @@ class XmlMetaBuilder:
         return getattr(meta, "namespace", None)
 
     def default_xml_type(self, clazz: Type) -> str:
-        """Return the default xml type for the fields of the given dataclass
-        with an undefined type."""
+        """Return the default xml type for the fields of the given dataclass.
+
+        If a class has fields with no xml type defined, attempt
+        to figure it from the rest of the fields. It's either
+        a text or an element field.
+
+        # Todo hacks like this are so unnecessary...
+        """
         counters: Dict[str, int] = defaultdict(int)
         for var in self.class_type.get_fields(clazz):
             xml_type = var.metadata.get("type")
@@ -229,6 +305,18 @@ class XmlMetaBuilder:
 
 
 class XmlVarBuilder:
+    """Binding class field metadata builder.
+
+    Args:
+        class_type: The supported class type, e.g. dataclass, attr, pydantic
+        default_xml_type: The default xml type of this class fields
+        element_name_generator: The element name generator
+        attribute_name_generator: The attribute name generator
+
+    Attributes:
+        index: The index of the next var
+    """
+
     __slots__ = (
         "index",
         "class_type",
@@ -261,7 +349,21 @@ class XmlVarBuilder:
         globalns: Any,
         factory: Optional[Callable] = None,
     ) -> Optional[XmlVar]:
-        """Build the binding metadata for a dataclass field."""
+        """Build the binding metadata for a class field.
+
+        Args:
+            name: The field name
+            type_hint: The typing annotations of the field
+            metadata: The field metadata mapping
+            init: Specify whether this field can be initialized
+            parent_namespace: The class namespace
+            default_value: The field default value or factory
+            globalns: Python's global namespace
+            factory: The value factory
+
+        Returns:
+            The field binding metadata instance.
+        """
         xml_type = metadata.get("type", self.default_xml_type)
         if xml_type == XmlType.IGNORE:
             return None
@@ -292,7 +394,7 @@ class XmlVarBuilder:
                 f"a wrapper requires a collection type on attribute {name}"
             )
 
-        local_name = self.build_local_name(xml_type, local_name, name)
+        local_name = local_name or self.build_local_name(xml_type, name)
 
         if tokens and sub_origin is None:
             sub_origin = origin
@@ -354,7 +456,18 @@ class XmlVarBuilder:
         globalns: Any,
         parent_namespace: Optional[str],
     ) -> Iterator[XmlVar]:
-        """Build the binding metadata for a compound dataclass field."""
+        """Build the binding metadata for a compound dataclass field.
+
+        Args:
+            name: The compound field name
+            choices: The list of choice metadata
+            factory: The compound field values factory
+            globalns: Python's global namespace
+            parent_namespace: The class namespace
+
+        Yields:
+            An iterator of field choice binding metadata instance.
+        """
         existing_types: Set[type] = set()
 
         for choice in choices:
@@ -390,18 +503,20 @@ class XmlVarBuilder:
 
             yield var
 
-    def build_local_name(
-        self, xml_type: str, local_name: Optional[str], name: str
-    ) -> str:
-        """Build a local name based on the field name and xml type if it's not
-        set."""
-        if not local_name:
-            if xml_type == XmlType.ATTRIBUTE:
-                return self.attribute_name_generator(name)
+    def build_local_name(self, xml_type: str, name: str) -> str:
+        """Transform the name for serialization by the target xml type.
 
-            return self.element_name_generator(name)
+        Args:
+            xml_type: The xml type: element, attribute, ...
+            name: The field name
 
-        return local_name
+        Returns:
+            The name to use for serialization.
+        """
+        if xml_type == XmlType.ATTRIBUTE:
+            return self.attribute_name_generator(name)
+
+        return self.element_name_generator(name)
 
     @classmethod
     def resolve_namespaces(
@@ -410,9 +525,7 @@ class XmlVarBuilder:
         namespace: Optional[str],
         parent_namespace: Optional[str],
     ) -> Tuple[str, ...]:
-        """
-        Resolve the namespace(s) for the given xml type and the parent
-        namespace.
+        """Resolve a fields supported namespaces.
 
         Only elements and wildcards are allowed to inherit the parent
         namespace if the given namespace is empty.
@@ -420,10 +533,13 @@ class XmlVarBuilder:
         In case of wildcard try to decode the ##any, ##other, ##local,
         ##target.
 
-        :param xml_type: The xml type
-            (Text|Element(s)|Attribute(s)|Wildcard)
-        :param namespace: The field namespace
-        :param parent_namespace: The parent namespace
+        Args:
+            xml_type: The xml type (Text|Element(s)|Attribute(s)|Wildcard)
+            namespace: The field namespace
+            parent_namespace: The parent namespace
+
+        Returns:
+            A tuple of supported namespaces.
         """
         if xml_type in (XmlType.ELEMENT, XmlType.WILDCARD) and namespace is None:
             namespace = parent_namespace
@@ -446,12 +562,15 @@ class XmlVarBuilder:
 
     @classmethod
     def default_namespace(cls, namespaces: Sequence[str]) -> Optional[str]:
-        """
-        Return the first valid namespace uri or None.
+        """Return the first valid namespace uri or None.
 
-        :param namespaces: A list of namespace options which may include
-            valid uri(s) or one of the ##any, ##other,
-            ##targetNamespace, ##local
+        Args:
+            namespaces: A list of namespace options which may include
+                valid uri(s) or a placeholder e.g. ##any, ##other,
+                ##targetNamespace, ##local
+
+        Returns:
+            A namespace uri or None if there isn't any.
         """
         for namespace in namespaces:
             if namespace and not namespace.startswith("#"):
@@ -461,7 +580,7 @@ class XmlVarBuilder:
 
     @classmethod
     def is_any_type(cls, types: Sequence[Type], xml_type: str) -> bool:
-        """Return whether the given xml type supports derived values."""
+        """Return whether the given xml type supports generic values."""
         if xml_type in (XmlType.ELEMENT, XmlType.ELEMENTS):
             return object in types
 
@@ -471,15 +590,15 @@ class XmlVarBuilder:
     def analyze_types(
         cls, type_hint: Any, globalns: Any
     ) -> Tuple[Any, Any, Tuple[Type, ...]]:
-        """
-        Analyze a type hint and return the origin, sub origin and the type
-        args.
+        """Analyze a type hint and return the origin, sub origin and the type args.
 
         The only case we support a sub origin is for fields derived from
         xs:NMTOKENS!
 
-        :raises XmlContextError: if the typing is not supported for
-            binding
+        # Todo please rewrite this in a way that makes sense :(
+
+        Raises:
+            XmlContextError: if the typing is not supported for binding
         """
         try:
             types = evaluate(type_hint, globalns)
@@ -510,7 +629,6 @@ class XmlVarBuilder:
         init: bool,
     ) -> bool:
         """Validate the given xml type against common unsupported cases."""
-
         if not init:
             # Ignore init==false vars
             return True
@@ -531,7 +649,7 @@ class XmlVarBuilder:
         return self.is_typing_supported(types)
 
     def is_typing_supported(self, types: Sequence[Type]) -> bool:
-        # Validate all types are registered in the converter.
+        """Validate all types are registered in the converter."""
         for tp in types:
             if (
                 not self.class_type.is_model(tp)

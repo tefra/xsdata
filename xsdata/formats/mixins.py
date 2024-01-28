@@ -12,12 +12,12 @@ from xsdata.utils.package import module_path, package_path
 
 
 class GeneratorResult(NamedTuple):
-    """
-    Generator easy access output wrapper.
+    """Generator result transfer object.
 
-    :param path: file path to be written
-    :param title: result title for misc usage
-    :param source: source code/output to be written
+    Args:
+        path: The target file path
+        title: The result title for misc usage
+        source: The source code/output to be written
     """
 
     path: Path
@@ -26,16 +26,15 @@ class GeneratorResult(NamedTuple):
 
 
 class AbstractGenerator(abc.ABC):
-    """Abstract code generator class."""
+    """Abstract code generator class.
+
+    Args:
+        config: The generator config instance
+    """
 
     __slots__ = "config"
 
     def __init__(self, config: GeneratorConfig):
-        """
-        Generator constructor.
-
-        :param config Generator configuration
-        """
         self.config = config
 
     def module_name(self, module: str) -> str:
@@ -74,11 +73,14 @@ class AbstractGenerator(abc.ABC):
         )
 
     def normalize_packages(self, classes: List[Class]):
-        """
-        Normalize the target package and module names by the given output
-        generator.
+        """Normalize the classes module and package names.
 
-        :param classes: a list of codegen class instances
+        Args:
+            classes: A list of class instances
+
+        Raises:
+            CodeGenerationErrorL If the analyzer failed to
+                designate a class to a package and module.
         """
         modules = {}
         packages = {}

@@ -1,7 +1,7 @@
 import json
 import warnings
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Type, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Type, Union
 
 from xsdata.exceptions import ConverterWarning, ParserError
 from xsdata.formats.bindings import AbstractParser, T
@@ -17,13 +17,12 @@ from xsdata.utils.constants import EMPTY_MAP
 
 @dataclass
 class JsonParser(AbstractParser):
-    """
-    Json parser for dataclasses.
+    """Json parser for data classes.
 
-    :param config: Parser configuration
-    :param context: Model context provider
-    :param load_factory: Replace the default json.load call with another
-        implementation
+    Args:
+        config: Parser configuration
+        context: The models context instance
+        load_factory: Json loader factory
     """
 
     config: ParserConfig = field(default_factory=ParserConfig)
@@ -31,9 +30,18 @@ class JsonParser(AbstractParser):
     load_factory: Callable = field(default=json.load)
 
     def parse(self, source: Any, clazz: Optional[Type[T]] = None) -> T:
-        """Parse the input stream or filename and return the resulting object
-        tree."""
+        """Parse the input stream into the target class type.
 
+        If no clazz is provided, the binding context will try
+        to locate it from imported dataclasses.
+
+        Args:
+            source: The source file name or stream to parse
+            clazz: The target class type to parse the source object
+
+        Returns:
+            An instance of the specified class representing the parsed content.
+        """
         data = self.load_json(source)
         tp = self.verify_type(clazz, data)
 
@@ -50,6 +58,14 @@ class JsonParser(AbstractParser):
                 raise ParserError(e)
 
     def load_json(self, source: Any) -> Union[Dict, List]:
+        """Load the given json source filename or stream.
+
+        Args:
+            source: A file name or file stream
+
+        Returns:
+            The loaded dictionary or list of dictionaries.
+        """
         if not hasattr(source, "read"):
             with open(source, "rb") as fp:
                 return self.load_factory(fp)
@@ -57,6 +73,18 @@ class JsonParser(AbstractParser):
         return self.load_factory(source)
 
     def verify_type(self, clazz: Optional[Type[T]], data: Union[Dict, List]) -> Type[T]:
+        """Verify the given data matches the given clazz.
+
+        If no clazz is provided, the binding context will try
+        to locate it from imported dataclasses.
+
+        Args:
+            clazz: The target class type to parse  object
+            data: The loaded dictionary or list of dictionaries
+
+        Returns:
+            The clazz type to bind the loaded data.
+        """
         if clazz is None:
             return self.detect_type(data)
 
@@ -84,6 +112,14 @@ class JsonParser(AbstractParser):
         return clazz  # type: ignore
 
     def detect_type(self, data: Union[Dict, List]) -> Type[T]:
+        """Locate the target clazz type from the data keys.
+
+        Args:
+            data: The loaded dictionary or list of dictionaries
+
+        Returns:
+            The clazz type to bind the loaded data.
+        """
         if not data:
             raise ParserError("Document is empty, can not detect type")
 
@@ -96,7 +132,15 @@ class JsonParser(AbstractParser):
         raise ParserError(f"Unable to locate model with properties({list(keys)})")
 
     def bind_dataclass(self, data: Dict, clazz: Type[T]) -> T:
-        """Recursively build the given model from the input dict data."""
+        """Create a new instance of the given class type with the given data.
+
+        Args:
+            data: The loaded data
+            clazz: The target class type to bind the input data
+
+        Returns:
+            An instance of the class type representing the parsed content.
+        """
         if set(data.keys()) == self.context.class_type.derived_keys:
             return self.bind_derived_dataclass(data, clazz)
 
@@ -120,6 +164,22 @@ class JsonParser(AbstractParser):
             raise ParserError(e)
 
     def bind_derived_dataclass(self, data: Dict, clazz: Type[T]) -> Any:
+        """Bind the input data to the given class type.
+
+        Examples:
+            >>> {
+                "qname": "foo",
+                "type": "my:type",
+                "value": {"prop": "value"}
+            }
+
+        Args:
+            data: The derived element dictionary
+            clazz: The target class type to bind the input data
+
+        Returns:
+            An instance of the class type representing the parsed content.
+        """
         qname = data["qname"]
         xsi_type = data["type"]
         params = data["value"]
@@ -144,8 +204,15 @@ class JsonParser(AbstractParser):
         return generic(qname=qname, type=xsi_type, value=value)
 
     def bind_best_dataclass(self, data: Dict, classes: Iterable[Type[T]]) -> T:
-        """Attempt to bind the given data to one possible models, if more than
-        one is successful return the object with the highest score."""
+        """Bind the input data to all the given classes and return best match.
+
+        Args:
+            data: The derived element dictionary
+            classes: The target class types to try
+
+        Returns:
+            An instance of one of the class types representing the parsed content.
+        """
         obj = None
         keys = set(data.keys())
         max_score = -1.0
@@ -169,8 +236,20 @@ class JsonParser(AbstractParser):
         )
 
     def bind_optional_dataclass(self, data: Dict, clazz: Type[T]) -> Optional[T]:
-        """Recursively build the given model from the input dict data but fail
-        on any converter warnings."""
+        """Bind the input data to the given class type.
+
+        This is a strict process, if there is any warning the process
+        returns None. This method is used to test if te data fit into
+        the class type.
+
+        Args:
+            data: The derived element dictionary
+            clazz: The target class type to bind the input data
+
+        Returns:
+            An instance of the class type representing the parsed content
+            or None if there is any warning or error.
+        """
         try:
             with warnings.catch_warnings():
                 warnings.filterwarnings("error", category=ConverterWarning)
@@ -179,10 +258,23 @@ class JsonParser(AbstractParser):
             return None
 
     def bind_value(
-        self, meta: XmlMeta, var: XmlVar, value: Any, recursive: bool = False
+        self,
+        meta: XmlMeta,
+        var: XmlVar,
+        value: Any,
+        recursive: bool = False,
     ) -> Any:
-        """Main entry point for binding values."""
+        """Main entry point for binding values.
 
+        Args:
+            meta: The parent xml meta instance
+            var: The xml var descriptor for the field
+            value: The data value
+            recursive: Whether this is a recursive call
+
+        Returns:
+            The parsed object
+        """
         # xs:anyAttributes get it out of the way, it's the mapping exception!
         if var.is_attributes:
             return dict(value)
@@ -190,9 +282,11 @@ class JsonParser(AbstractParser):
         # Repeating element, recursively bind the values
         if not recursive and var.list_element and isinstance(value, list):
             assert var.factory is not None
-            return var.factory(self.bind_value(meta, var, val, True) for val in value)
+            return var.factory(
+                self.bind_value(meta, var, val, recursive=True) for val in value
+            )
 
-        # If not dict this is an text or tokens value.
+        # If not dict this is a text or tokens value.
         if not isinstance(value, dict):
             return self.bind_text(meta, var, value)
 
@@ -209,7 +303,16 @@ class JsonParser(AbstractParser):
         return self.bind_complex_type(meta, var, value)
 
     def bind_text(self, meta: XmlMeta, var: XmlVar, value: Any) -> Any:
-        """Bind text/tokens value entrypoint."""
+        """Bind text/tokens value entrypoint.
+
+        Args:
+            meta: The parent xml meta instance
+            var: The xml var descriptor for the field
+            value: The data value
+
+        Returns:
+            The parsed tokens or text value.
+        """
         if var.is_elements:
             # Compound field we need to match the value to one of the choice elements
             check_subclass = self.context.class_type.is_model(value)
@@ -242,7 +345,16 @@ class JsonParser(AbstractParser):
         )
 
     def bind_complex_type(self, meta: XmlMeta, var: XmlVar, data: Dict) -> Any:
-        """Bind data to a user defined dataclass."""
+        """Bind complex values entrypoint.
+
+        Args:
+            meta: The parent xml meta instance
+            var: The xml var descriptor for the field
+            data: The complex data value
+
+        Returns:
+            The parsed dataclass instance.
+        """
         if var.is_clazz_union:
             # Union of dataclasses
             return self.bind_best_dataclass(data, var.types)
@@ -264,7 +376,24 @@ class JsonParser(AbstractParser):
         return self.bind_dataclass(data, var.clazz)
 
     def bind_derived_value(self, meta: XmlMeta, var: XmlVar, data: Dict) -> Any:
-        """Bind derived element entry point."""
+        """Bind derived data entrypoint.
+
+        The data is representation of a derived element, e.g. {
+            "qname": "foo",
+            "type": "my:type"
+            "value": Any
+        }
+
+        The data value can be a primitive value or a complex value.
+
+        Args:
+            meta: The parent xml meta instance
+            var: The xml var descriptor for the field
+            data: The derived element data
+
+        Returns:
+            The parsed object.
+        """
         qname = data["qname"]
         xsi_type = data["type"]
         params = data["value"]
@@ -297,8 +426,21 @@ class JsonParser(AbstractParser):
 
     @classmethod
     def find_var(
-        cls, xml_vars: Sequence[XmlVar], local_name: str, is_list: bool = False
+        cls,
+        xml_vars: List[XmlVar],
+        local_name: str,
+        is_list: bool = False,
     ) -> Optional[XmlVar]:
+        """Match the name to a xml variable.
+
+        Args:
+            xml_vars: A list of xml vars
+            local_name: A key from the loaded data
+            is_list: Whether the data value is an array
+
+        Returns:
+            One of the xml vars, if all search attributes match, None otherwise.
+        """
         for var in xml_vars:
             if var.local_name == local_name:
                 var_is_list = var.list_element or var.tokens
@@ -310,5 +452,20 @@ class JsonParser(AbstractParser):
 
 @dataclass
 class DictConverter(JsonParser):
-    def convert(self, data: Dict, clazz: Type[T]) -> T:
+    """Map data to a data class.
+
+    This is not a parser technically, as it doesn't
+    implement the parser interface correctly.
+    """
+
+    def convert(self, data: Dict[str, Any], clazz: Type[T]) -> T:
+        """Parse the input data into the target class type.
+
+        Args:
+            data: The input dictionary
+            clazz: The target class type to parse the input data
+
+        Returns:
+            An instance of the specified class representing the parsed data.
+        """
         return self.bind_dataclass(data, clazz)

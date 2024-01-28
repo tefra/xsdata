@@ -11,7 +11,15 @@ from xsdata.models.config import GeneratorConfig
 
 
 class DataclassGenerator(AbstractGenerator):
-    """Python dataclasses code generator."""
+    """Python dataclasses code generator.
+
+    Args:
+        config: The generator config instance
+
+    Attributes:
+        env: The jinja2 environment instance
+        filters: The template filters instance
+    """
 
     __slots__ = ("env", "filters")
 
@@ -22,9 +30,6 @@ class DataclassGenerator(AbstractGenerator):
     class_template = "class.jinja2"
 
     def __init__(self, config: GeneratorConfig):
-        """Override generator constructor to set templates directory and
-        environment filters."""
-
         super().__init__(config)
         template_paths = self.get_template_paths()
         loader = FileSystemLoader(template_paths)
@@ -34,17 +39,20 @@ class DataclassGenerator(AbstractGenerator):
 
     @classmethod
     def get_template_paths(cls) -> List[str]:
+        """Return a list of template paths to feed the jinja2 loader."""
         return [str(Path(__file__).parent.joinpath("templates"))]
 
     def render(self, classes: List[Class]) -> Iterator[GeneratorResult]:
-        """
-        Return an iterator of the generated results.
+        """Render the given classes to python packages and modules.
 
-        Group classes into modules and yield an output per module and
-        per path __init__.py file.
+        Args:
+              classes: A list of class instances
+
+        Yields:
+            An iterator of generator result instances.
         """
         packages = {obj.qname: obj.target_module for obj in classes}
-        resolver = DependenciesResolver(packages=packages)
+        resolver = DependenciesResolver(registry=packages)
 
         # Generate packages
         for path, cluster in self.group_by_package(classes).items():
@@ -65,8 +73,15 @@ class DataclassGenerator(AbstractGenerator):
             )
 
     def render_package(self, classes: List[Class], module: str) -> str:
-        """Render the source code for the __init__.py with all the imports of
-        the generated class names."""
+        """Render the package for the given classes.
+
+        Args:
+            classes: A list of class instances
+            module: The target dot notation path
+
+        Returns:
+            The rendered package output.
+        """
         imports = [
             Import(qname=obj.qname, source=obj.target_module)
             for obj in sorted(classes, key=lambda x: x.name)
@@ -80,11 +95,19 @@ class DataclassGenerator(AbstractGenerator):
         return f"{output.strip()}\n"
 
     def render_module(
-        self, resolver: DependenciesResolver, classes: List[Class]
+        self,
+        resolver: DependenciesResolver,
+        classes: List[Class],
     ) -> str:
-        """Render the source code for the target module of the given class
-        list."""
+        """Render the module for the given classes.
 
+        Args:
+            resolver: The dependencies resolver
+            classes: A list of class instances
+
+        Returns:
+            The rendered module output.
+        """
         if len({x.target_namespace for x in classes}) == 1:
             module_namespace = classes[0].target_namespace
         else:
@@ -105,9 +128,19 @@ class DataclassGenerator(AbstractGenerator):
         )
 
     def render_classes(
-        self, classes: List[Class], module_namespace: Optional[str]
+        self,
+        classes: List[Class],
+        module_namespace: Optional[str],
     ) -> str:
-        """Render the source code of the classes."""
+        """Render the classes source code in a module.
+
+        Args:
+            classes: A list of class instances
+            module_namespace: The module namespace URI
+
+        Returns:
+            The rendered classes source code output.
+        """
 
         def render_class(obj: Class) -> str:
             """Render class or enumeration."""
@@ -139,9 +172,14 @@ class DataclassGenerator(AbstractGenerator):
 
     @classmethod
     def ensure_packages(cls, package: Path) -> Iterator[GeneratorResult]:
-        """Ensure all the __init__ files exists for the target package path,
-        otherwise yield the necessary filepath, name, source output that needs
-        to be created."""
+        """Ensure __init__.py files exists recursively in the package.
+
+        Args:
+            package: The package file path
+
+        Yields:
+            An iterator of generator result instances.
+        """
         cwd = Path.cwd()
         while cwd < package:
             init = package.joinpath("__init__.py")
@@ -153,4 +191,5 @@ class DataclassGenerator(AbstractGenerator):
 
     @classmethod
     def init_filters(cls, config: GeneratorConfig) -> Filters:
+        """Initialize the filters instance by the generator configuration."""
         return Filters(config)

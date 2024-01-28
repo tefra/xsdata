@@ -30,6 +30,7 @@ version = release = metadata.version("xsdata")
 # ones.
 extensions = [
     "xsdatadocs",
+    "sphinx.ext.napoleon",
     "sphinx.ext.doctest",
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
@@ -86,3 +87,4 @@ autodoc_default_options = {
 autosummary_generate = True
 set_type_checking_flag = True
 always_document_param_types = False
+napoleon_google_docstring = True

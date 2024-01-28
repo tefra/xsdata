@@ -57,4 +57,4 @@ class UserXmlParserTests(FactoryTestCase):
         self.parser.emit_event("foo", "{tns}BarEl", a=1, b=2)
 
         mock_func.assert_called_once_with(a=1, b=2)
-        self.assertEqual({("foo", "{tns}BarEl"): mock_func}, self.parser.emit_cache)
+        self.assertEqual({("foo", "{tns}BarEl"): mock_func}, self.parser.hooks_cache)

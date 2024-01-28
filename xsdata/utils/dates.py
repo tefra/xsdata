@@ -1,9 +1,10 @@
 import datetime
 from calendar import isleap
-from typing import Any, Generator, Optional, Union
+from typing import Any, Iterator, Optional, Union
 
 
-def parse_date_args(value: Any, fmt: str) -> Generator:
+def parse_date_args(value: Any, fmt: str) -> Iterator[int]:
+    """Parse the fmt args from the value."""
     if not isinstance(value, str):
         raise ValueError("")
 
@@ -12,6 +13,7 @@ def parse_date_args(value: Any, fmt: str) -> Generator:
 
 
 def calculate_timezone(offset: Optional[int]) -> Optional[datetime.timezone]:
+    """Return a timezone instance by the given hours offset."""
     if offset is None:
         return None
 
@@ -22,6 +24,7 @@ def calculate_timezone(offset: Optional[int]) -> Optional[datetime.timezone]:
 
 
 def calculate_offset(obj: Union[datetime.time, datetime.datetime]) -> Optional[int]:
+    """Convert the datetime offset to signed minutes."""
     offset = obj.utcoffset()
     if offset is None:
         return None
@@ -30,6 +33,7 @@ def calculate_offset(obj: Union[datetime.time, datetime.datetime]) -> Optional[i
 
 
 def format_date(year: int, month: int, day: int) -> str:
+    """Return a xml formatted signed date."""
     if year < 0:
         year = -year
         sign = "-"
@@ -40,6 +44,7 @@ def format_date(year: int, month: int, day: int) -> str:
 
 
 def format_time(hour: int, minute: int, second: int, fractional_second: int) -> str:
+    """Return a xml formatted time."""
     if not fractional_second:
         return f"{hour:02d}:{minute:02d}:{second:02d}"
 
@@ -55,6 +60,7 @@ def format_time(hour: int, minute: int, second: int, fractional_second: int) -> 
 
 
 def format_offset(offset: Optional[int]) -> str:
+    """Return a xml formatted time offset."""
     if offset is None:
         return ""
 
@@ -77,10 +83,12 @@ mdays = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
 
 def monthlen(year: int, month: int) -> int:
+    """Return the number of days for a specific month and year."""
     return mdays[month] + (month == 2 and isleap(year))
 
 
 def validate_date(year: int, month: int, day: int):
+    """Validate the given year, month day is a valid date."""
     if not 1 <= month <= 12:
         raise ValueError("Month must be in 1..12")
 
@@ -90,6 +98,7 @@ def validate_date(year: int, month: int, day: int):
 
 
 def validate_time(hour: int, minute: int, second: int, franctional_second: int):
+    """Validate the time args are valid."""
     if not 0 <= hour <= 24:
         raise ValueError("Hour must be in 0..24")
 
@@ -110,6 +119,19 @@ SIMPLE_TWO_DIGITS_FORMATS = ("d", "m", "H", "M")
 
 
 class DateTimeParser:
+    """XML Datetime parser.
+
+    Args:
+        value: The datetime string
+        fmt: The target format string
+
+    Attributes:
+        vlen: The length of the datetime string
+        flen: The length of the format string
+        vidx: The current position of the datetime string
+        fidx: The current position of the format string
+    """
+
     def __init__(self, value: str, fmt: str):
         self.format = fmt
         self.value = value
@@ -118,7 +140,8 @@ class DateTimeParser:
         self.vidx = 0
         self.fidx = 0
 
-    def parse(self):
+    def parse(self) -> Iterator[int]:
+        """Yield the parsed datetime string arguments."""
         try:
             while self.fidx < self.flen:
                 char = self.next_format_char()
@@ -138,23 +161,28 @@ class DateTimeParser:
             )
 
     def next_format_char(self) -> str:
+        """Return the next format character to evaluate."""
         char = self.format[self.fidx]
         self.fidx += 1
         return char
 
     def has_more(self) -> bool:
+        """Return whether the value is not fully parsed yet."""
         return self.vidx < self.vlen
 
     def peek(self) -> str:
+        """Return the current evaluated character of the datetime string."""
         return self.value[self.vidx]
 
     def skip(self, char: str):
+        """Validate and skip over the given char."""
         if not self.has_more() or self.peek() != char:
             raise ValueError()
 
         self.vidx += 1
 
     def parse_var(self, var: str):
+        """Parse the given var from the datetime string."""
         if var in SIMPLE_TWO_DIGITS_FORMATS:
             yield self.parse_digits(2)
         elif var == "Y":
@@ -169,6 +197,7 @@ class DateTimeParser:
             raise ValueError()
 
     def parse_year(self) -> int:
+        """Parse the year argument."""
         negative = False
         if self.peek() == "-":
             self.vidx += 1
@@ -195,6 +224,7 @@ class DateTimeParser:
         return year
 
     def parse_fractional_second(self) -> int:
+        """Parse the fractional second argument."""
         if self.has_more() and self.peek() == ".":
             self.vidx += 1
             return self.parse_fixed_digits(9)
@@ -202,11 +232,13 @@ class DateTimeParser:
             return 0
 
     def parse_digits(self, digits: int) -> int:
+        """Parse the given number of digits."""
         start = self.vidx
         self.vidx += digits
         return int(self.value[start : self.vidx])
 
     def parse_minimum_digits(self, min_digits: int) -> int:
+        """Parse until the next character is not a digit."""
         start = self.vidx
         self.vidx += min_digits
 
@@ -216,6 +248,7 @@ class DateTimeParser:
         return int(self.value[start : self.vidx])
 
     def parse_fixed_digits(self, max_digits: int) -> int:
+        """Parse a fixed number of digits."""
         start = self.vidx
         just = max_digits
         while max_digits and self.has_more() and self.peek().isdigit():
@@ -225,6 +258,7 @@ class DateTimeParser:
         return int(self.value[start : self.vidx].ljust(just, "0"))
 
     def parse_offset(self) -> Optional[int]:
+        """Parse the xml timezone offset as minutes."""
         if not self.has_more():
             return None
 

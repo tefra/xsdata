@@ -16,7 +16,7 @@ class AnnotationBaseTest(TestCase):
             Annotation(
                 documentations=[
                     Documentation(
-                        elements=[
+                        content=[
                             "    I am a ",
                             AnyElement(
                                 qname="{http://www.w3.org/1999/xhtml}p",

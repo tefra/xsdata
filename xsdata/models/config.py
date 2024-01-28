@@ -4,7 +4,7 @@ import warnings
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Pattern, TextIO
+from typing import Any, Callable, Dict, List, Pattern, TextIO
 
 from xsdata import __version__
 from xsdata.exceptions import CodeGenerationWarning, GeneratorConfigError
@@ -14,22 +14,21 @@ from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.formats.dataclass.serializers.writers import XmlEventWriter
-from xsdata.logger import logger
 from xsdata.models.enums import Namespace
 from xsdata.models.mixins import array_element, attribute, element, text_node
 from xsdata.utils import objects, text
 
 
 class StructureStyle(Enum):
-    """
-    Code writer output structure strategies.
+    """Output structure style enumeration.
 
-    :cvar FILENAMES: filenames: groups classes by the schema location
-    :cvar NAMESPACES: namespaces: group classes by the target namespace
-    :cvar CLUSTERS: clusters: group by strong connected dependencies
-    :cvar SINGLE_PACKAGE: single-package: group all classes together
-    :cvar NAMESPACE_CLUSTERS: namespace-clusters: group by strong
-        connected dependencies and namespaces
+    Attributes:
+        FILENAMES: filenames: groups classes by the schema location
+        NAMESPACES: namespaces: group classes by the target namespace
+        CLUSTERS: clusters: group by strong connected dependencies
+        SINGLE_PACKAGE: single-package: group all classes together
+        NAMESPACE_CLUSTERS: namespace-clusters: group by strong
+            connected dependencies and namespaces
     """
 
     FILENAMES = "filenames"
@@ -40,42 +39,22 @@ class StructureStyle(Enum):
 
 
 class NameCase(Enum):
-    """
-    Code writer naming schemes.
+    """Naming case convention enumeration.
 
     All schemes are using a processor that splits a string into words
-    when it encounters non alphanumerical characters or when an upper
+    when it encounters non-alphanumerical characters or when an upper
     case letter follows a lower case letter.
 
-    +-----------+-----------+-----------+------------+-----------------+-----------+-------------+--------------+
-    | Original  | Pascal    | Camel     | Snake      | Screaming Snake | Mixed     | Mixed Snake | Mixed Pascal |
-    +===========+===========+===========+============+=================+===========+=============+==============+
-    | p00p      | P00P      | p00P      | p00p       | P00P            | p00p      | p00p        | P00p         |
-    +-----------+-----------+-----------+------------+-----------------+-----------+-------------+--------------+
-    | USERName  | Username  | username  | username   | USERNAME        | USERName  | USERName    | USERName     |
-    +-----------+-----------+-----------+------------+-----------------+-----------+-------------+--------------+
-    | UserNAME  | UserName  | userName  | user_name  | USER_NAME       | UserNAME  | User_NAME   | UserNAME     |
-    +-----------+-----------+-----------+------------+-----------------+-----------+-------------+--------------+
-    | USER_name | UserName  | userName  | user_name  | USER_NAME       | USERname  | USER_name   | USERname     |
-    +-----------+-----------+-----------+------------+-----------------+-----------+-------------+--------------+
-    | USER-NAME | UserName  | userName  | user_name  | USER_NAME       | USERNAME  | USER_NAME   | USERNAME     |
-    +-----------+-----------+-----------+------------+-----------------+-----------+-------------+--------------+
-    | User_Name | UserName  | userName  | user_name  | USER_NAME       | UserName  | User_Name   | UserName     |
-    +-----------+-----------+-----------+------------+-----------------+-----------+-------------+--------------+
-    | user_name | UserName  | userName  | user_name  | USER_NAME       | username  | user_name   | Username     |
-    +-----------+-----------+-----------+------------+-----------------+-----------+-------------+--------------+
-    | SUserNAME | SuserName | suserName | suser_name | SUSER_NAME      | SUserNAME | SUser_NAME  | SUserNAME    |
-    +-----------+-----------+-----------+------------+-----------------+-----------+-------------+--------------+
-
-    :cvar ORIGINAL: originalCase
-    :cvar PASCAL: pascalCase
-    :cvar CAMEL: camelCase
-    :cvar SNAKE: snakeCase
-    :cvar SCREAMING_SNAKE: screamingSnakeCase
-    :cvar MIXED: mixedCase mixedCase
-    :cvar MIXED_SNAKE: mixedSnakeCase
-    :cvar MIXED_PASCAL: mixedPascalCase
-    """  # noqa
+    Attributes:
+        ORIGINAL: originalCase
+        PASCAL: pascalCase
+        CAMEL: camelCase
+        SNAKE: snakeCase
+        SCREAMING_SNAKE: screamingSnakeCase
+        MIXED: mixedCase
+        MIXED_SNAKE: mixedSnakeCase
+        MIXED_PASCAL: mixedPascalCase
+    """
 
     ORIGINAL = "originalCase"
     PASCAL = "pascalCase"
@@ -87,6 +66,7 @@ class NameCase(Enum):
     MIXED_PASCAL = "mixedPascalCase"
 
     def __call__(self, string: str, **kwargs: Any) -> str:
+        """Apply the callback to the input string."""
         return self.callback(string, **kwargs)
 
     @property
@@ -108,14 +88,14 @@ __name_case_func__: Dict[str, Callable] = {
 
 
 class DocstringStyle(Enum):
-    """
-    Code writer docstring styles.
+    """Docstring style enumeration.
 
-    :cvar RST: reStructuredText
-    :cvar NUMPY: NumPy
-    :cvar GOOGLE: Google
-    :cvar ACCESSIBLE: Accessible
-    :cvar BLANK: Blank
+    Attributes:
+        RST: reStructuredText
+        NUMPY: NumPy
+        GOOGLE: Google
+        ACCESSIBLE: Accessible
+        BLANK: Blank
     """
 
     RST = "reStructuredText"
@@ -126,13 +106,13 @@ class DocstringStyle(Enum):
 
 
 class ClassFilterStrategy(Enum):
-    """
-    Class filter strategy.
+    """Class filter strategy enumeration.
 
-    :cvar ALL: all: Generate all types, discouraged!!!
-    :cvar ALL_GLOBALS: allGlobals: Generate all global types
-    :cvar REFERRED_GLOBALS: referredGlobals: Generate all global types
-        with at least one reference.
+    Attributes:
+        ALL: all: Generate all types, discouraged!!!
+        ALL_GLOBALS: allGlobals: Generate all global types
+        REFERRED_GLOBALS: referredGlobals: Generate all global types
+            with at least one reference.
     """
 
     ALL = "all"
@@ -141,13 +121,13 @@ class ClassFilterStrategy(Enum):
 
 
 class ObjectType(Enum):
-    """
-    Object type enumeration.
+    """Object type enumeration.
 
-    :cvar CLASS: class
-    :cvar FIELD: field
-    :cvar MODULE: module
-    :cvar PACKAGE: package
+    Attributes:
+        CLASS: class
+        FIELD: field
+        MODULE: module
+        PACKAGE: package
     """
 
     CLASS = "class"
@@ -157,11 +137,11 @@ class ObjectType(Enum):
 
 
 class ExtensionType(Enum):
-    """
-    Extension type enumeration.
+    """Extension type enumeration.
 
-    :cvar CLASS: class
-    :cvar DECORATOR: decorator
+    Attributes:
+        CLASS: class
+        DECORATOR: decorator
     """
 
     CLASS = "class"
@@ -170,17 +150,17 @@ class ExtensionType(Enum):
 
 @dataclass
 class OutputFormat:
-    """
-    Output format options.
+    """Output format model representation.
 
-    :param value: Output format name
-    :param repr: Generate __repr__ method
-    :param eq: Generate __eq__ method
-    :param order: Generate __lt__, __le__, __gt__, and __ge__ methods
-    :param unsafe_hash: Generate __hash__ method if not frozen
-    :param frozen: Enable read only properties
-    :param slots: Enable __slots__, python>=3.10 Only
-    :param kw_only: Enable keyword only arguments, python>=3.10 Only
+    Args:
+        value: Output format name
+        repr: Generate __repr__ method
+        eq: Generate __eq__ method
+        order: Generate __lt__, __le__, __gt__, and __ge__ methods
+        unsafe_hash: Generate __hash__ method
+        frozen: Enable read only properties
+        slots: Enable __slots__, python>=3.10 Only
+        kw_only: Enable keyword only arguments, python>=3.10 Only
     """
 
     value: str = text_node(default="dataclasses", cli="output")
@@ -193,9 +173,11 @@ class OutputFormat:
     kw_only: bool = attribute(default=False)
 
     def __post_init__(self):
+        """Post initialization method."""
         self.validate()
 
     def validate(self):
+        """Validate and reset configuration conflicts."""
         if self.order and not self.eq:
             raise GeneratorConfigError("eq must be true if order is true")
 
@@ -217,19 +199,19 @@ class OutputFormat:
 
 @dataclass
 class CompoundFields:
-    """
-    Compound fields options.
+    """Compound fields model representation.
 
-    :param enabled: Use compound fields for repeatable elements
-    :param default_name: Default compound field name
-    :param use_substitution_groups: Use substitution groups if they
-        exist, instead of element names.
-    :param force_default_name: Always use the default compound field
-        name, or try to generate one by the list of element names if
-        they are no longer than the max name parts. e.g.
-        hat_or_dress_or_something.
-    :param max_name_parts: Maximum number of element names before using
-        the default name.
+    Args:
+        enabled: Use compound fields for repeatable elements
+        default_name: Default compound field name
+        use_substitution_groups: Use substitution groups if they
+            exist, instead of element names.
+        force_default_name: Always use the default compound field
+            name, or try to generate one by the list of element names if
+            they are no longer than the max name parts. e.g.
+            hat_or_dress_or_something.
+        max_name_parts: Maximum number of element names before using
+            the default name.
     """
 
     enabled: bool = text_node(default=False, cli="compound-fields")
@@ -241,26 +223,26 @@ class CompoundFields:
 
 @dataclass
 class GeneratorOutput:
-    """
-    Main generator output options.
+    """Generator output model representation.
 
-    :param package: Target package
-    :param format: Output format
-    :param structure_style: Output structure style
-    :param docstring_style: Docstring style
-    :param filter_strategy: Class filter strategy
-    :param relative_imports: Use relative imports
-    :param compound_fields: Use compound fields for repeatable elements
-    :param max_line_length: Adjust the maximum line length
-    :param subscriptable_types: Use PEP-585 generics for standard
-        collections, python>=3.9 Only
-    :param union_type: Use PEP-604 union type, python>=3.10 Only
-    :param postponed_annotations: Enable postponed evaluation of
-        annotations
-    :param unnest_classes: Move inner classes to upper level
-    :param ignore_patterns: Ignore pattern restrictions
-    :param include_header: Include a header with codegen information in
-        the output
+    Args:
+        package: Target package
+        format: Output format
+        structure_style: Output structure style
+        docstring_style: Docstring style
+        filter_strategy: Class filter strategy
+        relative_imports: Use relative imports
+        compound_fields: Use compound fields for repeatable elements
+        max_line_length: Adjust the maximum line length
+        subscriptable_types: Use PEP-585 generics for standard
+            collections, python>=3.9 Only
+        union_type: Use PEP-604 union type, python>=3.10 Only
+        postponed_annotations: Enable postponed evaluation of
+            annotations
+        unnest_classes: Move inner classes to upper level
+        ignore_patterns: Ignore pattern restrictions
+        include_header: Include a header with codegen information in
+            the output
     """
 
     package: str = element(default="generated")
@@ -283,9 +265,11 @@ class GeneratorOutput:
     include_header: bool = element(default=False)
 
     def __post_init__(self):
+        """Post initialization method."""
         self.validate()
 
     def validate(self):
+        """Reset configuration conflicts."""
         if self.subscriptable_types and sys.version_info < (3, 9):
             self.subscriptable_types = False
             warnings.warn(
@@ -308,22 +292,19 @@ class GeneratorOutput:
             )
 
     def update(self, **kwargs: Any):
+        """Update instance attributes recursively."""
         objects.update(self, **kwargs)
         self.format.validate()
 
 
 @dataclass
 class NameConvention:
-    """
-    Name convention model.
+    """Name convention model representation.
 
-    :param case: Naming scheme, e.g. camelCase, snakeCase
-    :param safe_prefix: A prefix to be prepended into names that match
-        one of the reserved words: and, except, lambda, with, as,
-        finally, nonlocal, while, assert, false, none, yield, break,
-        for, not, class, from, or, continue, global, pass, def, if,
-        raise, del, import, return, elif, in, true, else, is, try,
-        str, int, bool, float, list, optional, dict, field
+    Args:
+        case: Naming scheme, e.g. camelCase, snakeCase
+        safe_prefix: A prefix to be prepended into names that match
+            one of the reserved words.
     """
 
     case: NameCase = attribute(optional=False)
@@ -332,13 +313,13 @@ class NameConvention:
 
 @dataclass
 class GeneratorConventions:
-    """
-    Generator global naming conventions.
+    """Generator naming conventions model representation.
 
-    :param class_name: Class naming conventions.
-    :param field_name: Field naming conventions.
-    :param module_name: Module naming conventions.
-    :param package_name: Package naming conventions.
+    Args:
+        class_name: Class naming conventions.
+        field_name: Field naming conventions.
+        module_name: Module naming conventions.
+        package_name: Package naming conventions.
     """
 
     class_name: NameConvention = element(
@@ -360,7 +341,8 @@ class GeneratorConventions:
 
 @dataclass
 class GeneratorAlias:
-    """
+    """Generator alias model representation.
+
     Define an alias for a module, package, class and field Alias definition
     model.
 
@@ -370,8 +352,9 @@ class GeneratorAlias:
     filename or target namespace depending on the selected output
     structure.
 
-    :param source: The source name from schema definition
-    :param target: The target name of the object.
+    Args:
+        source: The source name from schema definition
+        target: The target name of the object.
     """
 
     source: str = attribute(required=True)
@@ -380,17 +363,17 @@ class GeneratorAlias:
 
 @dataclass
 class GeneratorAliases:
-    """
-    Generator aliases for classes, fields, packages and modules that bypass the
-    global naming conventions.
+    """Generator aliases model representation.
 
-    .. warning::
-        The generator doesn't validate aliases.
+    Generator aliases for classes, fields, packages and modules
+    that bypass the global naming conventions. The aliases
+    are not validated as valid python identifiers.
 
-    :param class_name: list of class name aliases
-    :param field_name: list of field name aliases
-    :param package_name: list of package name aliases
-    :param module_name: list of module name aliases
+    Args:
+        class_name: A list of class name aliases
+        field_name: A list of field name aliases
+        package_name: A list of package name aliases
+        module_name: A list of module name aliases
     """
 
     class_name: List[GeneratorAlias] = array_element()
@@ -401,13 +384,14 @@ class GeneratorAliases:
 
 @dataclass
 class GeneratorSubstitution:
-    """
-    Search and replace substitution for a specific target type based on
-    :func:`re.sub`
+    """Generator substitution model representation.
 
-    :param type: The target object type
-    :param search: The search string or a pattern object
-    :param replace: The replacement string or pattern object
+    Search and replace substitutions based on `re.sub`.
+
+    Args:
+        type: The target object type
+        search: The search string or a pattern object
+        replace: The replacement string or pattern object
     """
 
     type: ObjectType = attribute(required=True)
@@ -417,17 +401,22 @@ class GeneratorSubstitution:
 
 @dataclass
 class GeneratorExtension:
-    """
-    Add decorators or base classes on the generated classes that match the
-    class name pattern.
+    """Generator extension model representation.
 
-    :param type: The extension type
-    :param class_name: The class name or a pattern to apply the
-        extension
-    :param import_string: The import string of the extension type
-    :param prepend: Prepend or append decorator or base class
-    :param apply_if_derived: Apply or skip if the class is already a
-        subclass
+    Add decorators or base classes on the generated classes
+    that match the class name pattern.
+
+    Args:
+        type: The extension type
+        class_name: The class name or a pattern to apply the extension
+        import_string: The import string of the extension type
+        prepend: Prepend or append decorator or base class
+        apply_if_derived: Apply or skip if the class is already a subclass
+
+    Attributes:
+        module_path: The module path of the base class or the annotation
+        func_name: The annotation or base class name
+        pattern: The compiled search class name pattern
     """
 
     type: ExtensionType = attribute(required=True)
@@ -450,6 +439,13 @@ class GeneratorExtension:
     )
 
     def __post_init__(self):
+        """Post initialization method.
+
+        Set the module, func_name and pattern instance attributes.
+
+        Raises:
+            GeneratorConfigError: If the pattern can not be compiled.
+        """
         try:
             self.module_path, self.func_name = self.import_string.rsplit(".", 1)
         except (ValueError, AttributeError):
@@ -465,14 +461,14 @@ class GeneratorExtension:
 
 @dataclass
 class GeneratorSubstitutions:
-    """
+    """Generator substitutions model representation.
+
     Generator search and replace substitutions for classes, fields, packages
     and modules names. The process runs before and after the default naming
     conventions.
 
-    .. warning:: The generator doesn't validate substitutions.
-
-    :param substitution: The list of substitutions
+    Args:
+        substitution: The list of substitution instances
     """
 
     substitution: List[GeneratorSubstitution] = array_element()
@@ -480,13 +476,14 @@ class GeneratorSubstitutions:
 
 @dataclass
 class GeneratorExtensions:
-    """
-    Generator extensions for classes. The process runs after the default naming
-    conventions.
+    """Generator extensions model representation.
 
-    .. warning:: The generator doesn't validate imports!
+    Generator extensions for classes. The process runs after the
+    default naming conventions. The generator doesn't validate
+    imports!
 
-    :param extension: The list of extensions
+    Args:
+        extension: The list of extension instances
     """
 
     extension: List[GeneratorExtension] = array_element()
@@ -494,51 +491,36 @@ class GeneratorExtensions:
 
 @dataclass
 class GeneratorConfig:
-    """
-    Generator configuration binding model.
+    """Generator configuration model representation.
 
-    :cvar version: xsdata version number the config was created/updated
-    :param output: Output options
-    :param conventions: Generator conventions
-    :param aliases: Generator aliases, Deprecated since v21.12, use
-        substitutions
-    :param substitutions: Generator search and replace substitutions for
-        classes, fields, packages and modules names.
-    :param extensions: Generator custom base classes and decorators for
-        classes.
+    Args:
+        output: Output options
+        conventions: Generator conventions
+        substitutions: Search and replace substitutions for
+            classes, fields, packages and modules names.
+        extensions: Generator custom base classes and decorators for classes.
+
+    Attributes:
+        version: The xsdata version number the config was created/updated
     """
 
     class Meta:
+        """Metadata options."""
+
         name = "Config"
         namespace = "http://pypi.org/project/xsdata"
 
     version: str = attribute(init=False, default=__version__)
     output: GeneratorOutput = element(default_factory=GeneratorOutput)
     conventions: GeneratorConventions = element(default_factory=GeneratorConventions)
-    aliases: Optional[GeneratorAliases] = element(default=None)
     substitutions: GeneratorSubstitutions = element(
         default_factory=GeneratorSubstitutions
     )
     extensions: GeneratorExtensions = element(default_factory=GeneratorExtensions)
 
-    def __post_init__(self):
-        if self.aliases:
-            alias_map = {
-                ObjectType.CLASS: self.aliases.class_name,
-                ObjectType.FIELD: self.aliases.field_name,
-                ObjectType.PACKAGE: self.aliases.package_name,
-                ObjectType.MODULE: self.aliases.module_name,
-            }
-            for object_type, aliases in alias_map.items():
-                for alias in aliases:
-                    self.substitutions.substitution.append(
-                        GeneratorSubstitution(
-                            type=object_type, search=alias.source, replace=alias.target
-                        )
-                    )
-
     @classmethod
     def create(cls) -> "GeneratorConfig":
+        """Initialize with default substitutions for common namespaces."""
         obj = cls()
 
         for ns in Namespace:
@@ -558,6 +540,7 @@ class GeneratorConfig:
 
     @classmethod
     def read(cls, path: Path) -> "GeneratorConfig":
+        """Load configuration from a file path."""
         if not path.exists():
             return cls()
 
@@ -572,23 +555,11 @@ class GeneratorConfig:
                 fail_on_converter_warnings=True,
             ),
         )
-        config = parser.from_path(path, cls)
-
-        if config.aliases and (
-            config.aliases.class_name
-            or config.aliases.field_name
-            or config.aliases.package_name
-            or config.aliases.module_name
-        ):
-            config.aliases = None
-            logger.warning("Migrating aliases to substitutions config, verify output!")
-            with path.open("w") as fp:
-                config.write(fp, config)
-
-        return config
+        return parser.from_path(path, cls)
 
     @classmethod
     def write(cls, output: TextIO, obj: "GeneratorConfig"):
+        """Write the configuration to the output stream as xml."""
         ctx = XmlContext(
             element_name_generator=text.pascal_case,
             attribute_name_generator=text.camel_case,

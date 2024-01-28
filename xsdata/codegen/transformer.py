@@ -11,14 +11,16 @@ from typing import Callable, Dict, List, NamedTuple, Optional, Tuple
 from xsdata.codegen import opener
 from xsdata.codegen.analyzer import ClassAnalyzer
 from xsdata.codegen.container import ClassContainer
-from xsdata.codegen.mappers.definitions import DefinitionsMapper
-from xsdata.codegen.mappers.dict import DictMapper
-from xsdata.codegen.mappers.dtd import DtdMapper
-from xsdata.codegen.mappers.element import ElementMapper
-from xsdata.codegen.mappers.schema import SchemaMapper
+from xsdata.codegen.mappers import (
+    DefinitionsMapper,
+    DictMapper,
+    DtdMapper,
+    ElementMapper,
+    SchemaMapper,
+)
 from xsdata.codegen.models import Class
+from xsdata.codegen.parsers import DtdParser
 from xsdata.codegen.parsers.definitions import DefinitionsParser
-from xsdata.codegen.parsers.dtd import DtdParser
 from xsdata.codegen.parsers.schema import SchemaParser
 from xsdata.codegen.utils import ClassUtils
 from xsdata.codegen.writer import CodeWriter
@@ -40,6 +42,15 @@ TYPE_JSON = 5
 
 
 class SupportedType(NamedTuple):
+    """A supported resource model representation.
+
+    Args:
+        id: The integer identifier
+        name: The name of the resource type
+        match_uri: A callable to match against URI strings
+        match_content: A callable to match against the raw file content
+    """
+
     id: int
     name: str
     match_uri: Callable
@@ -80,13 +91,19 @@ supported_types = [
 ]
 
 
-class SchemaTransformer:
-    """
-    Orchestrate the code generation from a list of sources to the output
-    format.
+class ResourceTransformer:
+    """Orchestrate the code generation from a list of sources.
 
-    :param print: Print to stdout the generated output
-    :param config: Generator configuration
+    Supports xsd, wsdl, dtd, xml and json documents.
+
+    Args:
+        print: Print to stdout the generated output
+        config: Generator configuration
+
+    Attributes:
+        classes: A list of class instances
+        processed: A list of processed uris
+        preloaded: A uri/content map used as cache
     """
 
     __slots__ = ("print", "config", "classes", "processed", "preloaded")
@@ -99,6 +116,12 @@ class SchemaTransformer:
         self.preloaded: Dict = {}
 
     def process(self, uris: List[str], cache: bool = False):
+        """Process a list of resolved URI strings.
+
+        Args:
+            uris: A list of absolute URI strings to process
+            cache: Specifies whether to catch the initial parsed classes
+        """
         cache_file = self.get_cache_file(uris) if cache else None
         if cache_file and cache_file.exists():
             logger.info(f"Loading from cache {cache_file}")
@@ -113,6 +136,14 @@ class SchemaTransformer:
         self.process_classes()
 
     def process_sources(self, uris: List[str]):
+        """Process a list of resolved URI strings.
+
+        Load the source URI strings and map them to codegen
+        classes for further processing.
+
+        Args:
+            uris: A list of absolute URI strings to process
+        """
         sources = defaultdict(list)
         for uri in uris:
             tp = self.classify_resource(uri)
@@ -125,7 +156,11 @@ class SchemaTransformer:
         self.process_json_documents(sources[TYPE_JSON])
 
     def process_definitions(self, uris: List[str]):
-        """Process a list of wsdl resources."""
+        """Process a list of wsdl resources.
+
+        Args:
+            uris: A list of wsdl URI strings to process
+        """
         definitions = None
         for uri in uris:
             services = self.parse_definitions(uri, namespace=None)
@@ -139,12 +174,20 @@ class SchemaTransformer:
             self.convert_definitions(definitions)
 
     def process_schemas(self, uris: List[str]):
-        """Process a list of xsd resources."""
+        """Process a list of xsd resources.
+
+        Args:
+            uris: A list of xsd URI strings to process
+        """
         for uri in uris:
             self.process_schema(uri)
 
     def process_dtds(self, uris: List[str]):
-        """Process a list of dtd resources."""
+        """Process a list of dtd resources.
+
+        Args:
+            uris: A list of dtd URI strings to process
+        """
         classes: List[Class] = []
 
         for uri in uris:
@@ -158,13 +201,23 @@ class SchemaTransformer:
         self.classes.extend(classes)
 
     def process_schema(self, uri: str, namespace: Optional[str] = None):
-        """Parse and convert schema to codegen models."""
+        """Parse and convert schema to codegen models.
+
+        Args:
+            uri: The schema URI location
+            namespace: The target namespace, if the URI is
+                from an inline import
+        """
         schema = self.parse_schema(uri, namespace)
         if schema:
             self.convert_schema(schema)
 
     def process_xml_documents(self, uris: List[str]):
-        """Process a list of xml resources."""
+        """Process a list of xml resources.
+
+        Args:
+            uris: A list of xml URI strings to process
+        """
         classes = []
         parser = TreeParser()
         location = os.path.dirname(uris[0]) if uris else ""
@@ -178,7 +231,11 @@ class SchemaTransformer:
         self.classes.extend(ClassUtils.reduce_classes(classes))
 
     def process_json_documents(self, uris: List[str]):
-        """Process a list of json resources."""
+        """Process a list of json resources.
+
+        Args:
+            uris: A list of json URI strings to process
+        """
         classes = []
         name = self.config.output.package.split(".")[-1]
         dirname = os.path.dirname(uris[0]) if uris else ""
@@ -200,8 +257,7 @@ class SchemaTransformer:
         self.classes.extend(ClassUtils.reduce_classes(classes))
 
     def process_classes(self):
-        """Process the generated classes and write or print the final
-        output."""
+        """Process the generated classes and write or print the output."""
         class_num, inner_num = self.count_classes(self.classes)
         if class_num:
             logger.info(
@@ -223,8 +279,13 @@ class SchemaTransformer:
             raise CodeGenerationError("Nothing to generate.")
 
     def convert_schema(self, schema: Schema):
-        """Convert a schema instance to codegen classes and process imports to
-        other schemas."""
+        """Convert a schema instance to codegen classes.
+
+        Process recursively any schema imports.
+
+        Args:
+            schema: The xsd schema instance
+        """
         for sub in schema.included():
             if sub.location:
                 self.process_schema(sub.location, schema.target_namespace)
@@ -236,7 +297,7 @@ class SchemaTransformer:
         self.classes.extend(DefinitionsMapper.map(definitions))
 
     def generate_classes(self, schema: Schema) -> List[Class]:
-        """Convert the given schema tree to a list of classes."""
+        """Convert the given schema instance to a list of classes."""
         uri = schema.location
         logger.info("Compiling schema %s", uri if uri else "...")
         classes = SchemaMapper.map(schema)
@@ -248,7 +309,12 @@ class SchemaTransformer:
         return classes
 
     def parse_schema(self, uri: str, namespace: Optional[str]) -> Optional[Schema]:
-        """Parse the given schema uri and return the schema tree object."""
+        """Parse the given URI and return the schema instance.
+
+        Args:
+            uri: The resource URI
+            namespace: The target namespace
+        """
         input_stream = self.load_resource(uri)
         if input_stream is None:
             return None
@@ -258,11 +324,16 @@ class SchemaTransformer:
         return parser.from_bytes(input_stream, Schema)
 
     def parse_definitions(
-        self, uri: str, namespace: Optional[str]
+        self,
+        uri: str,
+        namespace: Optional[str],
     ) -> Optional[Definitions]:
-        """Parse recursively the given wsdl uri and return the definitions'
-        tree object."""
+        """Parse recursively the given URI and return the definitions instance.
 
+        Args:
+            uri: The resource URI
+            namespace: The target namespace
+        """
         input_stream = self.load_resource(uri)
         if input_stream is None:
             return None
@@ -285,7 +356,14 @@ class SchemaTransformer:
         return definitions
 
     def load_resource(self, uri: str) -> Optional[bytes]:
-        """Read and return the contents of the given uri."""
+        """Read and return the contents of the given URI.
+
+        Args:
+            uri: The resource URI
+
+        Returns:
+            The raw bytes content or None if the resource could not be read
+        """
         if uri not in self.processed:
             try:
                 self.processed.append(uri)
@@ -298,9 +376,14 @@ class SchemaTransformer:
         return None
 
     def classify_resource(self, uri: str) -> int:
-        """Detect the resource type by the uri extension or the file
-        contents."""
+        """Detect the resource type by the URI extension or the contents.
 
+        Args:
+            uri: The resource URI
+
+        Returns:
+            The resource integer identifier.
+        """
         for supported_type in supported_types:
             if supported_type.match_uri(uri):
                 return supported_type.id
@@ -318,16 +401,21 @@ class SchemaTransformer:
         return TYPE_UNKNOWN
 
     def analyze_classes(self, classes: List[Class]) -> List[Class]:
-        """Analyzer the given class list and simplify attributes and
-        extensions."""
-
+        """Analyzer the given class list and return the final list of classes."""
         container = ClassContainer(config=self.config)
         container.extend(classes)
 
         return ClassAnalyzer.process(container)
 
     def count_classes(self, classes: List[Class]) -> Tuple[int, int]:
-        """Return a tuple of counters for the main and inner classes."""
+        """Return a tuple of counters for the main and inner classes.
+
+        Args:
+            classes: A list of class instances
+
+        Returns:
+            A tuple of root, inner counters, e.g. (100, 5)
+        """
         main = len(classes)
         inner = 0
         for cls in classes:
@@ -337,6 +425,14 @@ class SchemaTransformer:
 
     @classmethod
     def get_cache_file(cls, uris: List[str]) -> Path:
+        """Return the cache path for the raw mapped classes.
+
+        Args:
+            uris: A list of URI strings
+
+        Returns:
+            A temporary file path instance
+        """
         key = hashlib.md5("".join(uris).encode()).hexdigest()
         tempdir = tempfile.gettempdir()
         return Path(tempdir).joinpath(f"{key}.cache")

@@ -10,8 +10,11 @@ from xsdata.utils.collections import group_by
 
 
 class ClassValidator:
-    """Run validations against the class container in order to remove or merge
-    invalid or redefined types."""
+    """Container class validator.
+
+    Args:
+        container: The class container instance
+    """
 
     __slots__ = "container"
 
@@ -19,13 +22,15 @@ class ClassValidator:
         self.container = container
 
     def process(self):
-        """
-        Remove if possible classes with the same qualified name.
+        """Main process entrypoint.
+
+        Runs on groups of classes with the same
+        qualified name.
 
         Steps:
             1. Remove invalid classes
             2. Handle duplicate types
-            3. Merge dummy types
+            3. Merge global types
         """
         for classes in self.container.data.values():
             if len(classes) > 1:
@@ -38,8 +43,11 @@ class ClassValidator:
                 self.merge_global_types(classes)
 
     def remove_invalid_classes(self, classes: List[Class]):
-        """Remove from the given class list any class with missing extension
-        type."""
+        """Remove classes with undefined extensions.
+
+        Args:
+            classes: A list of
+        """
 
         def is_invalid(ext: Extension) -> bool:
             """Check if given type declaration is not native and is missing."""
@@ -51,9 +59,20 @@ class ClassValidator:
 
     @classmethod
     def handle_duplicate_types(cls, classes: List[Class]):
-        """Handle classes with same namespace, name that are derived from the
-        same xs type."""
+        """Find and handle duplicate classes.
 
+        If a class is defined more than once, keep either
+        the one that was in redefines or overrides, or the
+        last definition. If a class was redefined merge
+        circular group attrs and extensions.
+
+        In order for two classes to be duplicated they must
+        have the same qualified name and be derived from the
+        same xsd element.
+
+        Args:
+            classes: A list of classes with the same qualified name
+        """
         for items in group_by(classes, get_tag).values():
             if len(items) == 1:
                 continue
@@ -76,12 +95,14 @@ class ClassValidator:
 
     @classmethod
     def merge_redefined_type(cls, source: Class, target: Class):
-        """
-        Copy any attributes and extensions to redefined types from the original
-        definitions.
+        """Merge source properties to the target redefined target class instance.
 
-        Redefined inheritance is optional search for self references in
-        extensions and attribute groups.
+        Redefined classes usually have references to the original
+        class. We need to copy those.
+
+        Args:
+            source: The original source class instance
+            target: The redefined target class instance
         """
         circular_extension = cls.find_circular_extension(target)
         circular_group = cls.find_circular_group(target)
@@ -95,11 +116,16 @@ class ClassValidator:
 
     @classmethod
     def select_winner(cls, candidates: List[Class]) -> int:
-        """
-        Returns the index of the class that will survive the duplicate process.
+        """From a list of classes select which class index will remain.
 
         Classes that were extracted from in xs:override/xs:redefined
         containers have priority, otherwise pick the last in the list.
+
+        Args:
+            candidates: A list of duplicate class instances
+
+        Returns:
+            The index of winner class or -1 if there is no clear winner.
         """
         for index, item in enumerate(candidates):
             if item.container in (Tag.OVERRIDE, Tag.REDEFINE):
@@ -109,8 +135,18 @@ class ClassValidator:
 
     @classmethod
     def find_circular_extension(cls, target: Class) -> Optional[Extension]:
-        """Search for any target class extensions that is a circular
-        reference."""
+        """Find the first circular reference extension.
+
+        Redefined classes usually have references to the original
+        class with the same qualified name. We need to locate
+        those and copy any attrs.
+
+        Args:
+            target: The target class instance to inspect
+
+        Returns:
+            An extension instance or None if there is no circular extension.
+        """
         for ext in target.extensions:
             if ext.type.name == target.name:
                 return ext
@@ -119,20 +155,33 @@ class ClassValidator:
 
     @classmethod
     def find_circular_group(cls, target: Class) -> Optional[Attr]:
-        """Search for any target class attributes that is a circular
-        reference."""
+        """Find an attr with the same name as the target class name.
+
+        Redefined classes usually have references to the original
+        class with the same qualified name. We need to locate
+        those and copy any attrs.
+
+        Args:
+            target: The target class instance to inspect
+
+        Returns:
+            An attr instance or None if there is no circular attr.
+        """
         return ClassUtils.find_attr(target, target.name)
 
     @classmethod
     def merge_global_types(cls, classes: List[Class]):
-        """
-        Merge parent-child global types.
+        """Merge parent-child global types.
 
         Conditions
             1. One of them is derived from xs:element
             2. One of them is derived from xs:complexType
             3. The xs:element is a subclass of the xs:complexType
             4. The xs:element has no attributes (This can't happen in a valid schema)
+
+
+        Args:
+             classes: A list of duplicate classes
         """
         el = collections.first(x for x in classes if x.tag == Tag.ELEMENT)
         ct = collections.first(x for x in classes if x.tag == Tag.COMPLEX_TYPE)

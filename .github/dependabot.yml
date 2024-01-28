@@ -5,3 +5,12 @@ updates:
   schedule:
     interval: daily
   open-pull-requests-limit: 10
+- package-ecosystem: github-actions
+  directory: /
+  schedule:
+    interval: monthly
+  groups:
+    # open a single pull-request for all GitHub actions updates
+    github-actions:
+      patterns:
+      - '*'

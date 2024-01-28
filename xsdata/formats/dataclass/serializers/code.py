@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from enum import Enum
 from io import StringIO
-from typing import Any, List, Mapping, Set, TextIO, Tuple, Type, Union
+from typing import Any, Iterator, List, Mapping, Set, TextIO, Tuple, Type, Union
 
 from xsdata.formats.bindings import AbstractSerializer
 from xsdata.formats.dataclass.context import XmlContext
@@ -83,7 +83,7 @@ class PycodeSerializer(AbstractSerializer):
 
         return "".join(sorted(set(imports)))
 
-    def repr_object(self, obj: Any, level: int, types: Set[Type]):
+    def repr_object(self, obj: Any, level: int, types: Set[Type]) -> Iterator[str]:
         """Write the given object as repr code.
 
         Args:
@@ -106,7 +106,12 @@ class PycodeSerializer(AbstractSerializer):
         else:
             yield literal_value(obj)
 
-    def repr_array(self, obj: Union[List, Set, Tuple], level: int, types: Set[Type]):
+    def repr_array(
+        self,
+        obj: Union[List, Set, Tuple],
+        level: int,
+        types: Set[Type],
+    ) -> Iterator[str]:
         """Convert an iterable object to repr code.
 
         Args:
@@ -130,7 +135,7 @@ class PycodeSerializer(AbstractSerializer):
 
         yield f"{spaces * level}]"
 
-    def repr_mapping(self, obj: Mapping, level: int, types: Set[Type]):
+    def repr_mapping(self, obj: Mapping, level: int, types: Set[Type]) -> Iterator[str]:
         """Convert a map object to repr code.
 
         Args:
@@ -156,7 +161,7 @@ class PycodeSerializer(AbstractSerializer):
 
         yield f"{spaces * level}}}"
 
-    def repr_model(self, obj: Any, level: int, types: Set[Type]):
+    def repr_model(self, obj: Any, level: int, types: Set[Type]) -> Iterator[str]:
         """Convert a data model instance to repr code.
 
         Args:

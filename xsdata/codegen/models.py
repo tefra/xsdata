@@ -634,7 +634,7 @@ class Class:
 
         Raises:
             CodeGenerationError: if the target was not designated
-            a package and module.
+                a package and module.
         """
         if self.package and self.module:
             return f"{self.package}.{self.module}"

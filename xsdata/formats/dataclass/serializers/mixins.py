@@ -264,7 +264,7 @@ class XmlWriter(abc.ABC):
         generation.
 
         Args:
-             is_nil: Specify if the element requires `xsi:nil="true"`
+            is_nil: Specify if the element requires `xsi:nil="true"`
                 when content is empty
         """
         if not self.pending_tag:

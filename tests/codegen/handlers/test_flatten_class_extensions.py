@@ -225,7 +225,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
         self.processor.process_native_extension(target, extension)
         mock_replace_attributes_type.assert_called_once_with(target, extension)
 
-    def test_process_simple_extension_with_circular_refence(self):
+    def test_process_simple_extension_with_circular_reference(self):
         extension = ExtensionFactory.create()
         target = ClassFactory.create(extensions=[extension])
         self.processor.process_simple_extension(target, target, extension)

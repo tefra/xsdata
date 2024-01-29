@@ -66,7 +66,7 @@ styles.
 **clusters**
 
 This style will identify the strongly connected classes and will group them together,
-creating as many modules as possible. The modules are named after the the main class
+creating as many modules as possible. The modules are named after the main class
 of the group.
 
 .. code-block:: console

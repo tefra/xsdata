@@ -11,7 +11,7 @@ repos:
     rev: v0.1.11
     hooks:
       - id: ruff
-        args: [ --fix ]
+        args: [ --fix, --show-fixes ]
       - id: ruff-format
 
   - repo: https://github.com/PyCQA/docformatter

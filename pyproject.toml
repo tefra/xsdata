@@ -81,6 +81,7 @@ version = {attr = "xsdata.__version__"}
 [tool.ruff]
 target-version = "py38"
 
+[tool.ruff.lint]
 select = [
     # pycodestyle
     "E",

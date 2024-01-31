@@ -46,6 +46,7 @@ class ClassContainerTests(FactoryTestCase):
                 "ProcessAttributeTypes",
                 "MergeAttributes",
                 "ProcessMixedContentClass",
+                "UnwrapLists",
             ],
             30: [
                 "ResetAttributeSequences",

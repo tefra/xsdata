@@ -15,6 +15,7 @@ from .reset_attribute_sequences import ResetAttributeSequences
 from .sanitize_attributes_default_value import SanitizeAttributesDefaultValue
 from .sanitize_enumeration_class import SanitizeEnumerationClass
 from .unnest_inner_classes import UnnestInnerClasses
+from .unwrap_lists import UnwrapLists
 from .update_attributes_effective_choice import UpdateAttributesEffectiveChoice
 from .vacuum_inner_classes import VacuumInnerClasses
 from .validate_attributes_overrides import ValidateAttributesOverrides
@@ -37,6 +38,7 @@ __all__ = [
     "SanitizeAttributesDefaultValue",
     "SanitizeEnumerationClass",
     "UnnestInnerClasses",
+    "UnwrapLists",
     "UpdateAttributesEffectiveChoice",
     "VacuumInnerClasses",
     "ValidateAttributesOverrides",

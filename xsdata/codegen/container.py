@@ -18,6 +18,7 @@ from xsdata.codegen.handlers import (
     SanitizeAttributesDefaultValue,
     SanitizeEnumerationClass,
     UnnestInnerClasses,
+    UnwrapLists,
     UpdateAttributesEffectiveChoice,
     VacuumInnerClasses,
     ValidateAttributesOverrides,
@@ -54,6 +55,7 @@ class ClassContainer(ContainerInterface):
                 FlattenAttributeGroups(self),
             ],
             Steps.FLATTEN: [
+                UnwrapLists(self),
                 CalculateAttributePaths(),
                 FlattenClassExtensions(self),
                 SanitizeEnumerationClass(self),

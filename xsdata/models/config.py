@@ -168,6 +168,18 @@ class ExtensionType(Enum):
     DECORATOR = "decorator"
 
 
+class UnwrapListType(Enum):
+    """
+    Wrapped lists behaviour
+
+    :cvar KEEP: keep: Keep list wrappers in classes
+    :cvar INNER_NAME: innerName: Remove list wrapper keeping the inner element name
+    :cvar OUTER_NAME: outerName: Remove list wrapper keeping the outer element name
+    """
+    KEEP = "keep"
+    INNER_NAME = "innerName"
+    OUTER_NAME = "outerName"
+
 @dataclass
 class OutputFormat:
     """
@@ -261,6 +273,7 @@ class GeneratorOutput:
     :param ignore_patterns: Ignore pattern restrictions
     :param include_header: Include a header with codegen information in
         the output
+    :param wrapped_lists: Remove wrapper classes from list attributes keeping either the inner or outer element name
     """
 
     package: str = element(default="generated")
@@ -281,6 +294,7 @@ class GeneratorOutput:
     unnest_classes: bool = element(default=False)
     ignore_patterns: bool = element(default=False)
     include_header: bool = element(default=False)
+    wrapped_lists: UnwrapListType = element(default=UnwrapListType.KEEP)
 
     def __post_init__(self):
         self.validate()

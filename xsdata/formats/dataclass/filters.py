@@ -375,6 +375,9 @@ class Filters:
         if self.docstring_style == DocstringStyle.ACCESSIBLE and attr.help:
             metadata["doc"] = self.clean_docstring(attr.help, False)
 
+        if attr.wrapper is not None:
+            metadata["wrapper"] = attr.wrapper
+
         return self.filter_metadata(metadata)
 
     def field_choices(

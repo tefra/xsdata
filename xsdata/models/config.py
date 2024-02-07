@@ -268,7 +268,8 @@ class GeneratorOutput:
     structure_style: StructureStyle = element(
         default=StructureStyle.FILENAMES, name="Structure"
     )
-    docstring_style: DocstringStyle = element(default=DocstringStyle.RST)
+    docstring_
+      style: DocstringStyle = element(default=DocstringStyle.RST)
     filter_strategy: ClassFilterStrategy = element(
         default=ClassFilterStrategy.ALL_GLOBALS
     )
@@ -491,6 +492,24 @@ class GeneratorExtensions:
 
     extension: List[GeneratorExtension] = array_element()
 
+@dataclass
+class GeneratorSimpleType:
+    """
+    SimpleType to keep
+
+    :param type: The target object type
+    """
+
+    type: ObjectType = attribute(required=True)
+
+@dataclass
+class GeneratorTypesKeeping:
+    """
+    Generator simple types keeping.
+
+    :param types: The list of types to keep
+    """
+    simple_types: List[GeneratorSimpleType] = array_element()
 
 @dataclass
 class GeneratorConfig:
@@ -520,6 +539,7 @@ class GeneratorConfig:
         default_factory=GeneratorSubstitutions
     )
     extensions: GeneratorExtensions = element(default_factory=GeneratorExtensions)
+    keep: GeneratorTypesKeeping = element(default_factory=GeneratorTypesKeeping)
 
     def __post_init__(self):
         if self.aliases:

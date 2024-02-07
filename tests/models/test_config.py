@@ -50,7 +50,7 @@ class GeneratorConfigTests(TestCase):
             '    <ConstantName case="screamingSnakeCase" safePrefix="value"/>\n'
             '    <ModuleName case="snakeCase" safePrefix="mod"/>\n'
             '    <PackageName case="snakeCase" safePrefix="pkg"/>\n'
-            "  </Conventions>\n"
+            "  </Conventions>\n"            
             "  <Substitutions>\n"
             '    <Substitution type="package" search="http://www.w3.org/2001/XMLSchema" replace="xs"/>\n'
             '    <Substitution type="package" search="http://www.w3.org/XML/1998/namespace" replace="xml"/>\n'
@@ -64,6 +64,7 @@ class GeneratorConfigTests(TestCase):
             '    <Substitution type="class" search="(.*)Class$" replace="\\1Type"/>\n'
             "  </Substitutions>\n"
             "  <Extensions/>\n"
+            "  <TypesToKeep/>\n"
             "</Config>\n"
         )
         self.assertEqual(expected, file_path.read_text())
@@ -81,6 +82,7 @@ class GeneratorConfigTests(TestCase):
             "  </Conventions>\n"
             "  <Aliases/>\n"
             "  <Substitutions/>\n"
+            "  <TypesToKeep/>\n"
             "</Config>\n"
         )
         file_path = Path(tempfile.mktemp())
@@ -116,6 +118,7 @@ class GeneratorConfigTests(TestCase):
             "  <Aliases/>\n"
             "  <Substitutions/>\n"
             "  <Extensions/>\n"
+            "  <TypesToKeep/>\n"
             "</Config>\n"
         )
         self.assertEqual(expected, file_path.read_text())

@@ -268,8 +268,7 @@ class GeneratorOutput:
     structure_style: StructureStyle = element(
         default=StructureStyle.FILENAMES, name="Structure"
     )
-    docstring_
-      style: DocstringStyle = element(default=DocstringStyle.RST)
+    docstring_style: DocstringStyle = element(default=DocstringStyle.RST)
     filter_strategy: ClassFilterStrategy = element(
         default=ClassFilterStrategy.ALL_GLOBALS
     )
@@ -539,7 +538,7 @@ class GeneratorConfig:
         default_factory=GeneratorSubstitutions
     )
     extensions: GeneratorExtensions = element(default_factory=GeneratorExtensions)
-    keep: GeneratorTypesKeeping = element(default_factory=GeneratorTypesKeeping)
+    types_to_keep: GeneratorTypesKeeping = element(default_factory=GeneratorTypesKeeping)
 
     def __post_init__(self):
         if self.aliases:

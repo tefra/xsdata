@@ -75,9 +75,9 @@ class SchemaParser(UserXmlParser):
         """Collect the schema's default form for attributes and elements for
         later usage."""
 
-        self.element_form = attrs.get("elementFormDefault", None)
-        self.attribute_form = attrs.get("attributeFormDefault", None)
-        self.default_attributes = attrs.get("defaultAttributes", None)
+        self.element_form = attrs.get("elementFormDefault")
+        self.attribute_form = attrs.get("attributeFormDefault")
+        self.default_attributes = attrs.get("defaultAttributes")
 
     def end_schema(self, obj: T):
         """Normalize various properties for the schema and it's children."""

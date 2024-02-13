@@ -1,23 +1,44 @@
 import sys
 from typing import Any, Dict, List
 
-from xsdata.codegen.mappers.element import ElementMapper
+from xsdata.codegen.mappers.mixins import RawDocumentMapper
 from xsdata.codegen.models import AttrType, Class
 from xsdata.codegen.utils import ClassUtils
 from xsdata.models.enums import Tag
 
 
-class DictMapper:
-    """Map a dictionary to classes, extensions and attributes."""
+class DictMapper(RawDocumentMapper):
+    """Map a dictionary to classes.
+
+    This mapper is used to build classes from raw json documents.
+    """
 
     @classmethod
     def map(cls, data: Dict, name: str, location: str) -> List[Class]:
-        """Convert a dictionary to a list of codegen classes."""
+        """Map a dictionary to classes.
+
+        Args:
+            data: The json resource data
+            name: The main resource name
+            location: The resource location
+
+        Returns:
+            The list of classes.
+        """
         target = cls.build_class(data, name)
         return list(ClassUtils.flatten(target, f"{location}/{name}"))
 
     @classmethod
     def build_class(cls, data: Dict, name: str) -> Class:
+        """Build a class from a data dictionary.
+
+        Args:
+            data: The json resource data
+            name: The main resource name
+
+        Returns:
+            The list of classes.
+        """
         target = Class(qname=name, tag=Tag.ELEMENT, location="")
 
         for key, value in data.items():
@@ -27,6 +48,13 @@ class DictMapper:
 
     @classmethod
     def build_class_attribute(cls, target: Class, name: str, value: Any):
+        """Build a class attr.
+
+        Args:
+            target: The target class instance
+            name: The attr name
+            value: The data value to extract types and restrictions.
+        """
         if isinstance(value, list):
             if not value:
                 cls.build_class_attribute(target, name, None)
@@ -41,6 +69,6 @@ class DictMapper:
                 attr_type = AttrType(qname=inner.qname, forward=True)
                 target.inner.append(inner)
             else:
-                attr_type = ElementMapper.build_attribute_type(name, value)
+                attr_type = cls.build_attr_type(name, value)
 
-            ElementMapper.build_attribute(target, name, attr_type)
+            cls.build_attr(target, name, attr_type)

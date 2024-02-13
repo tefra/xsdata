@@ -7,13 +7,13 @@ from xsdata.models.enums import DataType
 
 
 class StandardNode(XmlNode):
-    """
-    XmlNode for any type elements with a standard xsi:type.
+    """XmlNode for elements with a standard xsi:type.
 
-    :param datatype: Standard xsi data type
-    :param ns_map: Namespace prefix-URI map
-    :param nillable: Specify whether the node supports nillable content
-    :param derived_factory: Optional derived element factory
+    Args:
+        datatype: The element standard xsi data type
+        ns_map: The element namespace prefix-URI map
+        nillable: Specifies whether nil content is allowed
+        derived_factory: The derived element factory
     """
 
     __slots__ = "datatype", "ns_map", "nillable", "derived_factory"
@@ -31,8 +31,27 @@ class StandardNode(XmlNode):
         self.derived_factory = derived_factory
 
     def bind(
-        self, qname: str, text: Optional[str], tail: Optional[str], objects: List
+        self,
+        qname: str,
+        text: Optional[str],
+        tail: Optional[str],
+        objects: List,
     ) -> bool:
+        """Bind the parsed data into an object for the ending element.
+
+        This entry point is called when a xml element ends and is
+        responsible to parse the current element text content.
+
+        Args:
+            qname: The element qualified name
+            text: The element text content
+            tail: The element tail content
+            objects: The list of intermediate parsed objects
+
+        Returns:
+            Always true, it's not possible to fail during parsing
+            for this node.
+        """
         obj = ParserUtils.parse_value(
             value=text,
             types=[self.datatype.type],
@@ -53,4 +72,5 @@ class StandardNode(XmlNode):
         return True
 
     def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
-        raise XmlContextError("Primitive node doesn't support child nodes!")
+        """Raise an exception if there is a child element inside this node."""
+        raise XmlContextError("StandardNode node doesn't support child nodes!")

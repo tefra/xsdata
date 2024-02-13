@@ -31,6 +31,8 @@ DS_OFFSET = -60
 
 
 class DateFormat:
+    """Xml date formats."""
+
     DATE = "%Y-%m-%d%z"
     TIME = "%H:%M:%S%z"
     DATE_TIME = "%Y-%m-%dT%H:%M:%S%z"
@@ -42,17 +44,16 @@ class DateFormat:
 
 
 class XmlDate(NamedTuple):
-    """
-    Concrete xs:date builtin type.
+    """Concrete xs:date builtin type.
 
     Represents iso 8601 date format [-]CCYY-MM-DD[Z|(+|-)hh:mm] with
     rich comparisons and hashing.
 
-    :param year: Any signed integer, eg (0, -535, 2020)
-    :param month: Unsigned integer between 1-12
-    :param day: Unsigned integer between 1-31
-    :param offset: Signed integer representing timezone offset in
-        minutes
+    Args:
+        year: Any signed integer, eg (0, -535, 2020)
+        month: Unsigned integer between 1-12
+        day: Unsigned integer between 1-31
+        offset: Signed integer representing timezone offset in minutes
     """
 
     year: int
@@ -67,9 +68,7 @@ class XmlDate(NamedTuple):
         day: Optional[int] = None,
         offset: Optional[int] = True,
     ) -> "XmlDate":
-        """Return a new instance replacing the specified fields with new
-        values."""
-
+        """Return a new instance replacing the specified fields with new values."""
         if year is None:
             year = self.year
         if month is None:
@@ -83,51 +82,48 @@ class XmlDate(NamedTuple):
 
     @classmethod
     def from_string(cls, string: str) -> "XmlDate":
-        """Initialize from string with format ``%Y-%m-%dT%z``"""
+        """Initialize from string with format `%Y-%m-%dT%z`."""
         return cls(*parse_date_args(string, DateFormat.DATE))
 
     @classmethod
     def from_date(cls, obj: datetime.date) -> "XmlDate":
-        """
-        Initialize from :class:`datetime.date` instance.
-
-        .. warning::
-
-            date instances don't have timezone information!
-        """
+        """Initialize from a `datetime.date` instance."""
         return cls(obj.year, obj.month, obj.day)
 
     @classmethod
     def from_datetime(cls, obj: datetime.datetime) -> "XmlDate":
-        """Initialize from :class:`datetime.datetime` instance."""
+        """Initialize from `datetime.datetime` instance."""
         return cls(obj.year, obj.month, obj.day, calculate_offset(obj))
 
     @classmethod
     def today(cls) -> "XmlDate":
-        """Initialize from datetime.date.today()"""
+        """Initialize with the current date."""
         return cls.from_date(datetime.date.today())
 
     def to_date(self) -> datetime.date:
-        """Return a :class:`datetime.date` instance."""
+        """Convert to a :`datetime.date` instance."""
         return datetime.date(self.year, self.month, self.day)
 
     def to_datetime(self) -> datetime.datetime:
-        """Return a :class:`datetime.datetime` instance."""
+        """Convert to a `datetime.datetime` instance."""
         tz_info = calculate_timezone(self.offset)
         return datetime.datetime(self.year, self.month, self.day, tzinfo=tz_info)
 
     def __str__(self) -> str:
-        """
-        Return the date formatted according to ISO 8601 for xml.
+        """Return the date formatted according to ISO 8601 for xml.
 
         Examples:
             - 2001-10-26
             - 2001-10-26+02:00
             - 2001-10-26Z
+
+        Returns:
+            The str result.
         """
         return format_date(self.year, self.month, self.day) + format_offset(self.offset)
 
     def __repr__(self) -> str:
+        """Return the instance string representation."""
         args = [self.year, self.month, self.day, self.offset]
         if args[-1] is None:
             del args[-1]
@@ -136,20 +132,20 @@ class XmlDate(NamedTuple):
 
 
 class XmlDateTime(NamedTuple):
-    """
-    Concrete xs:dateTime builtin type.
+    """Concrete xs:dateTime builtin type.
 
-    Represents iso 8601 date time format [-]CCYY-MM-DDThh
-    :mm: ss[Z|(+|-)hh:mm] with rich comparisons and hashing.
-    :param year: Any signed integer, eg (0, -535, 2020)
-    :param month: Unsigned integer between 1-12
-    :param day: Unsigned integer between 1-31
-    :param hour: Unsigned integer between 0-24
-    :param minute: Unsigned integer between 0-59
-    :param second: Unsigned integer between 0-59
-    :param fractional_second: Unsigned integer between 0-999999999
-    :param offset: Signed integer representing timezone offset in
-        minutes
+    Represents iso 8601 date time format `[-]CCYY-MM-DDThh:mm: ss[Z|(+|-)hh:mm]`
+    with rich comparisons and hashing.
+
+    Args:
+        year: Any signed integer, eg (0, -535, 2020)
+        month: Unsigned integer between 1-12
+        day: Unsigned integer between 1-31
+        hour: Unsigned integer between 0-24
+        minute: Unsigned integer between 0-59
+        second: Unsigned integer between 0-59
+        fractional_second: Unsigned integer between 0-999999999
+        offset: Signed integer representing timezone offset in minutes
     """
 
     year: int
@@ -163,10 +159,12 @@ class XmlDateTime(NamedTuple):
 
     @property
     def microsecond(self) -> int:
+        """Calculate the instance microseconds."""
         return self.fractional_second // 1000
 
     @property
     def duration(self) -> float:
+        """Calculate the instance signed duration in seconds."""
         if self.year < 0:
             negative = True
             year = -self.year
@@ -188,7 +186,7 @@ class XmlDateTime(NamedTuple):
 
     @classmethod
     def from_string(cls, string: str) -> "XmlDateTime":
-        """Initialize from string with format ``%Y-%m-%dT%H:%M:%S%z``"""
+        """Initialize from string with format `%Y-%m-%dT%H:%M:%S%z`."""
         (
             year,
             month,
@@ -206,7 +204,7 @@ class XmlDateTime(NamedTuple):
 
     @classmethod
     def from_datetime(cls, obj: datetime.datetime) -> "XmlDateTime":
-        """Initialize from :class:`datetime.datetime` instance."""
+        """Initialize from `datetime.datetime` instance."""
         return cls(
             obj.year,
             obj.month,
@@ -220,16 +218,16 @@ class XmlDateTime(NamedTuple):
 
     @classmethod
     def now(cls, tz: Optional[datetime.timezone] = None) -> "XmlDateTime":
-        """Initialize from datetime.datetime.now()"""
+        """Initialize with the current datetime and the given timezone."""
         return cls.from_datetime(datetime.datetime.now(tz=tz))
 
     @classmethod
     def utcnow(cls) -> "XmlDateTime":
-        """Initialize from datetime.now(timezone.utc)"""
+        """Initialize with the current datetime and utc timezone."""
         return cls.from_datetime(datetime.datetime.now(datetime.timezone.utc))
 
     def to_datetime(self) -> datetime.datetime:
-        """Return a :class:`datetime.datetime` instance."""
+        """Return a `datetime.datetime` instance."""
         return datetime.datetime(
             self.year,
             self.month,
@@ -252,9 +250,7 @@ class XmlDateTime(NamedTuple):
         fractional_second: Optional[int] = None,
         offset: Optional[int] = True,
     ) -> "XmlDateTime":
-        """Return a new instance replacing the specified fields with new
-        values."""
-
+        """Return a new instance replacing the specified fields with new values."""
         if year is None:
             year = self.year
         if month is None:
@@ -277,8 +273,7 @@ class XmlDateTime(NamedTuple):
         )
 
     def __str__(self) -> str:
-        """
-        Return the datetime formatted according to ISO 8601 for xml.
+        """Return the datetime formatted according to ISO 8601 for xml.
 
         Examples:
             - 2001-10-26T21:32:52
@@ -295,6 +290,7 @@ class XmlDateTime(NamedTuple):
         )
 
     def __repr__(self) -> str:
+        """Return the instance string representation."""
         args = tuple(self)
         if args[-1] is None:
             args = args[:-1]
@@ -305,36 +301,42 @@ class XmlDateTime(NamedTuple):
         return f"{self.__class__.__qualname__}({', '.join(map(str, args))})"
 
     def __eq__(self, other: Any) -> bool:
-        return cmp(self, other, operator.eq)
+        """Return self == other."""
+        return _cmp(self, other, operator.eq)
 
     def __ne__(self, other: Any) -> bool:
-        return cmp(self, other, operator.ne)
+        """Return self != other."""
+        return _cmp(self, other, operator.ne)
 
     def __lt__(self, other: Any) -> bool:
-        return cmp(self, other, operator.lt)
+        """Return self < other."""
+        return _cmp(self, other, operator.lt)
 
     def __le__(self, other: Any) -> bool:
-        return cmp(self, other, operator.le)
+        """Return self <= other."""
+        return _cmp(self, other, operator.le)
 
     def __gt__(self, other: Any) -> bool:
-        return cmp(self, other, operator.gt)
+        """Return self > other."""
+        return _cmp(self, other, operator.gt)
 
     def __ge__(self, other: Any) -> bool:
-        return cmp(self, other, operator.ge)
+        """Return self >= other."""
+        return _cmp(self, other, operator.ge)
 
 
 class XmlTime(NamedTuple):
-    """
-    Concrete xs:time builtin type.
+    """Concrete xs:time builtin type.
 
-    Represents iso 8601 time format hh
-    :mm: ss[Z|(+|-)hh:mm] with rich comparisons and hashing.
-    :param hour: Unsigned integer between 0-24
-    :param minute: Unsigned integer between 0-59
-    :param second: Unsigned integer between 0-59
-    :param fractional_second: Unsigned integer between 0-999999999
-    :param offset: Signed integer representing timezone offset in
-        minutes
+    Represents iso 8601 time format `hh:mm: ss[Z|(+|-)hh:mm]`
+    with rich comparisons and hashing.
+
+    Args:
+        hour: Unsigned integer between 0-24
+        minute: Unsigned integer between 0-59
+        second: Unsigned integer between 0-59
+        fractional_second: Unsigned integer between 0-999999999
+        offset: Signed integer representing timezone offset in minutes
     """
 
     hour: int
@@ -345,10 +347,12 @@ class XmlTime(NamedTuple):
 
     @property
     def microsecond(self) -> int:
+        """Calculate the instance microseconds."""
         return self.fractional_second // 1000
 
     @property
     def duration(self) -> float:
+        """Calculate the total duration in seconds."""
         return (
             self.hour * DS_HOUR
             + self.minute * DS_MINUTE
@@ -365,9 +369,7 @@ class XmlTime(NamedTuple):
         fractional_second: Optional[int] = None,
         offset: Optional[int] = True,
     ) -> "XmlTime":
-        """Return a new instance replacing the specified fields with new
-        values."""
-
+        """Return a new instance replacing the specified fields with new values."""
         if hour is None:
             hour = self.hour
         if minute is None:
@@ -383,7 +385,7 @@ class XmlTime(NamedTuple):
 
     @classmethod
     def from_string(cls, string: str) -> "XmlTime":
-        """Initialize from string format ``%H:%M:%S%z``"""
+        """Initialize from string format `%H:%M:%S%z`."""
         hour, minute, second, fractional_second, offset = parse_date_args(
             string, DateFormat.TIME
         )
@@ -392,7 +394,7 @@ class XmlTime(NamedTuple):
 
     @classmethod
     def from_time(cls, obj: datetime.time) -> "XmlTime":
-        """Initialize from :class:`datetime.time` instance."""
+        """Initialize from `datetime.time` instance."""
         return cls(
             obj.hour,
             obj.minute,
@@ -403,16 +405,16 @@ class XmlTime(NamedTuple):
 
     @classmethod
     def now(cls, tz: Optional[datetime.timezone] = None) -> "XmlTime":
-        """Initialize from datetime.datetime.now()"""
+        """Initialize with the current time and the given timezone."""
         return cls.from_time(datetime.datetime.now(tz=tz).time())
 
     @classmethod
     def utcnow(cls) -> "XmlTime":
-        """Initialize from datetime.now(timezone.utc)"""
+        """Initialize with the current time and utc timezone."""
         return cls.from_time(datetime.datetime.now(datetime.timezone.utc).time())
 
     def to_time(self) -> datetime.time:
-        """Return a :class:`datetime.time` instance."""
+        """Convert to a `datetime.time` instance."""
         return datetime.time(
             self.hour,
             self.minute,
@@ -422,8 +424,7 @@ class XmlTime(NamedTuple):
         )
 
     def __str__(self) -> str:
-        """
-        Return the time formatted according to ISO 8601 for xml.
+        """Return the time formatted according to ISO 8601 for xml.
 
         Examples:
             - 21:32:52
@@ -438,6 +439,7 @@ class XmlTime(NamedTuple):
         )
 
     def __repr__(self) -> str:
+        """Return the instance string representation."""
         args = list(self)
         if args[-1] is None:
             del args[-1]
@@ -445,28 +447,34 @@ class XmlTime(NamedTuple):
         return f"{self.__class__.__qualname__}({', '.join(map(str, args))})"
 
     def __eq__(self, other: Any) -> bool:
-        return cmp(self, other, operator.eq)
+        """Return self == other."""
+        return _cmp(self, other, operator.eq)
 
     def __ne__(self, other: Any) -> bool:
-        return cmp(self, other, operator.ne)
+        """Return self != other."""
+        return _cmp(self, other, operator.ne)
 
     def __lt__(self, other: Any) -> bool:
-        return cmp(self, other, operator.lt)
+        """Return self < other."""
+        return _cmp(self, other, operator.lt)
 
     def __le__(self, other: Any) -> bool:
-        return cmp(self, other, operator.le)
+        """Return self <= other."""
+        return _cmp(self, other, operator.le)
 
     def __gt__(self, other: Any) -> bool:
-        return cmp(self, other, operator.gt)
+        """Return self > other."""
+        return _cmp(self, other, operator.gt)
 
     def __ge__(self, other: Any) -> bool:
-        return cmp(self, other, operator.ge)
+        """Return self >= other."""
+        return _cmp(self, other, operator.ge)
 
 
 DurationType = Union[XmlTime, XmlDateTime]
 
 
-def cmp(a: DurationType, b: DurationType, op: Callable) -> bool:
+def _cmp(a: DurationType, b: DurationType, op: Callable) -> bool:
     if isinstance(b, a.__class__):
         return op(a.duration, b.duration)
 
@@ -474,6 +482,8 @@ def cmp(a: DurationType, b: DurationType, op: Callable) -> bool:
 
 
 class TimeInterval(NamedTuple):
+    """Time interval model representation."""
+
     negative: bool
     years: Optional[int]
     months: Optional[int]
@@ -484,8 +494,7 @@ class TimeInterval(NamedTuple):
 
 
 class XmlDuration(UserString):
-    """
-    Concrete xs:duration builtin type.
+    """Concrete xs:duration builtin type.
 
     Represents iso 8601 duration format PnYnMnDTnHnMnS
     with rich comparisons and hashing.
@@ -500,7 +509,8 @@ class XmlDuration(UserString):
         - **nM**: the number of minutes followed by a literal M
         - **nS**: the number of seconds followed by a literal S
 
-    :param value: String representation of a xs:duration, eg **P2Y6M5DT12H**
+    Args:
+        value: String representation of a xs:duration, eg **P2Y6M5DT12H**
     """
 
     def __init__(self, value: str) -> None:
@@ -566,13 +576,17 @@ class XmlDuration(UserString):
         )
 
     def asdict(self) -> Dict:
+        """Return instance as a dict."""
         return self._interval._asdict()
 
     def __repr__(self) -> str:
+        """Return the instance string representation."""
         return f'{self.__class__.__qualname__}("{self.data}")'
 
 
 class TimePeriod(NamedTuple):
+    """Time period model representation."""
+
     year: Optional[int]
     month: Optional[int]
     day: Optional[int]
@@ -580,8 +594,7 @@ class TimePeriod(NamedTuple):
 
 
 class XmlPeriod(UserString):
-    """
-    Concrete xs:gYear/Month/Day builtin type.
+    """Concrete xs:gYear/Month/Day builtin type.
 
     Represents iso 8601 period formats with rich comparisons and hashing.
 
@@ -592,7 +605,8 @@ class XmlPeriod(UserString):
         - xs:gMonthDay: **--%m-%d%z**
         - xs:gYearMonth: **%Y-%m%z**
 
-    :param value: String representation of a xs:period, eg **--11-01Z**
+    Args:
+        value: String representation of a xs:period, eg **--11-01Z**
     """
 
     def __init__(self, value: str) -> None:
@@ -653,9 +667,11 @@ class XmlPeriod(UserString):
         return self._period._asdict()
 
     def __repr__(self) -> str:
+        """Return the instance string representation."""
         return f'{self.__class__.__qualname__}("{self.data}")'
 
     def __eq__(self, other: Any) -> bool:
+        """Return self == other."""
         if isinstance(other, XmlPeriod):
             return self._period == other._period
 
@@ -663,8 +679,7 @@ class XmlPeriod(UserString):
 
 
 class XmlHexBinary(bytes):
-    """
-    Subclass bytes to infer base16 format.
+    """Subclass bytes to infer base16 format.
 
     This type can be used with xs:anyType fields that don't have a
     format property to specify the target output format.
@@ -672,8 +687,7 @@ class XmlHexBinary(bytes):
 
 
 class XmlBase64Binary(bytes):
-    """
-    Subclass bytes to infer base64 format.
+    """Subclass bytes to infer base64 format.
 
     This type can be used with xs:anyType fields that don't have a
     format property to specify the target output format.

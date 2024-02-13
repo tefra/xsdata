@@ -37,6 +37,7 @@ intern_typing = sys.intern("typing.")
 
 
 def is_from_typing(tp: Any) -> bool:
+    """Return whether the type is from the typing module."""
     return str(tp).startswith(intern_typing)
 
 
@@ -45,6 +46,7 @@ def evaluate(
     globalns: Any = None,
     localns: Any = None,
 ) -> Tuple[Type, ...]:
+    """Analyze/Validate the typing annotation."""
     return tuple(_evaluate(_eval_type(tp, globalns, localns)))
 
 

@@ -8,14 +8,14 @@ T = TypeVar("T", bound=object)
 
 @dataclass
 class AnyElement:
-    """
-    Generic model to bind xml document data to wildcard fields.
+    """Generic model to bind xml document data to wildcard fields.
 
-    :param qname: The element's qualified name
-    :param text: The element's text content
-    :param tail: The element's tail content
-    :param children: The element's list of child elements.
-    :param attributes: The element's key-value attribute mappings.
+    Args:
+        qname: The element's qualified name
+        text: The element's text content
+        tail: The element's tail content
+        children: The element's list of child elements.
+        attributes: The element's key-value attribute mappings.
     """
 
     qname: Optional[str] = field(default=None)
@@ -31,14 +31,14 @@ class AnyElement:
 
 @dataclass
 class DerivedElement(Generic[T]):
-    """
-    Generic model wrapper for type substituted elements.
+    """Generic model wrapper for type substituted elements.
 
     Example: eg. <b xsi:type="a">...</b>
 
-    :param qname: The element's qualified name
-    :param value: The wrapped value
-    :param type: The real xsi:type
+    Args:
+        qname: The element's qualified name
+        value: The wrapped value
+        type: The real xsi:type
     """
 
     qname: str

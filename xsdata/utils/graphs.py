@@ -2,13 +2,16 @@ from typing import Dict, Iterator, List, Set
 
 
 def strongly_connected_components(edges: Dict[str, List[str]]) -> Iterator[Set[str]]:
-    """
-    Compute Strongly Connected Components of a directed graph.
+    """Compute Strongly Connected Components of a directed graph.
 
     From https://code.activestate.com/recipes/578507/ From
     https://github.com/python/mypy/blob/master/mypy/build.py
 
-    :param edges: Mapping of vertex-edges values
+    Args:
+        edges: A vertex-edges map
+
+    Yields:
+        A set of the strongly connected components
     """
     identified: Set[str] = set()
     stack: List[str] = []

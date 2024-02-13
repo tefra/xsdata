@@ -37,15 +37,18 @@ class Namespace(Enum):
 
     @property
     def location(self) -> Optional[str]:
+        """The location of the local file."""
         local_path = COMMON_SCHEMA_DIR.joinpath(f"{self.prefix}.xsd")
         return local_path.as_uri() if local_path.exists() else None
 
     @classmethod
     def get_enum(cls, uri: Optional[str]) -> Optional["Namespace"]:
+        """Get the enum member instance from the uri."""
         return __STANDARD_NAMESPACES__.get(uri) if uri else None
 
     @classmethod
     def common(cls) -> Tuple["Namespace", ...]:
+        """Return the common namespaces."""
         return Namespace.XS, Namespace.XSI, Namespace.XML, Namespace.XLINK
 
 
@@ -64,15 +67,13 @@ class QNames:
 
 
 class NamespaceType:
-    """
-    Wildcard elements/attributes namespace types.
+    """Wildcard elements/attributes namespace types.
 
-    :cvar ANY_NS: elements from any namespace is allowed
-    :cvar OTHER_NS: elements from any namespace except the parent
-        element's namespace
-    :cvar LOCAL_NS: elements must come from no namespace
-    :cvar TARGET_NS: elements from the namespace of the parent element
-        can be present
+    Attributes:
+        ANY_NS: elements from any namespace is allowed
+        OTHER_NS: elements from any namespace except the parent element's namespace
+        LOCAL_NS: elements must come from no namespace
+        TARGET_NS: elements from the namespace of the parent element can be present
     """
 
     ANY_NS = "##any"
@@ -173,14 +174,16 @@ class DataType(Enum):
         self.wrapper = wrapper
 
     def __str__(self) -> str:
+        """Return the qualified string representation of the datatype."""
         return f"{{{Namespace.XS.uri}}}{self.code}"
 
     def prefixed(self, prefix: Optional[str] = Namespace.XS.prefix) -> str:
+        """Return the prefixed string representation of the datatype."""
         return f"{prefix}:{self.code}" if prefix else self.code
 
     @classmethod
     def from_value(cls, value: Any) -> "DataType":
-        """Infer the xsd type from the value itself."""
+        """Load from a literal value."""
         _type = type(value)
         calculate = __DataTypeInferIndex__.get(_type)
         if calculate:
@@ -190,18 +193,22 @@ class DataType(Enum):
 
     @classmethod
     def from_type(cls, tp: Type) -> "DataType":
+        """Load from a python type."""
         return __DataTypeIndex__.get(tp, DataType.STRING)
 
     @classmethod
     def from_qname(cls, qname: str) -> Optional["DataType"]:
+        """Load from a qualified name."""
         return __DataTypeQNameIndex__.get(qname)
 
     @classmethod
     def from_code(cls, code: str) -> "DataType":
+        """Load from the code name."""
         return __DataTypeCodeIndex__.get(code, DataType.STRING)
 
 
 def period_datatype(value: XmlPeriod) -> DataType:
+    """Infer the datatype of a xml period instance."""
     if value.year is not None:
         return DataType.G_YEAR_MONTH if value.month else DataType.G_YEAR
     if value.month:
@@ -210,6 +217,7 @@ def period_datatype(value: XmlPeriod) -> DataType:
 
 
 def int_datatype(value: int) -> DataType:
+    """Infer the datatype of an int value."""
     if -32768 <= value <= 32767:
         return DataType.SHORT
     if -2147483648 <= value <= 2147483647:
@@ -220,6 +228,7 @@ def int_datatype(value: int) -> DataType:
 
 
 def float_datatype(value: float) -> DataType:
+    """Infer the datatype of a float value."""
     if -1.175494351e-38 <= value <= 3.402823466e38:
         return DataType.FLOAT
     return DataType.DOUBLE
@@ -259,7 +268,7 @@ class EventType:
 
 
 class Tag:
-    """Xml Schema tag names."""
+    """Xml Schema tags."""
 
     ALL = "All"
     ANNOTATION = "Annotation"
@@ -329,13 +338,3 @@ class ProcessType(Enum):
     LAX = "lax"
     SKIP = "skip"
     STRICT = "strict"
-
-
-class BindingStyle(Enum):
-    RPC = "rpc"
-    DOCUMENT = "document"
-
-
-class UseChoice(Enum):
-    LITERAL = "literal"
-    ENCODED = "encoded"

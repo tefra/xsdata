@@ -1,7 +1,7 @@
 import sys
 from unittest import mock
 
-from xsdata.codegen.mappers.element import ElementMapper
+from xsdata.codegen.mappers import ElementMapper
 from xsdata.codegen.models import Restrictions
 from xsdata.codegen.utils import ClassUtils
 from xsdata.formats.dataclass.models.generics import AnyElement
@@ -267,28 +267,28 @@ class ElementMapperTests(FactoryTestCase):
         actual = ElementMapper.build_class(element, None)
         self.assertEqual(0, len(actual.attrs))
 
-    def test_build_attribute_type(self):
-        actual = ElementMapper.build_attribute_type(QNames.XSI_TYPE, "")
+    def test_build_attr_type(self):
+        actual = ElementMapper.build_attr_type(QNames.XSI_TYPE, "")
         self.assertEqual(str(DataType.QNAME), actual.qname)
         self.assertTrue(actual.native)
 
-        actual = ElementMapper.build_attribute_type("name", "foo")
+        actual = ElementMapper.build_attr_type("name", "foo")
         self.assertEqual(str(DataType.STRING), actual.qname)
         self.assertTrue(actual.native)
 
-        actual = ElementMapper.build_attribute_type("name", "")
+        actual = ElementMapper.build_attr_type("name", "")
         self.assertEqual(str(DataType.ANY_SIMPLE_TYPE), actual.qname)
         self.assertTrue(actual.native)
 
-        actual = ElementMapper.build_attribute_type("name", None)
+        actual = ElementMapper.build_attr_type("name", None)
         self.assertEqual(str(DataType.ANY_SIMPLE_TYPE), actual.qname)
         self.assertTrue(actual.native)
 
-        actual = ElementMapper.build_attribute_type("name", 1)
+        actual = ElementMapper.build_attr_type("name", 1)
         self.assertEqual(str(DataType.SHORT), actual.qname)
         self.assertTrue(actual.native)
 
-        actual = ElementMapper.build_attribute_type("name", "1.9")
+        actual = ElementMapper.build_attr_type("name", "1.9")
         self.assertEqual(str(DataType.FLOAT), actual.qname)
         self.assertTrue(actual.native)
 

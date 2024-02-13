@@ -11,30 +11,37 @@ class SanitizeEnumerationClass(RelativeHandlerInterface):
     __slots__ = ()
 
     def process(self, target: Class):
-        """
-        Process class receiver.
+        """Process entrypoint for classes.
 
         Steps:
             1. Filter attrs not derived from xs:enumeration
             2. Flatten attrs derived from xs:union of enumerations
+
+        Args:
+            target: The target class instance
         """
         self.filter(target)
         self.flatten(target)
 
     @classmethod
     def filter(cls, target: Class):
-        """Filter attrs not derived from xs:enumeration if there are any
-        xs:enumeration attrs."""
+        """Remove attrs not derived from xs:enumeration.
+
+        Args:
+            target: The target class instance
+        """
         enumerations = [attr for attr in target.attrs if attr.is_enumeration]
         if enumerations:
             target.attrs = enumerations
 
     def flatten(self, target: Class):
-        """
-        Flatten attrs derived from xs:union of enumeration classes.
+        """Flatten attrs derived from xs:union of enumeration classes.
 
         Find the enumeration classes and merge all of their members in
         the target class.
+
+        Args:
+            target: The target class instance
         """
         if len(target.attrs) != 1 or target.attrs[0].tag != Tag.UNION:
             return

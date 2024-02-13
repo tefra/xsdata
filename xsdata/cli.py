@@ -9,7 +9,7 @@ import click
 from click_default_group import DefaultGroup
 
 from xsdata import __version__
-from xsdata.codegen.transformer import SchemaTransformer
+from xsdata.codegen.transformer import ResourceTransformer
 from xsdata.logger import logger
 from xsdata.models.config import GeneratorConfig, GeneratorOutput
 from xsdata.utils.click import LogFormatter, LogHandler, model_options
@@ -116,14 +116,11 @@ def download(source: str, output: str):
 @click.option("--debug", is_flag=True, default=False, help="Show debug messages")
 @model_options(GeneratorOutput)
 def generate(**kwargs: Any):
-    """
-    Generate code from xml schemas, webservice definitions and any xml or json
-    document.
+    """Generate code from xsd, dtd, wsdl, xml and json files.
 
     The input source can be either a filepath, uri or a directory
     containing xml, json, xsd and wsdl files.
     """
-
     debug = kwargs.pop("debug")
     if debug:
         logger.setLevel(logging.DEBUG)
@@ -138,7 +135,7 @@ def generate(**kwargs: Any):
     config = GeneratorConfig.read(config_file)
     config.output.update(**params)
 
-    transformer = SchemaTransformer(config=config, print=stdout)
+    transformer = ResourceTransformer(config=config, print=stdout)
     uris = sorted(resolve_source(source, recursive=recursive))
     transformer.process(uris, cache=cache)
 
@@ -146,6 +143,7 @@ def generate(**kwargs: Any):
 
 
 def resolve_source(source: str, recursive: bool) -> Iterator[str]:
+    """Yields all supported resource URIs."""
     if source.find("://") > -1 and not source.startswith("file://"):
         yield source
     else:

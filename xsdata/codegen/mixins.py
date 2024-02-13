@@ -8,8 +8,11 @@ from xsdata.utils.constants import return_true
 
 
 class ContainerInterface(abc.ABC):
-    """Wrap a list of classes and expose a simple api for easy access and
-    process."""
+    """A class list wrapper with an easy access api.
+
+    Args:
+        config: The generator configuration instance
+    """
 
     __slots__ = ("config",)
 
@@ -18,37 +21,85 @@ class ContainerInterface(abc.ABC):
 
     @abc.abstractmethod
     def __iter__(self) -> Iterator[Class]:
-        """Create an iterator for the class map values."""
+        """Yield an iterator for the class map values."""
 
     @abc.abstractmethod
     def find(self, qname: str, condition: Callable = return_true) -> Optional[Class]:
-        """Search by qualified name for a specific class with an optional
-        condition callable."""
+        """Find class that matches the given qualified name and condition callable.
+
+        Classes are allowed to have the same qualified name, e.g. xsd:Element
+        extending xsd:ComplexType with the same name, you can provide and additional
+        callback to filter the classes like the tag.
+
+        Args:
+            qname: The qualified name of the class
+            condition: A user callable to filter further
+
+        Returns:
+            A class instance or None if no match found.
+        """
 
     @abc.abstractmethod
     def find_inner(self, source: Class, qname: str) -> Class:
-        """Search by qualified name for a specific inner class or fail."""
+        """Search by qualified name for a specific inner class or fail.
+
+        Args:
+            source: The source class to search for the inner class
+            qname: The qualified name of the inner class to look up
+
+        Returns:
+            The inner class instance
+
+        Raises:
+            CodeGenerationError: If the inner class is not found.
+        """
 
     @abc.abstractmethod
     def first(self, qname: str) -> Class:
-        """Search by qualified name for a specific class and return the first
-        available."""
+        """Return the first class that matches the qualified name.
+
+        Args:
+            qname: The qualified name of the class
+
+        Returns:
+            The first matching class
+
+        Raises:
+            KeyError: If no class matches the qualified name
+        """
 
     @abc.abstractmethod
     def add(self, item: Class):
-        """Add class item to the container."""
+        """Add class item to the container.
+
+        Args:
+            item: The class instance to add
+        """
 
     @abc.abstractmethod
     def extend(self, items: List[Class]):
-        """Add a list of classes to the container."""
+        """Add a list of classes to the container.
+
+        Args:
+            items: The list of class instances to add
+        """
 
     @abc.abstractmethod
     def reset(self, item: Class, qname: str):
-        """Update the given class qualified name."""
+        """Update the given class qualified name.
+
+        Args:
+            item: The target class instance to update
+            qname: The new qualified name of the class
+        """
 
     @abc.abstractmethod
     def set(self, items: List[Class]):
-        """Set the list of classes to the container."""
+        """Set the list of classes to the container.
+
+        Args:
+            items: The list of classes
+        """
 
 
 class HandlerInterface(abc.ABC):
@@ -58,12 +109,19 @@ class HandlerInterface(abc.ABC):
 
     @abc.abstractmethod
     def process(self, target: Class):
-        """Process the given target class."""
+        """Process the given target class.
+
+        Args:
+            target: The target class instance
+        """
 
 
 class RelativeHandlerInterface(HandlerInterface, metaclass=ABCMeta):
-    """Class handler interface with access to the complete classes'
-    container."""
+    """An interface for codegen handlers with class container access.
+
+    Args:
+        container: The container instance
+    """
 
     __slots__ = "container"
 
@@ -71,6 +129,15 @@ class RelativeHandlerInterface(HandlerInterface, metaclass=ABCMeta):
         self.container = container
 
     def base_attrs(self, target: Class) -> List[Attr]:
+        """Return a list of all parent attrs recursively.
+
+        Args:
+            target: The target class
+
+        Returns:
+            A list of attr instances.
+
+        """
         attrs: List[Attr] = []
         for extension in target.extensions:
             base = self.container.find(extension.type.qname)
@@ -87,11 +154,19 @@ class RelativeHandlerInterface(HandlerInterface, metaclass=ABCMeta):
 
     @abc.abstractmethod
     def process(self, target: Class):
-        """Process class."""
+        """Process entrypoint for a class.
+
+        Args:
+            target: The target class instance
+        """
 
 
 class ContainerHandlerInterface(abc.ABC):
-    """Class container."""
+    """A codegen interface for processing the whole class container.
+
+    Args:
+        container: The class container instance
+    """
 
     __slots__ = "container"
 

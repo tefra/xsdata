@@ -9,7 +9,14 @@ from xsdata.utils import collections
 
 
 class AddAttributeSubstitutions(RelativeHandlerInterface):
-    """Apply substitution attributes to the given class recursively."""
+    """Apply substitution attributes to the given class recursively.
+
+    Args:
+        container: The class container instance
+
+    Attributes:
+        substitutions: Mapping of type names to attr values
+    """
 
     __slots__ = "substitutions"
 
@@ -18,11 +25,15 @@ class AddAttributeSubstitutions(RelativeHandlerInterface):
         self.substitutions: Optional[Dict[str, List[Attr]]] = None
 
     def process(self, target: Class):
-        """
-        Search and process attributes not derived from xs:enumeration or
-        xs:any.
+        """Process the given class attrs for substitution groups.
 
-        Build the substitutions map if it's not initialized yet.
+        This method will ignore attrs in the class derived from
+        a xs:enumeration, xs:anyType and xs:any. If this is the
+        first time we call the method, build the substitution
+        map.
+
+        Args:
+            target: The target class instance
         """
         if self.substitutions is None:
             self.create_substitutions()
@@ -32,14 +43,18 @@ class AddAttributeSubstitutions(RelativeHandlerInterface):
                 self.process_attribute(target, attr)
 
     def process_attribute(self, target: Class, attr: Attr):
-        """
-        Check if the given attribute matches any substitution class in order to
-        clone its attributes to the target class.
+        """Add substitution attrs that refer to the attr type.
 
-        The cloned attributes are placed below the attribute they are
-        supposed to substitute.
+        If the given attr is referenced in substitution groups
+        clone all substitution attrs and place them bellow
+        the original attr. Convert all the attrs of the group
+        to repeatable choice elements.
 
         Guard against multiple substitutions in case of xs:groups.
+
+        Args:
+            target: The target class instance
+            attr: The source attr instance to check and process
         """
         index = target.attrs.index(attr)
         assert self.substitutions is not None
@@ -65,9 +80,11 @@ class AddAttributeSubstitutions(RelativeHandlerInterface):
                 self.process_attribute(target, clone)
 
     def create_substitutions(self):
-        """Create reference attributes for all the classes substitutions and
-        group them by their fully qualified name."""
+        """Build the substitutions mapping of type names to attr values.
 
+        The values are simple reference attrs that we can easily
+        clone later on demand.
+        """
         self.substitutions = defaultdict(list)
         for obj in self.container:
             for qname in obj.substitutions:
@@ -76,6 +93,11 @@ class AddAttributeSubstitutions(RelativeHandlerInterface):
 
     @classmethod
     def prepare_substituted(cls, attr: Attr):
+        """Prepare the original attr for substitutions.
+
+        Effectively place the attr inside a xs:choice container
+        with min occurs zero.
+        """
         attr.restrictions.min_occurs = 0
         if not attr.restrictions.choice:
             choice = id(attr)
@@ -84,9 +106,14 @@ class AddAttributeSubstitutions(RelativeHandlerInterface):
 
     @classmethod
     def create_substitution(cls, source: Class) -> Attr:
-        """Create an attribute with type that refers to the given source class
-        and namespaced qualified name."""
+        """Create a reference attr to the source class qname.
 
+        Args:
+            source: The source class to reference
+
+        Returns:
+            The reference to the source class attr.
+        """
         return Attr(
             name=source.name,
             types=[AttrType(qname=source.qname)],

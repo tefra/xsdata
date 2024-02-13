@@ -11,11 +11,17 @@ from xsdata.models.xsd import Schema
 
 
 class Downloader:
-    """
+    """Remote recursive resource downloader.
+
     Helper class to download a schema or a definitions with all their imports
     locally. The imports paths will be adjusted if necessary.
 
-    :param output: Output path
+    Args:
+        output: The output path
+
+    Attributes:
+        base_path: The base path for the resources
+        downloaded: A cache of the downloaded resources
     """
 
     __slots__ = ("output", "base_path", "downloaded")
@@ -49,9 +55,7 @@ class Downloader:
         self.wget_included(schema)
 
     def parse_definitions(self, uri: str, content: bytes):
-        """Convert content to a definitions instance and process all sub
-        imports."""
-
+        """Convert content to a definitions instance and process all sub imports."""
         parser = DefinitionsParser(location=uri)
         definitions = parser.from_bytes(content, Definitions)
         self.wget_included(definitions)
@@ -60,18 +64,21 @@ class Downloader:
             self.wget_included(schema)
 
     def wget_included(self, definition: Union[Schema, Definitions]):
+        """Download the definitions included resources."""
         for included in definition.included():
             if included.location:
                 schema_location = getattr(included, "schema_location", None)
                 self.wget(included.location, schema_location)
 
     def adjust_base_path(self, uri: str):
-        """
-        Adjust base path for every new uri loaded.
+        """Adjust base path for every new uri loaded.
 
         Example runs:
             - file:///schemas/air_v48_0/Air.wsdl -> file:///schemas/air_v48_0
             - file:///schemas/common_v48_0/CommonReqRsp.xsd -> file:///schemas
+
+        Args:
+            uri: A resource location URI
         """
         if not self.base_path:
             self.base_path = Path(uri).parent
@@ -86,8 +93,7 @@ class Downloader:
                     logger.info("Adjusting base path to %s", self.base_path)
 
     def adjust_imports(self, path: Path, content: str) -> str:
-        """Try to adjust the import locations for external locations that are
-        not relative to the first requested uri."""
+        """Update the location of the imports to point to the downloaded files."""
         matches = re.findall(r"ocation=\"(.*)\"", content)
         for match in matches:
             if isinstance(self.downloaded.get(match), Path):
@@ -98,13 +104,16 @@ class Downloader:
         return content
 
     def write_file(self, uri: str, location: Optional[str], content: str):
-        """
-        Write the given uri and it's content according to the base path and if
-        the uri is relative to first requested uri.
+        """Write the downloaded uri to a local file.
 
         Keep track of all the written file paths, in case we have to
         modify the location attribute in an upcoming schema/definition
         import.
+
+        Args:
+            uri: The resource URI
+            location: The import location of the resource
+            content: The raw content string
         """
         common_path = os.path.commonpath((self.base_path or "", uri))
         if common_path:

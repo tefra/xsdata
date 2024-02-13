@@ -2,6 +2,7 @@ from importlib import metadata
 
 
 def load_entry_points(name: str):
+    """Load the plugins for the given hook name."""
     entry_points = metadata.entry_points()
 
     if hasattr(entry_points, "select"):

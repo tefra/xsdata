@@ -10,7 +10,7 @@ from click.testing import CliRunner
 from tests import fixtures_dir
 from xsdata import __version__
 from xsdata.cli import cli, resolve_source
-from xsdata.codegen.transformer import SchemaTransformer
+from xsdata.codegen.transformer import ResourceTransformer
 from xsdata.codegen.writer import CodeWriter
 from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.logger import logger
@@ -33,8 +33,8 @@ class CliTests(TestCase):
     def tearDownClass(cls):
         CodeWriter.unregister_generator("testing")
 
-    @mock.patch.object(SchemaTransformer, "process")
-    @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
+    @mock.patch.object(ResourceTransformer, "process")
+    @mock.patch.object(ResourceTransformer, "__init__", return_value=None)
     def test_generate(self, mock_init, mock_process):
         source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
         result = self.runner.invoke(cli, [str(source), "--package", "foo"])
@@ -48,8 +48,8 @@ class CliTests(TestCase):
         self.assertEqual(StructureStyle.FILENAMES, config.output.structure_style)
         self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
 
-    @mock.patch.object(SchemaTransformer, "process")
-    @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
+    @mock.patch.object(ResourceTransformer, "process")
+    @mock.patch.object(ResourceTransformer, "__init__", return_value=None)
     def test_generate_with_configuration_file(self, mock_init, mock_process):
         file_path = Path(tempfile.mktemp())
         config = GeneratorConfig()
@@ -75,8 +75,8 @@ class CliTests(TestCase):
         self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
         file_path.unlink()
 
-    @mock.patch.object(SchemaTransformer, "process")
-    @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
+    @mock.patch.object(ResourceTransformer, "process")
+    @mock.patch.object(ResourceTransformer, "__init__", return_value=None)
     def test_generate_with_print_mode(self, mock_init, mock_process):
         source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
         result = self.runner.invoke(cli, [str(source), "--package", "foo", "--print"])
@@ -85,8 +85,8 @@ class CliTests(TestCase):
         self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
         self.assertTrue(mock_init.call_args[1]["print"])
 
-    @mock.patch.object(SchemaTransformer, "process")
-    @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
+    @mock.patch.object(ResourceTransformer, "process")
+    @mock.patch.object(ResourceTransformer, "__init__", return_value=None)
     def test_generate_with_debug_mode(self, *args):
         self.runner.invoke(cli, ["foo.xsd", "--package", "foo", "--debug"])
         self.assertEqual(logging.DEBUG, logger.level)

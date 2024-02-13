@@ -83,24 +83,24 @@ class PycodeSerializerTests(TestCase):
         self.assertEqual(expected, result)
 
     def test_write_object_with_empty_array(self):
-        iterator = self.serializer.write_object([], 0, set())
+        iterator = self.serializer.repr_object([], 0, set())
         self.assertEqual("[]", "".join(iterator))
 
-        iterator = self.serializer.write_object((), 0, set())
+        iterator = self.serializer.repr_object((), 0, set())
         self.assertEqual("()", "".join(iterator))
 
-        iterator = self.serializer.write_object(set(), 0, set())
+        iterator = self.serializer.repr_object(set(), 0, set())
         self.assertEqual("set()", "".join(iterator))
 
     def test_write_object_with_mapping(self):
-        iterator = self.serializer.write_object({}, 0, set())
+        iterator = self.serializer.repr_object({}, 0, set())
         self.assertEqual("{}", "".join(iterator))
 
-        iterator = self.serializer.write_object({"foo": "bar"}, 0, set())
+        iterator = self.serializer.repr_object({"foo": "bar"}, 0, set())
         self.assertEqual("{\n    'foo': 'bar',\n}", "".join(iterator))
 
     def test_write_object_with_enum(self):
-        iterator = self.serializer.write_object(Namespace.SOAP11, 0, set())
+        iterator = self.serializer.repr_object(Namespace.SOAP11, 0, set())
         self.assertEqual("Namespace.SOAP11", "".join(iterator))
 
     def test_build_imports_with_nested_types(self):

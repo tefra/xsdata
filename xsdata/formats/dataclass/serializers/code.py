@@ -1,11 +1,10 @@
 from dataclasses import dataclass, field
 from enum import Enum
 from io import StringIO
-from typing import Any, List, Mapping, Set, TextIO, Type
+from typing import Any, List, Mapping, Set, TextIO, Tuple, Type, Union
 
 from xsdata.formats.bindings import AbstractSerializer
 from xsdata.formats.dataclass.context import XmlContext
-from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.utils import collections
 from xsdata.utils.objects import literal_value
 
@@ -17,41 +16,42 @@ unset = object()
 
 @dataclass
 class PycodeSerializer(AbstractSerializer):
+    """Pycode serializer for data class instances.
+
+    Generate python pretty representation code from a model instance.
+
+    Args:
+        context: The models context instance
     """
-    Pycode serializer for dataclasses.
 
-    Return a python representation code of a model instance.
-
-    :param config: Serializer configuration
-    :param context: Model context provider
-    """
-
-    config: SerializerConfig = field(default_factory=SerializerConfig)
     context: XmlContext = field(default_factory=XmlContext)
 
     def render(self, obj: object, var_name: str = "obj") -> str:
-        """
-        Convert and return the given object tree as python representation code.
+        """Serialize the input model instance to python representation string.
 
-        :param obj: The input dataclass instance
-        :param var_name: The var name to assign the model instance
+        Args:
+            obj: The input model instance to serialize
+            var_name: The var name to assign the model instance
+
+        Returns:
+            The serialized representation string.
         """
         output = StringIO()
         self.write(output, obj, var_name)
         return output.getvalue()
 
     def write(self, out: TextIO, obj: Any, var_name: str):
-        """
-        Write the given object tree to the output text stream.
+        """Write the given object to the output text stream.
 
-        :param out: The output stream
-        :param obj: The input dataclass instance
-        :param var_name: The var name to assign the model instance
+        Args:
+            out: The output text stream
+            obj: The input model instance to serialize
+            var_name: The var name to assign the model instance
         """
         types: Set[Type] = set()
 
         tmp = StringIO()
-        for chunk in self.write_object(obj, 0, types):
+        for chunk in self.repr_object(obj, 0, types):
             tmp.write(chunk)
 
         imports = self.build_imports(types)
@@ -63,6 +63,14 @@ class PycodeSerializer(AbstractSerializer):
 
     @classmethod
     def build_imports(cls, types: Set[Type]) -> str:
+        """Build a list of imports from the given types.
+
+        Args:
+            types: A set of types
+
+        Returns:
+            The `from x import y` statements as string.
+        """
         imports = set()
         for tp in types:
             module = tp.__module__
@@ -75,20 +83,40 @@ class PycodeSerializer(AbstractSerializer):
 
         return "".join(sorted(set(imports)))
 
-    def write_object(self, obj: Any, level: int, types: Set[Type]):
+    def repr_object(self, obj: Any, level: int, types: Set[Type]):
+        """Write the given object as repr code.
+
+        Args:
+            obj: The input object to serialize
+            level: The current object level
+            types: The parent object types
+
+        Yields:
+            An iterator of the representation strings.
+        """
         types.add(type(obj))
         if collections.is_array(obj):
-            yield from self.write_array(obj, level, types)
+            yield from self.repr_array(obj, level, types)
         elif isinstance(obj, dict):
-            yield from self.write_mapping(obj, level, types)
+            yield from self.repr_mapping(obj, level, types)
         elif self.context.class_type.is_model(obj):
-            yield from self.write_class(obj, level, types)
+            yield from self.repr_model(obj, level, types)
         elif isinstance(obj, Enum):
             yield str(obj)
         else:
             yield literal_value(obj)
 
-    def write_array(self, obj: List, level: int, types: Set[Type]):
+    def repr_array(self, obj: Union[List, Set, Tuple], level: int, types: Set[Type]):
+        """Convert an iterable object to repr code.
+
+        Args:
+            obj: A list, set, tuple instance
+            level: The current object level
+            types: The parent object types
+
+        Yields:
+            An iterator of the representation strings.
+        """
         if not obj:
             yield str(obj)
             return
@@ -97,12 +125,22 @@ class PycodeSerializer(AbstractSerializer):
         yield "[\n"
         for val in obj:
             yield spaces * next_level
-            yield from self.write_object(val, next_level, types)
+            yield from self.repr_object(val, next_level, types)
             yield ",\n"
 
         yield f"{spaces * level}]"
 
-    def write_mapping(self, obj: Mapping, level: int, types: Set[Type]):
+    def repr_mapping(self, obj: Mapping, level: int, types: Set[Type]):
+        """Convert a map object to repr code.
+
+        Args:
+            obj: A map instance
+            level: The current object level
+            types: The parent object types
+
+        Yields:
+            An iterator of the representation strings.
+        """
         if not obj:
             yield str(obj)
             return
@@ -111,14 +149,24 @@ class PycodeSerializer(AbstractSerializer):
         yield "{\n"
         for key, value in obj.items():
             yield spaces * next_level
-            yield from self.write_object(key, next_level, types)
+            yield from self.repr_object(key, next_level, types)
             yield ": "
-            yield from self.write_object(value, next_level, types)
+            yield from self.repr_object(value, next_level, types)
             yield ",\n"
 
         yield f"{spaces * level}}}"
 
-    def write_class(self, obj: Any, level: int, types: Set[Type]):
+    def repr_model(self, obj: Any, level: int, types: Set[Type]):
+        """Convert a data model instance to repr code.
+
+        Args:
+            obj: A map instance
+            level: The current object level
+            types: The parent object types
+
+        Yields:
+            An iterator of the representation strings.
+        """
         yield f"{obj.__class__.__qualname__}(\n"
 
         next_level = level + 1
@@ -139,7 +187,7 @@ class PycodeSerializer(AbstractSerializer):
             else:
                 yield f"{spaces * next_level}{f.name}="
 
-            yield from self.write_object(value, next_level, types)
+            yield from self.repr_object(value, next_level, types)
 
             index += 1
 

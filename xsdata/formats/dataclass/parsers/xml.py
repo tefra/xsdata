@@ -11,13 +11,15 @@ from xsdata.utils.text import snake_case
 
 @dataclass
 class XmlParser(NodeParser):
-    """
-    Default Xml parser for dataclasses.
+    """Default Xml parser for data classes.
 
-    :param config: Parser configuration
-    :param context: Model context provider
-    :param handler: Override default XmlHandler
-    :ivar ms_map: The prefix-URI map generated during parsing
+    Args:
+        config: The parser config instance
+        context: The xml context instance
+        handler: The xml handler class
+
+    Attributes:
+        ns_map: The parsed namespace prefix-URI map
     """
 
     handler: Type[XmlHandler] = field(default=default_handler())
@@ -25,19 +27,25 @@ class XmlParser(NodeParser):
 
 @dataclass
 class UserXmlParser(NodeParser):
-    """
-    User Xml parser for dataclasses with hooks for emitting events to alter the
-    behavior when an elements starts or ends.
+    """Xml parser for dataclasses with hooks to events.
 
-    :param config: Parser configuration
-    :param context: Model context provider
-    :param handler: Override default XmlHandler
-    :ivar ms_map: The prefix-URI map generated during parsing
-    :ivar emit_cache: Qname to event name cache
+    The event hooks allow custom parsers to inject custom
+    logic between the start/end element events.
+
+    Args:
+        config: The parser config instance
+        context: The xml context instance
+        handler: The xml handler class
+
+    Attributes:
+        ns_map: The parsed namespace prefix-URI map
+        hooks_cache: The hooks cache is used to avoid
+            inspecting the class for custom methods
+            on duplicate events.
     """
 
     handler: Type[XmlHandler] = field(default=default_handler())
-    emit_cache: Dict = field(init=False, default_factory=dict)
+    hooks_cache: Dict = field(init=False, default_factory=dict)
 
     def start(
         self,
@@ -48,6 +56,18 @@ class UserXmlParser(NodeParser):
         attrs: Dict,
         ns_map: Dict,
     ):
+        """Build and queue the XmlNode for the starting element.
+
+        Override to emit the start element event.
+
+        Args:
+            clazz: The target class type, auto locate if omitted
+            queue: The XmlNode queue list
+            objects: The list of all intermediate parsed objects
+            qname: The element qualified name
+            attrs: The element attributes
+            ns_map: The element namespace prefix-URI map
+        """
         super().start(clazz, queue, objects, qname, attrs, ns_map)
         self.emit_event(EventType.START, qname, attrs=attrs)
 
@@ -59,31 +79,45 @@ class UserXmlParser(NodeParser):
         text: Optional[str],
         tail: Optional[str],
     ) -> bool:
+        """Parse the last xml node and bind any intermediate objects.
+
+        Override to emit the end element event if the binding process
+        is successful.
+
+        Args:
+            queue: The XmlNode queue list
+            objects: The list of all intermediate parsed objects
+            qname: The element qualified name
+            text: The element text content
+            tail: The element tail content
+
+        Returns:
+            Whether the binding process was successful.
+        """
         result = super().end(queue, objects, qname, text, tail)
         if result:
             self.emit_event(EventType.END, qname, obj=objects[-1][1])
         return result
 
     def emit_event(self, event: str, name: str, **kwargs: Any):
-        """
-        Propagate event to subclasses.
+        """Propagate event to subclasses.
 
         Match event and name to a subclass method and trigger it with
         any input keyword arguments.
 
         Example::
-
             event=start, name={urn}bookTitle -> start_booking_title(**kwargs)
 
-        :param event: Event type start|end
-        :param name: Element qualified name
-        :param kwargs: Event keyword arguments
+        Args:
+            event: The event type start|end
+            name: The qualified name of the element
+            kwargs: Additional keyword arguments passed to the hooks
         """
         key = (event, name)
-        if key not in self.emit_cache:
+        if key not in self.hooks_cache:
             method_name = f"{event}_{snake_case(local_name(name))}"
-            self.emit_cache[key] = getattr(self, method_name, None)
+            self.hooks_cache[key] = getattr(self, method_name, None)
 
-        method = self.emit_cache[key]
+        method = self.hooks_cache[key]
         if method:
             method(**kwargs)

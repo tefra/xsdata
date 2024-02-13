@@ -6,24 +6,30 @@ from xsdata.formats.dataclass.parsers.utils import ParserUtils
 
 
 class WildcardNode(XmlNode):
-    """
-    XmlNode for extensible elements that can hold any attribute and content.
+    """XmlNode for extensible elements that can hold any attribute and content.
 
     The resulting object tree will be a
     :class:`~xsdata.formats.dataclass.models.generics.AnyElement`
     instance.
 
-    :param var: Class field xml var instance
-    :param attrs: Key-value attribute mapping
-    :param ns_map: Namespace prefix-URI map
-    :param position: The node position of objects cache
-    :param factory: Wildcard element factory
+    Args:
+        var: The xml var instance
+        attrs: The element attributes
+        ns_map: The element namespace prefix-URI map
+        position: The current objects length, everything after
+            this position are considered children of this node.
+        factory: The generic element factory
     """
 
     __slots__ = "var", "attrs", "ns_map", "position", "factory"
 
     def __init__(
-        self, var: XmlVar, attrs: Dict, ns_map: Dict, position: int, factory: Type
+        self,
+        var: XmlVar,
+        attrs: Dict,
+        ns_map: Dict,
+        position: int,
+        factory: Type,
     ):
         self.var = var
         self.attrs = attrs
@@ -34,6 +40,22 @@ class WildcardNode(XmlNode):
     def bind(
         self, qname: str, text: Optional[str], tail: Optional[str], objects: List
     ) -> bool:
+        """Bind the parsed data into a generic element.
+
+        This entry point is called when a xml element ends and is
+        responsible to parse the current element attributes/text, bind
+        any children objects and initialize new generic element that
+        can fit any xml string.
+
+        Args:
+            qname: The element qualified name
+            text: The element text content
+            tail: The element tail content
+            objects: The list of intermediate parsed objects
+
+        Returns:
+            Whether the binding process was successful or not.
+        """
         children = self.fetch_any_children(self.position, objects)
         attributes = ParserUtils.parse_any_attributes(self.attrs, self.ns_map)
         derived = self.var.derived or qname != self.var.qname
@@ -57,7 +79,17 @@ class WildcardNode(XmlNode):
 
     @classmethod
     def fetch_any_children(cls, position: int, objects: List) -> List:
-        """Fetch the children of a wildcard node."""
+        """Fetch the children of this node in the objects list.
+
+        The children are removed from the objects list.
+
+        Args:
+            position: The position of the objects when this node was created.
+            objects: The list of intermediate parsed objects
+
+        Returns:
+            A list of parsed objects.
+        """
         children = [value for _, value in objects[position:]]
 
         del objects[position:]
@@ -65,6 +97,18 @@ class WildcardNode(XmlNode):
         return children
 
     def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
+        """Initialize the next child wildcard node to be queued, when an element starts.
+
+        This entry point is responsible to create the next node type
+        with all the necessary information on how to bind the incoming
+        input data. Wildcard nodes always return wildcard children.
+
+        Args:
+            qname: The element qualified name
+            attrs: The element attributes
+            ns_map: The element namespace prefix-URI map
+            position: The current length of the intermediate objects
+        """
         return WildcardNode(
             position=position,
             var=self.var,

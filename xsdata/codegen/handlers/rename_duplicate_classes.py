@@ -14,10 +14,7 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
     __slots__ = ()
 
     def run(self):
-        """Search for conflicts either by qualified name or local name
-        depending on the configuration and start renaming classes and
-        dependencies."""
-
+        """Detect and resolve class name conflicts."""
         use_name = self.should_use_names()
         getter = get_name if use_name else get_qname
         groups = collections.group_by(self.container, lambda x: text.alnum(getter(x)))
@@ -27,14 +24,12 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
                 self.rename_classes(classes, use_name)
 
     def should_use_names(self) -> bool:
-        """
-        Determine if we should be using names or qualified names to detect
-        collisions.
+        """Determine if names or qualified names should be used for detection.
 
         Strict unique names:
-        - Single package
-        - Clustered packages
-        - All classes have the same source location.
+            - Single package
+            - Clustered packages
+            - All classes have the same source location.
         """
         return (
             self.container.config.output.structure_style in REQUIRE_UNIQUE_NAMES
@@ -42,11 +37,15 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
         )
 
     def rename_classes(self, classes: List[Class], use_name: bool):
-        """
-        Rename all the classes in the list.
+        """Rename all the classes in the list.
 
         Protect classes derived from xs:element if there is only one in
         the list.
+
+        Args:
+            classes: A list of classes with duplicate names
+            use_name: Whether simple or qualified names should be used
+                during renaming
         """
         total_elements = sum(x.is_element for x in classes)
         for target in sorted(classes, key=get_name):
@@ -54,10 +53,17 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
                 self.rename_class(target, use_name)
 
     def rename_class(self, target: Class, use_name: bool):
-        """Find the next available class identifier, save the original name in
-        the class metadata and update the class qualified name and all classes
-        that depend on the target class."""
+        """Find the next available class name.
 
+        Save the original name in the class metadata and update
+        the class qualified name and all classes that depend on
+        the target class.
+
+        Args:
+            target: The target class instance to rename
+            use_name: Whether simple or qualified names should be
+                used during renaming
+        """
         qname = target.qname
         namespace, name = namespaces.split_qname(target.qname)
         target.qname = self.next_qname(namespace, name, use_name)
@@ -68,8 +74,14 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
             self.rename_class_dependencies(item, id(target), target.qname)
 
     def next_qname(self, namespace: str, name: str, use_name: bool) -> str:
-        """Append the next available index number for the given namespace and
-        local name."""
+        """Use int suffixes to get the next available qualified name.
+
+        Args:
+            namespace: The class namespace
+            name: The class name
+            use_name: Whether simple or qualified names should be
+                used during renaming
+        """
         index = 0
 
         if use_name:
@@ -87,9 +99,13 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
                 return qname
 
     def rename_class_dependencies(self, target: Class, reference: int, replace: str):
-        """Search and replace the old qualified attribute type name with the
-        new one if it exists in the target class attributes, extensions and
-        inner classes."""
+        """Search and replace the old qualified class name in all classes.
+
+        Args:
+            target: The target class instance to inspect
+            reference: The reference id of the renamed class
+            replace: The new qualified name of the renamed class
+        """
         for attr in target.attrs:
             self.rename_attr_dependencies(attr, reference, replace)
 
@@ -101,8 +117,15 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
             self.rename_class_dependencies(inner, reference, replace)
 
     def rename_attr_dependencies(self, attr: Attr, reference: int, replace: str):
-        """Search and replace the old qualified attribute type name with the
-        new one in the attr types, choices and default value."""
+        """Search and replace the old qualified class name in the attr types.
+
+        This also covers any choices and references to enum values.
+
+        Args:
+            attr: The target attr instance to inspect
+            reference: The reference id of the renamed class
+            replace: The new qualified name of the renamed class
+        """
         for attr_type in attr.types:
             if attr_type.reference == reference:
                 attr_type.qname = replace

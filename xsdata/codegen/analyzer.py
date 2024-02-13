@@ -7,12 +7,20 @@ from xsdata.exceptions import AnalyzerValueError
 
 
 class ClassAnalyzer:
-    """Validate, analyze, sanitize and select the final class list to be
-    generated."""
+    """Validate, analyze, sanitize and filter the generated classes."""
 
     @classmethod
     def process(cls, container: ClassContainer) -> List[Class]:
-        """Run all the processes."""
+        """Main entrypoint for the class container instance.
+
+        Orchestrate the class validations and processors.
+
+        Args:
+            container: The class container instance
+
+        Returns:
+            The list of classes to be generated.
+        """
         # Run validation checks for duplicate, invalid and redefined types.
         ClassValidator(container).process()
 
@@ -25,8 +33,17 @@ class ClassAnalyzer:
         return classes
 
     @classmethod
-    def class_references(cls, target: Class) -> List:
-        """Produce a list of instance references for the given class."""
+    def class_references(cls, target: Class) -> List[int]:
+        """Produce a list of instance references for the given class.
+
+        Collect the ids of the class, attr, extension and inner instances.
+
+        Args:
+            target: The target class instance
+
+        List:
+            The list of id references.
+        """
         result = [id(target)]
         for attr in target.attrs:
             result.append(id(attr))
@@ -43,7 +60,17 @@ class ClassAnalyzer:
 
     @classmethod
     def validate_references(cls, classes: List[Class]):
-        """Validate all code gen objects are not cross referenced."""
+        """Validate all codegen objects are not cross-referenced.
+
+        This validation ensures we never share any attr, or extension
+        between classes.
+
+        Args:
+            classes: The list of classes to be generated.
+
+        Raises:
+            AnalyzerValueError: If an object is shared between the classes.
+        """
         references = [ref for obj in classes for ref in cls.class_references(obj)]
         if len(references) != len(set(references)):
             raise AnalyzerValueError("Cross references detected!")

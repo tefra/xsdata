@@ -25,8 +25,32 @@ GLOBAL_TYPES = (Tag.ELEMENT, Tag.BINDING_OPERATION, Tag.BINDING_MESSAGE, Tag.MES
 
 @dataclass
 class Restrictions:
-    """Model representation of a dataclass field validation and type
-    metadata."""
+    """Class field validation restrictions.
+
+    Args:
+        min_occurs: The minimum number of occurrences
+        max_occurs: The maximum number of occurrences
+        min_exclusive: The lower exclusive bound for numeric values
+        min_inclusive: The lower inclusive bound for numeric values
+        min_length: The minimum length of characters or list items allowed
+        max_exclusive: The upper exclusive bound for numeric values
+        max_inclusive: The upper inclusive bound for numeric values
+        max_length: The max length of characters or list items allowed
+        total_digits:  The exact number of digits allowed for numeric values
+        fraction_digits: The maximum number of decimal places allowed
+        length: The exact number of characters or list items allowed
+        white_space: Specifies how white space is handled
+        pattern: Defines the exact sequence of characters that are acceptable
+        explicit_timezone: Require or prohibit the time zone offset in date/time
+        nillable: Specifies whether nil content is allowed
+        sequence: The sequence reference number of the attr
+        tokens: Specifies whether the value needs tokenization
+        format: The output format used for byte and datetime types
+        choice: The choice reference number of the attr
+        group: The group reference number of the attr
+        process_contents: Specifies the content processed mode: strict, lax, skip
+        path: The coded attr path in the source document
+    """
 
     min_occurs: Optional[int] = field(default=None)
     max_occurs: Optional[int] = field(default=None)
@@ -53,36 +77,25 @@ class Restrictions:
 
     @property
     def is_list(self) -> bool:
-        """Return true if max occurs property is larger than one."""
+        """Return whether the max occurs larger than one."""
         return self.max_occurs is not None and self.max_occurs > 1
 
     @property
     def is_optional(self) -> bool:
-        """Return true if min occurs property equals zero."""
+        """Return whether the min occurs is zero."""
         return self.min_occurs == 0
 
     @property
     def is_prohibited(self) -> bool:
+        """Return whether the max occurs is zero."""
         return self.max_occurs == 0
 
     def merge(self, source: "Restrictions"):
-        """Update properties from another instance."""
-        self.update(source)
+        """Update properties from another instance.
 
-        self.path = source.path + self.path
-        self.sequence = self.sequence or source.sequence
-        self.choice = self.choice or source.choice
-        self.tokens = self.tokens or source.tokens
-        self.format = self.format or source.format
-        self.group = self.group or source.group
-
-        if self.min_occurs is None and source.min_occurs is not None:
-            self.min_occurs = source.min_occurs
-
-        if self.max_occurs is None and source.max_occurs is not None:
-            self.max_occurs = source.max_occurs
-
-    def update(self, source: "Restrictions"):
+        Args:
+            source: The source instance to merge properties from
+        """
         keys = (
             "min_exclusive",
             "min_inclusive",
@@ -104,12 +117,30 @@ class Restrictions:
             if value is not None:
                 setattr(self, key, value)
 
-    def asdict(self, types: Optional[List[Type]] = None) -> Dict:
-        """
-        Return the initialized only properties as a dictionary.
+        self.path = source.path + self.path
+        self.sequence = self.sequence or source.sequence
+        self.choice = self.choice or source.choice
+        self.tokens = self.tokens or source.tokens
+        self.format = self.format or source.format
+        self.group = self.group or source.group
 
-        Skip None or implied values, and optionally use the parent
+        if self.min_occurs is None and source.min_occurs is not None:
+            self.min_occurs = source.min_occurs
+
+        if self.max_occurs is None and source.max_occurs is not None:
+            self.max_occurs = source.max_occurs
+
+    def asdict(self, types: Optional[List[Type]] = None) -> Dict:
+        """Return the initialized only properties as a dictionary.
+
+        Skip None or implied values, and optionally use the
         attribute types to convert relevant options.
+
+        Args:
+            types: An optional list of attr python types
+
+        Returns:
+            A key-value of map of the attr restrictions for generation.
         """
         result = {}
         sorted_types = converter.sort_types(types) if types else []
@@ -148,20 +179,30 @@ class Restrictions:
 
     @classmethod
     def from_element(cls, element: ElementBase) -> "Restrictions":
-        """Static constructor from a xsd model."""
+        """Static constructor from a xsd model.
+
+        Args:
+            element: A element base instance.
+
+        Returns:
+            The new restrictions instance
+        """
         return cls(**element.get_restrictions())
-
-
-class AttrCategory(IntEnum):
-    NATIVE = 0
-    FORWARD = 1
-    EXTERNAL = 2
 
 
 @dataclass(unsafe_hash=True)
 class AttrType:
-    """Model representation for the typing information for fields and
-    extensions."""
+    """Class field typing information.
+
+    Args:
+        qname: The namespace qualified name
+        alias: The type alias
+        reference: The type reference number
+        native: Specifies if it's python native type
+        forward: Specifies if it's a forward reference
+        circular: Specifies if it's a circular reference
+        substituted: Specifies if it has been processed for substitution groups
+    """
 
     qname: str
     alias: Optional[str] = field(default=None, compare=False)
@@ -173,6 +214,7 @@ class AttrType:
 
     @property
     def datatype(self) -> Optional[DataType]:
+        """Return the datatype instance if native, none otherwise."""
         return DataType.from_qname(self.qname) if self.native else None
 
     @property
@@ -181,9 +223,17 @@ class AttrType:
         return namespaces.local_name(self.qname)
 
     def is_dependency(self, allow_circular: bool) -> bool:
-        """Return true if attribute is not a forward/circular references, and
-        it's not a native python time."""
+        """Return whether this type is a dependency.
 
+        The type must a reference to a user type, not a forward
+        reference and not a circular unless if it's allowed.
+
+        Args:
+            allow_circular: Allow circular references as dependencies
+
+        Returns:
+            The bool result/
+        """
         return not (
             self.forward or self.native or (not allow_circular and self.circular)
         )
@@ -195,7 +245,24 @@ class AttrType:
 
 @dataclass
 class Attr:
-    """Model representation for a dataclass field."""
+    """Class field model representation.
+
+    Args:
+        tag: The xml tag that produced this attr
+        name: The final attr name
+        local_name: The original attr name
+        index: The index position of this attr in the class
+        default: The default value
+        fixed: Specifies if the default value is fixed
+        mixed: Specifies if the attr supports mixed content
+        types: The attr types list
+        choices: The attr choice list
+        namespace: The attr namespace
+        help: The attr help text
+        restrictions: The attr restrictions instance
+        parent: The class reference of the attr
+        substitution: The substitution group this attr belongs to
+    """
 
     tag: str
     name: str = field(compare=False)
@@ -213,26 +280,36 @@ class Attr:
     substitution: Optional[str] = field(default=None, compare=False)
 
     def __post_init__(self):
+        """Set the original attr name on init."""
         self.local_name = self.name
 
     @property
     def key(self) -> str:
+        """Generate a key for this attr.
+
+        Concatenate the tag/namespace/local_name.
+        This key is used to find duplicates, it's not
+        supposed to be unique.
+
+        Returns:
+            The unique key for this attr.
+
+        """
         return f"{self.tag}.{self.namespace}.{self.local_name}"
 
     @property
     def is_attribute(self) -> bool:
-        """Return whether this attribute is derived from a xs:attribute or
-        xs:anyAttribute."""
+        """Return whether this attr represents a xml attribute node."""
         return self.tag in (Tag.ATTRIBUTE, Tag.ANY_ATTRIBUTE)
 
     @property
     def is_enumeration(self) -> bool:
-        """Return whether this attribute is derived from a xs:enumeration."""
+        """Return whether this attr an enumeration member."""
         return self.tag == Tag.ENUMERATION
 
     @property
     def is_dict(self) -> bool:
-        """Return whether this attribute is a mapping of values."""
+        """Return whether this attr is derived from xs:anyAttribute."""
         return self.tag == Tag.ANY_ATTRIBUTE
 
     @property
@@ -242,85 +319,84 @@ class Attr:
 
     @property
     def is_forward_ref(self) -> bool:
+        """Return whether any attr types is a forward or circular reference."""
         return any(tp.circular or tp.forward for tp in self.types)
 
     @property
     def is_group(self) -> bool:
-        """Return whether this attribute is derived from a xs:group or
-        xs:attributeGroup."""
+        """Return whether this attr is a reference to a group class."""
         return self.tag in (Tag.ATTRIBUTE_GROUP, Tag.GROUP)
 
     @property
     def is_list(self) -> bool:
-        """Return whether this attribute is a list of values."""
+        """Return whether this attr requires a list of values."""
         return self.restrictions.is_list
 
     @property
     def is_prohibited(self) -> bool:
-        """Return whether this attribute is prohibited."""
+        """Return whether this attr is prohibited."""
         return self.restrictions.is_prohibited
 
     @property
     def is_nameless(self) -> bool:
-        """Return whether this attribute has a local name that will be used
-        during parsing/serialization."""
+        """Return whether this attr is a real xml node."""
         return self.tag not in (Tag.ATTRIBUTE, Tag.ELEMENT)
 
     @property
     def is_nillable(self) -> bool:
+        """Return whether this attr supports nil values."""
         return self.restrictions.nillable is True
 
     @property
     def is_optional(self) -> bool:
-        """Return whether this attribute is not required."""
+        """Return whether this attr is not required."""
         return self.restrictions.is_optional
 
     @property
     def is_suffix(self) -> bool:
-        """Return whether this attribute is not derived from a xs element with
-        mode suffix."""
+        """Return whether this attr is supposed to be generated last."""
         return self.index == sys.maxsize
 
     @property
     def is_xsi_type(self) -> bool:
-        """Return whether this attribute qualified name is equal to
-        xsi:type."""
+        """Return whether this attr represents a xsi:type attribute."""
         return self.namespace == Namespace.XSI.uri and self.name == "type"
 
     @property
     def is_tokens(self) -> bool:
-        """Return whether this attribute is a list of values."""
+        """Return whether this attr supports token values."""
         return self.restrictions.tokens is True
 
     @property
     def is_wildcard(self) -> bool:
-        """Return whether this attribute is derived from xs:anyAttribute or
-        xs:any."""
+        """Return whether this attr supports any content."""
         return self.tag in (Tag.ANY_ATTRIBUTE, Tag.ANY)
 
     @property
     def is_any_type(self) -> bool:
+        """Return whether this attr types support any content."""
         return any(tp is object for tp in self.get_native_types())
 
     @property
     def native_types(self) -> List[Type]:
-        """Return a list of all builtin data types."""
+        """Return a list of all the builtin data types."""
         return list(set(self.get_native_types()))
 
     @property
     def user_types(self) -> Iterator[AttrType]:
-        """Return an iterator of all the user defined types."""
+        """Yield an iterator of all the user defined types."""
         for tp in self.types:
             if not tp.native:
                 yield tp
 
     @property
     def slug(self) -> str:
+        """Return the slugified name of the attr."""
         return text.alnum(self.name)
 
     @property
     def xml_type(self) -> Optional[str]:
-        """Return the xml node type this attribute is mapped to."""
+        """Return the xml type this attribute is mapped to."""
         return xml_type_map.get(self.tag)
 
     def clone(self) -> "Attr":
@@ -332,19 +408,26 @@ class Attr:
         )
 
     def get_native_types(self) -> Iterator[Type]:
+        """Yield an iterator of all the native attr types."""
         for tp in self.types:
             datatype = tp.datatype
             if datatype:
                 yield datatype.type
 
     def can_be_restricted(self) -> bool:
-        """Return whether this attribute can be restricted."""
+        """Return whether this attr can be restricted."""
         return self.xml_type not in (Tag.ATTRIBUTE, None)
 
 
 @dataclass(unsafe_hash=True)
 class Extension:
-    """Model representation of a dataclass base class."""
+    """Base class model representation.
+
+    Args:
+        tag: The xml tag that produced this extension
+        type: The extension type
+        restrictions: The extension restrictions instance
+    """
 
     tag: str
     type: AttrType
@@ -360,6 +443,8 @@ class Extension:
 
 
 class Status(IntEnum):
+    """Class process status enumeration."""
+
     RAW = 0
     UNGROUPING = 10
     UNGROUPED = 11
@@ -375,8 +460,31 @@ class Status(IntEnum):
 
 @dataclass
 class Class:
-    """Model representation of a dataclass with fields, base/inner classes and
-    additional metadata settings."""
+    """Class model representation.
+
+    Args:
+        qname: The namespace qualified name
+        tag: The xml tag that produced this class
+        location: The schema/document location uri
+        mixed: Specifies whether this class supports mixed content
+        abstract: Specifies whether this is an abstract class
+        nillable: Specifies whether this class supports nil content
+        local_type: Specifies if this class was an inner type at some point
+        status: The processing status of the class
+        container: The xml container of the class, schema, override, redefine
+        package: The designated package of the class
+        module: The designated module of the class
+        namespace: The class namespace
+        help: The help text
+        meta_name: The xml element name of the class
+        default: The default value
+        fixed: Specifies whether the default value is fixed
+        substitutions: The list of all the substitution groups this class belongs to
+        extensions: The list of all the extension instances
+        attrs: The list of all the attr instances
+        inner: The list of all the inner class instances
+        ns_map: The namespace prefix-URI map
+    """
 
     qname: str
     tag: str
@@ -402,60 +510,62 @@ class Class:
 
     @property
     def name(self) -> str:
-        """Shortcut for qname local name."""
+        """Shortcut for the class local name."""
         return namespaces.local_name(self.qname)
 
     @property
     def slug(self) -> str:
+        """Return a slugified version of the class name."""
         return text.alnum(self.name)
 
     @property
     def ref(self) -> int:
+        """Return this id reference of this instance."""
         return id(self)
 
     @property
     def target_namespace(self) -> Optional[str]:
+        """Return the class target namespace."""
         return namespaces.target_uri(self.qname)
 
     @property
     def has_suffix_attr(self) -> bool:
-        """Return whether it includes a suffix attribute."""
+        """Return whether it includes a suffix attr."""
         return any(attr.is_suffix for attr in self.attrs)
 
     @property
     def has_help_attr(self) -> bool:
-        """Return whether it includes at least one attr with help content."""
+        """Return whether at least one of attrs has help content."""
         return any(attr.help and attr.help.strip() for attr in self.attrs)
 
     @property
     def is_complex(self) -> bool:
-        """Return whether this instance is derived from a xs:element or
-        xs:complexType."""
+        """Return whether class represents a xs:element/complex type."""
         return self.tag in (Tag.ELEMENT, Tag.COMPLEX_TYPE)
 
     @property
     def is_element(self) -> bool:
-        """Return whether this instance is derived from a non abstract
-        xs:element."""
+        """Return whether this class represents a xml element."""
         return self.tag == Tag.ELEMENT
 
     @property
     def is_enumeration(self) -> bool:
-        """Return whether all attributes are derived from xs:enumeration."""
+        """Return whether all attrs are enumeration members."""
         return len(self.attrs) > 0 and all(attr.is_enumeration for attr in self.attrs)
 
     @property
     def is_global_type(self) -> bool:
-        """Return whether this instance is a non-abstract element, wsdl binding
-        class or a complex type without simple content."""
+        """Return whether this class represents a root/global class.
+
+        Global classes are the only classes that get generated by default.
+        """
         return (not self.abstract and self.tag in GLOBAL_TYPES) or (
             self.tag == Tag.COMPLEX_TYPE and not self.is_simple_type
         )
 
     @property
     def is_group(self) -> bool:
-        """Return whether this attribute is derived from a xs:group or
-        xs:attributeGroup."""
+        """Return whether this class is derived from a xs:group/attributeGroup."""
         return self.tag in (Tag.ATTRIBUTE_GROUP, Tag.GROUP)
 
     @property
@@ -470,18 +580,25 @@ class Class:
 
     @property
     def is_restricted(self) -> bool:
+        """Return whether this class includes any restriction extensions."""
         return any(
             True for extension in self.extensions if extension.tag == Tag.RESTRICTION
         )
 
     @property
     def is_service(self) -> bool:
-        """Return whether this instance is derived from wsdl:operation."""
+        """Return whether this instance is derived from a wsdl:operation."""
         return self.tag == Tag.BINDING_OPERATION
 
     @property
     def is_simple_type(self) -> bool:
-        """Return whether the class represents a simple text type."""
+        """Return whether the class represents a simple type.
+
+        Simple Types:
+            - xs:simpleType/extension/list/union
+            - have only one attr
+            - have no extensions.
+        """
         return (
             len(self.attrs) == 1
             and self.attrs[0].tag in SIMPLE_TYPES
@@ -490,6 +607,8 @@ class Class:
 
     @property
     def references(self) -> Iterator[int]:
+        """Yield all class object reference numbers."""
+
         def all_refs():
             for ext in self.extensions:
                 yield ext.type.reference
@@ -511,7 +630,12 @@ class Class:
 
     @property
     def target_module(self) -> str:
-        """Return the target module this class is assigned to."""
+        """Return the designated full module path.
+
+        Raises:
+            CodeGenerationError: if the target was not designated
+            a package and module.
+        """
         if self.package and self.module:
             return f"{self.package}.{self.module}"
 
@@ -530,8 +654,9 @@ class Class:
         return replace(self, inner=inners, extensions=extensions, attrs=attrs)
 
     def dependencies(self, allow_circular: bool = False) -> Iterator[str]:
-        """
-        Return a set of dependencies for the given class.
+        """Yields all class dependencies.
+
+        Omit circular and forward references by default.
 
         Collect:
             * base classes
@@ -540,6 +665,9 @@ class Class:
             * recursively go through the inner classes
             * Ignore inner class references
             * Ignore native types.
+
+        Args:
+            allow_circular: Allow circular references
         """
         types = {ext.type for ext in self.extensions}
 
@@ -568,12 +696,12 @@ class Class:
 
 @dataclass
 class Import:
-    """
-    Model representation of a python import statement.
+    """Python import statement model representation.
 
-    :param qname:
-    :param source:
-    :param alias:
+    Args:
+        qname: The qualified name of the imported class
+        source: The absolute module path
+        alias: Specifies an alias to avoid naming conflicts
     """
 
     qname: str
@@ -582,11 +710,12 @@ class Import:
 
     @property
     def name(self) -> str:
-        """Shortcut for qname local name."""
+        """Return the name of the imported class."""
         return namespaces.local_name(self.qname)
 
     @property
     def slug(self) -> str:
+        """Return a slugified version of the imported class name."""
         return text.alnum(self.name)
 
 

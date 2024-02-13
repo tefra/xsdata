@@ -1,7 +1,7 @@
 from typing import Generator
 from unittest import mock
 
-from xsdata.codegen.mappers.definitions import DefinitionsMapper
+from xsdata.codegen.mappers import DefinitionsMapper
 from xsdata.codegen.models import Class, Status
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.models.enums import DataType, Namespace, Tag

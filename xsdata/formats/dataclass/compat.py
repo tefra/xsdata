@@ -8,6 +8,8 @@ from xsdata.utils.hooks import load_entry_points
 
 
 class FieldInfo(NamedTuple):
+    """A class field info wrapper."""
+
     name: str
     init: bool
     metadata: Dict[str, Any]
@@ -16,6 +18,8 @@ class FieldInfo(NamedTuple):
 
 
 class ClassType(abc.ABC):
+    """An interface for class types like attrs, pydantic."""
+
     __slots__ = ()
 
     @property
@@ -44,10 +48,13 @@ class ClassType(abc.ABC):
 
     @abc.abstractmethod
     def verify_model(self, obj: Any):
-        """
-        Verify the given value is a binding model.
+        """Verify the given value is a binding model.
 
-        :raises xsdata.exceptions.XmlContextError: if not supported
+        Args:
+            obj: The input model instance
+
+        Raises:
+            XmlContextError: if not supported
         """
 
     @abc.abstractmethod
@@ -60,17 +67,21 @@ class ClassType(abc.ABC):
 
     @abc.abstractmethod
     def default_choice_value(self, choice: Dict) -> Any:
-        """Return the default value or factory of the given model field
-        choice."""
+        """Return the default value or factory of the given model field choice."""
 
     def score_object(self, obj: Any) -> float:
-        """
-        Score a binding model instance by its field values types.
+        """Score a binding model instance by its field values types.
 
         Weights:
             1. None: 0
             2. str: 1
             3. *: 1.5
+
+        Args:
+            obj: The input object
+
+        Returns:
+            The float score value.
         """
         if not obj:
             return -1.0
@@ -93,40 +104,79 @@ class ClassType(abc.ABC):
 
 
 class ClassTypes:
+    """A class types registry.
+
+    Attributes:
+        types: A name-instance map of the registered class types
+    """
+
     __slots__ = "types"
 
     def __init__(self):
         self.types: Dict[str, ClassType] = {}
 
     def register(self, name: str, fmt: ClassType, **_: Any):
+        """Register a class type instance by name.
+
+        Args:
+            name: The name of the class type
+            fmt: The class type instance
+            **_: No idea :(
+        """
         self.types[name] = fmt
 
     def get_type(self, name: str) -> ClassType:
+        """Get a class type instance by name.
+
+        Args:
+            name: The class type name
+
+        Returns:
+            The class type instance
+
+        Raises:
+            KeyError: If the name is not registed.
+        """
         return self.types[name]
 
 
 class Dataclasses(ClassType):
+    """The dataclasses class type."""
+
     __slots__ = ()
 
     @property
     def any_element(self) -> Type:
+        """Return the generic any element class."""
         return AnyElement
 
     @property
     def derived_element(self) -> Type:
+        """Return the generic derived element class."""
         return DerivedElement
 
     def is_model(self, obj: Any) -> bool:
+        """Return whether the obj is a dataclass model."""
         return is_dataclass(obj)
 
     def verify_model(self, obj: Any):
+        """Validate whether the obj is a dataclass model.
+
+        Args:
+            obj: The input object to validate.
+
+        Raises:
+            XmlContextError: If it's not a dataclass model.
+        """
         if not self.is_model(obj):
             raise XmlContextError(f"Type '{obj}' is not a dataclass.")
 
     def get_fields(self, obj: Any) -> Iterator[FieldInfo]:
+        """Return a dataclass fields iterator."""
         yield from cast(List[FieldInfo], fields(obj))
 
     def default_value(self, field: FieldInfo, default: Optional[Any] = None) -> Any:
+        """Return the default value or factory of the given model field."""
         if field.default_factory is not MISSING:
             return field.default_factory
 
@@ -136,6 +186,7 @@ class Dataclasses(ClassType):
         return default
 
     def default_choice_value(self, choice: Dict) -> Any:
+        """Return the default value or factory of the given model field choice."""
         factory = choice.get("default_factory")
         if callable(factory):
             return factory

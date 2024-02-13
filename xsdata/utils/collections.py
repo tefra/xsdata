@@ -16,6 +16,7 @@ T = TypeVar("T")
 
 
 def is_array(value: Any) -> bool:
+    """Return whether the value is a list style type."""
     if isinstance(value, tuple):
         return not hasattr(value, "_fields")
 
@@ -23,11 +24,14 @@ def is_array(value: Any) -> bool:
 
 
 def unique_sequence(items: Iterable[T], key: Optional[str] = None) -> List[T]:
-    """
-    Return a new list with the unique values from an iterable.
+    """Return a new unique list, preserving the original order.
 
-    Optionally you can also provide a lambda to generate the unique key
-    of each item in the iterable object.
+    Args:
+        items: The iterable to filter
+        key: An optional callable to generate the unique keys
+
+    Returns:
+        A new unique list.
     """
     seen = set()
 
@@ -64,8 +68,15 @@ def apply(items: Iterable, func: Callable):
 
 
 def find(items: Sequence, value: Any) -> int:
-    """Return the index of the value in the given sequence without raising
-    exception in case of failure."""
+    """Return the index of the value in the given sequence.
+
+    Args:
+        items: The sequence to search in
+        value: The value to search for
+
+    Returns:
+        The index in the sequence or -1 if the value is not found.
+    """
     try:
         return items.index(value)
     except ValueError:
@@ -83,12 +94,7 @@ def prepend(target: List, *args: Any):
 
 
 def connected_components(lists: List[List[Any]]) -> Iterator[List[Any]]:
-    """
-    Merge lists of lists that share common elements.
-
-    https://stackoverflow.com/questions/4842613/merge-lists-that-share-
-    common-elements
-    """
+    """Merge lists of lists that share common elements."""
     neighbors = defaultdict(set)
     for each in lists:
         for item in each:
@@ -109,6 +115,7 @@ def connected_components(lists: List[List[Any]]) -> Iterator[List[Any]]:
 
 
 def find_connected_component(groups: List[List[Any]], value: Any) -> int:
+    """Find the list index that contains the given value."""
     for index, group in enumerate(groups):
         if value in group:
             return index

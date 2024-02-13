@@ -2,7 +2,7 @@ from dataclasses import asdict
 from unittest import TestCase, mock
 
 from tests import fixtures_dir
-from xsdata.codegen.parsers.dtd import DtdParser
+from xsdata.codegen.parsers import DtdParser
 from xsdata.exceptions import ParserError
 from xsdata.models.dtd import (
     DtdAttributeDefault,

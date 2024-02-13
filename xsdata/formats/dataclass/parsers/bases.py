@@ -6,7 +6,6 @@ from typing import Any, Dict, List, Optional, Tuple, Type, cast
 from xsdata.exceptions import ConverterWarning, ParserError
 from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.context import XmlContext
-from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.mixins import (
     EventsHandler,
     PushParser,
@@ -21,23 +20,32 @@ Parsed = Tuple[Optional[str], Any]
 
 @dataclass
 class NodeParser(PushParser):
-    """
-    Bind xml nodes to dataclasses.
+    """Bind xml nodes to data classes.
 
-    :param config: Parser configuration
-    :param context: Model context provider
-    :param handler: Override default XmlHandler
-    :ivar ms_map: Namespace registry of parsed prefix-URI mappings
+    Args:
+        context: The models context instance
+        handler: The xml handler class
+
+    Attributes:
+        ns_map: The parsed namespace prefix-URI map
     """
 
-    config: ParserConfig = field(default_factory=ParserConfig)
     context: XmlContext = field(default_factory=XmlContext)
     handler: Type[XmlHandler] = field(default=EventsHandler)
-    ns_map: Dict = field(init=False, default_factory=dict)
 
     def parse(self, source: Any, clazz: Optional[Type[T]] = None) -> T:
-        """Parse the input stream or filename and return the resulting object
-        tree."""
+        """Parse the input file or stream into the target class type.
+
+        If no clazz is provided, the binding context will try
+        to locate it from imported dataclasses.
+
+        Args:
+            source: The source file or stream object to parse
+            clazz: The target class type to parse the source bytes object
+
+        Returns:
+            An instance of the specified class representing the parsed content.
+        """
         handler = self.handler(clazz=clazz, parser=self)
 
         with warnings.catch_warnings():
@@ -64,18 +72,15 @@ class NodeParser(PushParser):
         attrs: Dict,
         ns_map: Dict,
     ):
-        """
-        Start element notification receiver.
+        """Build and queue the XmlNode for the starting element.
 
-        Build and queue the XmlNode for the starting element.
-
-        :param clazz: Root class type, if it's missing look for any
-            suitable models from the current context.
-        :param queue: The active XmlNode queue
-        :param objects: The list of all intermediate parsed objects
-        :param qname: Qualified name
-        :param attrs: Attribute key-value map
-        :param ns_map: Namespace prefix-URI map
+        Args:
+            clazz: The target class type, auto locate if omitted
+            queue: The XmlNode queue list
+            objects: The list of all intermediate parsed objects
+            qname: The element qualified name
+            attrs: The element attributes
+            ns_map: The element namespace prefix-URI map
         """
         from xsdata.formats.dataclass.parsers.nodes import ElementNode, WrapperNode
 
@@ -130,17 +135,17 @@ class NodeParser(PushParser):
         text: Optional[str],
         tail: Optional[str],
     ) -> bool:
-        """
-        End element notification receiver.
+        """Parse the last xml node and bind any intermediate objects.
 
-        Pop the last XmlNode from the queue and use it to build and
-        return the resulting object tree with its text and tail content.
+        Args:
+            queue: The XmlNode queue list
+            objects: The list of all intermediate parsed objects
+            qname: The element qualified name
+            text: The element text content
+            tail: The element tail content
 
-        :param queue: Xml nodes queue
-        :param objects: List of parsed objects
-        :param qname: Qualified name
-        :param text: Text content
-        :param tail: Tail content
+        Returns:
+            Whether the binding process was successful.
         """
         item = queue.pop()
         return item.bind(qname, text, tail, objects)
@@ -148,10 +153,10 @@ class NodeParser(PushParser):
 
 @dataclass
 class RecordParser(NodeParser):
-    """
-    Bind xml nodes to dataclasses and store the intermediate events.
+    """Bind xml nodes to dataclasses and store the intermediate events.
 
-    :ivar events: List of pushed events
+    Attributes:
+        events: The list of recorded events
     """
 
     events: List = field(init=False, default_factory=list)
@@ -165,19 +170,17 @@ class RecordParser(NodeParser):
         attrs: Dict,
         ns_map: Dict,
     ):
-        """
-        Start element notification receiver.
+        """Build and queue the XmlNode for the starting element.
 
-        Build and queue the XmlNode for the starting element, append the
-        event with the attributes and ns map to the events list.
+        Record the start event for later processing.
 
-        :param clazz: Root class type, if it's missing look for any
-            suitable models from the current context.
-        :param queue: The active XmlNode queue
-        :param objects: The list of all intermediate parsed objects
-        :param qname: Qualified name
-        :param attrs: Attributes key-value map
-        :param ns_map: Namespace prefix-URI map
+        Args:
+            clazz: The target class type, auto locate if omitted
+            queue: The XmlNode queue list
+            objects: The list of all intermediate parsed objects
+            qname: The element qualified name
+            attrs: The element attributes
+            ns_map: The element namespace prefix-URI map
         """
         self.events.append((EventType.START, qname, copy.deepcopy(attrs), ns_map))
         super().start(clazz, queue, objects, qname, attrs, ns_map)
@@ -190,23 +193,31 @@ class RecordParser(NodeParser):
         text: Optional[str],
         tail: Optional[str],
     ) -> Any:
-        """
-        End element notification receiver.
+        """Parse the last xml node and bind any intermediate objects.
 
-        Pop the last XmlNode from the queue and use it to build and
-        return the resulting object tree with its text and tail content.
-        Append the end event with the text,tail content to the events
-        list.
+        Record the end event for later processing
 
-        :param queue: Xml nodes queue
-        :param objects: List of parsed objects
-        :param qname: Qualified name
-        :param text: Text content
-        :param tail: Tail content
+        Args:
+            queue: The XmlNode queue list
+            objects: The list of all intermediate parsed objects
+            qname: The element qualified name
+            text: The element text content
+            tail: The element tail content
+
+        Returns:
+            Whether the binding process was successful.
         """
         self.events.append((EventType.END, qname, text, tail))
         return super().end(queue, objects, qname, text, tail)
 
     def register_namespace(self, prefix: Optional[str], uri: str):
+        """Register the uri prefix in the namespace registry.
+
+        Record the start-ns event for later processing
+
+        Args:
+            prefix: Namespace prefix
+            uri: Namespace uri
+        """
         self.events.append((EventType.START_NS, prefix, uri))
         super().register_namespace(prefix, uri)

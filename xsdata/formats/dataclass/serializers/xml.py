@@ -4,7 +4,6 @@ from io import StringIO
 from typing import (
     Any,
     Dict,
-    Generator,
     Iterable,
     Iterator,
     List,
@@ -21,23 +20,25 @@ from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlMeta, XmlVar
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
-from xsdata.formats.dataclass.serializers.mixins import XmlWriter, XmlWriterEvent
+from xsdata.formats.dataclass.serializers.mixins import (
+    EventIterator,
+    XmlWriter,
+    XmlWriterEvent,
+)
 from xsdata.formats.dataclass.serializers.writers import default_writer
 from xsdata.models.enums import DataType, QNames
 from xsdata.utils import collections, namespaces
 from xsdata.utils.constants import EMPTY_MAP
 
-NoneStr = Optional[str]
-
 
 @dataclass
 class XmlSerializer(AbstractSerializer):
-    """
-    Xml serializer for dataclasses.
+    """Xml serializer for data classes.
 
-    :param config: Serializer configuration
-    :param context: Model context provider
-    :param writer: Override default XmlWriter
+    Args:
+        config: The serializer config instance
+        context: The models context instance
+        writer: The xml writer class
     """
 
     config: SerializerConfig = field(default_factory=SerializerConfig)
@@ -45,23 +46,26 @@ class XmlSerializer(AbstractSerializer):
     writer: Type[XmlWriter] = field(default=default_writer())
 
     def render(self, obj: Any, ns_map: Optional[Dict] = None) -> str:
-        """
-        Convert and return the given object tree as xml string.
+        """Serialize the input model instance to xml string.
 
-        :param obj: The input dataclass instance
-        :param ns_map: User defined namespace prefix-URI map
+        Args:
+            obj: The input model instance to serialize
+            ns_map: A user defined namespace prefix-URI map
+
+        Returns:
+            The serialized xml string output.
         """
         output = StringIO()
         self.write(output, obj, ns_map)
         return output.getvalue()
 
     def write(self, out: TextIO, obj: Any, ns_map: Optional[Dict] = None):
-        """
-        Write the given object tree to the output text stream.
+        """Serialize the given object to the output text stream.
 
-        :param out: The output stream
-        :param obj: The input dataclass instance
-        :param ns_map: User defined namespace prefix-URI map
+        Args:
+            out: The output text stream
+            obj: The input model instance to serialize
+            ns_map: A user defined namespace prefix-URI map
         """
         events = self.write_object(obj)
         handler = self.writer(
@@ -71,8 +75,15 @@ class XmlSerializer(AbstractSerializer):
         )
         handler.write(events)
 
-    def write_object(self, obj: Any):
-        """Produce an events stream from a dataclass or a derived element."""
+    def write_object(self, obj: Any) -> EventIterator:
+        """Convert a user model, or derived element instance to sax events.
+
+        Args:
+            obj: A user model, or derived element instance
+
+        Yields:
+            An iterator of sax events.
+        """
         qname = xsi_type = None
         if isinstance(obj, self.context.class_type.derived_element):
             meta = self.context.build(
@@ -80,26 +91,37 @@ class XmlSerializer(AbstractSerializer):
             )
             qname = obj.qname
             obj = obj.value
-            xsi_type = namespaces.real_xsi_type(qname, meta.target_qname)
+            xsi_type = self.real_xsi_type(qname, meta.target_qname)
 
         yield from self.write_dataclass(obj, qname=qname, xsi_type=xsi_type)
 
     def write_dataclass(
         self,
         obj: Any,
-        namespace: NoneStr = None,
-        qname: NoneStr = None,
+        namespace: Optional[str] = None,
+        qname: Optional[str] = None,
         nillable: bool = False,
         xsi_type: Optional[str] = None,
-    ) -> Generator:
-        """
-        Produce an events stream from a dataclass.
+    ) -> EventIterator:
+        """Convert a model instance to sax events.
 
-        Optionally override the qualified name and the xsi properties
-        type and nil.
+        Optionally override the qualified name and the
+        xsi attributes type and nil.
+
+        Args:
+            obj: A model instance
+            namespace: The field namespace URI
+            qname: Override the field qualified name
+            nillable: Specifies whether the field is nillable
+            xsi_type: Override the field xsi type
+
+        Yields:
+            An iterator of sax events.
         """
         meta = self.context.build(
-            obj.__class__, namespace, globalns=self.config.globalns
+            obj.__class__,
+            namespace,
+            globalns=self.config.globalns,
         )
         qname = qname or meta.qname
         nillable = nillable or meta.nillable
@@ -117,10 +139,24 @@ class XmlSerializer(AbstractSerializer):
 
         yield XmlWriterEvent.END, qname
 
-    def write_xsi_type(self, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
-        """Produce an events stream from a dataclass for the given var with xsi
-        abstract type check for non wildcards."""
+    def write_xsi_type(
+        self,
+        value: Any,
+        var: XmlVar,
+        namespace: Optional[str],
+    ) -> EventIterator:
+        """Convert a xsi:type value to sax events.
 
+        The value can be assigned to wildcard, element or compound fields
+
+        Args:
+            value: A model instance
+            var: The field metadata instance
+            namespace: The field namespace URI
+
+        Yields:
+            An iterator of sax events.
+        """
         if var.is_wildcard:
             choice = var.find_value_choice(value, True)
             if choice:
@@ -130,25 +166,37 @@ class XmlSerializer(AbstractSerializer):
         elif var.is_element:
             xsi_type = self.xsi_type(var, value, namespace)
             yield from self.write_dataclass(
-                value, namespace, var.qname, var.nillable, xsi_type
+                value,
+                namespace,
+                var.qname,
+                var.nillable,
+                xsi_type,
             )
         else:
-            # var elements
+            # var elements/compound
             meta = self.context.fetch(value.__class__, namespace)
             yield from self.write_dataclass(value, qname=meta.target_qname)
 
-    def write_value(self, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
-        """
-        Delegates the given value to the correct writer according to the
-        variable metadata.
+    def write_value(
+        self, value: Any, var: XmlVar, namespace: Optional[str]
+    ) -> EventIterator:
+        """Convert any value to sax events according to the var instance.
 
         The order of the checks is important as more than one condition
         can be true.
+
+        Args:
+            value: The input value
+            var: The field metadata instance
+            namespace: The class namespace URI
+
+        Yields:
+            An iterator of sax events.
         """
         if var.mixed:
             yield from self.write_mixed_content(value, var, namespace)
         elif var.is_text:
-            yield from self.write_data(value, var, namespace)
+            yield from self.write_data(value, var)
         elif var.tokens:
             yield from self.write_tokens(value, var, namespace)
         elif var.is_elements:
@@ -159,9 +207,21 @@ class XmlSerializer(AbstractSerializer):
             yield from self.write_any_type(value, var, namespace)
 
     def write_list(
-        self, values: Iterable, var: XmlVar, namespace: NoneStr
-    ) -> Generator:
-        """Produce an events stream for the given list of values."""
+        self,
+        values: Iterable,
+        var: XmlVar,
+        namespace: Optional[str],
+    ) -> EventIterator:
+        """Convert an array of values to sax events.
+
+        Args:
+            values: A list, set, tuple instance
+            var: The field metadata instance
+            namespace: The class namespace
+
+        Yields:
+            An iterator of sax events.
+        """
         if var.wrapper is not None:
             yield XmlWriterEvent.START, var.wrapper
             for value in values:
@@ -171,9 +231,19 @@ class XmlSerializer(AbstractSerializer):
             for value in values:
                 yield from self.write_value(value, var, namespace)
 
-    def write_tokens(self, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
-        """Produce an events stream for the given tokens list or list of tokens
-        lists."""
+    def write_tokens(
+        self, value: Any, var: XmlVar, namespace: Optional[str]
+    ) -> EventIterator:
+        """Convert an array of token values to sax events.
+
+        Args:
+            value: A list, set, tuple instance
+            var: The field metadata instance
+            namespace: The class namespace
+
+        Yields:
+            An iterator of sax events.
+        """
         if value or var.nillable or var.required:
             if value and collections.is_array(value[0]):
                 for val in value:
@@ -182,22 +252,39 @@ class XmlSerializer(AbstractSerializer):
                 yield from self.write_element(value, var, namespace)
 
     def write_mixed_content(
-        self, values: List, var: XmlVar, namespace: NoneStr
-    ) -> Generator:
-        """Produce an events stream for the given list of mixed type
-        objects."""
+        self,
+        values: List,
+        var: XmlVar,
+        namespace: Optional[str],
+    ) -> EventIterator:
+        """Convert mixed content values to sax events.
+
+        Args:
+            values: A list instance of mixed type values
+            var: The field metadata instance
+            namespace: The class namespace
+
+        Yields:
+            An iterator of sax events.
+        """
         for value in values:
             yield from self.write_any_type(value, var, namespace)
 
-    def write_any_type(self, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
-        """
-        Produce an events stream for the given object.
+    def write_any_type(
+        self, value: Any, var: XmlVar, namespace: Optional[str]
+    ) -> EventIterator:
+        """Convert a value assigned to a xs:anyType field to sax events.
 
-        The object can be a dataclass or a generic object or any other
-        simple type.
+        Args:
+            value: A list instance of mixed type values
+            var: The field metadata instance
+            namespace: The class namespace
+
+        Yields:
+            An iterator of sax events.
         """
         if isinstance(value, self.context.class_type.any_element):
-            yield from self.write_wildcard(value, var, namespace)
+            yield from self.write_any_element(value, var, namespace)
         elif isinstance(value, self.context.class_type.derived_element):
             yield from self.write_derived_element(value, namespace)
         elif self.context.class_type.is_model(value):
@@ -205,13 +292,24 @@ class XmlSerializer(AbstractSerializer):
         elif var.is_element:
             yield from self.write_element(value, var, namespace)
         else:
-            yield from self.write_data(value, var, namespace)
+            yield from self.write_data(value, var)
 
-    def write_derived_element(self, value: Any, namespace: NoneStr) -> Generator:
+    def write_derived_element(
+        self, value: Any, namespace: Optional[str]
+    ) -> EventIterator:
+        """Convert a derived element instance to sax events.
+
+        Args:
+            value: A list instance of mixed type values
+            namespace: The class namespace
+
+        Yields:
+            An iterator of sax events.
+        """
         if self.context.class_type.is_model(value.value):
             meta = self.context.fetch(value.value.__class__)
             qname = value.qname
-            xsi_type = namespaces.real_xsi_type(qname, meta.target_qname)
+            xsi_type = self.real_xsi_type(qname, meta.target_qname)
 
             yield from self.write_dataclass(
                 value.value, namespace, qname=qname, xsi_type=xsi_type
@@ -224,8 +322,19 @@ class XmlSerializer(AbstractSerializer):
             yield XmlWriterEvent.DATA, value.value
             yield XmlWriterEvent.END, value.qname
 
-    def write_wildcard(self, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
-        """Produce an element events stream for the given generic object."""
+    def write_any_element(
+        self, value: Any, var: XmlVar, namespace: Optional[str]
+    ) -> EventIterator:
+        """Convert a generic any element instance to sax events.
+
+        Args:
+            value: A list instance of mixed type values
+            var: The field metadata instance
+            namespace: The class namespace
+
+        Yields:
+            An iterator of sax events.
+        """
         if value.qname:
             namespace, tag = namespaces.split_qname(value.qname)
             yield XmlWriterEvent.START, value.qname
@@ -244,35 +353,69 @@ class XmlSerializer(AbstractSerializer):
         if value.tail:
             yield XmlWriterEvent.DATA, value.tail
 
-    def xsi_type(self, var: XmlVar, value: Any, namespace: NoneStr) -> Optional[str]:
-        """Get xsi:type if the given value is a derived instance."""
+    def xsi_type(
+        self, var: XmlVar, value: Any, namespace: Optional[str]
+    ) -> Optional[str]:
+        """Return the xsi:type for the given value and field metadata instance.
+
+        If the value type is either a child or parent for one of the var types,
+        we need to declare it as n xsi:type.
+
+        Args:
+            value: A list instance of mixed type values
+            var: The field metadata instance
+            namespace: The class namespace
+
+        Raises:
+            SerializerError: If the value type is completely unrelated to
+                the field types.
+        """
         if not value or value.__class__ in var.types:
             return None
 
         clazz = var.clazz
         if clazz is None or self.context.is_derived(value, clazz):
             meta = self.context.fetch(value.__class__, namespace)
-            return namespaces.real_xsi_type(var.qname, meta.target_qname)
+            return self.real_xsi_type(var.qname, meta.target_qname)
 
         raise SerializerError(
             f"{value.__class__.__name__} is not derived from {clazz.__name__}"
         )
 
-    def write_elements(self, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
-        """Produce an events stream from compound elements field."""
+    def write_elements(
+        self, value: Any, var: XmlVar, namespace: Optional[str]
+    ) -> EventIterator:
+        """Convert the value assigned to a compound field to sax events.
+
+        Args:
+            value: A list instance of mixed type values
+            var: The field metadata instance
+            namespace: The class namespace
+
+        Yields:
+            An iterator of sax events.
+        """
         if collections.is_array(value):
-            for choice in value:
-                yield from self.write_choice(choice, var, namespace)
+            for val in value:
+                yield from self.write_choice(val, var, namespace)
         else:
             yield from self.write_choice(value, var, namespace)
 
-    def write_choice(self, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
-        """
-        Produce an events stream for the given value of a compound elements
-        field.
+    def write_choice(
+        self, value: Any, var: XmlVar, namespace: Optional[str]
+    ) -> EventIterator:
+        """Convert a single value assigned to a compound field to sax events.
 
-        The value can be anything as long as we can match the qualified
-        name or its type to a choice.
+        Args:
+            value: A list instance of mixed type values
+            var: The field metadata instance
+            namespace: The class namespace
+
+        Yields:
+            An iterator of sax events.
+
+        Raises:
+            SerializerError: If the value doesn't match any choice field.
         """
         if isinstance(value, self.context.class_type.derived_element):
             choice = var.find_choice(value.qname)
@@ -302,8 +445,22 @@ class XmlSerializer(AbstractSerializer):
 
         yield from func(value, choice, namespace)
 
-    def write_element(self, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
-        """Produce an element events stream for the given simple type value."""
+    def write_element(
+        self,
+        value: Any,
+        var: XmlVar,
+        namespace: Optional[str],
+    ) -> EventIterator:
+        """Convert a value assigned to an element field to sax events.
+
+        Args:
+            value: A list instance of mixed type values
+            var: The field metadata instance
+            namespace: The class namespace (unused)
+
+        Yields:
+            An iterator of sax events.
+        """
         yield XmlWriterEvent.START, var.qname
 
         if var.nillable:
@@ -318,19 +475,34 @@ class XmlSerializer(AbstractSerializer):
         yield XmlWriterEvent.END, var.qname
 
     @classmethod
-    def write_data(cls, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
-        """Produce a data event for the given value."""
+    def write_data(cls, value: Any, var: XmlVar) -> EventIterator:
+        """Convert a value assigned to a text field to sax events.
+
+        Args:
+            value: A list instance of mixed type values
+            var: The field metadata instance
+
+        Yields:
+            An iterator of sax events.
+        """
         yield XmlWriterEvent.DATA, cls.encode(value, var)
 
     @classmethod
     def next_value(cls, obj: Any, meta: XmlMeta) -> Iterator[Tuple[XmlVar, Any]]:
-        """
-        Return the non attribute variables with their object values in the
-        correct order according to their definition and the sequential metadata
-        property.
+        """Produce the next non attribute value of a model instance to convert.
+
+        The generator will produce the values in the order the fields
+        are defined in the model or by their sequence number.
 
         Sequential fields need to be rendered together in parallel order
         eg: <a1/><a2/><a1/><a/2></a1>
+
+        Args:
+            obj: The input model instance
+            meta: The model metadata instance
+
+        Yields:
+            An iterator of field metadata instance and value tuples.
         """
         index = 0
         attrs = meta.get_element_vars()
@@ -380,17 +552,18 @@ class XmlSerializer(AbstractSerializer):
         xsi_type: Optional[str],
         ignore_optionals: bool,
     ) -> Iterator[Tuple[str, Any]]:
-        """
-        Return the attribute variables with their object values if set and not
-        empty iterables.
+        """Produce the next attribute value to convert.
 
-        :param obj: Input object
-        :param meta: Object metadata
-        :param nillable: Is model nillable
-        :param xsi_type: The true xsi:type of the object
-        :param ignore_optionals: Skip optional attributes with default
-            value
-        :return:
+        Args:
+            obj: The input model instance
+            meta: The model metadata instance
+            nillable: Specifies if the current element supports nillable content
+            xsi_type: The real xsi:type of the object
+            ignore_optionals: Specifies if optional attributes with default
+                values should be ignored.
+
+        Yields:
+            An iterator of attribute name-value pairs.
         """
         for var in meta.get_attribute_vars():
             if var.is_attribute:
@@ -414,8 +587,7 @@ class XmlSerializer(AbstractSerializer):
 
     @classmethod
     def encode(cls, value: Any, var: XmlVar) -> Any:
-        """
-        Encode values for xml serialization.
+        """Encode a value for xml serialization.
 
         Converts values to strings. QName instances is an exception,
         those values need to wait until the XmlWriter assigns prefixes
@@ -426,6 +598,13 @@ class XmlSerializer(AbstractSerializer):
         need to carry the xml vars inside the writer. Instead of that we
         do the easy encoding here and leave the qualified names for
         later.
+
+        Args:
+            value: The simple type vale to encode
+            var: The field metadata instance
+
+        Returns:
+            The encoded value.
         """
         if isinstance(value, (str, QName)) or var is None:
             return value
@@ -437,3 +616,17 @@ class XmlSerializer(AbstractSerializer):
             return cls.encode(value.value, var)
 
         return converter.serialize(value, format=var.format)
+
+    @classmethod
+    def real_xsi_type(cls, qname: str, target_qname: Optional[str]) -> Optional[str]:
+        """Compare the qname with the target qname and return the real xsi:type.
+
+        Args:
+            qname: The field type qualified name
+            target_qname: The value type qualified name
+
+        Returns:
+            None if the qname and target qname match, otherwise
+            return the target qname.
+        """
+        return target_qname if target_qname != qname else None

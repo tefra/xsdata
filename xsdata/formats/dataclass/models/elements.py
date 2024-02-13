@@ -41,41 +41,59 @@ class MetaMixin:
     __slots__: Tuple[str, ...] = ()
 
     def __eq__(self, other: Any) -> bool:
+        """Implement equality operator."""
         return tuple(self) == tuple(other)
 
     def __iter__(self) -> Iterator:
+        """Implement iteration."""
         for name in self.__slots__:
             yield getattr(self, name)
 
     def __repr__(self) -> str:
+        """Implement representation."""
         params = (f"{name}={getattr(self, name)!r}" for name in self.__slots__)
         return f"{self.__class__.__qualname__}({', '.join(params)})"
 
 
 class XmlVar(MetaMixin):
-    """
-    Class field binding metadata.
+    """Class field binding metadata.
 
-    :param index: Field ordering
-    :param name: Field name
-    :param qname: Qualified name
-    :param types: List of all the supported data types
-    :param init: Include field in the constructor
-    :param mixed: Field supports mixed content type values
-    :param tokens: Field is derived from xs:list
-    :param format: Value format information
-    :param derived: Wrap parsed values with a generic type
-    :param any_type: Field supports dynamic value types
-    :param required: Field is mandatory
-    :param nillable: Field supports nillable content
-    :param sequence: Render values in sequential mode
-    :param list_element: Field is a list of elements
-    :param default: Field default value or factory
-    :param xml_Type: Field xml type
-    :param namespaces: List of the supported namespaces
-    :param elements: Mapping of qname-repeatable elements
-    :param wildcards: List of repeatable wildcards
-    :param wrapper: A name for the wrapper. Applies for list types only.
+    Args:
+        index: Position index of the variable
+        name: Name of the variable
+        qname: Namespace-qualified name of the variable
+        types: Supported types for the variable
+        clazz: Target class type
+        init: Indicates if the field should be included in the constructor
+        mixed: Indicates if the field supports mixed content type values.
+        factory: Callable factory for lists
+        tokens_factory: Callable factory for tokens
+        format: Information about the value format
+        derived: Indicates whether parsed values should be wrapped with a generic type
+        any_type: Indicates if the field supports dynamic value types
+        process_contents: Information about processing contents
+        required: Indicates if the field is mandatory
+        nillable: Indicates if the field supports nillable content
+        sequence: Specifies rendering values in sequential mode
+        default: Default value or factory for the field
+        xml_type: Type of the XML field (element, attribute, etc.)
+        namespaces: List of supported namespaces
+        elements: Mapping of qualified name-repeatable elements
+        wildcards: List of repeatable wildcards
+        wrapper: Name for the wrapper (applies for list types only)
+
+    Attributes:
+        tokens: Indicates if the field has associated tokens
+        list_element: Indicates if the field is a list or tuple element
+        namespace_matches: Matching namespaces information
+        is_clazz_union: Indicates if the field is a union of multiple types
+        local_name: Local name extracted from the qualified name
+        is_text: Indicates if the field represents text content
+        is_element: Indicates if the field represents an XML element
+        is_elements: Indicates if the field represents a sequence of XML elements
+        is_wildcard: Indicates if the field represents a wildcard
+        is_attribute: Indicates if the field represents an XML attribute
+        is_attributes: Indicates if the field represents a sequence of XML attributes
     """
 
     __slots__ = (
@@ -192,21 +210,35 @@ class XmlVar(MetaMixin):
 
     @property
     def element_types(self) -> Set[Type]:
+        """Return the unique element types."""
         return {tp for element in self.elements.values() for tp in element.types}
 
     def find_choice(self, qname: str) -> Optional["XmlVar"]:
-        """Match and return a choice field by its qualified name."""
+        """Match and return a choice field by its qualified name.
+
+        Args:
+            qname: The qualified name to lookup
+
+        Returns:
+            The choice xml var instance or None if there are no matches.
+        """
         match = self.elements.get(qname)
         return match or find_by_namespace(self.wildcards, qname)
 
     def find_value_choice(self, value: Any, is_class: bool) -> Optional["XmlVar"]:
-        """
-        Match and return a choice field that matches the given value.
+        """Match and return a choice field that matches the given value.
 
         Cases:
             - value is none or empty tokens list: look for a nillable choice
             - value is a dataclass: look for exact type or a subclass
             - value is primitive: test value against the converter
+
+        Args:
+            value: The value to match its type to one of the choices
+            is_class: Whether the value is a binding class
+
+        Returns:
+            The choice xml var instance or None if there are no matches.
         """
         is_tokens = collections.is_array(value)
         if value is None or (not value and is_tokens):
@@ -218,25 +250,56 @@ class XmlVar(MetaMixin):
         return self.find_primitive_choice(value, is_tokens)
 
     def find_nillable_choice(self, is_tokens: bool) -> Optional["XmlVar"]:
+        """Find the first nillable choice.
+
+        Args:
+            is_tokens: Specify if the choice must support token values
+
+        Returns:
+            The choice xml var instance or None if there are no matches.
+        """
         return collections.first(
             element
             for element in self.elements.values()
             if element.nillable and is_tokens == element.tokens
         )
 
-    def find_clazz_choice(self, tp: Type) -> Optional["XmlVar"]:
+    def find_clazz_choice(self, clazz: Type) -> Optional["XmlVar"]:
+        """Find the best matching choice for the given class.
+
+        Best Matches:
+            1. The class is explicitly defined in a choice types
+            2. The class is a subclass of one of the choice types
+
+        Args:
+            clazz: The class type to match
+
+        Returns:
+            The choice xml var instance or None if there are no matches.
+        """
         derived = None
         for element in self.elements.values():
-            if element.clazz:
-                if tp in element.types:
-                    return element
+            if not element.clazz:
+                continue
 
-                if derived is None and any(issubclass(tp, t) for t in element.types):
-                    derived = element
+            if clazz in element.types:
+                return element
+
+            if derived is None and any(issubclass(clazz, t) for t in element.types):
+                derived = element
 
         return derived
 
     def find_primitive_choice(self, value: Any, is_tokens: bool) -> Optional["XmlVar"]:
+        """Match and return a choice field that matches the given primitive value.
+
+        Args:
+            value: A primitive value, e.g. str, int, float, enum
+            is_tokens: Specify whether it's a tokens value
+
+        Returns:
+            The choice xml var instance or None if there are no matches.
+        """
         tp = type(value) if not is_tokens else type(value[0])
         for element in self.elements.values():
             if (element.any_type or element.clazz) or element.tokens != is_tokens:
@@ -254,8 +317,14 @@ class XmlVar(MetaMixin):
         return None
 
     def is_optional(self, value: Any) -> bool:
-        """Return whether this var instance is not required and the given value
-        matches the default one."""
+        """Verify this var is optional and the value matches the default one.
+
+        Args:
+            value: The value to compare against the default one
+
+        Returns:
+            The bool result.
+        """
         if self.required:
             return False
 
@@ -264,7 +333,14 @@ class XmlVar(MetaMixin):
         return self.default == value
 
     def match_namespace(self, qname: str) -> bool:
-        """Match the given qname to the wildcard allowed namespaces."""
+        """Match the given qname to the wildcard allowed namespaces.
+
+        Args:
+            qname: The namespace qualified name of an element
+
+        Returns:
+            The bool result.
+        """
         if self.namespace_matches is None:
             self.namespace_matches = {}
 
@@ -296,21 +372,24 @@ get_index = operator.attrgetter("index")
 
 
 class XmlMeta(MetaMixin):
-    """
-    Class binding metadata.
+    """Class binding metadata.
 
-    :param clazz: The dataclass type
-    :param qname: The namespace qualified name.
-    :param target_qname: The target namespace qualified name.
-    :param nillable: Specifies whether an explicit empty value can be
-        assigned.
-    :param mixed_content: Has a wildcard with mixed flag enabled
-    :param text: Text var
-    :param choices: List of compound vars
-    :param elements: Mapping of qname-element vars
-    :param wildcards: List of wildcard vars
-    :param attributes: Mapping of qname-attribute vars
-    :param any_attributes: List of wildcard attributes vars
+    Args:
+        clazz: The binding model
+        qname: The namespace-qualified name
+        target_qname: The target namespace-qualified name
+        nillable: Specifies whether this class supports nillable content
+        text: A text variable
+        choices: A list of compound variables
+        elements: A mapping of qualified name to sequence of element variables
+        wildcards: A list of wildcard variables
+        attributes: A mapping of qualified name to attribute variable
+        any_attributes: A list of wildcard variables
+        wrappers: a mapping of wrapper names to sequences of wrapped variables
+
+    Attributes:
+        namespace: The target namespace extracted from the qualified name
+        mixed_content: Specifies if the class supports mixed content
     """
 
     __slots__ = (
@@ -361,6 +440,7 @@ class XmlMeta(MetaMixin):
 
     @property
     def element_types(self) -> Set[Type]:
+        """Return a unique list of all elements types."""
         return {
             tp
             for elements in self.elements.values()
@@ -369,6 +449,7 @@ class XmlMeta(MetaMixin):
         }
 
     def get_element_vars(self) -> List[XmlVar]:
+        """Return a sorted list of the class element variables."""
         result = list(
             itertools.chain(self.wildcards, self.choices, *self.elements.values())
         )
@@ -378,10 +459,12 @@ class XmlMeta(MetaMixin):
         return sorted(result, key=get_index)
 
     def get_attribute_vars(self) -> List[XmlVar]:
+        """Return a sorted list of the class attribute variables."""
         result = itertools.chain(self.any_attributes, self.attributes.values())
         return sorted(result, key=get_index)
 
     def get_all_vars(self) -> List[XmlVar]:
+        """Return a sorted list of all the class variables."""
         result = list(
             itertools.chain(
                 self.wildcards,
@@ -397,14 +480,39 @@ class XmlMeta(MetaMixin):
         return sorted(result, key=get_index)
 
     def find_attribute(self, qname: str) -> Optional[XmlVar]:
+        """Find an attribute var with the given qname.
+
+        Args:
+            qname: The namespace qualified name
+
+        Returns:
+            The xml var instance or None if there is no match.
+        """
         return self.attributes.get(qname)
 
     def find_any_attributes(self, qname: str) -> Optional[XmlVar]:
+        """Find a wildcard attribute var that matches the given qname.
+
+        Args:
+            qname: The namespace qualified name
+
+        Returns:
+            The xml var instance or None if there is no match.
+        """
         return find_by_namespace(self.any_attributes, qname)
 
     def find_wildcard(self, qname: str) -> Optional[XmlVar]:
-        """Match the given qualified name to a wildcard and optionally to one
-        of its choice elements."""
+        """Find a wildcard var that matches the given qname.
+
+        If the wildcard has choices, attempt to match and return
+        one of them as well.
+
+        Args:
+            qname: The namespace qualified name
+
+        Returns:
+            The xml var instance or None if there is no match.
+        """
         wildcard = find_by_namespace(self.wildcards, qname)
 
         if wildcard and wildcard.elements:
@@ -415,12 +523,27 @@ class XmlMeta(MetaMixin):
         return wildcard
 
     def find_any_wildcard(self) -> Optional[XmlVar]:
-        if self.wildcards:
-            return self.wildcards[0]
+        """Return the first declared wildcard var.
 
-        return None
+        Returns:
+            The xml var instance or None if there are no wildcard vars.
+        """
+        return self.wildcards[0] if self.wildcards else None
 
     def find_children(self, qname: str) -> Iterator[XmlVar]:
+        """Find all class vars that match the given qname.
+
+        Go through the elements, choices and wildcards. Sometimes
+        a class might contain more than one var with the same
+        qualified name. The binding process has to check all
+        of them and see which one to use.
+
+        Args:
+            qname: The namespace qualified name
+
+        Yields:
+            An iterator of all the class vars that match the given qname.
+        """
         elements = self.elements.get(qname)
         if elements:
             yield from elements
@@ -435,8 +558,17 @@ class XmlMeta(MetaMixin):
             yield chd
 
 
-def find_by_namespace(xml_vars: Sequence[XmlVar], qname: str) -> Optional[XmlVar]:
-    for xml_var in xml_vars:
+def find_by_namespace(vars: Sequence[XmlVar], qname: str) -> Optional[XmlVar]:
+    """Match the given qname to one of the given vars.
+
+    Args:
+        vars: The list of vars to match
+        qname: The namespace qualified name to lookup
+
+    Returns:
+        The first matching xml var instance or None if there are no matches.
+    """
+    for xml_var in vars:
         if xml_var.match_namespace(qname):
             return xml_var
 

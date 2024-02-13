@@ -13,28 +13,17 @@ EVENTS = (EventType.START, EventType.END, EventType.START_NS)
 
 
 class XmlEventHandler(XmlHandler):
-    """
-    Event handler based on :func:`xml.etree.ElementTree.iterparse` api.
-
-    :param parser: The parser instance to feed with events
-    :param clazz: The target binding model, auto located if omitted.
-    """
-
-    __slots__ = ()
+    """A native xml event handler."""
 
     def parse(self, source: Any) -> Any:
-        """
-        Parse an XML document from a system identifier or an InputSource or
-        directly from an xml Element or ElementTree.
+        """Parse the source XML document.
 
-        When source is an Element or ElementTree the handler will walk
-        over the objects structure.
+        Args:
+            source: The xml source, can be a file resource or an input stream,
+                or a xml tree/element.
 
-        When source is a system identifier or an InputSource the parser
-        will ignore comments and recover from errors.
-
-        When config process_xinclude is enabled the handler will parse
-        the whole document and then walk down the element tree.
+        Returns:
+            An instance of the class type representing the parsed content.
         """
         if isinstance(source, etree.ElementTree):
             source = source.getroot()
@@ -53,8 +42,15 @@ class XmlEventHandler(XmlHandler):
 
         return self.process_context(ctx)
 
-    def process_context(self, context: Iterable) -> Any:
-        """Iterate context and push the events to main parser."""
+    def process_context(self, context: Iterable[Tuple[str, Any]]) -> Any:
+        """Iterate context and push events to main parser.
+
+        Args:
+            context: The iterable xml context
+
+        Returns:
+            An instance of the class type representing the parsed content.
+        """
         ns_map: Dict = {}
         for event, element in context:
             if event == EventType.START:
@@ -86,11 +82,17 @@ class XmlEventHandler(XmlHandler):
 
 
 def iterwalk(element: etree.Element, ns_map: Dict) -> Iterator[Tuple[str, Any]]:
-    """
-    Walk over the element tree structure and emit start-ns/start/end events.
+    """Walk over the element tree and emit events.
 
     The ElementTree doesn't preserve the original namespace prefixes, we
     have to generate new ones.
+
+    Args:
+        element: The etree element instance
+        ns_map: The namespace prefix-URI mapping
+
+    Yields:
+        An iterator of events
     """
     uri = namespaces.target_uri(element.tag)
     if uri is not None:
@@ -106,6 +108,16 @@ def iterwalk(element: etree.Element, ns_map: Dict) -> Iterator[Tuple[str, Any]]:
 
 
 def get_base_url(base_url: Optional[str], source: Any) -> Optional[str]:
+    """Return the base url of the source.
+
+    Args:
+        base_url: The base url from the parser config
+        source: The xml source input
+
+    Args:
+        A base url str or None, if no base url is provided
+        and the source is not a string path.
+    """
     if base_url:
         return base_url
 
@@ -118,6 +130,8 @@ def xinclude_loader(
     encoding: Optional[str] = None,
     base_url: Optional[str] = None,
 ) -> Any:
-    """Custom loader for xinclude to support base_url argument that doesn't
-    exist for python < 3.9."""
+    """Custom loader for xinclude parsing.
+
+    The base_url argument was added in python >= 3.9.
+    """
     return xinclude.default_loader(urljoin(base_url or "", href), parse, encoding)

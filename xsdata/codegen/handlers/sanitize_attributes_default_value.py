@@ -6,8 +6,7 @@ from xsdata.models.enums import DataType
 
 
 class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
-    """
-    Sanitize attributes default values.
+    """Sanitize attributes default values.
 
     Cases:
         1. Ignore enumerations.
@@ -20,6 +19,13 @@ class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
     __slots__ = ()
 
     def process(self, target: Class):
+        """Process entrypoint for classes.
+
+        Inspect all attrs and attr choices.
+
+        Args:
+            target: The target class instance.
+        """
         for attr in target.attrs:
             self.process_attribute(target, attr)
 
@@ -27,6 +33,18 @@ class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
                 self.process_attribute(target, choice)
 
     def process_attribute(self, target: Class, attr: Attr):
+        """Process entrypoint for attrs.
+
+        Cases:
+            - Reset min_occurs
+            - Reset default value
+            - Validate default value against types
+            - Set empty string as default value for string text nodes.
+
+        Args:
+            target: The target class instance
+            attr: The attr instance
+        """
         if self.should_reset_required(attr):
             attr.restrictions.min_occurs = 0
 
@@ -41,6 +59,12 @@ class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
             attr.default = ""
 
     def process_types(self, target: Class, attr: Attr):
+        """Reset attr types if default value doesn't pass validation.
+
+        Args:
+            target: The target class instance
+            attr: The attr instance
+        """
         if self.is_valid_external_value(target, attr):
             return
 
@@ -58,12 +82,17 @@ class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
         self.reset_attribute_types(attr)
 
     def is_valid_external_value(self, target: Class, attr: Attr) -> bool:
-        """Return whether the default value of the given attr can be mapped to
-        user defined type like an enumeration or an inner complex content
-        class."""
+        """Validate user defined types.
 
+        Only enumerations and complex content inner types are supported.
+
+        Args:
+            target: The target class instance
+            attr: The attr instance
+        .
+        """
         for tp in attr.user_types:
-            source = self.find_type(target, tp)
+            source = self.find_inner_type(target, tp)
             if self.is_valid_inner_type(source, attr, tp):
                 return True
 
@@ -72,7 +101,16 @@ class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
 
         return False
 
-    def find_type(self, target: Class, attr_type: AttrType) -> Class:
+    def find_inner_type(self, target: Class, attr_type: AttrType) -> Class:
+        """Find the inner class for the given attr type.
+
+        Args:
+            target: The target class instance
+            attr_type: The attr type instance
+
+        Returns:
+            The inner class instance.
+        """
         if attr_type.forward:
             return self.container.find_inner(target, attr_type.qname)
 
@@ -80,10 +118,23 @@ class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
 
     @classmethod
     def is_valid_inner_type(
-        cls, source: Class, attr: Attr, attr_type: AttrType
+        cls,
+        source: Class,
+        attr: Attr,
+        attr_type: AttrType,
     ) -> bool:
-        """Return whether the inner class can inherit the attr default value
-        and swap them as well."""
+        """Return whether the inner class can inherit the attr default value.
+
+        If it does, then swap the default/fixed values.
+
+        Args:
+            source: The inner source class instance
+            attr: The attr instance
+            attr_type: The attr type instance
+
+        Returns:
+            The bool result.
+        """
         if attr_type.forward:
             for src_attr in source.attrs:
                 if src_attr.xml_type is None:
@@ -96,15 +147,24 @@ class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
 
     @classmethod
     def is_valid_enum_type(cls, source: Class, attr: Attr) -> bool:
-        """
-        Convert string literal default values to enumeration members
-        placeholders and return result.
+        """Return whether the default value matches an enum member.
 
-        The placeholders will be converted to proper references from the
-        generator filters.
+        If it does convert the string literal default value to
+        enumeration members placeholders. The placeholder will be
+        converted to proper references from the generator filters,
+        because we don't know yet the enumeration class name.
 
-        Placeholder examples: Single -> @enum@qname::member_name
-        Multiple -> @enum@qname::first_member@second_member
+
+        Placeholder examples:
+            Single -> @enum@qname::member_name
+            Multiple -> @enum@qname::first_member@second_member
+
+        Args:
+            source: The inner source class instance
+            attr: The attr instance
+
+        Returns:
+            The bool result.
         """
         assert attr.default is not None
 
@@ -127,13 +187,18 @@ class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
 
     @classmethod
     def is_valid_native_value(cls, target: Class, attr: Attr) -> bool:
-        """
-        Return whether the default value of the given attribute can be
-        converted successfully to and from xml.
+        """Return whether the default value can be converted successfully.
 
         The test process for enumerations and fixed value fields are
         strict, meaning the textual representation also needs to match
         the original.
+
+        Args:
+            target: The target class instance
+            attr: The attr instance
+
+        Returns:
+            The bool result.
         """
         assert attr.default is not None
 
@@ -162,10 +227,19 @@ class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
 
     @classmethod
     def should_reset_required(cls, attr: Attr) -> bool:
-        """
-        Return whether the min occurrences for the attr needs to be reset.
+        """Return whether the min_occurs needs to be reset.
 
-        @Todo figure out if wildcards are supposed to be optional!
+        Condition:
+            - Attr not derived from xs:attribute
+            - It has no default value
+            - It's derived from xs:anyType
+            - It has max_occurs==1
+
+        Args:
+            attr: The attr instance
+
+        Returns:
+            The bool result.
         """
         return (
             not attr.is_attribute
@@ -176,12 +250,18 @@ class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
 
     @classmethod
     def should_reset_default(cls, attr: Attr) -> bool:
-        """
-        Return whether we should unset the default value of the attribute.
+        """Return whether the default value needs to be reset.
 
-        - Default value is not set
-        - Attribute is xsi:type (ignorable)
-        - Attribute is part of a choice
+        Cases:
+            - Attr is xsi:type (ignorable)
+            - Attr has max_occurs > 1
+            - Attr is not derived from xs:attribute and has min_occurs=0
+
+        Args:
+            attr: The attr instance
+
+        Returns:
+            The bool result.
         """
         return attr.default is not None and (
             attr.is_xsi_type
@@ -191,6 +271,11 @@ class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
 
     @classmethod
     def reset_attribute_types(cls, attr: Attr):
+        """Reset the attribute type to string.
+
+        Args:
+            attr: The attr instance
+        """
         attr.types.clear()
         attr.types.append(AttrType(qname=str(DataType.STRING), native=True))
         attr.restrictions.format = None

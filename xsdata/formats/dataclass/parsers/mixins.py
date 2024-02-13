@@ -1,4 +1,5 @@
 import abc
+from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple, Type
 
 from xsdata.exceptions import XmlHandlerError
@@ -9,27 +10,40 @@ from xsdata.models.enums import EventType
 NoneStr = Optional[str]
 
 
+@dataclass
 class PushParser(AbstractParser):
-    """
-    A generic interface for event based content handlers like sax.
+    """A generic interface for event based content handlers like sax.
 
-    :param config: Parser configuration.
+    Args:
+        config: The parser configuration instance
+
+    Attributes:
+        ns_map: The parsed namespace prefix-URI map
     """
 
-    config: ParserConfig
-    ns_map: Dict
+    config: ParserConfig = field(default_factory=ParserConfig)
+    ns_map: Dict[Optional[str], str] = field(init=False, default_factory=dict)
 
     @abc.abstractmethod
     def start(
         self,
         clazz: Optional[Type],
-        queue: List,
-        objects: List,
+        queue: List[Any],
+        objects: List[Any],
         qname: str,
-        attrs: Dict,
-        ns_map: Dict,
+        attrs: Dict[str, str],
+        ns_map: Dict[Optional[str], str],
     ):
-        """Queue the next xml node for parsing."""
+        """Build and queue the XmlNode for the starting element.
+
+        Args:
+            clazz: The target class type, auto locate if omitted
+            queue: The XmlNode queue list
+            objects: The list of all intermediate parsed objects
+            qname: The element qualified name
+            attrs: The element attributes
+            ns_map: The element namespace prefix-URI map
+        """
 
     @abc.abstractmethod
     def end(
@@ -40,74 +54,92 @@ class PushParser(AbstractParser):
         text: NoneStr,
         tail: NoneStr,
     ) -> bool:
-        """
-        Parse the last xml node and bind any intermediate objects.
+        """Parse the last xml node and bind any intermediate objects.
 
-        :return: The result of the binding process.
+        Args:
+            queue: The XmlNode queue list
+            objects: The list of all intermediate parsed objects
+            qname: The element qualified name
+            text: The element text content
+            tail: The element tail content
+
+        Returns:
+            Whether the binding process was successful.
         """
 
     def register_namespace(self, prefix: NoneStr, uri: str):
-        """
-        Add the given prefix-URI namespaces mapping if the prefix is new.
+        """Register the uri prefix in the namespace registry.
 
-        :param prefix: Namespace prefix
-        :param uri: Namespace uri
+        Args:
+            prefix: Namespace prefix
+            uri: Namespace uri
         """
         if prefix not in self.ns_map:
             self.ns_map[prefix] = uri
 
 
 class XmlNode(abc.ABC):
-    """
-    The xml node interface.
+    """The xml node interface.
 
     The nodes are responsible to find and queue the child nodes when a
     new element starts and build the resulting object tree when the
     element ends. The parser needs to maintain a queue for these nodes
-    and a list of all the intermediate object trees.
+    and a list of all the intermediate objects.
     """
 
     @abc.abstractmethod
     def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> "XmlNode":
-        """
-        Initialize the next child node to be queued, when a new xml element
-        starts.
+        """Initialize the next child node to be queued, when an element starts.
 
         This entry point is responsible to create the next node type
         with all the necessary information on how to bind the incoming
         input data.
 
-        :param qname: Qualified name
-        :param attrs: Attribute key-value map
-        :param ns_map: Namespace prefix-URI map
-        :param position: The current objects position, to mark future
-            objects as children
+        Args:
+            qname: The element qualified name
+            attrs: The element attributes
+            ns_map: The element namespace prefix-URI map
+            position: The current length of the intermediate objects
+
+        Returns:
+            The child xml node instance.
         """
 
     @abc.abstractmethod
-    def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
-        """
-        Build the object tree for the ending element and return whether the
-        result was successful or not.
+    def bind(
+        self,
+        qname: str,
+        text: NoneStr,
+        tail: NoneStr,
+        objects: List[Any],
+    ) -> bool:
+        """Bind the parsed data into an object for the ending element.
 
-        This entry point is called when an xml element ends and is
+        This entry point is called when a xml element ends and is
         responsible to parse the current element attributes/text, bind
-        any children objects and initialize  new object.
+        any children objects and initialize new object.
 
-        :param qname: Qualified name
-        :param text: Text content
-        :param tail: Tail content
-        :param objects: The list of intermediate parsed objects, eg
-            [(qname, object)]
+        Args:
+            qname: The element qualified name
+            text: The element text content
+            tail: The element tail content
+            objects: The list of intermediate parsed objects
+
+        Returns:
+            Whether the binding process was successful or not.
         """
 
 
 class XmlHandler:
-    """
-    Abstract content handler.
+    """Abstract content handler.
 
-    :param parser: The parser instance to feed with events
-    :param clazz: The target binding model, auto located if omitted.
+    Args:
+        parser: The parser instance to feed with events
+        clazz: The target class type, auto locate if omitted
+
+    Attributes:
+        queue: The XmlNode queue list
+        objects: The list of intermediate parsed objects
     """
 
     __slots__ = ("parser", "clazz", "queue", "objects")
@@ -119,16 +151,26 @@ class XmlHandler:
         self.objects: List = []
 
     def parse(self, source: Any) -> Any:
-        """Parse an XML document from a system identifier or an InputSource."""
+        """Parse the source XML document.
+
+        Args:
+            source: The xml source, can be a file resource or an input stream.
+
+        Returns:
+            An instance of the class type representing the parsed content.
+        """
         raise NotImplementedError("This method must be implemented!")
 
-    def merge_parent_namespaces(self, ns_map: Dict) -> Dict:
-        """
-        Merge and return the given prefix-URI map with the parent node.
+    def merge_parent_namespaces(self, ns_map: Dict[Optional[str], str]) -> Dict:
+        """Merge the given prefix-URI map with the parent node map.
 
-        Register new prefixes with the parser.
+        This method also registers new prefixes with the parser.
 
-        :param ns_map: Namespace prefix-URI map
+        Args:
+            ns_map: The current element namespace prefix-URI map
+
+        Returns:
+            The new merged namespace prefix-URI map.
         """
         if self.queue:
             parent_ns_map = self.queue[-1].ns_map
@@ -150,15 +192,15 @@ class XmlHandler:
 class EventsHandler(XmlHandler):
     """Sax content handler for pre-recorded events."""
 
-    __slots__ = ("data_frames", "flush_next")
-
-    def __init__(self, parser: PushParser, clazz: Optional[Type]):
-        super().__init__(parser, clazz)
-        self.data_frames: List = []
-        self.flush_next: Optional[str] = None
-
     def parse(self, source: List[Tuple]) -> Any:
-        """Forward the pre-recorded events to the main parser."""
+        """Forward the pre-recorded events to the main parser.
+
+        Args:
+            source: A list of event data
+
+        Returns:
+            An instance of the class type representing the parsed content.
+        """
         for event, *args in source:
             if event == EventType.START:
                 qname, attrs, ns_map = args

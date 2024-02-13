@@ -4,8 +4,7 @@ from typing import Any
 
 
 def dump(obj: Any):
-    """
-    Write any object into a dump json file.
+    """Write any object into a dump json file.
 
     For internal troubleshooting purposes only!!!
     """

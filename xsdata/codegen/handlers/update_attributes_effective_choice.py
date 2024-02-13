@@ -7,16 +7,22 @@ from xsdata.utils import collections
 
 
 class UpdateAttributesEffectiveChoice(HandlerInterface):
-    """
-    Look for fields that are repeated and mark them effectively as choices if
-    they are not part of symmetrical sequences.
+    """Detect implied repeated choices and update them.
 
-    valid eg: <a/><b/><a/> symmetrical sequence: <a/><b/><a/><b/>
+    valid eg: <a/><b/><a/><c/>
+    symmetrical sequence: <a/><b/><a/><b/>
     """
 
     __slots__ = ()
 
     def process(self, target: Class):
+        """Process entrypoint for classes.
+
+        Ignore enumerations, for performance reasons.
+
+        Args:
+            target: The target class instance
+        """
         if target.is_enumeration:
             return
 
@@ -29,6 +35,11 @@ class UpdateAttributesEffectiveChoice(HandlerInterface):
 
     @classmethod
     def reset_symmetrical_choices(cls, target: Class):
+        """Mark symmetrical choices as sequences.
+
+        Args:
+            target: The target class instance
+        """
         groups = collections.group_by(target.attrs, get_restriction_choice)
         for choice, attrs in groups.items():
             if choice is None or choice > 0:
@@ -52,7 +63,6 @@ class UpdateAttributesEffectiveChoice(HandlerInterface):
                     attr.restrictions.choice = None
                     cls.reset_effective_choice(
                         attr.restrictions.path,
-                        "s",
                         attr.restrictions.sequence,
                         attr.restrictions.max_occurs,
                     )
@@ -61,18 +71,33 @@ class UpdateAttributesEffectiveChoice(HandlerInterface):
     def reset_effective_choice(
         cls,
         paths: List[Tuple[str, int, int, int]],
-        name: str,
         index: int,
         max_occur: int,
     ):
+        """Update an attr path to resemble a repeatable sequence.
+
+        Args:
+            paths: The paths of an attr
+            index: The sequence index
+            max_occur: The new max occurrences
+        """
         for i, path in enumerate(paths):
-            if path[0] == name and path[1] == index and path[3] == 1:
+            if path[0] == "s" and path[1] == index and path[3] == 1:
                 new_path = (*path[:-1], max_occur)
                 paths[i] = new_path
                 break
 
     @classmethod
     def merge_attrs(cls, target: Class, groups: List[List[int]]) -> List[Attr]:
+        """Merge same name/tag/namespace attrs.
+
+        Args:
+            target: The target class
+            groups: The list of connected attr indexes
+
+        Returns:
+            The final list of target class attrs
+        """
         attrs = []
 
         for index, attr in enumerate(target.attrs):
@@ -98,6 +123,21 @@ class UpdateAttributesEffectiveChoice(HandlerInterface):
 
     @classmethod
     def group_repeating_attrs(cls, target: Class) -> List[List[int]]:
+        """Create a list of indexes of the same attrs.
+
+        Example: [
+            [0, 1 ,2],
+            [3, 4, 6],
+            [5,]
+        ]
+
+        Args:
+            target: The target class instance
+
+        Returns:
+            The list of indexes
+
+        """
         counters = defaultdict(list)
         for index, attr in enumerate(target.attrs):
             if not attr.is_attribute:

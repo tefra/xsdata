@@ -1,4 +1,4 @@
-[![image](https://github.com/tefra/xsdata/raw/main/docs/_static/logo.svg)](https://xsdata.readthedocs.io/)
+[![image](https://github.com/tefra/xsdata/raw/main/docs/logo.svg)](https://xsdata.readthedocs.io/)
 
 # Naive XML Bindings for python
 

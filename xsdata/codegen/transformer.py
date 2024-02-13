@@ -44,7 +44,7 @@ TYPE_JSON = 5
 class SupportedType(NamedTuple):
     """A supported resource model representation.
 
-    Args:
+    Attributes:
         id: The integer identifier
         name: The name of the resource type
         match_uri: A callable to match against URI strings

@@ -205,7 +205,7 @@ class XmlContext:
             clazz: The input clazz type
             qname: The xsi:type to lookup from cache
 
-        Args:
+        Returns:
             The matching class type or None if no matches.
         """
         types: List[Type] = self.find_types(qname)

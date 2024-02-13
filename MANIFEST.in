@@ -1,4 +1,4 @@
-include LICENSE README.rst LICENSE CHANGES.rst
+include LICENSE README.md LICENSE CHANGES.md
 recursive-include docs *
 recursive-include tests *
 recursive-include xsdata *

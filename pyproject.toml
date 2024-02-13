@@ -2,6 +2,9 @@
 requires = ["setuptools>=61.2"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools.packages.find]
+include = ["xsdata"]
+
 [project]
 name = "xsdata"
 description = "Python XML Binding"
@@ -33,8 +36,8 @@ dependencies = [
 dynamic = ["version"]
 
 [project.readme]
-file = "README.rst"
-content-type = "text/x-rst"
+file = "README.md"
+content-type = "text/markdown"
 
 [project.urls]
 Homepage = "https://github.com/tefra/xsdata"
@@ -53,13 +56,13 @@ cli = [
 ]
 docs = [
     "mkdocs",
-    "mkdocstrings",
-    "furo",
-    "sphinx",
-    "sphinx-autobuild",
-    "sphinx-autodoc-typehints",
-    "sphinx-copybutton",
-    "sphinx-inline-tabs",
+    "mkdocs-gen-files",
+    "mkdocs-literate-nav",
+    "mkdocs-material",
+    "mkdocs-minify-plugin",
+    "mkdocstrings[python]",
+    "markdown-exec[ansi]",
+    "pymdownx-superfence-filter-lines",
 ]
 lxml = ["lxml>=4.4.1"]
 soap = ["requests"]
@@ -119,7 +122,6 @@ ignore = [
     "D100",
     "D104",
     "D107"
-
 ]
 
 isort = { known-first-party = ['xsdata', 'tests'] }
@@ -137,6 +139,7 @@ max-line-length = 88
 
 [tool.pytest.ini_options]
 addopts = "--color=yes --benchmark-skip"
+doctest_optionflags = "NORMALIZE_WHITESPACE"
 
 [tool.coverage.run]
 omit = [

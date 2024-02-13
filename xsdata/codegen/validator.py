@@ -46,7 +46,7 @@ class ClassValidator:
         """Remove classes with undefined extensions.
 
         Args:
-            classes: A list of
+            classes: A list of class instances
         """
 
         def is_invalid(ext: Extension) -> bool:

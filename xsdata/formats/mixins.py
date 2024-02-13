@@ -14,7 +14,7 @@ from xsdata.utils.package import module_path, package_path
 class GeneratorResult(NamedTuple):
     """Generator result transfer object.
 
-    Args:
+    Attributes:
         path: The target file path
         title: The result title for misc usage
         source: The source code/output to be written
@@ -79,7 +79,7 @@ class AbstractGenerator(abc.ABC):
             classes: A list of class instances
 
         Raises:
-            CodeGenerationErrorL If the analyzer failed to
+            CodeGenerationError: If the analyzer failed to
                 designate a class to a package and module.
         """
         modules = {}

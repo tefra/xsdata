@@ -237,12 +237,10 @@ class GeneratorOutput:
         subscriptable_types: Use PEP-585 generics for standard
             collections, python>=3.9 Only
         union_type: Use PEP-604 union type, python>=3.10 Only
-        postponed_annotations: Enable postponed evaluation of
-            annotations
+        postponed_annotations: Use 563 postponed evaluation of  annotations
         unnest_classes: Move inner classes to upper level
         ignore_patterns: Ignore pattern restrictions
-        include_header: Include a header with codegen information in
-            the output
+        include_header: Include a header with codegen information in the output
     """
 
     package: str = element(default="generated")

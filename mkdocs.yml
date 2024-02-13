@@ -1,0 +1,124 @@
+site_name: "xsdata"
+site_url: https://xsdata.readthedocs.io/
+site_description: >-
+  xsData is a complete data binding library for python allowing developers to
+  access and use XML and JSON documents as simple objects rather than using DOM.
+repo_name: tefra/xsdata
+repo_url: https://github.com/tefra/xsdata
+edit_uri: edit/main/docs/
+exclude_docs: |
+  scripts/
+  __pycache__/
+
+
+theme:
+  name: 'material'
+  custom_dir: docs/overrides
+  palette:
+  - media: "(prefers-color-scheme: light)"
+    scheme: default
+    primary: white
+    accent: deep purple
+    toggle:
+      icon: material/lightbulb-outline
+      name: "Switch to dark mode"
+  - media: "(prefers-color-scheme: dark)"
+    scheme: slate
+    primary: black
+    accent: deep purple
+    toggle:
+      icon: material/lightbulb
+      name: "Switch to light mode"
+  features:
+    - content.action.edit
+    - content.action.view
+    - content.code.annotate
+    - content.code.copy
+    - content.tooltips
+    - navigation.tabs
+    - navigation.footer
+    - navigation.top
+    - content.tabs.link
+    - search.suggest
+    - toc.integrate
+  logo: 'logo-small.svg'
+  favicon: 'favicon.png'
+
+watch:
+  - xsdata
+
+plugins:
+- search
+- minify:
+    minify_html: true
+- markdown-exec
+- gen-files:
+    scripts:
+    - docs/scripts/generate_api.py
+- literate-nav:
+    nav_file: SUMMARY.md
+- mkdocstrings:
+    handlers:
+      python:
+        load_external_modules: true
+        options:
+          members_order: source
+          show_source: true
+          show_root_heading: true
+        import:
+        - https://docs.python-requests.org/en/master/objects.inv
+        - https://docs.python.org/3/objects.inv
+        - https://lxml.de/apidoc/objects.inv
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: "*"
+          class: "highlight"
+          format: !!python/name:pymdownx_superfence_filter_lines.do_format
+          validator: !!python/name:pymdownx_superfence_filter_lines.do_validate
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+
+nav:
+- Get Started:
+  - Welcome to xsdata: index.md
+  - Installation: installation.md
+  - Changelog: changelog.md
+  - Samples: samples.md
+  - PyPI: https://pypi.org/project/xsdata/
+  - Conda: https://anaconda.org/conda-forge/xsdata
+- Code Generator:
+  - Introduction: codegen/intro.md
+  - Configuration: codegen/config.md
+  - Docstring styles: codegen/docstrings.md
+  - DTD Modeling: codegen/dtd_modeling.md
+  - WSDL Modeling: codegen/wsdl_modeling.md
+  - Samples Modeling: codegen/samples_modeling.md
+  - Download Schemas: codegen/download_schemas.md
+  - Architecture: codegen/architecture.md
+- Data Models:
+  - Classes: models/classes.md
+  - Fields: models/fields.md
+  - Types: models/types.md
+- Data Binding:
+  - Basics: data_binding/basics.md
+  - XML Parsing: data_binding/xml_parsing.md
+  - XML Serializing: data_binding/xml_serializing.md
+  - JSON Parsing: data_binding/json_parsing.md
+  - JSON Serializing: data_binding/json_serializing.md
+  - Pycode Serializing: data_binding/pycode_serializing.md
+- FAQ: faq.md
+- API: api/
+- Plugins:
+    - How-to: plugins/how_to.md
+    - List: plugins/list.md

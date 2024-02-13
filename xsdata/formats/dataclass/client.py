@@ -11,7 +11,7 @@ from xsdata.formats.dataclass.transports import DefaultTransport, Transport
 class Config(NamedTuple):
     """Service configuration class.
 
-    Args:
+    Attributes:
         style: The binding style
         location: The service endpoint url
         transport: The transport namespace
@@ -98,14 +98,17 @@ class Client:
     def send(self, obj: Any, headers: Optional[Dict] = None) -> Any:
         """Build and send a request for the input object.
 
-        >>> params = {"body": {"add": {"int_a": 3, "int_b": 4}}}
-        >>> res = client.send(params)
-
+        ```py
+        params = {"body": {"add": {"int_a": 3, "int_b": 4}}}
+        res = client.send(params)
+        ```
         Is equivalent with:
 
-        >>> req = CalculatorSoapAddInput(
-        >>> body=CalculatorSoapAddInput.Body(add=Add(3, 4)))
-        >>> res = client.send(req)
+        ```py
+        req = CalculatorSoapAddInput(
+        body=CalculatorSoapAddInput.Body(add=Add(3, 4)))
+        res = client.send(req)
+        ```
 
         Args:
             obj: The request model instance or a pure dictionary

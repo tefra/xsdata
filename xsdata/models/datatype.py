@@ -49,7 +49,7 @@ class XmlDate(NamedTuple):
     Represents iso 8601 date format [-]CCYY-MM-DD[Z|(+|-)hh:mm] with
     rich comparisons and hashing.
 
-    Args:
+    Attributes:
         year: Any signed integer, eg (0, -535, 2020)
         month: Unsigned integer between 1-12
         day: Unsigned integer between 1-31
@@ -137,7 +137,7 @@ class XmlDateTime(NamedTuple):
     Represents iso 8601 date time format `[-]CCYY-MM-DDThh:mm: ss[Z|(+|-)hh:mm]`
     with rich comparisons and hashing.
 
-    Args:
+    Attributes:
         year: Any signed integer, eg (0, -535, 2020)
         month: Unsigned integer between 1-12
         day: Unsigned integer between 1-31
@@ -331,7 +331,7 @@ class XmlTime(NamedTuple):
     Represents iso 8601 time format `hh:mm: ss[Z|(+|-)hh:mm]`
     with rich comparisons and hashing.
 
-    Args:
+    Attributes:
         hour: Unsigned integer between 0-24
         minute: Unsigned integer between 0-59
         second: Unsigned integer between 0-59

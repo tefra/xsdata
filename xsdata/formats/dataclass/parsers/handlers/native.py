@@ -114,7 +114,7 @@ def get_base_url(base_url: Optional[str], source: Any) -> Optional[str]:
         base_url: The base url from the parser config
         source: The xml source input
 
-    Args:
+    Returns:
         A base url str or None, if no base url is provided
         and the source is not a string path.
     """

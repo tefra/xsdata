@@ -63,9 +63,6 @@ instance/
 # Scrapy stuff:
 .scrapy
 
-# Sphinx documentation
-docs/_build/
-
 # PyBuilder
 #target/
 
@@ -99,6 +96,10 @@ venv.bak/
 
 # mkdocs documentation
 /site
+# Ignore everything in the docs/api directory
+docs/api/*
+# But not the .gitkeep file
+!docs/api/.gitkeep
 
 # mypy
 .mypy_cache/

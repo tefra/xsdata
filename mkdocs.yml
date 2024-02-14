@@ -40,7 +40,6 @@ theme:
     - navigation.top
     - content.tabs.link
     - search.suggest
-    - toc.integrate
   logo: 'logo-small.svg'
   favicon: 'favicon.png'
 
@@ -117,6 +116,8 @@ nav:
   - JSON Parsing: data_binding/json_parsing.md
   - JSON Serializing: data_binding/json_serializing.md
   - Pycode Serializing: data_binding/pycode_serializing.md
+  - Dict Decoding: data_binding/dict_decoding.md
+  - Dict Encoding: data_binding/dict_encoding.md
 - FAQ: faq.md
 - API: api/
 - Plugins:

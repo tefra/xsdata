@@ -9,6 +9,8 @@ from tests.fixtures.calculator import (
 from tests.fixtures.hello import HelloGetHelloAsString
 from xsdata.exceptions import ClientValueError
 from xsdata.formats.dataclass.client import Client, Config, TransportTypes
+from xsdata.formats.dataclass.parsers import XmlParser
+from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.formats.dataclass.transports import DefaultTransport
 
 response = """
@@ -26,6 +28,18 @@ response = """
 
 
 class ClientTests(TestCase):
+    def test__init__(self):
+        config = Config.from_service(CalculatorSoapAdd, transport="foobar")
+
+        client = Client(config)
+        self.assertIs(client.parser.context, client.serializer.context)
+
+        client = Client(config, parser=XmlParser())
+        self.assertIs(client.parser.context, client.serializer.context)
+
+        client = Client(config, serializer=XmlSerializer())
+        self.assertIs(client.parser.context, client.serializer.context)
+
     def test_from_service(self):
         client = Client.from_service(CalculatorSoapAdd, location="http://testurl.com")
 

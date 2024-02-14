@@ -133,7 +133,7 @@ By using a custom dict factory you can change the output behaviour, like filter 
 or conveniently
 
 ```python
->>> from xsdata.formats.dataclass.serializers.json import DictFactory
+>>> from xsdata.formats.dataclass.serializers import DictFactory
 >>>
 >>> serializer = JsonSerializer(dict_factory=DictFactory.FILTER_NONE)
 

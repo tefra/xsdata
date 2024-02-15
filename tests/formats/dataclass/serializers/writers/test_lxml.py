@@ -1,3 +1,4 @@
+from dataclasses import make_dataclass
 from unittest import TestCase
 
 from tests import fixtures_dir
@@ -34,12 +35,12 @@ class LxmlEventWriterTests(TestCase):
         self.assertEqual(expected, actual)
 
     def test_encoding(self):
-        self.serializer.config.encoding = "US-ASCII"
-        self.serializer.config.xml_version = "1.1"
-        actual = self.serializer.render(books)
-        xml_declaration, _ = actual.split("\n", 1)
-
-        self.assertEqual('<?xml version="1.1" encoding="US-ASCII"?>', xml_declaration)
+        self.serializer.config.encoding = "ISO-8859-1"
+        x = make_dataclass("x", [("value", str)])
+        obj = x("á, é, í, ó")
+        actual = self.serializer.render(obj)
+        expected = '<?xml version="1.0" encoding="ISO-8859-1"?>\n<x>á, é, í, ó</x>\n'
+        self.assertEqual(expected, actual)
 
     def test_declaration_disabled(self):
         self.serializer.config.xml_declaration = False

@@ -60,6 +60,6 @@ class LxmlEventWriter(XmlWriter):
             encoding=self.config.encoding,
             pretty_print=self.config.pretty_print,
             xml_declaration=False,
-        ).decode()
+        ).decode(self.config.encoding)
 
         self.output.write(xml)

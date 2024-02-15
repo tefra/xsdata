@@ -1,9 +1,8 @@
-from dataclasses import dataclass, field
 from typing import Any, Dict, NamedTuple, Optional, Type, Union
 
 from xsdata.exceptions import ClientValueError
-from xsdata.formats.dataclass.parsers import XmlParser
-from xsdata.formats.dataclass.parsers.json import DictConverter
+from xsdata.formats.dataclass.context import XmlContext
+from xsdata.formats.dataclass.parsers import DictDecoder, XmlParser
 from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.formats.dataclass.transports import DefaultTransport, Transport
 
@@ -59,7 +58,6 @@ class TransportTypes:
     SOAP = "http://schemas.xmlsoap.org/soap/http"
 
 
-@dataclass
 class Client:
     """A wsdl client.
 
@@ -70,11 +68,31 @@ class Client:
         serializer: The xml serializer instance
     """
 
-    config: Config
-    transport: Transport = field(default_factory=DefaultTransport)
-    parser: XmlParser = field(default_factory=XmlParser)
-    serializer: XmlSerializer = field(default_factory=XmlSerializer)
-    dict_converter: DictConverter = field(init=False, default_factory=DictConverter)
+    __slots__ = "config", "transport", "parser", "serializer"
+
+    def __init__(
+        self,
+        config: Config,
+        transport: Optional[Transport] = None,
+        parser: Optional[XmlParser] = None,
+        serializer: Optional[XmlSerializer] = None,
+    ):
+        self.config = config
+        self.transport = transport or DefaultTransport()
+
+        if not serializer and not parser:
+            context = XmlContext()
+            serializer = XmlSerializer(context=context)
+            parser = XmlParser(context=context)
+        elif not serializer:
+            assert parser is not None
+            serializer = XmlSerializer(context=parser.context)
+        elif not parser:
+            assert serializer is not None
+            parser = XmlParser(context=serializer.context)
+
+        self.parser = parser
+        self.serializer = serializer
 
     @classmethod
     def from_service(cls, obj: Type, **kwargs: Any) -> "Client":
@@ -159,7 +177,8 @@ class Client:
             ClientValueError: If the config input type doesn't match the given object.
         """
         if isinstance(obj, Dict):
-            obj = self.dict_converter.convert(obj, self.config.input)
+            decoder = DictDecoder(context=self.serializer.context)
+            obj = decoder.decode(obj, self.config.input)
 
         if not isinstance(obj, self.config.input):
             raise ClientValueError(

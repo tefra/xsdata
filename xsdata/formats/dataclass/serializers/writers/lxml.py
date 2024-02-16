@@ -1,6 +1,6 @@
 from typing import Iterator
 
-from lxml.etree import indent, tostring
+from lxml import etree
 from lxml.sax import ElementTreeContentHandler
 
 from xsdata.formats.dataclass.serializers.mixins import XmlWriter
@@ -52,14 +52,16 @@ class LxmlEventWriter(XmlWriter):
 
         assert isinstance(self.handler, ElementTreeContentHandler)
 
-        if self.config.pretty_print and self.config.pretty_print_indent is not None:
-            indent(self.handler.etree, self.config.pretty_print_indent)
+        if self.config.indent:
+            etree.indent(self.handler.etree, self.config.indent)
 
-        xml = tostring(
+        xml = etree.tostring(
             self.handler.etree,
             encoding=self.config.encoding,
-            pretty_print=self.config.pretty_print,
             xml_declaration=False,
         ).decode(self.config.encoding)
 
         self.output.write(xml)
+
+        if self.config.indent:
+            self.output.write("\n")

@@ -5,7 +5,7 @@
 >>> from xsdata.formats.dataclass.serializers import JsonSerializer
 >>> from xsdata.formats.dataclass.serializers.config import SerializerConfig
 
->>> config = SerializerConfig(pretty_print=True)
+>>> config = SerializerConfig(indent="  ")
 >>> context = XmlContext()
 >>> serializer = JsonSerializer()
 >>> serializer = JsonSerializer(context=context, config=config)

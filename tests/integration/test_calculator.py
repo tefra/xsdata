@@ -37,7 +37,7 @@ class CalculatorServiceTests(TestCase):
         mock_most.return_value = response
 
         config = Config.from_service(CalculatorSoapAdd)
-        serializer = XmlSerializer(config=SerializerConfig(pretty_print=True))
+        serializer = XmlSerializer(config=SerializerConfig(indent="  "))
         client = Client(config=config, serializer=serializer)
         result = client.send({"Body": {"Add": {"intA": 1, "intB": 3}}})
 

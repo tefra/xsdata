@@ -5,7 +5,7 @@
 >>> from xsdata.formats.dataclass.serializers import XmlSerializer
 >>> from xsdata.formats.dataclass.serializers.config import SerializerConfig
 
->>> config = SerializerConfig(pretty_print=True)
+>>> config = SerializerConfig(indent="  ")
 >>> context = XmlContext()
 >>> serializer = XmlSerializer()
 >>> serializer = XmlSerializer(context=context, config=config)
@@ -118,7 +118,7 @@ them through config.
 >>> from xsdata.formats.dataclass.serializers.config import SerializerConfig
 ...
 >>> serializer = XmlSerializer(config=SerializerConfig(
-...     pretty_print=True,
+...     indent="  ",
 ...     xml_declaration=False,
 ...     ignore_default_attributes=True,
 ...     schema_location="urn books.xsd",
@@ -142,7 +142,7 @@ them through config.
 
 There are two writers based on lxml and native python that may vary in performance in
 some cases. The output of all them is consistent with a few exceptions when handling
-mixed content with `pretty_print=True`.
+mixed content and enabled indentation.
 
 !!! Hint
 

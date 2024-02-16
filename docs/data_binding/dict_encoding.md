@@ -9,7 +9,7 @@ serialization.
 >>> from xsdata.formats.dataclass.serializers import DictEncoder
 >>> from xsdata.formats.dataclass.serializers.config import SerializerConfig
 
->>> config = SerializerConfig(pretty_print=True)
+>>> config = SerializerConfig(indent="  ")
 >>> context = XmlContext()
 >>> encoder = DictEncoder()
 >>> encoder = DictEncoder(context=context, config=config)

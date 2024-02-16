@@ -10,7 +10,7 @@ from xsdata.formats.dataclass.serializers.writers import LxmlEventWriter
 
 class LxmlEventWriterTests(TestCase):
     def setUp(self):
-        config = SerializerConfig(pretty_print=True)
+        config = SerializerConfig(indent="  ")
         self.serializer = XmlSerializer(config=config, writer=LxmlEventWriter)
 
     def test_render(self):
@@ -50,20 +50,11 @@ class LxmlEventWriterTests(TestCase):
 
         self.assertEqual(expected, actual)
 
-    def test_pretty_print_false(self):
-        self.serializer.config.pretty_print = False
+    def test_no_indent(self):
+        self.serializer.config.indent = None
         actual = self.serializer.render(books)
         expected = fixtures_dir.joinpath("books/books_auto_ns.xml").read_text()
 
         _, actual = actual.split("\n", 1)
         _, expected = expected.split("\n", 1)
         self.assertEqual(expected.replace("  ", "").replace("\n", ""), actual)
-
-    def test_pretty_print_indent(self):
-        self.serializer.config.pretty_print_indent = "    "
-        actual = self.serializer.render(books)
-        expected = fixtures_dir.joinpath("books/books_auto_ns.xml").read_text()
-
-        _, actual = actual.split("\n", 1)
-        _, expected = expected.split("\n", 1)
-        self.assertEqual(expected.replace("  ", "    "), actual)

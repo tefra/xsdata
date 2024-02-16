@@ -27,7 +27,7 @@ def test_json_documents():
     clazz = load_class(result.output, "Series")
 
     parser = JsonParser()
-    config = SerializerConfig(pretty_print=True)
+    config = SerializerConfig(indent="  ")
     serializer = JsonSerializer(config=config)
 
     for i in range(1, 3):

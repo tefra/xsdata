@@ -57,7 +57,7 @@ you want to use a parser/serializer.
 ...     attribute_name_generator=text.kebab_case
 ... )
 >>> serializer = XmlSerializer(context=context)
->>> serializer.config.pretty_print = True
+>>> serializer.config.indent = "  "
 >>> print(serializer.render(obj))
 <?xml version="1.0" encoding="UTF-8"?>
 <person birth-date="1986-09-25">
@@ -194,17 +194,9 @@ Renders the XML declaration header.
 
 **Default:** `True`
 
-### `pretty_print`
+### `indent`
 
-Enable indentation.
-
-**Type**: `bool`
-
-**Default:** `False`
-
-### `pretty_print_indent`
-
-Indentation string for each indent level.
+Indent output by the given string.
 
 **Type**: `Optional[str]`
 
@@ -286,7 +278,7 @@ types.
 >>> city1.streets.append(street1)
 >>> street1.houses.append(house1)
 >>> type_map = {"City": City, "Street": Street, "House": House}
->>> serializer_config = SerializerConfig(pretty_print=True, globalns=type_map)
+>>> serializer_config = SerializerConfig(indent="  ", globalns=type_map)
 >>> xml_serializer = XmlSerializer(config=serializer_config)
 >>> serialized_house = xml_serializer.render(city1)
 >>> print(serialized_house)

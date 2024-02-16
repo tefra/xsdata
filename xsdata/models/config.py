@@ -562,6 +562,6 @@ class GeneratorConfig:
             element_name_generator=text.pascal_case,
             attribute_name_generator=text.camel_case,
         )
-        config = SerializerConfig(pretty_print=True)
+        config = SerializerConfig(indent="  ")
         serializer = XmlSerializer(context=ctx, config=config, writer=XmlEventWriter)
         serializer.write(output, obj, ns_map={None: "http://pypi.org/project/xsdata"})

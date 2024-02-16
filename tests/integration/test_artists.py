@@ -25,7 +25,7 @@ def test_xml_documents():
 
     parser = XmlParser()
     serializer = XmlSerializer(writer=XmlEventWriter)
-    serializer.config.pretty_print = True
+    serializer.config.indent = "  "
     serializer.config.xml_declaration = False
     ns_map = {None: "http://musicbrainz.org/ns/mmd-2.0#"}
 

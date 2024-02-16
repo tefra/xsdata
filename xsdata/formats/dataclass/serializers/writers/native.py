@@ -60,11 +60,11 @@ class XmlEventWriter(XmlWriter):
         """
         super().start_tag(qname)
 
-        if self.config.pretty_print:
+        if self.config.indent:
             if self.current_level:
                 self.handler.ignorableWhitespace("\n")
                 self.handler.ignorableWhitespace(
-                    (self.config.pretty_print_indent or "  ") * self.current_level
+                    self.config.indent * self.current_level
                 )
 
             self.current_level += 1
@@ -83,16 +83,14 @@ class XmlEventWriter(XmlWriter):
         Args:
             qname: The qualified name of the element
         """
-        if not self.config.pretty_print:
+        if not self.config.indent:
             super().end_tag(qname)
             return
 
         self.current_level -= 1
         if self.pending_end_element:
             self.handler.ignorableWhitespace("\n")
-            self.handler.ignorableWhitespace(
-                (self.config.pretty_print_indent or "  ") * self.current_level
-            )
+            self.handler.ignorableWhitespace(self.config.indent * self.current_level)
 
         super().end_tag(qname)
 

@@ -30,7 +30,7 @@ def test_json_documents():
     clazz = load_class(result.output, "Balance")
 
     parser = JsonParser()
-    config = SerializerConfig(pretty_print=True)
+    config = SerializerConfig(indent="  ")
     serializer = JsonSerializer(config=config)
 
     for sample in filepath.joinpath("samples").glob("*.json"):

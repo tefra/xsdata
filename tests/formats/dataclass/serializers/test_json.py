@@ -2,6 +2,7 @@ import json
 from unittest.case import TestCase
 
 from tests.fixtures.books import BookForm, Books
+from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.formats.dataclass.serializers.json import DictFactory, JsonSerializer
 from xsdata.models.datatype import XmlDate
 
@@ -59,10 +60,9 @@ class JsonSerializerTests(TestCase):
 
         self.assertEqual(self.expected, json.loads(actual))
 
-    def test_pretty_print_indent(self):
-        serializer = JsonSerializer()
-        serializer.config.pretty_print = True
-        serializer.config.pretty_print_indent = "    "
+    def test_indent(self):
+        config = SerializerConfig(indent="    ")
+        serializer = JsonSerializer(config=config)
 
         actual = serializer.render(self.books)
         expected = f"""{{

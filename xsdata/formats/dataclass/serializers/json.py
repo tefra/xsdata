@@ -1,7 +1,7 @@
 import json
 from dataclasses import dataclass, field
 from io import StringIO
-from typing import Any, Callable, Dict, Optional, TextIO, Tuple, Union
+from typing import Any, Callable, Dict, TextIO, Tuple
 
 from xsdata.formats.bindings import AbstractSerializer
 from xsdata.formats.dataclass.serializers import DictEncoder
@@ -58,8 +58,4 @@ class JsonSerializer(DictEncoder, AbstractSerializer):
             out: The output text stream
             obj: The input model instance to serialize
         """
-        indent: Optional[Union[int, str]] = None
-        if self.config.pretty_print:
-            indent = self.config.pretty_print_indent or 2
-
-        self.dump_factory(self.encode(obj), out, indent=indent)
+        self.dump_factory(self.encode(obj), out, indent=self.config.indent)

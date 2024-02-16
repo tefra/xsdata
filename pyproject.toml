@@ -64,7 +64,7 @@ docs = [
     "markdown-exec[ansi]",
     "pymdownx-superfence-filter-lines",
 ]
-lxml = ["lxml>=4.4.1"]
+lxml = ["lxml>=4.5.0"]
 soap = ["requests"]
 test = [
     "pre-commit",

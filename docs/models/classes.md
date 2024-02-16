@@ -9,7 +9,7 @@ Plugins can extend support for output formats.
 from dataclasses import dataclass # markdown-exec: hide
 from xsdata.formats.dataclass.serializers import XmlSerializer # markdown-exec: hide
 serializer = XmlSerializer() # markdown-exec: hide
-serializer.config.pretty_print = True # markdown-exec: hide
+serializer.config.indent = "  " # markdown-exec: hide
 @dataclass
 class Book:
     title: str
@@ -34,7 +34,7 @@ The local name of the XML/JSON element.
 >>> from xsdata.formats.dataclass.serializers import XmlSerializer
 >>> from xsdata.utils.text import camel_case
 >>> serializer = XmlSerializer()
->>> serializer.config.pretty_print = True
+>>> serializer.config.indent = "  "
 >>> serializer.config.xml_declaration = False
 >>>
 >>> @dataclass

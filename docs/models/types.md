@@ -234,7 +234,7 @@ You can register you own custom types as well as long as they are not dataclasse
 >>> from xsdata.formats.dataclass.serializers import XmlSerializer
 ...
 >>> serializer = XmlSerializer()
->>> serializer.config.pretty_print = True
+>>> serializer.config.indent = "  "
 >>> serializer.config.xml_declaration = False
 >>>
 >>> class TheGoodFloat(float):

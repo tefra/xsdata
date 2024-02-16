@@ -34,4 +34,4 @@ class AnnotationBaseTest(TestCase):
                 ]
             )
         )
-        self.assertEqual("I am a <p>test<span>!</span></p>", base.display_help)
+        self.assertEqual("I am a <p>test<span>!</span>\n</p>", base.display_help)

@@ -29,7 +29,7 @@ from xsdata.utils.constants import DEFAULT_ATTR_NAME
 from xsdata.utils.namespaces import clean_uri
 
 docstring_serializer = XmlSerializer(
-    config=SerializerConfig(pretty_print=True, xml_declaration=False)
+    config=SerializerConfig(indent="  ", xml_declaration=False)
 )
 
 

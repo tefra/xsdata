@@ -13,7 +13,7 @@ def validate_bindings(schema: Path, clazz: Type):
 
     sample = schema.parent.joinpath("sample.xml")
     obj = XmlParser().from_path(sample, clazz)
-    config = SerializerConfig(pretty_print=True)
+    config = SerializerConfig(indent="  ")
     actual = JsonSerializer(config=config).render(obj)
 
     expected = sample.with_suffix(".json")
@@ -23,7 +23,7 @@ def validate_bindings(schema: Path, clazz: Type):
     else:
         expected.write_text(actual, encoding="utf-8")
 
-    config = SerializerConfig(pretty_print=True)
+    config = SerializerConfig(indent="  ")
     xml = XmlSerializer(config=config).render(obj)
 
     validator = etree.XMLSchema(etree.parse(str(schema)))

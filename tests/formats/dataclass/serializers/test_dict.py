@@ -104,36 +104,3 @@ class DictEncoderTests(TestCase):
         expected = expected[:-1]
         actual = [name for name, value in serializer.next_value(book)]
         self.assertEqual(expected, actual)
-
-    def test_pretty_print_indent(self):
-        serializer = JsonSerializer()
-        serializer.config.pretty_print = True
-        serializer.config.pretty_print_indent = "    "
-
-        actual = serializer.render(self.books)
-        expected = f"""{{
-    "book": [
-        {{
-            "author": "{self.expected["book"][0]["author"]}",
-            "title": "{self.expected["book"][0]["title"]}",
-            "genre": "{self.expected["book"][0]["genre"]}",
-            "price": {self.expected["book"][0]["price"]},
-            "pub_date": "{self.expected["book"][0]["pub_date"]}",
-            "review": "{self.expected["book"][0]["review"]}",
-            "id": "{self.expected["book"][0]["id"]}",
-            "lang": "en"
-        }},
-        {{
-            "author": "{self.expected["book"][1]["author"]}",
-            "title": "{self.expected["book"][1]["title"]}",
-            "genre": "{self.expected["book"][1]["genre"]}",
-            "price": null,
-            "pub_date": null,
-            "review": "{self.expected["book"][1]["review"]}",
-            "id": "{self.expected["book"][1]["id"]}",
-            "lang": "en"
-        }}
-    ]
-}}"""
-
-        self.assertEqual(expected, actual)

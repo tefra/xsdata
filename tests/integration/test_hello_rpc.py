@@ -43,7 +43,7 @@ class HelloRpcServiceTests(TestCase):
         mock_most.return_value = response
 
         config = Config.from_service(HelloGetHelloAsString)
-        serializer = XmlSerializer(config=SerializerConfig(pretty_print=True))
+        serializer = XmlSerializer(config=SerializerConfig(indent="  "))
         client = Client(config=config, serializer=serializer)
         result = client.send({"Body": {"getHelloAsString": {"arg0": "chris"}}})
 
@@ -67,7 +67,7 @@ class HelloRpcServiceTests(TestCase):
         mock_most.return_value = response
 
         config = Config.from_service(HelloGetHelloAsString)
-        serializer = XmlSerializer(config=SerializerConfig(pretty_print=True))
+        serializer = XmlSerializer(config=SerializerConfig(indent="  "))
         client = Client(config=config, serializer=serializer)
         result = client.send({"Body": {"getHelloAsString": {"arg0": "chris"}}})
 
@@ -87,7 +87,7 @@ class HelloRpcServiceTests(TestCase):
     @pytest.mark.skip
     def test_live(self):
         config = Config.from_service(HelloGetHelloAsString)
-        serializer = XmlSerializer(config=SerializerConfig(pretty_print=True))
+        serializer = XmlSerializer(config=SerializerConfig(indent="  "))
         client = Client(config=config, serializer=serializer)
         result = client.send({"Body": {"getHelloAsString": {"arg0": "chris"}}})
         print(result)

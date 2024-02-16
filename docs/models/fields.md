@@ -18,7 +18,7 @@ The local name of the XML/JSON field.
 >>> from xsdata.formats.dataclass.parsers import XmlParser
 >>> parser = XmlParser()
 >>> serializer = XmlSerializer()
->>> serializer.config.pretty_print = True
+>>> serializer.config.indent = "  "
 >>> serializer.config.xml_declaration = False
 >>>
 >>> @dataclass

@@ -73,37 +73,12 @@ Check the [documentation](https://xsdata.readthedocs.io) for more ✨✨✨
   - Support xinclude statements and unknown properties
   - Customize behaviour through config
 
-## Changelog: 24.1 (2024-01-04)
+## Changelog: 24.2 (2024-02-17)
 
-- Fixed XmlParser to ignore xsi attrs when fail on unknown attributes is enabled
-  ([#846](https://github.com/tefra/xsdata/pull/846))
-- Fixed parsing mandatory byte elements with no value
-  ([#873](https://github.com/tefra/xsdata/pull/873))
-- Fixed issue in json binding with union fields
-  ([#864](https://github.com/tefra/xsdata/pull/864))
-- Fixed PycodeSerializer to escape unicode characters in string values
-  ([#877](https://github.com/tefra/xsdata/pull/877))
-- Fixed compound field choices with forward references
-  ([#886](https://github.com/tefra/xsdata/pull/886))
-- Fixed google style docstrings to add missing colon
-  ([#884](https://github.com/tefra/xsdata/pull/884))
-- Fixed deprecation warnings for datetime.datetime.utcnow()
-- Fixed XmlSerializer to ignore empty non-nillable/required tokens
-  ([#902](https://github.com/tefra/xsdata/pull/902))
-- Fixed issue with invalid variable names when using originalCase naming convention
-  ([#881](https://github.com/tefra/xsdata/pull/881))
-- Added type hints for compound fields
-  ([#858](https://github.com/tefra/xsdata/pull/858),
-  [#885](https://github.com/tefra/xsdata/pull/885))
-- Added http header when loading remote resources
-  ([#867](https://github.com/tefra/xsdata/pull/867))
-- Added warning when converting parent field to a list
-  ([#871](https://github.com/tefra/xsdata/pull/871))
-- Added ruff to format generated code ([#892](https://github.com/tefra/xsdata/pull/892))
-- Added option to use substitution group names for compound field name
-  ([#905](https://github.com/tefra/xsdata/pull/905))
-- Updated base64 decoding to enable validation
-  ([#875](https://github.com/tefra/xsdata/pull/875))
-- Updated generator to render prohibited parent fields with restriction extensions
-  ([#908](https://github.com/tefra/xsdata/pull/908))
-- Updated generator so plugins can easily override templates
+- Added Dict encoder/decoder ([#921](https://github.com/tefra/xsdata/pull/921))
+- Deprecated Serializer config pretty_print/pretty_print_indentation
+  ([#942](https://github.com/tefra/xsdata/pull/942))
+- Fixed lxml event writer to respect the encoding configuration
+  ([#940](https://github.com/tefra/xsdata/pull/940))
+- Migrated documentation to mkdocs with markdown
+- Refactored project docstrings

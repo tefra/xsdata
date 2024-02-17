@@ -4,10 +4,8 @@ recursive-include tests *
 recursive-include xsdata *
 
 
-prune docs/_build
-prune docs/api/reference
-exclude docs/_static/logo.png
 exclude .readthedocs.yml
+exclude .mkdocs.yml
 exclude .pre-commit-config.yaml
 
 global-exclude .DS_Store *.pyc

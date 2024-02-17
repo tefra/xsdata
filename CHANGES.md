@@ -1,3 +1,13 @@
+## 24.2 (2024-02-17)
+
+- Added Dict encoder/decoder ([#921](https://github.com/tefra/xsdata/pull/921))
+- Deprecated Serializer config pretty_print/pretty_print_indentation
+  ([#942](https://github.com/tefra/xsdata/pull/942))
+- Fixed lxml event writer to respect the encoding configuration
+  ([#940](https://github.com/tefra/xsdata/pull/940))
+- Migrated documentation to mkdocs with markdown
+- Refactored project docstrings
+
 ## 24.1 (2024-01-04)
 
 - Fixed XmlParser to ignore xsi attrs when fail on unknown attributes is enabled

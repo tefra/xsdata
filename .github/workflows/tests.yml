@@ -38,7 +38,7 @@ jobs:
         run: |
           pytest --cov=./xsdata --cov-report=xml --cov-branch --doctest-glob="docs/*.md"
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
@@ -104,7 +104,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
-    - uses: pre-commit/action@v3.0.0
+    - uses: pre-commit/action@v3.0.1
   check-package:
     name: Build & Inspect Package
     runs-on: ubuntu-latest

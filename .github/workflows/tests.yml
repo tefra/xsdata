@@ -27,7 +27,7 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - name: Install libxml2
-        if: startsWith(matrix.python, 'pypy') || startsWith(matrix.python, '3.13')
+        if: startsWith(matrix.python, '3.13')
         run: |
           sudo apt-get install libxml2-dev libxslt-dev
       - name: Install dependencies

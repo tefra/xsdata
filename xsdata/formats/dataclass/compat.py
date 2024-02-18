@@ -12,10 +12,10 @@ class FieldInfo(Protocol):
     """A class field info wrapper."""
 
     name: str
-    default: Any
-    default_factory: Any
     init: bool
     metadata: 'MappingProxyType[Any, Any]'
+    default: Any
+    default_factory: Any
 
 
 class ClassType(abc.ABC):

@@ -1,20 +1,21 @@
 import abc
 from dataclasses import MISSING, fields, is_dataclass
-from typing import Any, Dict, Iterator, List, NamedTuple, Optional, Set, Type, cast
+from types import MappingProxyType
+from typing import Any, Dict, Iterator, Optional, Protocol, Set, Type
 
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.models.generics import AnyElement, DerivedElement
 from xsdata.utils.hooks import load_entry_points
 
 
-class FieldInfo(NamedTuple):
+class FieldInfo(Protocol):
     """A class field info wrapper."""
 
     name: str
-    init: bool
-    metadata: Dict[str, Any]
     default: Any
     default_factory: Any
+    init: bool
+    metadata: MappingProxyType[Any, Any]
 
 
 class ClassType(abc.ABC):
@@ -173,7 +174,7 @@ class Dataclasses(ClassType):
 
     def get_fields(self, obj: Any) -> Iterator[FieldInfo]:
         """Return a dataclass fields iterator."""
-        yield from cast(List[FieldInfo], fields(obj))
+        yield from fields(obj)
 
     def default_value(self, field: FieldInfo, default: Optional[Any] = None) -> Any:
         """Return the default value or factory of the given model field."""

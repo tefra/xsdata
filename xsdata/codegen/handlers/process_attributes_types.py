@@ -132,7 +132,7 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
         conditions = (
             lambda obj: obj.tag == tag,
             lambda obj: tag == Tag.ELEMENT and obj.tag == Tag.COMPLEX_TYPE,
-            lambda obj: not obj.is_complex,
+            lambda obj: not obj.is_complex_type,
             lambda x: True,
         )
 
@@ -157,7 +157,13 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
             return
 
         inner = self.container.find_inner(target, attr_type.qname)
-        if inner.is_simple_type:
+
+        # If the inner class behaves as a simple type flatten it.
+        if (
+            len(inner.attrs) == 1
+            and not inner.attrs[0].xml_type
+            and not inner.extensions
+        ):
             self.copy_attribute_properties(inner, target, attr, attr_type)
             target.inner.remove(inner)
 
@@ -166,8 +172,8 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
 
         Strategies:
             1. Reset absent types with a warning
-            2. Copy attribute properties from a simple type
             3. Copy format restriction from an enumeration
+            2. Copy attribute properties from a simple type
             4. Set circular flag for the rest
 
         Args:
@@ -178,10 +184,7 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
         source = self.find_dependency(attr_type, attr.tag)
         if not source:
             logger.warning("Reset absent type: %s", attr_type.name)
-            use_str = not source or not source.is_complex
-            self.reset_attribute_type(attr_type, use_str)
-        elif source.is_simple_type:
-            self.copy_attribute_properties(source, target, attr, attr_type)
+            self.reset_attribute_type(attr_type, True)
         elif source.is_enumeration:
             attr.restrictions.min_length = None
             attr.restrictions.max_length = None
@@ -189,6 +192,8 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
                 x.restrictions.format for x in source.attrs if x.restrictions.format
             )
             attr_type.reference = id(source)
+        elif not source.is_complex_type:
+            self.copy_attribute_properties(source, target, attr, attr_type)
         elif source.is_element and source.abstract:
             # Substitution groups with abstract elements are used like
             # placeholders and shouldn't be added as standalone fields.

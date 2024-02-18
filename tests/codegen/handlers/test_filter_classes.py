@@ -27,7 +27,7 @@ class FilterClassesTests(FactoryTestCase):
 
         element = ClassFactory.create(tag=Tag.ELEMENT, abstract=True)
 
-        expected = [complex_type, enum_1]
+        expected = [complex_type, enum_1, element]
         self.container.extend([complex_type, enum_1, simple_type, enum_2, element])
         self.handler.run()
         self.assertEqual(expected, list(self.container))

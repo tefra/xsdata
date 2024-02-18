@@ -50,7 +50,7 @@ class FilterClasses(ContainerHandlerInterface):
         """
         occurs = set()
         for obj in self.container:
-            if obj.is_global_type:
+            if obj.is_complex_type:
                 occurs.add(obj.ref)
                 occurs.update(obj.references)
 
@@ -67,7 +67,7 @@ class FilterClasses(ContainerHandlerInterface):
         """
         occurs = set()
         for obj in self.container:
-            if obj.is_global_type:
+            if obj.is_complex_type:
                 references = list(obj.references)
                 occurs.update(references)
                 if references:

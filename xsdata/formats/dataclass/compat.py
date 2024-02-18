@@ -13,7 +13,7 @@ class FieldInfo(Protocol):
 
     name: str
     init: bool
-    metadata: 'MappingProxyType[Any, Any]'
+    metadata: "MappingProxyType[Any, Any]"
     default: Any
     default_factory: Any
 

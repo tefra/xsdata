@@ -15,7 +15,7 @@ class FieldInfo(Protocol):
     default: Any
     default_factory: Any
     init: bool
-    metadata: MappingProxyType[Any, Any]
+    metadata: 'MappingProxyType[Any, Any]'
 
 
 class ClassType(abc.ABC):

@@ -1,5 +1,6 @@
 import sys
 
+from xsdata.codegen.models import SIMPLE_TYPES
 from xsdata.exceptions import CodeGenerationError
 from xsdata.models.enums import DataType, Namespace, Tag
 from xsdata.utils.namespaces import build_qname
@@ -101,6 +102,16 @@ class ClassTests(FactoryTestCase):
         obj.attrs[1].index = sys.maxsize
         self.assertTrue(obj.has_suffix_attr)
 
+    def test_property_is_complex(self):
+        obj = ClassFactory.create(tag=Tag.ELEMENT)
+        self.assertTrue(obj.is_complex)
+
+        obj = ClassFactory.create(tag=Tag.COMPLEX_TYPE)
+        self.assertTrue(obj.is_complex)
+
+        obj = ClassFactory.create(tag=Tag.SIMPLE_TYPE)
+        self.assertFalse(obj.is_complex)
+
     def test_property_is_element(self):
         obj = ClassFactory.create(tag=Tag.ELEMENT)
         self.assertTrue(obj.is_element)
@@ -118,6 +129,21 @@ class ClassTests(FactoryTestCase):
         obj.attrs.clear()
         self.assertFalse(obj.is_enumeration)
 
+    def test_property_is_global_type(self):
+        obj = ClassFactory.create(abstract=True, tag=Tag.ELEMENT)
+        self.assertFalse(obj.is_global_type)
+
+        obj = ClassFactory.create(tag=Tag.ELEMENT)
+        self.assertTrue(obj.is_global_type)
+
+        obj = ClassFactory.create(tag=Tag.COMPLEX_TYPE)
+        obj.extensions.append(ExtensionFactory.create())
+        self.assertTrue(obj.is_global_type)
+
+        obj.extensions.clear()
+        obj.attrs.append(AttrFactory.create(tag=Tag.EXTENSION))
+        self.assertFalse(obj.is_global_type)
+
     def test_property_is_restricted(self):
         obj = ClassFactory.create()
         ext = ExtensionFactory.create(tag=Tag.EXTENSION)
@@ -127,6 +153,21 @@ class ClassTests(FactoryTestCase):
 
         ext.tag = Tag.RESTRICTION
         self.assertTrue(obj.is_restricted)
+
+    def test_property_is_simple_type(self):
+        obj = ClassFactory.elements(2)
+
+        self.assertFalse(obj.is_simple_type)
+
+        obj.attrs.pop()
+        self.assertFalse(obj.is_simple_type)
+
+        for tag in SIMPLE_TYPES:
+            obj.attrs[0].tag = tag
+            self.assertTrue(obj.is_simple_type)
+
+        obj.extensions.append(ExtensionFactory.create())
+        self.assertFalse(obj.is_simple_type)
 
     def test_property_is_group(self):
         self.assertTrue(ClassFactory.create(tag=Tag.GROUP).is_group)

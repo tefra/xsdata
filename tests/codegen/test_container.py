@@ -145,7 +145,7 @@ class ClassContainerTests(FactoryTestCase):
         container = ClassContainer(config=GeneratorConfig())
         container.extend([complex_type, enum_1, enum_2, simple_type, element])
 
-        expected = [complex_type, enum_1, element]
+        expected = [complex_type, enum_1]
         container.filter_classes()
         self.assertEqual(expected, list(container))
 

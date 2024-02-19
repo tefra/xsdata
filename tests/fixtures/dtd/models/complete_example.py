@@ -3,64 +3,14 @@ from enum import Enum
 from typing import List, Optional
 
 
-@dataclass
-class Body:
-    value: str = field(
-        default="",
-        metadata={
-            "required": True,
-        },
-    )
-
-
-@dataclass
-class Origin:
-    value: str = field(
-        default="",
-        metadata={
-            "required": True,
-        },
-    )
-
-
 class PostStatus(Enum):
     DRAFT = "draft"
     PUBLISHED = "published"
 
 
 @dataclass
-class Source:
-    value: str = field(
-        default="",
-        metadata={
-            "required": True,
-        },
-    )
-
-
-@dataclass
-class Tag:
-    value: str = field(
-        default="",
-        metadata={
-            "required": True,
-        },
-    )
-
-
-@dataclass
-class Title:
-    value: str = field(
-        default="",
-        metadata={
-            "required": True,
-        },
-    )
-
-
-@dataclass
 class Tags:
-    tag: List[Tag] = field(
+    tag: List[str] = field(
         default_factory=list,
         metadata={
             "name": "Tag",
@@ -100,21 +50,21 @@ class Post:
             "required": True,
         },
     )
-    origin: List[Origin] = field(
+    origin: List[str] = field(
         default_factory=list,
         metadata={
             "name": "Origin",
             "type": "Element",
         },
     )
-    source: List[Source] = field(
+    source: List[str] = field(
         default_factory=list,
         metadata={
             "name": "Source",
             "type": "Element",
         },
     )
-    title: Optional[Title] = field(
+    title: Optional[str] = field(
         default=None,
         metadata={
             "name": "Title",
@@ -122,7 +72,7 @@ class Post:
             "required": True,
         },
     )
-    body: Optional[Body] = field(
+    body: Optional[str] = field(
         default=None,
         metadata={
             "name": "Body",

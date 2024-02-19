@@ -385,8 +385,8 @@ class FlattenClassExtensionsTests(FactoryTestCase):
         self.assertTrue(callback(source, target, extension))
 
     def test_should_flatten_extension(self):
-        source = ClassFactory.create(tag=Tag.COMPLEX_TYPE)
-        target = ClassFactory.create(tag=Tag.ELEMENT)
+        source = ClassFactory.create()
+        target = ClassFactory.create()
 
         self.assertFalse(self.processor.should_flatten_extension(source, target))
 
@@ -407,7 +407,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
         self.assertTrue(self.processor.should_flatten_extension(source, target))
 
         # Source is a simple type
-        source = ClassFactory.simple_type()
+        source = ClassFactory.create(attrs=[AttrFactory.create(tag=Tag.SIMPLE_TYPE)])
         target = ClassFactory.elements(1)
         self.assertTrue(self.processor.should_flatten_extension(source, target))
 

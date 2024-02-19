@@ -73,7 +73,7 @@ class FlattenClassExtensions(RelativeHandlerInterface):
             target.extensions.remove(extension)
         elif target.is_enumeration:
             self.process_enum_extension(source, target, extension)
-        elif not source.is_complex_type or source.is_enumeration:
+        elif not source.is_complex or source.is_enumeration:
             self.process_simple_extension(source, target, extension)
         else:
             self.process_complex_extension(source, target, extension)
@@ -100,7 +100,7 @@ class FlattenClassExtensions(RelativeHandlerInterface):
         """
         if source.is_enumeration:
             self.merge_enumerations(source, target)
-        elif not source.is_complex_type:
+        elif source.is_simple_type:
             self.merge_enumeration_types(source, target)
         elif len(target.attrs) == 1:
             self.set_default_value(source, target)
@@ -278,7 +278,7 @@ class FlattenClassExtensions(RelativeHandlerInterface):
             target: The target class instance
         """
         if not source.extensions and (
-            not source.is_complex_type
+            source.is_simple_type
             or target.has_suffix_attr
             or (source.has_suffix_attr and target.attrs)
         ):

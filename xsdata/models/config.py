@@ -105,6 +105,21 @@ class DocstringStyle(Enum):
     BLANK = "Blank"
 
 
+class ClassFilterStrategy(Enum):
+    """Class filter strategy enumeration.
+
+    Attributes:
+        ALL: all: Generate all types, discouraged!!!
+        ALL_GLOBALS: allGlobals: Generate all global types
+        REFERRED_GLOBALS: referredGlobals: Generate all global types
+            with at least one reference.
+    """
+
+    ALL = "all"
+    ALL_GLOBALS = "allGlobals"
+    REFERRED_GLOBALS = "referredGlobals"
+
+
 class ObjectType(Enum):
     """Object type enumeration.
 
@@ -215,6 +230,7 @@ class GeneratorOutput:
         format: Output format
         structure_style: Output structure style
         docstring_style: Docstring style
+        filter_strategy: Class filter strategy
         relative_imports: Use relative imports
         compound_fields: Use compound fields for repeatable elements
         max_line_length: Adjust the maximum line length
@@ -233,6 +249,9 @@ class GeneratorOutput:
         default=StructureStyle.FILENAMES, name="Structure"
     )
     docstring_style: DocstringStyle = element(default=DocstringStyle.RST)
+    filter_strategy: ClassFilterStrategy = element(
+        default=ClassFilterStrategy.ALL_GLOBALS
+    )
     relative_imports: bool = element(default=False)
     compound_fields: CompoundFields = element(default_factory=CompoundFields)
     max_line_length: int = attribute(default=79)

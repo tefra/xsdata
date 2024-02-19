@@ -140,6 +140,21 @@ The style of docstrings to create.
 **CLI Option:**
 `-ds, --docstring-style [reStructuredText|NumPy|Google|Accessible|Blank]`
 
+### FilterStrategy
+
+When the class analyzer runs, a lot of types, base classes are flattened, leaving a lot
+of orphan classes. The filter strategy can be used to remove unused classes.
+
+| Style             | Description                                                                 |
+| ----------------- | --------------------------------------------------------------------------- |
+| `all`             | Generate all simple and complex types.                                      |
+| `allGlobals`      | Generate global elements and complex types and all referenced simple types. |
+| `referredGlobals` | Generate global elements and all referenced simple and complex types.       |
+
+**Default Value:** `allGlobals`
+
+**CLI Option:** `-fs, --filter-strategy [all|allGlobals|referredGlobals]`
+
 ### RelativeImports
 
 Generate relative instead of absolute imports.

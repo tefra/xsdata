@@ -16,7 +16,6 @@ from xsdata.utils.text import (
     screaming_snake_case,
     snake_case,
     split_words,
-    variable,
 )
 
 
@@ -25,9 +24,11 @@ class TextTests(TestCase):
         self.assertEqual("p00p", original_case("p00p", foobar=True))
         self.assertEqual("p00p", original_case("p00p"))
         self.assertEqual("USERName", original_case("USERName"))
+        self.assertEqual("_USERName", original_case("_USERName"))
         self.assertEqual("UserNAME", original_case("UserNAME"))
         self.assertEqual("USER_name", original_case("USER_name"))
-        self.assertEqual("USER-NAME", original_case("USER-NAME"))
+        self.assertEqual("USER_name", original_case("3USER_name"))
+        self.assertEqual("USERNAME", original_case("USER-NAME"))
         self.assertEqual("User_Name", original_case("User_Name"))
         self.assertEqual("user_name", original_case("user_name"))
         self.assertEqual("SUserNAME", original_case("SUserNAME"))
@@ -145,13 +146,6 @@ class TextTests(TestCase):
         self.assertEqual("foo1", alnum("\tfoo*1"))
         self.assertEqual("foo1", alnum(" foo*1"))
         self.assertEqual("1", alnum(" βιβλίο*1"))
-
-    def test_variable(self):
-        self.assertEqual("foO1", variable("foO1"))
-        self.assertEqual("foo_1", variable("foo_1"))
-        self.assertEqual("foo1", variable("foo-1"))
-        self.assertEqual("foo1", variable("@foo1"))
-        self.assertEqual("foo1", variable("1foo1"))
 
     def test_classify(self):
         for ltr in string.ascii_uppercase:

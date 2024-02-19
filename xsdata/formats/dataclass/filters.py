@@ -384,7 +384,7 @@ class Filters:
         if not slug or not slug[0].isalpha():
             return self.safe_name(f"{prefix}_{name}", prefix, name_case, **kwargs)
 
-        result = text.variable(name_case(name, **kwargs))
+        result = name_case(name, **kwargs)
         if text.is_reserved(result):
             return self.safe_name(f"{name}_{prefix}", prefix, name_case, **kwargs)
 

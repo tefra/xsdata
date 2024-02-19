@@ -1,3 +1,8 @@
+## 24.2.1 (2024-02-19)
+
+- Fixed FieldInfo type errors ([#949](https://github.com/tefra/xsdata/pull/949))
+- Fixed private package names ([#950](https://github.com/tefra/xsdata/pull/950))
+
 ## 24.2 (2024-02-17)
 
 - Added Dict encoder/decoder ([#921](https://github.com/tefra/xsdata/pull/921))

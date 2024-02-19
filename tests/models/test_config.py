@@ -33,7 +33,6 @@ class GeneratorConfigTests(TestCase):
             '    <Format repr="true" eq="true" order="false" unsafeHash="false" frozen="false" slots="false" kwOnly="false">dataclasses</Format>\n'
             "    <Structure>filenames</Structure>\n"
             "    <DocstringStyle>reStructuredText</DocstringStyle>\n"
-            "    <FilterStrategy>allGlobals</FilterStrategy>\n"
             "    <RelativeImports>false</RelativeImports>\n"
             '    <CompoundFields defaultName="choice" useSubstitutionGroups="false" forceDefaultName="false" maxNameParts="3">false</CompoundFields>\n'
             "    <PostponedAnnotations>false</PostponedAnnotations>\n"
@@ -94,7 +93,6 @@ class GeneratorConfigTests(TestCase):
             ' frozen="false" slots="false" kwOnly="false">dataclasses</Format>\n'
             "    <Structure>filenames</Structure>\n"
             "    <DocstringStyle>reStructuredText</DocstringStyle>\n"
-            "    <FilterStrategy>allGlobals</FilterStrategy>\n"
             "    <RelativeImports>false</RelativeImports>\n"
             '    <CompoundFields defaultName="choice" useSubstitutionGroups="false" forceDefaultName="false" maxNameParts="3">false</CompoundFields>\n'
             "    <PostponedAnnotations>false</PostponedAnnotations>\n"

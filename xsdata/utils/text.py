@@ -87,8 +87,11 @@ def capitalize(value: str, **kwargs: Any) -> str:
 
 
 def original_case(value: str, **kwargs: Any) -> str:
-    """Return the input string without any modifications."""
-    return value
+    """Return the input string but ensure it's a valid Python variable."""
+    # Strip out all characters that are not alphanumeric or underscores
+    value = re.sub(r"\W", "", value)
+    # Then strip out leading digit and underscore characters
+    return re.sub(r"^[^a-zA-Z_]+", "", value)
 
 
 def pascal_case(value: str, **kwargs: Any) -> str:
@@ -214,11 +217,3 @@ __alnum_ascii__ = set(string.digits + string.ascii_letters)
 def alnum(value: str) -> str:
     """Return the ascii alphanumerical characters in lower case."""
     return "".join(filter(__alnum_ascii__.__contains__, value)).lower()
-
-
-def variable(value: str) -> str:
-    """Returns a version of the string that will be a valid Python variable."""
-    # Strip out all characters that are not alphanumeric or underscores
-    value = re.sub(r"\W", "", value)
-    # Then strip out leading digit and underscore characters
-    return re.sub(r"^[^a-zA-Z]+", "", value)

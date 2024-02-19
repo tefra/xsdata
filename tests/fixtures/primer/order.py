@@ -5,83 +5,6 @@ from xsdata.models.datatype import XmlDate
 
 
 @dataclass
-class Items:
-    item: List["Items.Item"] = field(
-        default_factory=list,
-        metadata={
-            "type": "Element",
-            "namespace": "",
-        },
-    )
-
-    @dataclass
-    class Item:
-        """
-        Parameters
-        ----------
-        product_name
-        quantity
-        usprice
-            Price amount in USD
-        comment
-        ship_date
-        part_num
-            Stock Keeping Unit
-        """
-
-        product_name: Optional[str] = field(
-            default=None,
-            metadata={
-                "name": "productName",
-                "type": "Element",
-                "namespace": "",
-                "required": True,
-            },
-        )
-        quantity: Optional[int] = field(
-            default=None,
-            metadata={
-                "type": "Element",
-                "namespace": "",
-                "required": True,
-                "max_exclusive": 100,
-            },
-        )
-        usprice: Optional[Decimal] = field(
-            default=None,
-            metadata={
-                "name": "USPrice",
-                "type": "Element",
-                "namespace": "",
-                "required": True,
-            },
-        )
-        comment: Optional[str] = field(
-            default=None,
-            metadata={
-                "type": "Element",
-            },
-        )
-        ship_date: Optional[XmlDate] = field(
-            default=None,
-            metadata={
-                "name": "shipDate",
-                "type": "Element",
-                "namespace": "",
-            },
-        )
-        part_num: Optional[str] = field(
-            default=None,
-            metadata={
-                "name": "partNum",
-                "type": "Attribute",
-                "required": True,
-                "pattern": r"\d{3}-[A-Z]{2}",
-            },
-        )
-
-
-@dataclass
 class Usaddress:
     class Meta:
         name = "USAddress"
@@ -149,6 +72,83 @@ class Comment:
 
 
 @dataclass
+class Items:
+    item: List["Items.Item"] = field(
+        default_factory=list,
+        metadata={
+            "type": "Element",
+            "namespace": "",
+        },
+    )
+
+    @dataclass
+    class Item:
+        """
+        Parameters
+        ----------
+        product_name
+        quantity
+        usprice
+            Price amount in USD
+        comment
+        ship_date
+        part_num
+            Stock Keeping Unit
+        """
+
+        product_name: Optional[str] = field(
+            default=None,
+            metadata={
+                "name": "productName",
+                "type": "Element",
+                "namespace": "",
+                "required": True,
+            },
+        )
+        quantity: Optional[int] = field(
+            default=None,
+            metadata={
+                "type": "Element",
+                "namespace": "",
+                "required": True,
+                "max_exclusive": 100,
+            },
+        )
+        usprice: Optional[Decimal] = field(
+            default=None,
+            metadata={
+                "name": "USPrice",
+                "type": "Element",
+                "namespace": "",
+                "required": True,
+            },
+        )
+        comment: Optional[Comment] = field(
+            default=None,
+            metadata={
+                "type": "Element",
+            },
+        )
+        ship_date: Optional[XmlDate] = field(
+            default=None,
+            metadata={
+                "name": "shipDate",
+                "type": "Element",
+                "namespace": "",
+            },
+        )
+        part_num: Optional[str] = field(
+            default=None,
+            metadata={
+                "name": "partNum",
+                "type": "Attribute",
+                "required": True,
+                "pattern": r"\d{3}-[A-Z]{2}",
+            },
+        )
+
+
+@dataclass
 class PurchaseOrderType:
     """Purchase order schema for Example.com.
 
@@ -183,7 +183,7 @@ class PurchaseOrderType:
             "required": True,
         },
     )
-    comment: Optional[str] = field(
+    comment: Optional[Comment] = field(
         default=None,
         metadata={
             "type": "Element",

@@ -5,6 +5,7 @@ from xsdata.codegen.handlers import (
     CalculateAttributePaths,
     CreateCompoundFields,
     DesignateClassPackages,
+    DisambiguateChoices,
     FilterClasses,
     FlattenAttributeGroups,
     FlattenClassExtensions,
@@ -93,6 +94,7 @@ class ClassContainer(ContainerInterface):
             Steps.FINALIZE: [
                 VacuumInnerClasses(),
                 CreateCompoundFields(self),
+                DisambiguateChoices(self),
                 ResetAttributeSequenceNumbers(self),
             ],
         }

@@ -35,6 +35,10 @@ class AttrTests(FactoryTestCase):
         attr = AttrFactory.attribute(name="a", namespace="b")
         self.assertEqual("Attribute.b.a", attr.key)
 
+    def test_property_qname(self):
+        attr = AttrFactory.attribute(name="a", namespace="b")
+        self.assertEqual("{b}a", attr.qname)
+
     def test_property_is_property(self):
         self.assertTrue(AttrFactory.attribute().is_attribute)
         self.assertTrue(AttrFactory.any_attribute().is_attribute)
@@ -64,6 +68,18 @@ class AttrTests(FactoryTestCase):
         self.assertFalse(attr.is_forward_ref)
         attr.types.append(AttrTypeFactory.create("foo", forward=True))
         self.assertTrue(attr.is_forward_ref)
+
+    def test_property_is_circular_ref(self):
+        attr = AttrFactory.create()
+        self.assertFalse(attr.is_circular_ref)
+
+        attr.types.append(AttrTypeFactory.create("foo", forward=True))
+        self.assertFalse(attr.is_circular_ref)
+
+        self.assertFalse(attr.is_circular_ref)
+
+        attr.types.append(AttrTypeFactory.create("foo", circular=True))
+        self.assertTrue(attr.is_circular_ref)
 
     def test_property_is_group(self):
         self.assertTrue(AttrFactory.group().is_group)

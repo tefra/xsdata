@@ -178,9 +178,9 @@ class Restrictions:
 
         return result
 
-    def clone(self) -> "Restrictions":
-        """Return a deep cloned instance."""
-        return replace(self)
+    def clone(self, **kwargs: Any) -> "Restrictions":
+        """Return a deep cloned instance and replace any args."""
+        return replace(self, **kwargs)
 
     @classmethod
     def from_element(cls, element: ElementBase) -> "Restrictions":
@@ -243,9 +243,9 @@ class AttrType:
             self.forward or self.native or (not allow_circular and self.circular)
         )
 
-    def clone(self) -> "AttrType":
+    def clone(self, **kwargs: Any) -> "AttrType":
         """Return a deep cloned instance."""
-        return replace(self)
+        return replace(self, **kwargs)
 
 
 @dataclass
@@ -303,6 +303,11 @@ class Attr:
         return f"{self.tag}.{self.namespace}.{self.local_name}"
 
     @property
+    def qname(self) -> str:
+        """Return the fully qualified name of the attr."""
+        return namespaces.build_qname(self.namespace, self.local_name)
+
+    @property
     def is_attribute(self) -> bool:
         """Return whether this attr represents a xml attribute node."""
         return self.tag in (Tag.ATTRIBUTE, Tag.ANY_ATTRIBUTE)
@@ -326,6 +331,11 @@ class Attr:
     def is_forward_ref(self) -> bool:
         """Return whether any attr types is a forward or circular reference."""
         return any(tp.circular or tp.forward for tp in self.types)
+
+    @property
+    def is_circular_ref(self) -> bool:
+        """Return whether any attr types is a circular reference."""
+        return any(tp.circular for tp in self.types)
 
     @property
     def is_group(self) -> bool:

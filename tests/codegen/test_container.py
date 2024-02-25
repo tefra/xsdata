@@ -56,6 +56,7 @@ class ClassContainerTests(FactoryTestCase):
             50: [
                 "VacuumInnerClasses",
                 "CreateCompoundFields",
+                "DisambiguateChoices",
                 "ResetAttributeSequenceNumbers",
             ],
         }

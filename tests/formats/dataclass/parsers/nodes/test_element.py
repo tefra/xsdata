@@ -371,7 +371,6 @@ class ElementNodeTests(FactoryTestCase):
             name="a",
             qname="a",
             types=(TypeC,),
-            derived=True,
         )
         xsi_type = "foo"
         namespace = self.meta.namespace
@@ -384,7 +383,6 @@ class ElementNodeTests(FactoryTestCase):
 
         self.assertIsInstance(actual, ElementNode)
         self.assertEqual(10, actual.position)
-        self.assertEqual(DerivedElement, actual.derived_factory)
         self.assertIs(mock_ctx_fetch.return_value, actual.meta)
 
         mock_xsi_type.assert_called_once_with(attrs, ns_map)

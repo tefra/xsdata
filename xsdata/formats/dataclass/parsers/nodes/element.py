@@ -501,7 +501,7 @@ class ElementNode(XmlNode):
         if var.clazz:
             return self.build_element_node(
                 var.clazz,
-                var.derived,
+                False,
                 var.nillable,
                 attrs,
                 ns_map,
@@ -512,15 +512,16 @@ class ElementNode(XmlNode):
             )
 
         if not var.any_type and not var.is_wildcard:
-            return nodes.PrimitiveNode(
-                var, ns_map, self.meta.mixed_content, derived_factory
-            )
+            return nodes.PrimitiveNode(var, ns_map, self.meta.mixed_content)
 
         datatype = DataType.from_qname(xsi_type) if xsi_type else None
-        derived = var.derived or var.is_wildcard
+        derived = var.is_wildcard
         if datatype:
             return nodes.StandardNode(
-                datatype, ns_map, var.nillable, derived_factory if derived else None
+                datatype,
+                ns_map,
+                var.nillable,
+                derived_factory if derived else None,
             )
 
         node = None

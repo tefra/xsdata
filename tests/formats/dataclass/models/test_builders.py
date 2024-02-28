@@ -1,3 +1,4 @@
+import functools
 import sys
 import uuid
 from dataclasses import dataclass, field, fields, make_dataclass
@@ -7,7 +8,15 @@ from xml.etree.ElementTree import QName
 
 from tests.fixtures.artists import Artist
 from tests.fixtures.books import BookForm
-from tests.fixtures.models import ChoiceType, Parent, TypeA, TypeB, TypeNS1, UnionType
+from tests.fixtures.models import (
+    AmbiguousChoiceType,
+    ChoiceType,
+    Parent,
+    TypeA,
+    TypeB,
+    TypeNS1,
+    UnionType,
+)
 from tests.fixtures.series import Country
 from tests.fixtures.submodels import ChoiceTypeChild
 from xsdata.exceptions import XmlContextError
@@ -16,7 +25,7 @@ from xsdata.formats.dataclass.models.builders import XmlMetaBuilder, XmlVarBuild
 from xsdata.formats.dataclass.models.elements import XmlMeta, XmlType
 from xsdata.models.datatype import XmlDate
 from xsdata.utils import text
-from xsdata.utils.constants import return_input, return_true
+from xsdata.utils.constants import return_input
 from xsdata.utils.namespaces import build_qname
 from xsdata.utils.testing import FactoryTestCase, XmlMetaFactory, XmlVarFactory
 
@@ -132,7 +141,7 @@ class XmlMetaBuilderTests(FactoryTestCase):
     def test_build_locates_globalns_per_field(self):
         actual = self.builder.build(ChoiceTypeChild, None)
         self.assertEqual(1, len(actual.choices))
-        self.assertEqual(9, len(actual.choices[0].elements))
+        self.assertEqual(7, len(actual.choices[0].elements))
 
         with self.assertRaises(XmlContextError):
             self.builder.find_declared_class(object, "foo")
@@ -276,6 +285,8 @@ class XmlMetaBuilderTests(FactoryTestCase):
 
 
 class XmlVarBuilderTests(TestCase):
+    maxDiff = None
+
     def setUp(self) -> None:
         self.builder = XmlVarBuilder(
             class_type=class_types.get_type("dataclasses"),
@@ -285,15 +296,14 @@ class XmlVarBuilderTests(TestCase):
         )
 
         super().setUp()
-        self.maxDiff = None
 
     def test_build_with_choice_field(self):
         globalns = sys.modules[ChoiceType.__module__].__dict__
         type_hints = get_type_hints(ChoiceType)
         class_field = fields(ChoiceType)[0]
 
-        self.maxDiff = None
         actual = self.builder.build(
+            ChoiceType,
             "choice",
             type_hints["choice"],
             class_field.metadata,
@@ -337,18 +347,8 @@ class XmlVarBuilderTests(TestCase):
                     factory=list,
                     namespaces=("bar",),
                 ),
-                "{bar}int2": XmlVarFactory.create(
-                    index=5,
-                    name="choice",
-                    qname="{bar}int2",
-                    types=(int,),
-                    derived=True,
-                    nillable=True,
-                    factory=list,
-                    namespaces=("bar",),
-                ),
                 "{bar}float": XmlVarFactory.create(
-                    index=6,
+                    index=5,
                     name="choice",
                     qname="{bar}float",
                     types=(float,),
@@ -356,26 +356,15 @@ class XmlVarBuilderTests(TestCase):
                     namespaces=("bar",),
                 ),
                 "{bar}qname": XmlVarFactory.create(
-                    index=7,
+                    index=6,
                     name="choice",
                     qname="{bar}qname",
                     types=(QName,),
                     factory=list,
                     namespaces=("bar",),
                 ),
-                "{bar}tokens": XmlVarFactory.create(
-                    index=8,
-                    name="choice",
-                    qname="{bar}tokens",
-                    types=(int,),
-                    tokens_factory=list,
-                    derived=True,
-                    factory=list,
-                    default=return_true,
-                    namespaces=("bar",),
-                ),
                 "{foo}union": XmlVarFactory.create(
-                    index=9,
+                    index=7,
                     name="choice",
                     qname="{foo}union",
                     types=(UnionType,),
@@ -383,20 +372,20 @@ class XmlVarBuilderTests(TestCase):
                     factory=list,
                     namespaces=("foo",),
                 ),
-                "{bar}p": XmlVarFactory.create(
-                    index=10,
+                "{bar}tokens": XmlVarFactory.create(
+                    index=8,
                     name="choice",
-                    qname="{bar}p",
-                    types=(float,),
+                    qname="{bar}tokens",
+                    types=(str,),
+                    tokens_factory=list,
                     derived=True,
                     factory=list,
-                    default=1.1,
                     namespaces=("bar",),
                 ),
             },
             wildcards=[
                 XmlVarFactory.create(
-                    index=11,
+                    index=9,
                     name="choice",
                     xml_type=XmlType.WILDCARD,
                     qname="{http://www.w3.org/1999/xhtml}any",
@@ -408,17 +397,44 @@ class XmlVarBuilderTests(TestCase):
             ],
         )
 
-        self.maxDiff = None
         self.assertEqual(expected, actual)
+
+    def test_build_with_ambiguous_choices(self):
+        type_hints = get_type_hints(AmbiguousChoiceType)
+        class_field = fields(AmbiguousChoiceType)[0]
+
+        with self.assertRaises(XmlContextError) as cm:
+            self.builder.build(
+                AmbiguousChoiceType,
+                "choice",
+                type_hints["choice"],
+                class_field.metadata,
+                True,
+                None,
+                None,
+                {},
+            )
+
+        self.assertEqual(
+            "Error on AmbiguousChoiceType::choice: Compound field contains ambiguous types",
+            str(cm.exception),
+        )
 
     def test_build_validates_result(self):
         with self.assertRaises(XmlContextError) as cm:
             self.builder.build(
-                "foo", List[int], {"type": "Attributes"}, True, None, None, None
+                BookForm,
+                "foo",
+                List[int],
+                {"type": "Attributes"},
+                True,
+                None,
+                None,
+                None,
             )
 
         self.assertEqual(
-            "Xml type 'Attributes' does not support typing: typing.List[int]",
+            "Error on BookForm::foo: Xml Attributes does not support typing `typing.List[int]`",
             str(cm.exception),
         )
 
@@ -465,20 +481,22 @@ class XmlVarBuilderTests(TestCase):
         self.assertEqual(("foo", "p"), tuple(sorted(actual)))
 
     def test_analyze_types(self):
-        actual = self.builder.analyze_types(List[List[Union[str, int]]], None)
+        func = functools.partial(self.builder.analyze_types, BookForm, "foo")
+
+        actual = func(List[List[Union[str, int]]], None)
         self.assertEqual((list, list, (int, str)), actual)
 
-        actual = self.builder.analyze_types(Union[str, int], None)
+        actual = func(Union[str, int], None)
         self.assertEqual((None, None, (int, str)), actual)
 
-        actual = self.builder.analyze_types(Dict[str, int], None)
+        actual = func(Dict[str, int], None)
         self.assertEqual((dict, None, (int, str)), actual)
 
         with self.assertRaises(XmlContextError) as cm:
-            self.builder.analyze_types(List[List[List[int]]], None)
+            func(List[List[List[int]]], None)
 
         self.assertEqual(
-            "Unsupported typing: typing.List[typing.List[typing.List[int]]]",
+            "Error on BookForm::foo: Unsupported field typing `typing.List[typing.List[typing.List[int]]]`",
             str(cm.exception),
         )
 

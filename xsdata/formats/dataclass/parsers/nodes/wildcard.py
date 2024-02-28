@@ -58,7 +58,7 @@ class WildcardNode(XmlNode):
         """
         children = self.fetch_any_children(self.position, objects)
         attributes = ParserUtils.parse_any_attributes(self.attrs, self.ns_map)
-        derived = self.var.derived or qname != self.var.qname
+        derived = qname != self.var.qname
         text = ParserUtils.normalize_content(text) if children else text
         text = "" if text is None and not self.var.nillable else text
         tail = ParserUtils.normalize_content(tail)

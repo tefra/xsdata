@@ -190,6 +190,7 @@ class XmlMetaBuilder:
                 parent_namespace = getattr(real_clazz.Meta, "namespace", namespace)
 
             var = builder.build(
+                clazz,
                 field.name,
                 type_hints[field.name],
                 field.metadata,
@@ -340,6 +341,7 @@ class XmlVarBuilder:
 
     def build(
         self,
+        model: Type,
         name: str,
         type_hint: Any,
         metadata: Mapping[str, Any],
@@ -352,7 +354,8 @@ class XmlVarBuilder:
         """Build the binding metadata for a class field.
 
         Args:
-            name: The field name
+            model: The model class
+            name: The model field name
             type_hint: The typing annotations of the field
             metadata: The field metadata mapping
             init: Specify whether this field can be initialized
@@ -380,18 +383,20 @@ class XmlVarBuilder:
         sequence = metadata.get("sequence", None)
         wrapper = metadata.get("wrapper", None)
 
-        origin, sub_origin, types = self.analyze_types(type_hint, globalns)
+        origin, sub_origin, types = self.analyze_types(model, name, type_hint, globalns)
 
         if not self.is_valid(xml_type, origin, sub_origin, types, tokens, init):
             raise XmlContextError(
-                f"Xml type '{xml_type}' does not support typing: {type_hint}"
+                f"Error on {model.__qualname__}::{name}: "
+                f"Xml {xml_type} does not support typing `{type_hint}`"
             )
 
         if wrapper is not None and (
             not isinstance(origin, type) or not issubclass(origin, (list, set, tuple))
         ):
             raise XmlContextError(
-                f"a wrapper requires a collection type on attribute {name}"
+                f"Error on {model.__qualname__}::{name}: "
+                f"A wrapper field requires a collection type"
             )
 
         local_name = local_name or self.build_local_name(xml_type, name)
@@ -416,7 +421,7 @@ class XmlVarBuilder:
         self.index += 1
         cur_index = self.index
         for choice in self.build_choices(
-            name, choices, origin, globalns, parent_namespace
+            model, name, choices, origin, globalns, parent_namespace
         ):
             if choice.is_element:
                 elements[choice.qname] = choice
@@ -444,12 +449,12 @@ class XmlVarBuilder:
             wildcards=wildcards,
             namespaces=namespaces,
             xml_type=xml_type,
-            derived=False,
             wrapper=wrapper,
         )
 
     def build_choices(
         self,
+        model: Type,
         name: str,
         choices: List[Dict],
         factory: Callable,
@@ -459,7 +464,8 @@ class XmlVarBuilder:
         """Build the binding metadata for a compound dataclass field.
 
         Args:
-            name: The compound field name
+            model: The model class
+            name: The model field name
             choices: The list of choice metadata
             factory: The compound field values factory
             globalns: Python's global namespace
@@ -483,6 +489,7 @@ class XmlVarBuilder:
                 metadata["type"] = XmlType.ELEMENT
 
             var = self.build(
+                model,
                 name,
                 type_hint,
                 metadata,
@@ -496,8 +503,11 @@ class XmlVarBuilder:
             # It's impossible for choice elements to be ignorable, read above!
             assert var is not None
 
-            if var.any_type or any(True for tp in var.types if tp in existing_types):
-                var.derived = True
+            if any(True for tp in var.types if tp in existing_types):
+                raise XmlContextError(
+                    f"Error on {model.__qualname__}::{name}: "
+                    f"Compound field contains ambiguous types"
+                )
 
             existing_types.update(var.types)
 
@@ -588,7 +598,7 @@ class XmlVarBuilder:
 
     @classmethod
     def analyze_types(
-        cls, type_hint: Any, globalns: Any
+        cls, model: Type, name: str, type_hint: Any, globalns: Any
     ) -> Tuple[Any, Any, Tuple[Type, ...]]:
         """Analyze a type hint and return the origin, sub origin and the type args.
 
@@ -617,7 +627,10 @@ class XmlVarBuilder:
 
             return origin, sub_origin, tuple(converter.sort_types(types))
         except Exception:
-            raise XmlContextError(f"Unsupported typing: {type_hint}")
+            raise XmlContextError(
+                f"Error on {model.__qualname__}::{name}: "
+                f"Unsupported field typing `{type_hint}`"
+            )
 
     def is_valid(
         self,

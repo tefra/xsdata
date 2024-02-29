@@ -147,7 +147,7 @@ class RelativeHandlerInterface(HandlerInterface, metaclass=ABCMeta):
             attrs.extend(self.base_attrs(base))
 
             for attr in base.attrs:
-                attr.parent = base
+                attr.parent = base.qname
                 attrs.append(attr)
 
         return attrs

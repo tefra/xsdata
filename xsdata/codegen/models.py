@@ -72,10 +72,10 @@ class Restrictions:
     pattern: Optional[str] = field(default=None)
     explicit_timezone: Optional[str] = field(default=None)
     nillable: Optional[bool] = field(default=None)
-    sequence: Optional[int] = field(default=None)
+    sequence: Optional[int] = field(default=None, compare=False)
     tokens: Optional[bool] = field(default=None)
     format: Optional[str] = field(default=None)
-    choice: Optional[int] = field(default=None)
+    choice: Optional[int] = field(default=None, compare=False)
     group: Optional[int] = field(default=None)
     process_contents: Optional[str] = field(default=None)
     path: List[Tuple[str, int, int, int]] = field(default_factory=list)
@@ -265,7 +265,7 @@ class Attr:
         namespace: The attr namespace
         help: The attr help text
         restrictions: The attr restrictions instance
-        parent: The class reference of the attr
+        parent: The parent class qualified name of the attr
         substitution: The substitution group this attr belongs to
     """
 
@@ -281,7 +281,7 @@ class Attr:
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None, compare=False)
     restrictions: Restrictions = field(default_factory=Restrictions, compare=False)
-    parent: Optional["Class"] = field(default=None, compare=False)
+    parent: Optional[str] = field(default=None, compare=False)
     substitution: Optional[str] = field(default=None, compare=False)
 
     def __post_init__(self):
@@ -503,7 +503,7 @@ class Class:
 
     qname: str
     tag: str
-    location: str
+    location: str = field(compare=False)
     mixed: bool = field(default=False)
     abstract: bool = field(default=False)
     nillable: bool = field(default=False)

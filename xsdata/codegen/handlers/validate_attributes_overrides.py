@@ -133,7 +133,7 @@ class ValidateAttributesOverrides(RelativeHandlerInterface):
             assert parent_attr.parent is not None
             logger.warning(
                 "Converting parent field `%s::%s` to a list to match child class `%s`",
-                parent_attr.parent.name,
+                parent_attr.parent,
                 parent_attr.name,
                 target.name,
             )

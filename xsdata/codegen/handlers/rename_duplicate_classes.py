@@ -1,7 +1,14 @@
-from typing import List
+from typing import Dict, List
 
 from xsdata.codegen.mixins import ContainerHandlerInterface
-from xsdata.codegen.models import Attr, Class, get_location, get_name, get_qname
+from xsdata.codegen.models import (
+    Attr,
+    AttrType,
+    Class,
+    get_location,
+    get_name,
+    get_qname,
+)
 from xsdata.models.config import StructureStyle
 from xsdata.utils import collections, namespaces, text
 
@@ -20,7 +27,12 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
         groups = collections.group_by(self.container, lambda x: text.alnum(getter(x)))
 
         for classes in groups.values():
-            if len(classes) > 1:
+            if len(classes) < 2:
+                continue
+
+            if all(x == classes[0] for x in classes):
+                self.merge_classes(classes)
+            else:
                 self.rename_classes(classes, use_name)
 
     def should_use_names(self) -> bool:
@@ -35,6 +47,23 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
             self.container.config.output.structure_style in REQUIRE_UNIQUE_NAMES
             or len(set(map(get_location, self.container))) == 1
         )
+
+    def merge_classes(self, classes: List[Class]):
+        """Remove the duplicate classes and update all references.
+
+        Args:
+            classes: A list of duplicate classes
+        """
+        keep = classes[0]
+        new = keep.ref
+
+        replacements = {}
+        for item in classes[1:]:
+            replacements[item.ref] = new
+            self.container.remove(item)
+
+        for item in self.container:
+            self.update_class_references(item, replacements)
 
     def rename_classes(self, classes: List[Class], use_name: bool):
         """Rename all the classes in the list.
@@ -97,6 +126,33 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
 
             if cmp not in reserved:
                 return qname
+
+    def update_class_references(self, target: Class, replacements: Dict[int, int]):
+        """Go through all class types and update all references.
+
+        Args:
+            target: The target class instance to update
+            replacements: A mapping of old-new class references
+        """
+
+        def update_maybe(attr_type: AttrType):
+            exists = replacements.get(attr_type.reference)
+            if exists:
+                attr_type.reference = exists
+
+        for attr in target.attrs:
+            for tp in attr.types:
+                update_maybe(tp)
+
+            for choice in attr.choices:
+                for tp in choice.types:
+                    update_maybe(tp)
+
+        for ext in target.extensions:
+            update_maybe(ext.type)
+
+        for inner in target.inner:
+            self.update_class_references(inner, replacements)
 
     def rename_class_dependencies(self, target: Class, reference: int, replace: str):
         """Search and replace the old qualified class name in all classes.

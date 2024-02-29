@@ -20,8 +20,9 @@ class RenameDuplicateClassesTests(FactoryTestCase):
         self.container = ClassContainer(config=GeneratorConfig())
         self.processor = RenameDuplicateClasses(container=self.container)
 
+    @mock.patch.object(RenameDuplicateClasses, "merge_classes")
     @mock.patch.object(RenameDuplicateClasses, "rename_classes")
-    def test_run(self, mock_rename_classes):
+    def test_run(self, mock_rename_classes, mock_merge_classes):
         classes = [
             ClassFactory.create(qname="{foo}A"),
             ClassFactory.create(qname="{foo}a"),
@@ -38,9 +39,13 @@ class RenameDuplicateClassesTests(FactoryTestCase):
                 mock.call(classes[3:], False),
             ]
         )
+        self.assertEqual(0, mock_merge_classes.call_count)
 
+    @mock.patch.object(RenameDuplicateClasses, "merge_classes")
     @mock.patch.object(RenameDuplicateClasses, "rename_classes")
-    def test_run_with_single_package_structure(self, mock_rename_classes):
+    def test_run_with_single_package_structure(
+        self, mock_rename_classes, mock_merge_classes
+    ):
         classes = [
             ClassFactory.create(qname="{foo}a"),
             ClassFactory.create(qname="{bar}a"),
@@ -50,9 +55,13 @@ class RenameDuplicateClassesTests(FactoryTestCase):
         self.processor.run()
 
         mock_rename_classes.assert_called_once_with(classes, True)
+        self.assertEqual(0, mock_merge_classes.call_count)
 
+    @mock.patch.object(RenameDuplicateClasses, "merge_classes")
     @mock.patch.object(RenameDuplicateClasses, "rename_classes")
-    def test_run_with_single_location_source(self, mock_rename_classes):
+    def test_run_with_single_location_source(
+        self, mock_rename_classes, mock_merge_classes
+    ):
         classes = [
             ClassFactory.create(qname="{foo}a"),
             ClassFactory.create(qname="{bar}a"),
@@ -64,9 +73,11 @@ class RenameDuplicateClassesTests(FactoryTestCase):
         self.processor.run()
 
         mock_rename_classes.assert_called_once_with(classes, True)
+        self.assertEqual(0, mock_merge_classes.call_count)
 
+    @mock.patch.object(RenameDuplicateClasses, "merge_classes")
     @mock.patch.object(RenameDuplicateClasses, "rename_classes")
-    def test_run_with_clusters_structure(self, mock_rename_classes):
+    def test_run_with_clusters_structure(self, mock_rename_classes, mock_merge_classes):
         classes = [
             ClassFactory.create(qname="{foo}a"),
             ClassFactory.create(qname="{bar}a"),
@@ -77,6 +88,62 @@ class RenameDuplicateClassesTests(FactoryTestCase):
         self.processor.run()
 
         mock_rename_classes.assert_called_once_with(classes, True)
+        self.assertEqual(0, mock_merge_classes.call_count)
+
+    @mock.patch.object(RenameDuplicateClasses, "merge_classes")
+    @mock.patch.object(RenameDuplicateClasses, "rename_classes")
+    def test_run_with_same_classes(self, mock_rename_classes, mock_merge_classes):
+        first = ClassFactory.create()
+        second = first.clone()
+        third = ClassFactory.create()
+
+        self.container.extend([first, second, third])
+        self.processor.run()
+
+        self.assertEqual(0, mock_rename_classes.call_count)
+        mock_merge_classes.assert_called_once_with([first, second])
+
+    @mock.patch.object(RenameDuplicateClasses, "update_class_references")
+    def test_merge_classes(self, mock_update_class_references):
+        first = ClassFactory.create()
+        second = first.clone()
+        third = first.clone()
+        fourth = ClassFactory.create()
+        fifth = ClassFactory.create()
+
+        self.container.extend([first, second, third, fourth, fifth])
+        self.processor.run()
+
+        replacements = {
+            id(second): id(first),
+            id(third): id(first),
+        }
+
+        mock_update_class_references.assert_has_calls(
+            [
+                mock.call(first, replacements),
+                mock.call(fourth, replacements),
+                mock.call(fifth, replacements),
+            ]
+        )
+        self.assertEqual([first, fourth, fifth], list(self.container))
+
+    def test_update_class_references(self):
+        replacements = {1: 2, 3: 4, 5: 6, 7: 8}
+        target = ClassFactory.create(
+            attrs=AttrFactory.list(3),
+            extensions=ExtensionFactory.list(2),
+            inner=[ClassFactory.elements(2), ClassFactory.create()],
+        )
+        target.attrs[1].choices = AttrFactory.list(2)
+
+        target.attrs[0].types[0].reference = 1
+        target.attrs[1].choices[0].types[0].reference = 3
+        target.extensions[1].type.reference = 5
+        target.inner[0].attrs[0].types[0].reference = 7
+
+        self.processor.update_class_references(target, replacements)
+        self.assertEqual([6, 2, 4, 8], list(target.references))
 
     @mock.patch.object(RenameDuplicateClasses, "rename_class")
     def test_rename_classes(self, mock_rename_class):

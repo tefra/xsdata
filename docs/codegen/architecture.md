@@ -139,6 +139,7 @@ pass through each step before next one starts. The order of the steps is very im
 
 - [VacuumInnerClasses][xsdata.codegen.handlers.VacuumInnerClasses]
 - [CreateCompoundFields][xsdata.codegen.handlers.CreateCompoundFields]
+- [DisambiguateChoices][xsdata.codegen.handlers.DisambiguateChoices]
 - [ResetAttributeSequenceNumbers][xsdata.codegen.handlers.ResetAttributeSequenceNumbers]
 
 ### Step: Designate

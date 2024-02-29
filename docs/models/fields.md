@@ -256,9 +256,12 @@ Elements type represents repeatable choice elements. It's more commonly referred
 
 !!! Warning
 
-    If a compound field includes ambiguous types, you need to use
-    `~xsdata.formats.dataclass.models.generics.DerivedElement` to wrap
-    your values, otherwise your object can be assigned to the wrong element.
+    A compound field can not contain ambigous types because it's impossible to infer the
+    element from the actual value.
+
+    The xml contenxt will raise an error. The solution is to introduce intermediate
+    simple types or subclasses per element. This will resolve xml roundtrips but
+    it will not work for certain json roundtrips.
 
 #### Wildcard
 

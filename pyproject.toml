@@ -51,7 +51,7 @@ cli = [
     "docformatter>=1.7.2",
     "jinja2>=2.10",
     "toposort>=1.5",
-    "ruff>=0.1.9"
+    "ruff>=0.3.0"
 ]
 docs = [
     "mkdocs",

@@ -3,6 +3,7 @@ from pathlib import Path
 from unittest import mock
 
 from xsdata.codegen.resolver import DependenciesResolver
+from xsdata.exceptions import CodeGenerationError
 from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.models.config import GeneratorConfig
 from xsdata.utils.testing import ClassFactory, FactoryTestCase
@@ -45,12 +46,16 @@ class DataclassGeneratorTests(FactoryTestCase):
         self.assertEqual(expected, actual)
         mock_render_package.assert_has_calls(
             [
-                mock.call([classes[0]], "foo.bar"),
-                mock.call([classes[1]], "bar.foo"),
-                mock.call([classes[2]], "thug.life"),
+                mock.call([classes[0]], "foo.bar", cwd.joinpath("foo/bar/__init__.py")),
+                mock.call([classes[1]], "bar.foo", cwd.joinpath("bar/foo/__init__.py")),
+                mock.call(
+                    [classes[2]], "thug.life", cwd.joinpath("thug/life/__init__.py")
+                ),
             ]
         )
-        mock_render_module.assert_has_calls([mock.call(mock.ANY, [x]) for x in classes])
+        mock_render_module.assert_has_calls(
+            [mock.call(mock.ANY, [x], mock.ANY) for x in classes]
+        )
 
     def test_render_package(self):
         classes = [
@@ -62,7 +67,7 @@ class DataclassGeneratorTests(FactoryTestCase):
 
         random.shuffle(classes)
 
-        actual = self.generator.render_package(classes, "foo.tests")
+        actual = self.generator.render_package(classes, "foo.tests", Path.cwd())
         expected = "\n".join(
             [
                 "from foo.bar import A as BarA",
@@ -94,7 +99,7 @@ class DataclassGeneratorTests(FactoryTestCase):
 
         resolver = DependenciesResolver({})
 
-        actual = self.generator.render_module(resolver, classes)
+        actual = self.generator.render_module(resolver, classes, Path.cwd())
         expected = (
             "from dataclasses import dataclass, field\n"
             "from enum import Enum\n"
@@ -110,6 +115,7 @@ class DataclassGeneratorTests(FactoryTestCase):
             "    :cvar ATTR_B: I am a member\n"
             "    :cvar ATTR_C:\n"
             '    """\n'
+            "\n"
             "    ATTR_B = None\n"
             "    ATTR_C = None\n"
             "\n"
@@ -120,6 +126,7 @@ class DataclassGeneratorTests(FactoryTestCase):
             "    :ivar attr_d: I am a field\n"
             "    :ivar attr_e:\n"
             '    """\n'
+            "\n"
             "    class Meta:\n"
             '        name = "class_C"\n'
             "\n"
@@ -128,14 +135,14 @@ class DataclassGeneratorTests(FactoryTestCase):
             "        metadata={\n"
             '            "name": "attr_D",\n'
             '            "type": "Element",\n'
-            "        }\n"
+            "        },\n"
             "    )\n"
             "    attr_e: Optional[str] = field(\n"
             "        default=None,\n"
             "        metadata={\n"
             '            "name": "attr_E",\n'
             '            "type": "Element",\n'
-            "        }\n"
+            "        },\n"
             "    )\n"
             "\n"
             "\n"
@@ -153,7 +160,7 @@ class DataclassGeneratorTests(FactoryTestCase):
         ]
         resolver = DependenciesResolver({})
 
-        actual = self.generator.render_module(resolver, classes)
+        actual = self.generator.render_module(resolver, classes, Path.cwd())
         expected = (
             "from dataclasses import dataclass, field\n"
             "from typing import Optional\n"
@@ -170,7 +177,7 @@ class DataclassGeneratorTests(FactoryTestCase):
             "        metadata={\n"
             '            "name": "attr_C",\n'
             '            "type": "Element",\n'
-            "        }\n"
+            "        },\n"
             "    )\n"
             "\n"
             "\n"
@@ -185,7 +192,7 @@ class DataclassGeneratorTests(FactoryTestCase):
             "        metadata={\n"
             '            "name": "attr_B",\n'
             '            "type": "Element",\n'
-            "        }\n"
+            "        },\n"
             "    )\n"
         )
 
@@ -205,3 +212,13 @@ class DataclassGeneratorTests(FactoryTestCase):
         )
 
         self.assertEqual("", self.generator.package_name(""))
+
+    def test_format_with_invalid_code(self):
+        src_code = """a = "1"""
+        file_path = Path(__file__)
+
+        self.generator.config.output.max_line_length = 55
+        with self.assertRaises(CodeGenerationError) as cm:
+            self.generator.ruff_code(src_code, file_path)
+
+        self.assertIn("Ruff failed", str(cm.exception))

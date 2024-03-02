@@ -1,6 +1,3 @@
-import subprocess
-from pathlib import Path
-from textwrap import indent
 from typing import ClassVar, Dict, List, Type
 
 from xsdata.codegen.models import Class
@@ -46,7 +43,7 @@ class CodeWriter:
         for result in self.generator.render(classes):
             if result.source.strip():
                 logger.info("Generating package: %s", result.title)
-                src_code = self.ruff_code(header + result.source, result.path)
+                src_code = header + result.source
                 result.path.parent.mkdir(parents=True, exist_ok=True)
                 result.path.write_text(src_code, encoding="utf-8")
 
@@ -60,7 +57,7 @@ class CodeWriter:
         header = self.generator.render_header()
         for result in self.generator.render(classes):
             if result.source.strip():
-                src_code = self.ruff_code(header + result.source, result.path)
+                src_code = header + result.source
                 print(src_code, end="")
 
     @classmethod
@@ -101,39 +98,3 @@ class CodeWriter:
             name: The generator name
         """
         cls.generators.pop(name)
-
-    def ruff_code(self, src_code: str, file_path: Path) -> str:
-        """Run ruff format on the src code.
-
-        Args:
-            src_code: The output source code
-            file_path: The file path the source code will be written to
-
-        Returns:
-            The formatted output source code
-        """
-        commands = [
-            [
-                "ruff",
-                "format",
-                "--stdin-filename",
-                str(file_path),
-                "--line-length",
-                str(self.generator.config.output.max_line_length),
-            ],
-        ]
-        try:
-            src_code_encoded = src_code.encode()
-            for command in commands:
-                result = subprocess.run(
-                    command,
-                    input=src_code_encoded,
-                    capture_output=True,
-                    check=True,
-                )
-                src_code_encoded = result.stdout
-
-            return src_code_encoded.decode()
-        except subprocess.CalledProcessError as e:
-            error = indent(e.stderr.decode(), "  ")
-            raise CodeGenerationError(f"Ruff failed:\n{error}")

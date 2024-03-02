@@ -69,7 +69,6 @@ class XmlVar(MetaMixin):
         factory: Callable factory for lists
         tokens_factory: Callable factory for tokens
         format: Information about the value format
-        derived: Indicates whether parsed values should be wrapped with a generic type
         any_type: Indicates if the field supports dynamic value types
         process_contents: Information about processing contents
         required: Indicates if the field is mandatory
@@ -107,7 +106,6 @@ class XmlVar(MetaMixin):
         "factory",
         "tokens_factory",
         "format",
-        "derived",
         "any_type",
         "process_contents",
         "required",
@@ -144,7 +142,6 @@ class XmlVar(MetaMixin):
         factory: Optional[Callable],
         tokens_factory: Optional[Callable],
         format: Optional[str],
-        derived: bool,
         any_type: bool,
         process_contents: str,
         required: bool,
@@ -167,7 +164,6 @@ class XmlVar(MetaMixin):
         self.mixed = mixed
         self.tokens = tokens_factory is not None
         self.format = format
-        self.derived = derived
         self.any_type = any_type
         self.process_contents = process_contents
         self.required = required

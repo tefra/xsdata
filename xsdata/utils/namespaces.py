@@ -111,7 +111,7 @@ def local_name(qname: str) -> str:
     return split_qname(qname)[1]
 
 
-NCNAME_PUNCTUATION = {"\u00B7", "\u0387", ".", "-", "_"}
+NCNAME_PUNCTUATION = {"\u00b7", "\u0387", ".", "-", "_"}
 
 
 def is_ncname(name: Optional[str]) -> bool:

@@ -2,6 +2,7 @@ from .add_attribute_substitutions import AddAttributeSubstitutions
 from .calculate_attribute_paths import CalculateAttributePaths
 from .create_compound_fields import CreateCompoundFields
 from .designate_class_packages import DesignateClassPackages
+from .disambiguate_choices import DisambiguateChoices
 from .filter_classes import FilterClasses
 from .flatten_attribute_groups import FlattenAttributeGroups
 from .flatten_class_extensions import FlattenClassExtensions
@@ -24,6 +25,7 @@ __all__ = [
     "CalculateAttributePaths",
     "CreateCompoundFields",
     "DesignateClassPackages",
+    "DisambiguateChoices",
     "FilterClasses",
     "FlattenAttributeGroups",
     "FlattenClassExtensions",

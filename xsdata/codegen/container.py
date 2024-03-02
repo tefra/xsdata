@@ -5,6 +5,7 @@ from xsdata.codegen.handlers import (
     CalculateAttributePaths,
     CreateCompoundFields,
     DesignateClassPackages,
+    DisambiguateChoices,
     FilterClasses,
     FlattenAttributeGroups,
     FlattenClassExtensions,
@@ -93,6 +94,7 @@ class ClassContainer(ContainerInterface):
             Steps.FINALIZE: [
                 VacuumInnerClasses(),
                 CreateCompoundFields(self),
+                DisambiguateChoices(self),
                 ResetAttributeSequenceNumbers(self),
             ],
         }
@@ -238,6 +240,14 @@ class ClassContainer(ContainerInterface):
             item: The class instance to add
         """
         self.data.setdefault(item.qname, []).append(item)
+
+    def remove(self, item: Class):
+        """Remove class instance from to the container.
+
+        Args:
+            item: The class instances to remove
+        """
+        self.data[item.qname].remove(item)
 
     def reset(self, item: Class, qname: str):
         """Update the given class qualified name.

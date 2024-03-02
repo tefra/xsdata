@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Type
+from typing import Dict, List, Optional
 
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.models.elements import XmlVar
@@ -13,15 +13,13 @@ class PrimitiveNode(XmlNode):
         var: The xml var instance
         ns_map: The element namespace prefix-URI map
         mixed: Specifies if this node supports mixed content
-        derived_factory: The derived element factory
     """
 
-    __slots__ = "var", "ns_map", "derived_factory"
+    __slots__ = "var", "ns_map"
 
-    def __init__(self, var: XmlVar, ns_map: Dict, mixed: bool, derived_factory: Type):
+    def __init__(self, var: XmlVar, ns_map: Dict, mixed: bool):
         self.var = var
         self.ns_map = ns_map
-        self.derived_factory = derived_factory
         self.mixed = mixed
 
     def bind(
@@ -57,9 +55,6 @@ class PrimitiveNode(XmlNode):
 
         if obj is None and not self.var.nillable:
             obj = b"" if bytes in self.var.types else ""
-
-        if self.var.derived:
-            obj = self.derived_factory(qname=qname, value=obj)
 
         objects.append((qname, obj))
 

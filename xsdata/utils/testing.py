@@ -57,6 +57,8 @@ def load_class(output: str, clazz_name: str) -> Any:
 
 
 class FactoryTestCase(unittest.TestCase):
+    maxDiff = None
+
     def setUp(self):
         super().setUp()
         ClassFactory.reset()
@@ -370,7 +372,6 @@ class XmlVarFactory(Factory):
         factory: Optional[Callable] = None,
         tokens_factory: Optional[Callable] = None,
         format: Optional[str] = None,
-        derived: bool = False,
         any_type: bool = False,
         required: bool = False,
         nillable: bool = False,
@@ -409,7 +410,6 @@ class XmlVarFactory(Factory):
             factory=factory,
             tokens_factory=tokens_factory,
             format=format,
-            derived=derived,
             any_type=any_type,
             required=required,
             nillable=nillable,

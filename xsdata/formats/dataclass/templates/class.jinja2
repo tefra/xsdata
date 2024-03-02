@@ -18,7 +18,7 @@ class {{ class_name }}{{"({})".format(base_classes) if base_classes }}:
 {%- if help %}
 {{ help|indent(4, first=True) }}
 {%- endif -%}
-{%- if local_name or obj.is_nillable or obj.namespace is not none or target_namespace or obj.local_type %}
+{%- if local_name or obj.is_nillable or obj.namespace is not none or target_namespace or (obj.local_type and level == 0) %}
     class Meta:
         {%- if obj.local_type %}
         global_type = False

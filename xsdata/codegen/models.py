@@ -72,10 +72,10 @@ class Restrictions:
     pattern: Optional[str] = field(default=None)
     explicit_timezone: Optional[str] = field(default=None)
     nillable: Optional[bool] = field(default=None)
-    sequence: Optional[int] = field(default=None)
+    sequence: Optional[int] = field(default=None, compare=False)
     tokens: Optional[bool] = field(default=None)
     format: Optional[str] = field(default=None)
-    choice: Optional[int] = field(default=None)
+    choice: Optional[int] = field(default=None, compare=False)
     group: Optional[int] = field(default=None)
     process_contents: Optional[str] = field(default=None)
     path: List[Tuple[str, int, int, int]] = field(default_factory=list)
@@ -178,9 +178,9 @@ class Restrictions:
 
         return result
 
-    def clone(self) -> "Restrictions":
-        """Return a deep cloned instance."""
-        return replace(self)
+    def clone(self, **kwargs: Any) -> "Restrictions":
+        """Return a deep cloned instance and replace any args."""
+        return replace(self, **kwargs)
 
     @classmethod
     def from_element(cls, element: ElementBase) -> "Restrictions":
@@ -243,9 +243,9 @@ class AttrType:
             self.forward or self.native or (not allow_circular and self.circular)
         )
 
-    def clone(self) -> "AttrType":
+    def clone(self, **kwargs: Any) -> "AttrType":
         """Return a deep cloned instance."""
-        return replace(self)
+        return replace(self, **kwargs)
 
 
 @dataclass
@@ -265,7 +265,7 @@ class Attr:
         namespace: The attr namespace
         help: The attr help text
         restrictions: The attr restrictions instance
-        parent: The class reference of the attr
+        parent: The parent class qualified name of the attr
         substitution: The substitution group this attr belongs to
     """
 
@@ -281,7 +281,7 @@ class Attr:
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None, compare=False)
     restrictions: Restrictions = field(default_factory=Restrictions, compare=False)
-    parent: Optional["Class"] = field(default=None, compare=False)
+    parent: Optional[str] = field(default=None, compare=False)
     substitution: Optional[str] = field(default=None, compare=False)
 
     def __post_init__(self):
@@ -301,6 +301,11 @@ class Attr:
 
         """
         return f"{self.tag}.{self.namespace}.{self.local_name}"
+
+    @property
+    def qname(self) -> str:
+        """Return the fully qualified name of the attr."""
+        return namespaces.build_qname(self.namespace, self.local_name)
 
     @property
     def is_attribute(self) -> bool:
@@ -326,6 +331,11 @@ class Attr:
     def is_forward_ref(self) -> bool:
         """Return whether any attr types is a forward or circular reference."""
         return any(tp.circular or tp.forward for tp in self.types)
+
+    @property
+    def is_circular_ref(self) -> bool:
+        """Return whether any attr types is a circular reference."""
+        return any(tp.circular for tp in self.types)
 
     @property
     def is_group(self) -> bool:
@@ -493,7 +503,7 @@ class Class:
 
     qname: str
     tag: str
-    location: str
+    location: str = field(compare=False)
     mixed: bool = field(default=False)
     abstract: bool = field(default=False)
     nillable: bool = field(default=False)

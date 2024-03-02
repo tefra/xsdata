@@ -87,7 +87,7 @@ class Client:
         elif not serializer:
             assert parser is not None
             serializer = XmlSerializer(context=parser.context)
-        elif not parser:
+        else:
             assert serializer is not None
             parser = XmlParser(context=serializer.context)
 

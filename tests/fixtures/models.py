@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from dataclasses import field
+from decimal import Decimal
 from typing import Dict, Any
 from typing import List
 from typing import Optional
@@ -95,17 +96,10 @@ class ChoiceType:
                 {"name": "a", "type": TypeA},
                 {"name": "b", "type": TypeB},
                 {"name": "int", "type": int},
-                {"name": "int2", "type": int, "nillable": True},
                 {"name": "float", "type": float},
                 {"name": "qname", "type": QName},
-                {
-                    "name": "tokens",
-                    "type": List[int],
-                    "tokens": True,
-                    "default_factory": return_true
-                },
                 {"name": "union", "type": Type["UnionType"], "namespace": "foo"},
-                {"name": "p", "type": float, "fixed": True, "default": 1.1},
+                {"name": "tokens", "type": List[Decimal], "tokens": True},
                 {
                     "wildcard": True,
                     "type": object,
@@ -127,6 +121,18 @@ class OptionalChoiceType:
         }
     )
 
+
+@dataclass
+class AmbiguousChoiceType:
+    choice: int = field(
+        metadata={
+            "type": "Elements",
+            "choices": (
+                {"name": "a", "type": int},
+                {"name": "b", "type": int},
+            ),
+        }
+    )
 
 
 @dataclass

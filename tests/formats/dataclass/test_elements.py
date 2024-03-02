@@ -1,4 +1,5 @@
 from dataclasses import make_dataclass
+from decimal import Decimal
 from unittest import mock
 from unittest.case import TestCase
 from xml.etree.ElementTree import QName
@@ -45,7 +46,7 @@ class XmlValTests(TestCase):
         meta = self.context.build(ChoiceType)
         var = meta.choices[0]
         self.assertEqual(
-            {TypeA, TypeB, int, float, QName, UnionType}, var.element_types
+            {TypeA, TypeB, int, float, QName, UnionType, Decimal}, var.element_types
         )
 
     def test_find_choice(self):
@@ -88,14 +89,11 @@ class XmlValTests(TestCase):
         meta = self.context.build(ChoiceType)
         var = meta.choices[0]
 
-        self.assertIsNone(var.find_value_choice(["1.1", "1.2"], False))
+        self.assertEqual(var.elements["tokens"], var.find_value_choice(["1.2"], False))
         self.assertIsNone(var.find_value_choice([], False))
-        self.assertEqual(var.elements["int2"], var.find_value_choice(None, False))
         self.assertEqual(var.elements["qname"], var.find_value_choice("foo", False))
         self.assertEqual(var.elements["int"], var.find_value_choice(1, False))
-        self.assertEqual(var.elements["tokens"], var.find_value_choice([1, 2], False))
         self.assertEqual(var.elements["a"], var.find_value_choice(TypeA(1), True))
-
         der = make_dataclass("Der", fields=[], bases=(TypeA,))
         self.assertEqual(var.elements["a"], var.find_value_choice(der(1), True))
 

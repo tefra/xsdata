@@ -70,10 +70,18 @@ class ContainerInterface(abc.ABC):
 
     @abc.abstractmethod
     def add(self, item: Class):
-        """Add class item to the container.
+        """Add class instance to the container.
 
         Args:
             item: The class instance to add
+        """
+
+    @abc.abstractmethod
+    def remove(self, item: Class):
+        """Remove class instance from the container.
+
+        Args:
+            item: The class instances to remove
         """
 
     @abc.abstractmethod
@@ -147,7 +155,7 @@ class RelativeHandlerInterface(HandlerInterface, metaclass=ABCMeta):
             attrs.extend(self.base_attrs(base))
 
             for attr in base.attrs:
-                attr.parent = base
+                attr.parent = base.qname
                 attrs.append(attr)
 
         return attrs

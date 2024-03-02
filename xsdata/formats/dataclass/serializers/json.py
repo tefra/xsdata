@@ -1,28 +1,10 @@
 import json
 from dataclasses import dataclass, field
 from io import StringIO
-from typing import Any, Callable, Dict, TextIO, Tuple
+from typing import Any, Callable, TextIO
 
 from xsdata.formats.bindings import AbstractSerializer
 from xsdata.formats.dataclass.serializers import DictEncoder
-
-
-def filter_none(x: Tuple) -> Dict:
-    """Convert a key-value pairs to dict, ignoring None values.
-
-    Args:
-        x: Key-value pairs
-
-    Returns:
-        The filtered dictionary.
-    """
-    return {k: v for k, v in x if v is not None}
-
-
-class DictFactory:
-    """Dictionary factory types."""
-
-    FILTER_NONE = filter_none
 
 
 @dataclass

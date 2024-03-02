@@ -1,10 +1,13 @@
+import subprocess
 from pathlib import Path
+from textwrap import indent
 from typing import Iterator, List, Optional
 
 from jinja2 import Environment, FileSystemLoader
 
 from xsdata.codegen.models import Class, Import
 from xsdata.codegen.resolver import DependenciesResolver
+from xsdata.exceptions import CodeGenerationError
 from xsdata.formats.dataclass.filters import Filters
 from xsdata.formats.mixins import AbstractGenerator, GeneratorResult
 from xsdata.models.config import GeneratorConfig
@@ -57,27 +60,34 @@ class DataclassGenerator(AbstractGenerator):
         # Generate packages
         for path, cluster in self.group_by_package(classes).items():
             module = ".".join(path.relative_to(Path.cwd()).parts)
+            package_path = path.joinpath("__init__.py")
+            src_code = self.render_package(cluster, module, package_path)
+
             yield GeneratorResult(
-                path=path.joinpath("__init__.py"),
+                path=package_path,
                 title="init",
-                source=self.render_package(cluster, module),
+                source=src_code,
             )
             yield from self.ensure_packages(path.parent)
 
         # Generate modules
         for path, cluster in self.group_by_module(classes).items():
+            module_path = path.with_suffix(".py")
+            src_code = self.render_module(resolver, cluster, module_path)
+
             yield GeneratorResult(
-                path=path.with_suffix(".py"),
+                path=module_path,
                 title=cluster[0].target_module,
-                source=self.render_module(resolver, cluster),
+                source=src_code,
             )
 
-    def render_package(self, classes: List[Class], module: str) -> str:
+    def render_package(self, classes: List[Class], module: str, filename: Path) -> str:
         """Render the package for the given classes.
 
         Args:
             classes: A list of class instances
             module: The target dot notation path
+            filename: The package path
 
         Returns:
             The rendered package output.
@@ -92,18 +102,20 @@ class DataclassGenerator(AbstractGenerator):
             imports=imports,
             module=module,
         )
-        return f"{output.strip()}\n"
+        return self.ruff_code(output, filename)
 
     def render_module(
         self,
         resolver: DependenciesResolver,
         classes: List[Class],
+        filename: Path,
     ) -> str:
         """Render the module for the given classes.
 
         Args:
             resolver: The dependencies resolver
             classes: A list of class instances
+            filename: The module path
 
         Returns:
             The rendered module output.
@@ -119,13 +131,15 @@ class DataclassGenerator(AbstractGenerator):
         output = self.render_classes(classes, module_namespace)
         module = classes[0].target_module
 
-        return self.env.get_template(self.module_template).render(
+        result = self.env.get_template(self.module_template).render(
             output=output,
             classes=classes,
             module=module,
             imports=imports,
             namespace=module_namespace,
         )
+
+        return self.ruff_code(result, filename)
 
     def render_classes(
         self,
@@ -160,7 +174,7 @@ class DataclassGenerator(AbstractGenerator):
                 .strip()
             )
 
-        return "\n\n\n".join(map(render_class, classes)) + "\n"
+        return "\n".join(map(render_class, classes))
 
     def module_name(self, name: str) -> str:
         """Convert the given module name to safe snake case."""
@@ -193,3 +207,39 @@ class DataclassGenerator(AbstractGenerator):
     def init_filters(cls, config: GeneratorConfig) -> Filters:
         """Initialize the filters instance by the generator configuration."""
         return Filters(config)
+
+    def ruff_code(self, src_code: str, file_path: Path) -> str:
+        """Run ruff format on the src code.
+
+        Args:
+            src_code: The output source code
+            file_path: The file path the source code will be written to
+
+        Returns:
+            The formatted output source code
+        """
+        commands = [
+            [
+                "ruff",
+                "format",
+                "--stdin-filename",
+                str(file_path),
+                "--line-length",
+                str(self.config.output.max_line_length),
+            ],
+        ]
+        try:
+            src_code_encoded = src_code.encode()
+            for command in commands:
+                result = subprocess.run(
+                    command,
+                    input=src_code_encoded,
+                    capture_output=True,
+                    check=True,
+                )
+                src_code_encoded = result.stdout
+
+            return src_code_encoded.decode()
+        except subprocess.CalledProcessError as e:
+            error = indent(e.stderr.decode(), "  ")
+            raise CodeGenerationError(f"Ruff failed:\n{error}")

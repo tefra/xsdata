@@ -2,8 +2,9 @@ import json
 from unittest.case import TestCase
 
 from tests.fixtures.books import BookForm, Books
+from xsdata.formats.dataclass.serializers import DictFactory
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
-from xsdata.formats.dataclass.serializers.json import DictFactory, JsonSerializer
+from xsdata.formats.dataclass.serializers.json import JsonSerializer
 from xsdata.models.datatype import XmlDate
 
 

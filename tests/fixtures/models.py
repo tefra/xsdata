@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from dataclasses import field
+from decimal import Decimal
 from typing import Dict, Any
 from typing import List
 from typing import Optional
@@ -98,7 +99,7 @@ class ChoiceType:
                 {"name": "float", "type": float},
                 {"name": "qname", "type": QName},
                 {"name": "union", "type": Type["UnionType"], "namespace": "foo"},
-                {"name": "tokens", "type": List[str], "tokens": True},
+                {"name": "tokens", "type": List[Decimal], "tokens": True},
                 {
                     "wildcard": True,
                     "type": object,

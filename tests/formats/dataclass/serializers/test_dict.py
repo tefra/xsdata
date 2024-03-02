@@ -1,11 +1,9 @@
-import json
 from unittest.case import TestCase
 
 from tests.fixtures.books import BookForm, Books
 from tests.fixtures.datatypes import Telephone
 from xsdata.exceptions import XmlContextError
-from xsdata.formats.dataclass.serializers import DictEncoder
-from xsdata.formats.dataclass.serializers.json import DictFactory, JsonSerializer
+from xsdata.formats.dataclass.serializers import DictEncoder, DictFactory
 from xsdata.models.datatype import XmlDate
 from xsdata.models.xsd import Attribute
 from xsdata.utils.testing import XmlVarFactory
@@ -73,8 +71,7 @@ class DictEncoderTests(TestCase):
 
     def test_encode_with_enum(self):
         obj = Attribute()
-        serializer = JsonSerializer(dict_factory=DictFactory.FILTER_NONE)
-        actual = json.loads(serializer.render(obj))
+        actual = self.encoder.encode(obj)
 
         self.assertEqual("optional", actual["use"])
 
@@ -85,9 +82,8 @@ class DictEncoderTests(TestCase):
 
     def test_next_value(self):
         book = self.books.book[0]
-        serializer = JsonSerializer()
 
-        actual = [name for name, value in serializer.next_value(book)]
+        actual = [name for name, value in self.encoder.next_value(book)]
         expected = [
             "author",
             "title",
@@ -100,7 +96,7 @@ class DictEncoderTests(TestCase):
         ]
         self.assertEqual(expected, actual)
 
-        serializer.config.ignore_default_attributes = True
+        self.encoder.config.ignore_default_attributes = True
         expected = expected[:-1]
-        actual = [name for name, value in serializer.next_value(book)]
+        actual = [name for name, value in self.encoder.next_value(book)]
         self.assertEqual(expected, actual)

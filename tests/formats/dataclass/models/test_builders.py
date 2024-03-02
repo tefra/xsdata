@@ -2,6 +2,7 @@ import functools
 import sys
 import uuid
 from dataclasses import dataclass, field, fields, make_dataclass
+from decimal import Decimal
 from typing import Dict, Iterator, List, Tuple, Union, get_type_hints
 from unittest import TestCase, mock
 from xml.etree.ElementTree import QName
@@ -376,7 +377,7 @@ class XmlVarBuilderTests(TestCase):
                     index=8,
                     name="choice",
                     qname="{bar}tokens",
-                    types=(str,),
+                    types=(Decimal,),
                     tokens_factory=list,
                     derived=True,
                     factory=list,

@@ -70,6 +70,8 @@ class DisambiguateChoicesTest(FactoryTestCase):
         self.assertEqual("a", target.inner[0].qname)
         self.assertEqual("{xs}b", target.inner[1].qname)
 
+        self.assertEqual(["a", "{xs}b"], [x.qname for x in compound.types])
+
     def test_process_with_duplicate_any_types(self):
         compound = AttrFactory.create(tag=Tag.CHOICE, types=[])
         target = ClassFactory.create()
@@ -91,7 +93,7 @@ class DisambiguateChoicesTest(FactoryTestCase):
         self.assertEqual("{xs}b", target.inner[1].qname)
 
     def test_process_with_duplicate_complex_types(self):
-        compound = AttrFactory.create(tag=Tag.CHOICE, types=[])
+        compound = AttrFactory.any()
         target = ClassFactory.create()
         target.attrs.append(compound)
         compound.choices.append(AttrFactory.reference(name="a", qname="myint"))
@@ -111,6 +113,8 @@ class DisambiguateChoicesTest(FactoryTestCase):
         for inner in target.inner:
             self.assertEqual("myint", inner.extensions[0].type.qname)
             self.assertEqual("myint", inner.extensions[0].type.qname)
+
+        self.assertEqual(DataType.ANY_TYPE, compound.types[0].datatype)
 
     def test_disambiguate_choice_with_unnest_true(self):
         target = ClassFactory.create()
@@ -136,6 +140,21 @@ class DisambiguateChoicesTest(FactoryTestCase):
 
         self.assertTrue(attr.types[0].circular)
         self.assertIsNotNone(self.container.find(attr.qname))
+
+    def test_find_ambiguous_choices_ignore_wildcards(self):
+        """Wildcards are merged."""
+
+        attr = AttrFactory.create()
+        attr.choices.append(AttrFactory.any())
+        attr.choices.append(AttrFactory.any())
+        attr.choices.append(
+            AttrFactory.create(
+                name="this", types=[AttrTypeFactory.native(DataType.ANY_TYPE)]
+            )
+        )
+
+        result = self.handler.find_ambiguous_choices(attr)
+        self.assertEqual(["this"], [x.name for x in result])
 
     def test_is_simple_type(self):
         attr = AttrFactory.native(DataType.STRING)

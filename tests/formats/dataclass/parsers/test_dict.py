@@ -1,5 +1,6 @@
 import json
 from dataclasses import asdict, make_dataclass
+from decimal import Decimal
 from typing import List, Optional, Union
 from xml.etree.ElementTree import QName
 
@@ -232,14 +233,13 @@ class DictDecoderTests(FactoryTestCase):
         self.assertEqual(2, actual.wildcard)
 
     def test_bind_simple_type_with_elements_var(self):
-        data = {"choice": ["1.0", 1, "a", "{a}b"]}
+        data = {"choice": ["1.0", 1, ["1.2"], "{a}b"]}
 
         actual = self.decoder.bind_dataclass(data, ChoiceType)
 
         self.assertEqual(1.0, actual.choice[0])
         self.assertEqual(1, actual.choice[1])
-        self.assertEqual(QName("a"), actual.choice[2])
-        self.assertIsInstance(actual.choice[2], QName)
+        self.assertEqual([Decimal("1.2")], actual.choice[2])
         self.assertEqual(QName("{a}b"), actual.choice[3])
         self.assertIsInstance(actual.choice[3], QName)
 
@@ -308,6 +308,13 @@ class DictDecoderTests(FactoryTestCase):
             "Unable to locate compound element ChoiceType.choice[nope]",
             str(cm.exception),
         )
+
+    def test_bind_derived_value_with_simple_type(self):
+        data = {"choice": [{"qname": "float", "value": 1, "type": None}]}
+
+        actual = self.decoder.bind_dataclass(data, ChoiceType)
+        expected = ChoiceType(choice=[DerivedElement(qname="float", value=1)])
+        self.assertEqual(expected, actual)
 
     def test_bind_wildcard_dataclass(self):
         data = {"a": None, "wildcard": {"x": 1}}

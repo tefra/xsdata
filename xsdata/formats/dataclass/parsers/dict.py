@@ -389,6 +389,7 @@ class DictDecoder:
             return self.bind_derived_value(meta, choice, data)
 
         if not isinstance(params, dict):
+            # Is this scenario still possible???
             value = self.bind_text(meta, var, params)
         elif xsi_type:
             clazz: Optional[Type] = self.context.find_type(xsi_type)

@@ -197,12 +197,14 @@ class ClassUtils:
         inner = ClassUtils.find_inner(source, attr_type.qname)
         if inner is target:
             attr_type.circular = True
+            attr_type.reference = target.ref
         else:
             # In extreme cases this adds duplicate inner classes
             clone = inner.clone()
             clone.package = target.package
             clone.module = target.module
             clone.status = Status.RAW
+            attr_type.reference = clone.ref
             target.inner.append(clone)
 
     @classmethod

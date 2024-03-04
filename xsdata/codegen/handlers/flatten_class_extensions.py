@@ -109,8 +109,11 @@ class FlattenClassExtensions(RelativeHandlerInterface):
             # the target enumeration, mypy doesn't play nicely.
             target.attrs.clear()
 
-        if extension and target.is_enumeration:
-            target.extensions.remove(extension)
+        if extension:
+            if target.is_enumeration:
+                target.extensions.remove(extension)
+            else:
+                extension.type.reference = source.ref
 
     @classmethod
     def merge_enumerations(cls, source: Class, target: Class):

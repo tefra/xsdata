@@ -77,11 +77,14 @@ class UnnestInnerClassesTests(FactoryTestCase):
                 AttrTypeFactory.create(qname="b", forward=False),
             ]
         )
+        source = ClassFactory.create()
 
-        self.processor.update_types(attr, "a", "c")
+        self.processor.update_types(attr, "a", source)
 
-        self.assertEqual("c", attr.types[0].qname)
+        self.assertEqual(source.qname, attr.types[0].qname)
         self.assertFalse(attr.types[0].forward)
+        self.assertEqual(source.ref, attr.types[0].reference)
+
         self.assertEqual("a", attr.types[1].qname)
         self.assertFalse(attr.types[1].forward)
         self.assertEqual("b", attr.types[2].qname)

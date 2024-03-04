@@ -133,7 +133,9 @@ class CreateCompoundFields(RelativeHandlerInterface):
 
         min_occurs, max_occurs = self.sum_counters(counters)
         name = self.choose_name(target, names, list(filter(None, substitutions)))
-        types = collections.unique_sequence(t for attr in attrs for t in attr.types)
+        types = collections.unique_sequence(
+            t.clone() for attr in attrs for t in attr.types
+        )
 
         target.attrs.insert(
             pos,
@@ -256,7 +258,7 @@ class CreateCompoundFields(RelativeHandlerInterface):
         return Attr(
             name=attr.local_name,
             namespace=attr.namespace,
-            types=attr.types,
+            types=[x.clone() for x in attr.types],
             tag=attr.tag,
             help=attr.help,
             restrictions=restrictions,

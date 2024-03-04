@@ -47,7 +47,7 @@ class DefinitionsValueError(ValueError):
 
 
 class AnalyzerValueError(ValueError):
-    """Unhandled behaviour during class analyze process.."""
+    """Unhandled behaviour during class analyze process."""
 
 
 class ResolverValueError(ValueError):

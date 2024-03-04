@@ -259,6 +259,8 @@ class ProcessAttributeTypesTests(FactoryTestCase):
         attr_type = AttrTypeFactory.create(circular=True)
 
         self.processor.process_inner_type(target, attr, attr_type)
+
+        self.assertEqual(target.ref, attr_type.reference)
         self.assertEqual(0, mock_copy_attribute_properties.call_count)
         self.assertEqual(0, mock_update_restrictions.call_count)
 

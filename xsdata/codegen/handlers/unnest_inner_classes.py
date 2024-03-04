@@ -42,7 +42,7 @@ class UnnestInnerClasses(RelativeHandlerInterface):
         attr = self.find_forward_attr(target, inner.qname)
         if attr:
             clone = self.clone_class(inner, target.name)
-            self.update_types(attr, inner.qname, clone.qname)
+            self.update_types(attr, inner.qname, clone)
             self.container.add(clone)
 
     @classmethod
@@ -65,17 +65,18 @@ class UnnestInnerClasses(RelativeHandlerInterface):
         return clone
 
     @classmethod
-    def update_types(cls, attr: Attr, search: str, replace: str):
+    def update_types(cls, attr: Attr, search: str, source: Class):
         """Update the references from an inner to a global class.
 
         Args:
             attr: The target attr to inspect and update
             search: The current inner class qname
-            replace: The new global class qname
+            source: The new global class qname
         """
         for attr_type in attr.types:
             if attr_type.qname == search and attr_type.forward:
-                attr_type.qname = replace
+                attr_type.qname = source.qname
+                attr_type.reference = source.ref
                 attr_type.forward = False
 
     @classmethod

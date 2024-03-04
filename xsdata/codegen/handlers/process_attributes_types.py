@@ -154,6 +154,7 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
             attr_type: The attr type instance
         """
         if attr_type.circular:
+            attr_type.reference = target.ref
             return
 
         inner = self.container.find_inner(target, attr_type.qname)
@@ -166,6 +167,8 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
         ):
             self.copy_attribute_properties(inner, target, attr, attr_type)
             target.inner.remove(inner)
+        else:
+            attr_type.reference = inner.ref
 
     def process_dependency_type(self, target: Class, attr: Attr, attr_type: AttrType):
         """Process an attr type that depends on any global type.

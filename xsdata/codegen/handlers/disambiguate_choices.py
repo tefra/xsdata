@@ -64,7 +64,7 @@ class DisambiguateChoices(RelativeHandlerInterface):
 
         if attr.tag == Tag.CHOICE:
             types = (tp for choice in attr.choices for tp in choice.types)
-            attr.types = collections.unique_sequence(types)
+            attr.types = collections.unique_sequence(x.clone() for x in types)
 
     @classmethod
     def merge_wildcard_choices(cls, attr: Attr):

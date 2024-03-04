@@ -145,7 +145,11 @@ class DefinitionsMapper:
             # Only Envelope classes need to be added in service input/output
             if message_class.meta_name:
                 message_type = message_class.name.split("_")[-1]
-                attrs.append(cls.build_attr(message_type, message_class.qname))
+                attrs.append(
+                    cls.build_attr(
+                        message_type, message_class.qname, reference=id(message_class)
+                    )
+                )
 
         assert binding_operation.location is not None
 
@@ -516,6 +520,7 @@ class DefinitionsMapper:
         forward: bool = False,
         namespace: Optional[str] = None,
         default: Optional[str] = None,
+        reference: int = 0,
     ) -> Attr:
         """Helper method to build an attr instance.
 
@@ -526,6 +531,7 @@ class DefinitionsMapper:
             forward: Whether the type is a forward reference
             namespace: The attr namespace
             default: The attr default value
+            reference: The class id reference, if any
 
         Returns:
             The new attr instance.
@@ -539,6 +545,10 @@ class DefinitionsMapper:
             name=name,
             namespace=namespace,
             default=default,
-            types=[AttrType(qname=qname, forward=forward, native=native)],
+            types=[
+                AttrType(
+                    qname=qname, forward=forward, native=native, reference=reference
+                )
+            ],
             restrictions=Restrictions(min_occurs=occurs, max_occurs=occurs),
         )

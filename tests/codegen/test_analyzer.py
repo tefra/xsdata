@@ -8,7 +8,6 @@ from xsdata.models.config import GeneratorConfig
 from xsdata.utils.testing import (
     AttrFactory,
     ClassFactory,
-    ExtensionFactory,
     FactoryTestCase,
 )
 
@@ -36,26 +35,7 @@ class ClassAnalyzerTests(FactoryTestCase):
         mock_container_process.assert_called_once_with()
         mock_validate_references.assert_called_once_with(classes)
 
-    def test_class_references(self):
-        target = ClassFactory.elements(
-            2,
-            inner=ClassFactory.list(2, attrs=AttrFactory.list(1)),
-            extensions=ExtensionFactory.list(1),
-        )
-
-        actual = ClassAnalyzer.class_references(target)
-        # +1 target
-        # +2 attrs
-        # +2 attr types
-        # +1 extension
-        # +1 extension type
-        # +2 inner classes
-        # +2 inner classes attrs
-        # +2 inner classes attr types
-        self.assertEqual(13, len(actual))
-        self.assertEqual(id(target), actual[0])
-
-    def test_validate_references(self):
+    def test_validate_with_cross_references(self):
         first = ClassFactory.elements(2)
         second = ClassFactory.create(attrs=first.attrs)
 
@@ -64,4 +44,13 @@ class ClassAnalyzerTests(FactoryTestCase):
         with self.assertRaises(AnalyzerValueError) as cm:
             ClassAnalyzer.validate_references([first, second])
 
-        self.assertEqual("Cross references detected!", str(cm.exception))
+        self.assertEqual("Cross reference detected", str(cm.exception))
+
+    def test_validate_unresolved_references(self):
+        first = ClassFactory.create()
+        first.attrs.append(AttrFactory.reference("foo"))
+
+        with self.assertRaises(AnalyzerValueError) as cm:
+            ClassAnalyzer.validate_references([first])
+
+        self.assertEqual("Unresolved reference", str(cm.exception))

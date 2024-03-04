@@ -29,7 +29,12 @@ GLOBAL_TYPES = (
 
 
 @dataclass
-class Restrictions:
+class CodegenModel:
+    """Base codegen model."""
+
+
+@dataclass
+class Restrictions(CodegenModel):
     """Class field validation restrictions.
 
     Args:
@@ -196,7 +201,7 @@ class Restrictions:
 
 
 @dataclass(unsafe_hash=True)
-class AttrType:
+class AttrType(CodegenModel):
     """Class field typing information.
 
     Args:
@@ -249,7 +254,7 @@ class AttrType:
 
 
 @dataclass
-class Attr:
+class Attr(CodegenModel):
     """Class field model representation.
 
     Args:
@@ -435,7 +440,7 @@ class Attr:
 
 
 @dataclass(unsafe_hash=True)
-class Extension:
+class Extension(CodegenModel):
     """Base class model representation.
 
     Args:
@@ -474,7 +479,7 @@ class Status(IntEnum):
 
 
 @dataclass
-class Class:
+class Class(CodegenModel):
     """Class model representation.
 
     Args:

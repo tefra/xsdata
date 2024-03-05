@@ -77,11 +77,11 @@ class ContainerInterface(abc.ABC):
         """
 
     @abc.abstractmethod
-    def remove(self, item: Class):
-        """Remove class instance from the container.
+    def remove(self, *items: Class):
+        """Safely remove classes from the container.
 
         Args:
-            item: The class instances to remove
+            items: The classes to remove
         """
 
     @abc.abstractmethod

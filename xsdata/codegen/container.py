@@ -241,13 +241,16 @@ class ClassContainer(ContainerInterface):
         """
         self.data.setdefault(item.qname, []).append(item)
 
-    def remove(self, item: Class):
-        """Remove class instance from to the container.
+    def remove(self, *items: Class):
+        """Safely remove classes from the container.
 
         Args:
-            item: The class instances to remove
+            items: The classes to remove
         """
-        self.data[item.qname].remove(item)
+        for item in items:
+            self.data[item.qname] = [
+                c for c in self.data[item.qname] if c.ref != item.ref
+            ]
 
     def reset(self, item: Class, qname: str):
         """Update the given class qualified name.
@@ -256,7 +259,7 @@ class ClassContainer(ContainerInterface):
             item: The target class instance to update
             qname: The new qualified name of the class
         """
-        self.data[qname].remove(item)
+        self.data[qname] = [c for c in self.data[qname] if c.ref != item.ref]
         self.add(item)
 
     def set(self, items: List[Class]):

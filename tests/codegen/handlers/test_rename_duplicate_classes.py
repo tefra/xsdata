@@ -114,22 +114,20 @@ class RenameDuplicateClassesTests(FactoryTestCase):
         self.container.extend([first, second, third, fourth, fifth])
         self.processor.run()
 
-        replacements = {
-            id(second): id(first),
-            id(third): id(first),
-        }
+        search = {first.ref, second.ref}
+        replace = third.ref
 
         mock_update_class_references.assert_has_calls(
             [
-                mock.call(first, replacements),
-                mock.call(fourth, replacements),
-                mock.call(fifth, replacements),
+                mock.call(first, search, replace),
+                mock.call(fourth, search, replace),
+                mock.call(fifth, search, replace),
             ]
         )
         self.assertEqual([first, fourth, fifth], list(self.container))
 
     def test_update_class_references(self):
-        replacements = {1: 2, 3: 4, 5: 6, 7: 8}
+        replacements = {1, 2, 3, 4}
         target = ClassFactory.create(
             attrs=AttrFactory.list(3),
             extensions=ExtensionFactory.list(2),
@@ -138,12 +136,12 @@ class RenameDuplicateClassesTests(FactoryTestCase):
         target.attrs[1].choices = AttrFactory.list(2)
 
         target.attrs[0].types[0].reference = 1
-        target.attrs[1].choices[0].types[0].reference = 3
-        target.extensions[1].type.reference = 5
-        target.inner[0].attrs[0].types[0].reference = 7
+        target.attrs[1].choices[0].types[0].reference = 2
+        target.extensions[1].type.reference = 3
+        target.inner[0].attrs[0].types[0].reference = 4
 
-        self.processor.update_class_references(target, replacements)
-        self.assertEqual([6, 2, 4, 8], list(target.references))
+        self.processor.update_class_references(target, replacements, 5)
+        self.assertEqual([5, 5, 5, 5], list(target.references))
 
     @mock.patch.object(RenameDuplicateClasses, "rename_class")
     def test_rename_classes(self, mock_rename_class):

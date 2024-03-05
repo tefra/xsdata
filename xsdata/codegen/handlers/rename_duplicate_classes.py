@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import List, Set
 
 from xsdata.codegen.mixins import ContainerHandlerInterface
 from xsdata.codegen.models import (
@@ -54,16 +54,13 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
         Args:
             classes: A list of duplicate classes
         """
-        keep = classes[0]
-        new = keep.ref
-
-        replacements = {}
-        for item in classes[1:]:
-            replacements[item.ref] = new
-            self.container.remove(item)
+        keep = classes.pop()
+        replace = keep.ref
+        self.container.remove(*classes)
+        search = {item.ref for item in classes}
 
         for item in self.container:
-            self.update_class_references(item, replacements)
+            self.update_class_references(item, search, replace)
 
     def rename_classes(self, classes: List[Class], use_name: bool):
         """Rename all the classes in the list.
@@ -127,18 +124,18 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
             if cmp not in reserved:
                 return qname
 
-    def update_class_references(self, target: Class, replacements: Dict[int, int]):
+    def update_class_references(self, target: Class, search: Set[int], replace: int):
         """Go through all class types and update all references.
 
         Args:
             target: The target class instance to update
-            replacements: A mapping of old-new class references
+            search: A set of class references to find
+            replace: The new class reference to replace
         """
 
         def update_maybe(attr_type: AttrType):
-            exists = replacements.get(attr_type.reference)
-            if exists:
-                attr_type.reference = exists
+            if attr_type.reference in search:
+                attr_type.reference = replace
 
         for attr in target.attrs:
             for tp in attr.types:
@@ -152,7 +149,7 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
             update_maybe(ext.type)
 
         for inner in target.inner:
-            self.update_class_references(inner, replacements)
+            self.update_class_references(inner, search, replace)
 
     def rename_class_dependencies(self, target: Class, reference: int, replace: str):
         """Search and replace the old qualified class name in all classes.

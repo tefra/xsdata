@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from xsdata.codegen.container import ClassContainer
+from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.models import Attr, Class, Extension, get_tag
 from xsdata.codegen.utils import ClassUtils
 from xsdata.logger import logger
@@ -18,7 +18,7 @@ class ClassValidator:
 
     __slots__ = "container"
 
-    def __init__(self, container: ClassContainer):
+    def __init__(self, container: ContainerInterface):
         self.container = container
 
     def process(self):

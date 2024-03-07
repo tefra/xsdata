@@ -19,6 +19,7 @@ from .unnest_inner_classes import UnnestInnerClasses
 from .update_attributes_effective_choice import UpdateAttributesEffectiveChoice
 from .vacuum_inner_classes import VacuumInnerClasses
 from .validate_attributes_overrides import ValidateAttributesOverrides
+from .validate_references import ValidateReferences
 
 __all__ = [
     "AddAttributeSubstitutions",
@@ -42,4 +43,5 @@ __all__ = [
     "UpdateAttributesEffectiveChoice",
     "VacuumInnerClasses",
     "ValidateAttributesOverrides",
+    "ValidateReferences",
 ]

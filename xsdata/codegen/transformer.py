@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import Callable, Dict, List, NamedTuple, Optional, Tuple
 
 from xsdata.codegen import opener
-from xsdata.codegen.analyzer import ClassAnalyzer
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.mappers import (
     DefinitionsMapper,
@@ -404,8 +403,8 @@ class ResourceTransformer:
         """Analyzer the given class list and return the final list of classes."""
         container = ClassContainer(config=self.config)
         container.extend(classes)
-
-        return ClassAnalyzer.process(container)
+        container.process()
+        return list(container)
 
     def count_classes(self, classes: List[Class]) -> Tuple[int, int]:
         """Return a tuple of counters for the main and inner classes.

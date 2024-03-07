@@ -22,10 +22,12 @@ from xsdata.codegen.handlers import (
     UpdateAttributesEffectiveChoice,
     VacuumInnerClasses,
     ValidateAttributesOverrides,
+    ValidateReferences,
 )
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.models import Class, Status
 from xsdata.codegen.utils import ClassUtils
+from xsdata.codegen.validator import ClassValidator
 from xsdata.models.config import GeneratorConfig
 from xsdata.utils import collections
 from xsdata.utils.constants import return_true
@@ -49,10 +51,11 @@ class ClassContainer(ContainerInterface):
 
     Attributes:
         processors: A step-processors mapping
+        data: The class qname map
         step: The current process step
     """
 
-    __slots__ = ("data", "processors", "step")
+    __slots__ = ("processors", "step")
 
     def __init__(self, config: GeneratorConfig):
         """Initialize the container and all the class processors.
@@ -64,10 +67,7 @@ class ClassContainer(ContainerInterface):
             config: The generator configuration instance
         """
         super().__init__(config)
-
         self.step: int = 0
-        self.data: Dict = {}
-
         self.processors: Dict[int, List] = {
             Steps.UNGROUP: [
                 FlattenAttributeGroups(self),
@@ -176,6 +176,7 @@ class ClassContainer(ContainerInterface):
             5. Create compound fields, cleanup classes and atts
             7. Designate final class names, packages and modules
         """
+        self.validate_classes()
         self.process_classes(Steps.UNGROUP)
         self.remove_groups()
         self.process_classes(Steps.FLATTEN)
@@ -184,6 +185,10 @@ class ClassContainer(ContainerInterface):
         self.process_classes(Steps.RESOLVE)
         self.process_classes(Steps.FINALIZE)
         self.designate_classes()
+
+    def validate_classes(self):
+        """Merge redefined classes."""
+        ClassValidator(self).process()
 
     def process_classes(self, step: int):
         """Run the given step processors for all classes.
@@ -219,6 +224,7 @@ class ClassContainer(ContainerInterface):
         """Designate the final class names, packages and modules."""
         designators = [
             RenameDuplicateClasses(self),
+            ValidateReferences(self),
             DesignateClassPackages(self),
         ]
 

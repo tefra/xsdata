@@ -1,6 +1,6 @@
 import abc
 from abc import ABCMeta
-from typing import Callable, Iterator, List, Optional
+from typing import Callable, Dict, Iterator, List, Optional
 
 from xsdata.codegen.models import Attr, Class
 from xsdata.models.config import GeneratorConfig
@@ -14,10 +14,11 @@ class ContainerInterface(abc.ABC):
         config: The generator configuration instance
     """
 
-    __slots__ = ("config",)
+    __slots__ = ("config", "data")
 
     def __init__(self, config: GeneratorConfig):
         self.config = config
+        self.data: Dict[str, List[Class]] = {}
 
     @abc.abstractmethod
     def __iter__(self) -> Iterator[Class]:

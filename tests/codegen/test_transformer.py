@@ -3,7 +3,6 @@ import tempfile
 from pathlib import Path
 from unittest import mock
 
-from xsdata.codegen.analyzer import ClassAnalyzer
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.mappers import (
     DefinitionsMapper,
@@ -470,19 +469,13 @@ class ResourceTransformerTests(FactoryTestCase):
 
         self.assertEqual((2, 16), self.transformer.count_classes(classes))
 
-    @mock.patch.object(ClassAnalyzer, "process")
+    @mock.patch.object(ClassContainer, "process")
     def test_analyze_classes(self, mock_process):
         classes = ClassFactory.list(2)
-        mock_process.return_value = classes[1:]
 
         result = self.transformer.analyze_classes(classes)
-        self.assertEqual(1, len(result))
-
-        actual = mock_process.call_args[0][0]
-
-        self.assertIsInstance(actual, ClassContainer)
-        self.assertEqual(2, len(actual.data))
-        self.assertEqual(self.transformer.config, actual.config)
+        self.assertEqual(2, len(result))
+        mock_process.assert_called_once()
 
     def test_get_cache_file(self):
         uris = ["a.xml", "b.json"]

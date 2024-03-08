@@ -1,3 +1,6 @@
+from typing import Any
+
+
 class CodeGenerationError(TypeError):
     """Unexpected state during code generation related errors."""
 
@@ -48,6 +51,10 @@ class DefinitionsValueError(ValueError):
 
 class AnalyzerValueError(ValueError):
     """Unhandled behaviour during class analyze process."""
+
+    def __init__(self, message: str, **kwargs: Any):
+        super().__init__(message)
+        self.meta = kwargs
 
 
 class ResolverValueError(ValueError):

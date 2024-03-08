@@ -667,18 +667,47 @@ class Class(CodegenModel):
         Args:
             allow_circular: Allow circular references
         """
-        types = {ext.type for ext in self.extensions}
-
-        for attr in self.attrs:
-            types.update(attr.types)
-            types.update(tp for choice in attr.choices for tp in choice.types)
-
-        for tp in types:
-            if tp.is_dependency(allow_circular):
+        for tp in set(self.types()):
+            if tp.is_dependency(allow_circular=allow_circular):
                 yield tp.qname
 
+    def types(self) -> Iterator[AttrType]:
+        """Yields all class types."""
+        for ext in self.extensions:
+            yield ext.type
+
+        for attr in self.attrs:
+            yield from attr.types
+
+            for choice in attr.choices:
+                yield from choice.types
+
         for inner in self.inner:
-            yield from inner.dependencies(allow_circular)
+            yield from inner.types()
+
+    def children(self) -> Iterator[CodegenModel]:
+        """Yield all codegen children."""
+        for attr in self.attrs:
+            yield attr
+            yield attr.restrictions
+
+            for tp in attr.types:
+                yield tp
+
+            for choice in attr.choices:
+                yield choice
+                yield choice.restrictions
+
+                for tp in choice.types:
+                    yield tp
+
+        for ext in self.extensions:
+            yield ext
+            yield ext.type
+            yield ext.restrictions
+
+        for inner in self.inner:
+            yield from inner.children()
 
     def has_forward_ref(self) -> bool:
         """Return whether this class has any forward references."""

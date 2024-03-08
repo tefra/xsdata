@@ -1,7 +1,7 @@
-from typing import Dict, Optional, Set, Tuple
+from typing import Dict, Optional
 
 from xsdata.codegen.mixins import ContainerInterface, RelativeHandlerInterface
-from xsdata.codegen.models import Attr, AttrType, Class, Status
+from xsdata.codegen.models import Attr, AttrType, Class
 from xsdata.codegen.utils import ClassUtils
 from xsdata.logger import logger
 from xsdata.models.enums import DataType, Tag
@@ -204,7 +204,8 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
         else:
             if source.nillable:
                 attr.restrictions.nillable = True
-            self.set_circular_flag(source, target, attr_type)
+
+            attr_type.reference = id(source)
             self.detect_lazy_namespace(source, target, attr)
 
     @classmethod
@@ -254,58 +255,6 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
         attr.help = attr.help or source_attr.help
         attr.fixed = attr.fixed or source_attr.fixed
         attr.default = attr.default or source_attr.default
-
-    def set_circular_flag(self, source: Class, target: Class, attr_type: AttrType):
-        """Detect circular references and set the type flag.
-
-        Args:
-            source: The source class instance
-            target: The target class instance
-            attr_type: The attr type instance
-        """
-        attr_type.reference = id(source)
-        attr_type.circular = self.is_circular_dependency(source, target, set())
-
-        if attr_type.circular:
-            logger.debug("Possible circular reference %s, %s", target.name, source.name)
-
-    def is_circular_dependency(self, source: Class, target: Class, seen: Set) -> bool:
-        """Check if any source dependencies recursively match the target class.
-
-        Args:
-            source: The source class instance
-            target: The target class instance
-            seen: A set of qualified names, to guard against recursive runs
-
-        Returns:
-            The bool result
-        """
-        if source is target or source.status == Status.FLATTENING:
-            return True
-
-        for qname in self.cached_dependencies(source):
-            if qname not in seen:
-                seen.add(qname)
-                check = self.container.find(qname)
-                if check and self.is_circular_dependency(check, target, seen):
-                    return True
-
-        return False
-
-    def cached_dependencies(self, source: Class) -> Tuple[str]:
-        """Returns from cache the source class dependencies.
-
-        Args:
-            source: The source class instance
-
-        Returns:
-            A tuple containing the qualified names of the class dependencies.
-        """
-        cache_key = id(source)
-        if cache_key not in self.dependencies:
-            self.dependencies[cache_key] = tuple(source.dependencies())
-
-        return self.dependencies[cache_key]
 
     @classmethod
     def reset_attribute_type(cls, attr_type: AttrType, use_str: bool = True):

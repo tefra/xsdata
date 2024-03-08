@@ -5,6 +5,7 @@ from xsdata.codegen.handlers import (
     CalculateAttributePaths,
     CreateCompoundFields,
     DesignateClassPackages,
+    DetectCircularReferences,
     DisambiguateChoices,
     FilterClasses,
     FlattenAttributeGroups,
@@ -40,7 +41,8 @@ class Steps:
     FLATTEN = 20
     SANITIZE = 30
     RESOLVE = 40
-    FINALIZE = 50
+    CLEANUP = 50
+    FINALIZE = 60
 
 
 class ClassContainer(ContainerInterface):
@@ -91,8 +93,11 @@ class ClassContainer(ContainerInterface):
             Steps.RESOLVE: [
                 ValidateAttributesOverrides(self),
             ],
-            Steps.FINALIZE: [
+            Steps.CLEANUP: [
                 VacuumInnerClasses(),
+            ],
+            Steps.FINALIZE: [
+                DetectCircularReferences(self),
                 CreateCompoundFields(self),
                 DisambiguateChoices(self),
                 ResetAttributeSequenceNumbers(self),
@@ -165,17 +170,7 @@ class ClassContainer(ContainerInterface):
         return classes[0]
 
     def process(self):
-        """Run the processor and filter steps.
-
-        Steps:
-            1. Ungroup xs:groups and xs:attributeGroups
-            2. Remove the group classes from the container
-            3. Flatten extensions, attrs and attr types
-            4. Remove the classes that won't be generated
-            5. Resolve attrs overrides
-            5. Create compound fields, cleanup classes and atts
-            7. Designate final class names, packages and modules
-        """
+        """Run the processor and filter steps."""
         self.validate_classes()
         self.process_classes(Steps.UNGROUP)
         self.remove_groups()
@@ -183,6 +178,7 @@ class ClassContainer(ContainerInterface):
         self.filter_classes()
         self.process_classes(Steps.SANITIZE)
         self.process_classes(Steps.RESOLVE)
+        self.process_classes(Steps.CLEANUP)
         self.process_classes(Steps.FINALIZE)
         self.designate_classes()
 

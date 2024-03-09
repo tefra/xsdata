@@ -474,8 +474,10 @@ class Status(IntEnum):
     SANITIZED = 31
     RESOLVING = 40
     RESOLVED = 41
-    FINALIZING = 50
-    FINALIZED = 51
+    CLEANING = 50
+    CLEANED = 51
+    FINALIZING = 60
+    FINALIZED = 61
 
 
 @dataclass
@@ -606,25 +608,9 @@ class Class(CodegenModel):
     @property
     def references(self) -> Iterator[int]:
         """Yield all class object reference numbers."""
-
-        def all_refs():
-            for ext in self.extensions:
-                yield ext.type.reference
-
-            for attr in self.attrs:
-                for tp in attr.types:
-                    yield tp.reference
-
-                for choice in attr.choices:
-                    for ctp in choice.types:
-                        yield ctp.reference
-
-            for inner in self.inner:
-                yield from inner.references
-
-        for ref in all_refs():
-            if ref:
-                yield ref
+        for tp in self.types():
+            if tp.reference:
+                yield tp.reference
 
     @property
     def target_module(self) -> str:

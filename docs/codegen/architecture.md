@@ -57,8 +57,6 @@ graph LR
     B --> C[Validate class references]
 ```
 
-API: [xsdata.codegen.analyzer.ClassAnalyzer][]
-
 ### Validate Classes
 
 - Remove types with unknown references
@@ -135,9 +133,13 @@ pass through each step before next one starts. The order of the steps is very im
 
 - [ValidateAttributesOverrides][xsdata.codegen.handlers.ValidateAttributesOverrides]
 
-### Step: Finalize
+### Step: Vacuum
 
 - [VacuumInnerClasses][xsdata.codegen.handlers.VacuumInnerClasses]
+
+### Step: Finalize
+
+- [DetectCircularReferences][xsdata.codegen.handlers.DetectCircularReferences]
 - [CreateCompoundFields][xsdata.codegen.handlers.CreateCompoundFields]
 - [DisambiguateChoices][xsdata.codegen.handlers.DisambiguateChoices]
 - [ResetAttributeSequenceNumbers][xsdata.codegen.handlers.ResetAttributeSequenceNumbers]
@@ -145,4 +147,5 @@ pass through each step before next one starts. The order of the steps is very im
 ### Step: Designate
 
 - [RenameDuplicateClasses][xsdata.codegen.handlers.RenameDuplicateClasses]
+- [ValidateReferences][xsdata.codegen.handlers.ValidateReferences]
 - [DesignateClassPackages][xsdata.codegen.handlers.DesignateClassPackages]

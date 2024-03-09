@@ -2,7 +2,7 @@ from unittest import mock
 
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import ProcessAttributeTypes
-from xsdata.codegen.models import Class, Restrictions, Status
+from xsdata.codegen.models import Restrictions, Status
 from xsdata.codegen.utils import ClassUtils
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import DataType, Tag
@@ -180,11 +180,8 @@ class ProcessAttributeTypesTests(FactoryTestCase):
         self.assertIsNone(attr.restrictions.min_length)
         self.assertIsNone(attr.restrictions.max_length)
 
-    @mock.patch.object(ProcessAttributeTypes, "set_circular_flag")
     @mock.patch.object(ProcessAttributeTypes, "find_dependency")
-    def test_process_dependency_type_with_complex_type(
-        self, mock_find_dependency, mock_set_circular_flag
-    ):
+    def test_process_dependency_type_with_complex_type(self, mock_find_dependency):
         complex_type = ClassFactory.elements(1)
         mock_find_dependency.return_value = complex_type
 
@@ -193,13 +190,13 @@ class ProcessAttributeTypesTests(FactoryTestCase):
         attr_type = attr.types[0]
 
         self.processor.process_dependency_type(target, attr, attr_type)
-        mock_set_circular_flag.assert_called_once_with(complex_type, target, attr_type)
 
         self.assertFalse(attr.restrictions.nillable)
 
         complex_type.nillable = True
         self.processor.process_dependency_type(target, attr, attr_type)
         self.assertTrue(attr.restrictions.nillable)
+        self.assertEqual(complex_type.ref, attr_type.reference)
 
     @mock.patch.object(ProcessAttributeTypes, "find_dependency")
     def test_process_dependency_type_with_abstract_type_type(
@@ -328,63 +325,6 @@ class ProcessAttributeTypesTests(FactoryTestCase):
         self.assertEqual("foo", attr.default)
         self.assertTrue("foo", attr.fixed)
 
-    @mock.patch.object(ProcessAttributeTypes, "is_circular_dependency")
-    def test_set_circular_flag(self, mock_is_circular_dependency):
-        source = ClassFactory.create()
-        target = ClassFactory.create()
-        attr = AttrFactory.create()
-        attr_type = attr.types[0]
-
-        mock_is_circular_dependency.return_value = True
-
-        self.processor.set_circular_flag(source, target, attr_type)
-        self.assertTrue(attr_type.circular)
-        self.assertEqual(id(source), attr_type.reference)
-
-        mock_is_circular_dependency.assert_called_once_with(source, target, set())
-
-    @mock.patch.object(ClassContainer, "find")
-    @mock.patch.object(Class, "dependencies")
-    def test_is_circular_dependency(self, mock_dependencies, mock_container_find):
-        source = ClassFactory.create()
-        target = ClassFactory.create()
-        another = ClassFactory.create()
-        processing = ClassFactory.create(status=Status.FLATTENING)
-
-        find_classes = {"a": another, "b": target}
-
-        mock_container_find.side_effect = lambda x: find_classes.get(x)
-        mock_dependencies.side_effect = [
-            list("ccde"),
-            list("abc"),
-            list("xy"),
-        ]
-
-        self.assertTrue(
-            self.processor.is_circular_dependency(processing, target, set())
-        )
-
-        self.processor.dependencies.clear()
-        self.assertFalse(self.processor.is_circular_dependency(source, target, set()))
-
-        self.processor.dependencies.clear()
-        self.assertTrue(self.processor.is_circular_dependency(source, target, set()))
-
-        self.processor.dependencies.clear()
-        self.assertTrue(self.processor.is_circular_dependency(source, source, set()))
-
-        mock_container_find.assert_has_calls(
-            [
-                mock.call("c"),
-                mock.call("d"),
-                mock.call("e"),
-                mock.call("a"),
-                mock.call("x"),
-                mock.call("y"),
-                mock.call("b"),
-            ]
-        )
-
     def test_find_dependency(self):
         attr_type = AttrTypeFactory.create(qname="a")
 
@@ -412,21 +352,6 @@ class ProcessAttributeTypesTests(FactoryTestCase):
 
         actual = self.processor.find_dependency(attr_type, Tag.EXTENSION)
         self.assertEqual(simple_type, actual)
-
-    @mock.patch.object(Class, "dependencies")
-    def test_cached_dependencies(self, mock_class_dependencies):
-        mock_class_dependencies.return_value = ["a", "b"]
-
-        source = ClassFactory.create()
-        self.processor.dependencies[id(source)] = ("a",)
-
-        actual = self.processor.cached_dependencies(source)
-        self.assertEqual(("a",), actual)
-
-        self.processor.dependencies.clear()
-        actual = self.processor.cached_dependencies(source)
-        self.assertEqual(("a", "b"), actual)
-        mock_class_dependencies.assert_called_once_with()
 
     def test_update_restrictions(self):
         attr = AttrFactory.native(DataType.NMTOKENS)

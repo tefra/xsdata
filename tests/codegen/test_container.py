@@ -53,8 +53,9 @@ class ClassContainerTests(FactoryTestCase):
                 "SanitizeAttributesDefaultValue",
             ],
             40: ["ValidateAttributesOverrides"],
-            50: [
-                "VacuumInnerClasses",
+            50: ["VacuumInnerClasses"],
+            60: [
+                "DetectCircularReferences",
                 "CreateCompoundFields",
                 "DisambiguateChoices",
                 "ResetAttributeSequenceNumbers",

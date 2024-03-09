@@ -2,6 +2,7 @@ from .add_attribute_substitutions import AddAttributeSubstitutions
 from .calculate_attribute_paths import CalculateAttributePaths
 from .create_compound_fields import CreateCompoundFields
 from .designate_class_packages import DesignateClassPackages
+from .detect_circular_references import DetectCircularReferences
 from .disambiguate_choices import DisambiguateChoices
 from .filter_classes import FilterClasses
 from .flatten_attribute_groups import FlattenAttributeGroups
@@ -26,6 +27,7 @@ __all__ = [
     "CalculateAttributePaths",
     "CreateCompoundFields",
     "DesignateClassPackages",
+    "DetectCircularReferences",
     "DisambiguateChoices",
     "FilterClasses",
     "FlattenAttributeGroups",
@@ -35,8 +37,8 @@ __all__ = [
     "ProcessMixedContentClass",
     "RenameDuplicateAttributes",
     "RenameDuplicateClasses",
-    "ResetAttributeSequences",
     "ResetAttributeSequenceNumbers",
+    "ResetAttributeSequences",
     "SanitizeAttributesDefaultValue",
     "SanitizeEnumerationClass",
     "UnnestInnerClasses",

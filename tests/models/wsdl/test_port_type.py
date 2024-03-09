@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from xsdata.exceptions import DefinitionsValueError
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.models.wsdl import PortType, PortTypeOperation
 
 
@@ -11,7 +11,5 @@ class PortTypeTests(TestCase):
 
         self.assertEqual(res, obj.find_operation("foo"))
 
-        with self.assertRaises(DefinitionsValueError) as cm:
+        with self.assertRaises(CodegenError):
             obj.find_operation("nope")
-
-        self.assertEqual("Unknown PortTypeOperation name: nope", str(cm.exception))

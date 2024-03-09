@@ -1,7 +1,7 @@
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.mixins import RelativeHandlerInterface
 from xsdata.codegen.models import Attr, Class
 from xsdata.codegen.utils import ClassUtils
-from xsdata.exceptions import AnalyzerValueError
 
 
 class FlattenAttributeGroups(RelativeHandlerInterface):
@@ -46,7 +46,7 @@ class FlattenAttributeGroups(RelativeHandlerInterface):
         source = self.container.find(qname, condition=lambda x: x.tag == attr.tag)
 
         if not source:
-            raise AnalyzerValueError(f"Group attribute not found: `{qname}`")
+            raise CodegenError("Unknown group reference", tag=attr.tag, qname=qname)
 
         if source is target:
             ClassUtils.remove_attribute(target, attr)

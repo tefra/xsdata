@@ -5,7 +5,8 @@ from pathlib import Path
 from unittest import TestCase
 
 from xsdata import __version__
-from xsdata.exceptions import GeneratorConfigError, ParserError
+from xsdata.codegen.exceptions import CodegenError
+from xsdata.exceptions import ParserError
 from xsdata.models.config import (
     ExtensionType,
     GeneratorConfig,
@@ -127,11 +128,11 @@ class GeneratorConfigTests(TestCase):
         with self.assertRaises(ParserError):
             GeneratorConfig.read(file_path)
 
-    def test_format_with_invalid_state(self):
-        with self.assertRaises(GeneratorConfigError) as cm:
+    def test_format_with_invalid_eq_config(self):
+        with warnings.catch_warnings(record=True) as w:
             OutputFormat(eq=False, order=True)
 
-        self.assertEqual("eq must be true if order is true", str(cm.exception))
+        self.assertEqual("Enabling eq because order is true", str(w[-1].message))
 
     def test_subscriptable_types_requires_390(self):
         if sys.version_info < (3, 9):
@@ -200,15 +201,11 @@ class GeneratorConfigTests(TestCase):
     def test_extension_with_invalid_import_string(self):
         cases = [None, "", "bar"]
         for case in cases:
-            with self.assertRaises(GeneratorConfigError) as cm:
+            with self.assertRaises(CodegenError):
                 GeneratorExtension(type=ExtensionType.DECORATOR, import_string=case)
 
-            self.assertEqual(f"Invalid extension import '{case}'", str(cm.exception))
-
     def test_extension_with_invalid_class_name_pattern(self):
-        with self.assertRaises(GeneratorConfigError) as cm:
+        with self.assertRaises(CodegenError):
             GeneratorExtension(
                 type=ExtensionType.DECORATOR, import_string="a.b", class_name="*Foo"
             )
-
-        self.assertEqual("Failed to compile pattern '*Foo'", str(cm.exception))

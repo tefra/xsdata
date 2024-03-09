@@ -3,8 +3,8 @@ from typing import Iterator, List
 from unittest import mock
 
 from xsdata import __version__
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.models import Class
-from xsdata.exceptions import CodeGenerationError
 from xsdata.formats.mixins import AbstractGenerator, GeneratorResult
 from xsdata.models.config import GeneratorConfig
 from xsdata.utils.testing import ClassFactory, FactoryTestCase
@@ -45,12 +45,8 @@ class AbstractGeneratorTests(FactoryTestCase):
         self.assertEqual("mod", classes[1].module)
         self.assertEqual("mod", classes[2].module)
 
-        with self.assertRaises(CodeGenerationError) as cm:
+        with self.assertRaises(CodegenError):
             self.generator.normalize_packages(ClassFactory.list(1))
-
-        self.assertEqual(
-            "Class `class_B` has not been assigned to a package", str(cm.exception)
-        )
 
     @mock.patch("datetime.datetime", wraps=datetime.datetime)
     def test_render_header(self, mock_datetime):

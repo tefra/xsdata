@@ -4,7 +4,7 @@ from dataclasses import asdict, dataclass, field, replace
 from enum import IntEnum
 from typing import Any, Dict, Iterator, List, Optional, Tuple, Type
 
-from xsdata.exceptions import CodeGenerationError
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.models.enums import DataType, Namespace, Tag
@@ -626,8 +626,8 @@ class Class(CodegenModel):
         if self.module:
             return self.module
 
-        raise CodeGenerationError(
-            f"Class `{self.name}` has not been assigned to a module yet!"
+        raise CodegenError(
+            "Type has not been assigned to a module yet!", type=self.qname
         )
 
     def clone(self) -> "Class":

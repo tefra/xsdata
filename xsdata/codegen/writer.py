@@ -1,7 +1,7 @@
 from typing import ClassVar, Dict, List, Type
 
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.models import Class
-from xsdata.exceptions import CodeGenerationError
 from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.formats.mixins import AbstractGenerator
 from xsdata.logger import logger
@@ -73,8 +73,8 @@ class CodeWriter:
             A new code writer instance.
         """
         if config.output.format.value not in cls.generators:
-            raise CodeGenerationError(
-                f"Unknown output format: '{config.output.format.value}'"
+            raise CodegenError(
+                "Unknown output format", format=config.output.format.value
             )
 
         generator_class = cls.generators[config.output.format.value]

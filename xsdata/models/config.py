@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Pattern, TextIO
 
 from xsdata import __version__
-from xsdata.exceptions import CodeGenerationWarning, GeneratorConfigError
+from xsdata.codegen.exceptions import CodegenError, CodegenWarning
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers import XmlParser
 from xsdata.formats.dataclass.parsers.config import ParserConfig
@@ -164,21 +164,25 @@ class OutputFormat:
     def validate(self):
         """Validate and reset configuration conflicts."""
         if self.order and not self.eq:
-            raise GeneratorConfigError("eq must be true if order is true")
+            self.eq = True
+            warnings.warn(
+                "Enabling eq because order is true",
+                CodegenWarning,
+            )
 
         if self.value == "dataclasses" and sys.version_info < (3, 10):
             if self.slots:
                 self.slots = False
                 warnings.warn(
                     "slots requires python >= 3.10, reverting...",
-                    CodeGenerationWarning,
+                    CodegenWarning,
                 )
 
             if self.kw_only:
                 self.kw_only = False
                 warnings.warn(
                     "kw_only requires python >= 3.10, reverting...",
-                    CodeGenerationWarning,
+                    CodegenWarning,
                 )
 
 
@@ -253,21 +257,21 @@ class GeneratorOutput:
             self.subscriptable_types = False
             warnings.warn(
                 "Generics PEP 585 requires python >= 3.9, reverting...",
-                CodeGenerationWarning,
+                CodegenWarning,
             )
 
         if self.union_type and sys.version_info < (3, 10):
             self.union_type = False
             warnings.warn(
                 "UnionType PEP 604 requires python >= 3.10, reverting...",
-                CodeGenerationWarning,
+                CodegenWarning,
             )
 
         if self.union_type and not self.postponed_annotations:
             self.postponed_annotations = True
             warnings.warn(
                 "Enabling postponed annotations, because `union_type==True`",
-                CodeGenerationWarning,
+                CodegenWarning,
             )
 
     def update(self, **kwargs: Any):
@@ -428,14 +432,16 @@ class GeneratorExtension:
         try:
             self.module_path, self.func_name = self.import_string.rsplit(".", 1)
         except (ValueError, AttributeError):
-            raise GeneratorConfigError(
-                f"Invalid extension import '{self.import_string}'"
+            raise CodegenError(
+                "Invalid extension import string", value=self.import_string
             )
 
         try:
             self.pattern = re.compile(self.class_name)
         except re.error:
-            raise GeneratorConfigError(f"Failed to compile pattern '{self.class_name}'")
+            raise CodegenError(
+                "Failed to compile extension pattern", pattern=self.class_name
+            )
 
 
 @dataclass

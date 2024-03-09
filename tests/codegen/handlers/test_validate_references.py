@@ -1,6 +1,6 @@
 from xsdata.codegen.container import ClassContainer
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.handlers import ValidateReferences
-from xsdata.exceptions import AnalyzerValueError
 from xsdata.models.config import (
     GeneratorConfig,
 )
@@ -25,10 +25,8 @@ class ValidateReferencesTests(FactoryTestCase):
         second = first.clone()
         self.container.extend([first, second])
 
-        with self.assertRaises(AnalyzerValueError) as cm:
+        with self.assertRaises(CodegenError):
             self.handler.run()
-
-        self.assertEqual("Duplicate types found", str(cm.exception))
 
     def test_validate_unique_instances(self):
         first = ClassFactory.create()
@@ -37,10 +35,8 @@ class ValidateReferencesTests(FactoryTestCase):
         second.extensions = first.extensions
         self.container.extend([first, second])
 
-        with self.assertRaises(AnalyzerValueError) as cm:
+        with self.assertRaises(CodegenError):
             self.handler.run()
-
-        self.assertEqual("Cross reference detected", str(cm.exception))
 
     def test_validate_unresolved_references(self):
         first = ClassFactory.create()
@@ -48,10 +44,8 @@ class ValidateReferencesTests(FactoryTestCase):
         first.attrs.append(AttrFactory.reference("foo"))
         self.container.add(first)
 
-        with self.assertRaises(AnalyzerValueError) as cm:
+        with self.assertRaises(CodegenError):
             self.handler.run()
-
-        self.assertEqual("Unresolved reference detected", str(cm.exception))
 
     def test_validate_misrepresented_references(self):
         first = ClassFactory.create()
@@ -64,7 +58,5 @@ class ValidateReferencesTests(FactoryTestCase):
         )
         self.container.add(first)
 
-        with self.assertRaises(AnalyzerValueError) as cm:
+        with self.assertRaises(CodegenError):
             self.handler.run()
-
-        self.assertEqual("Misrepresented reference", str(cm.exception))

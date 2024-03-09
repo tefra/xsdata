@@ -1,8 +1,8 @@
 from unittest import mock
 
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.models import Class
 from xsdata.codegen.resolver import DependenciesResolver
-from xsdata.exceptions import ResolverValueError
 from xsdata.models.enums import DataType
 from xsdata.utils.namespaces import build_qname
 from xsdata.utils.testing import (
@@ -194,7 +194,7 @@ class DependenciesResolverTest(FactoryTestCase):
         self.resolver.registry[class_a.qname] = "foo.bar"
 
         self.assertEqual("foo.bar", self.resolver.get_class_module(class_a.qname))
-        with self.assertRaises(ResolverValueError):
+        with self.assertRaises(CodegenError):
             self.resolver.get_class_module("nope")
 
     def test_import_classes(self):
@@ -209,10 +209,8 @@ class DependenciesResolverTest(FactoryTestCase):
 
     def test_create_class_map_for_duplicate_classes(self):
         classes = ClassFactory.list(2, qname="a")
-        with self.assertRaises(ResolverValueError) as cm:
+        with self.assertRaises(CodegenError):
             self.resolver.create_class_map(classes)
-
-        self.assertEqual("Duplicate class: `a`", str(cm.exception))
 
     @mock.patch.object(Class, "dependencies")
     def test_create_class_list(self, mock_dependencies):

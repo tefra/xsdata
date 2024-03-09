@@ -4,8 +4,8 @@ from typing import Dict, List
 
 from toposort import toposort_flatten
 
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.models import Class, Import, get_slug
-from xsdata.exceptions import ResolverValueError
 from xsdata.utils import collections
 
 logger = logging.getLogger(__name__)
@@ -136,10 +136,10 @@ class DependenciesResolver:
             qname: The namespace qualified name of the class
 
         Raises:
-            ResolverValueError: if name doesn't exist.
+            CodeGenerationError: if name doesn't exist.
         """
         if qname not in self.registry:
-            raise ResolverValueError(f"Unknown dependency: {qname}")
+            raise CodegenError("Failed to resolve dependency", qname=qname)
         return self.registry[qname]
 
     def import_classes(self) -> List[str]:
@@ -156,7 +156,7 @@ class DependenciesResolver:
         """Index the list of classes by their qualified names.
 
         Raises:
-            ResolverValueError: If two classes have the same qname.
+            CodeGenerationError: If two classes have the same qname.
 
         Returns:
             A qname-class map.
@@ -164,7 +164,7 @@ class DependenciesResolver:
         result: Dict[str, Class] = {}
         for obj in classes:
             if obj.qname in result:
-                raise ResolverValueError(f"Duplicate class: `{obj.name}`")
+                raise CodegenError("Duplicate class during resolve", qname=obj.qname)
             result[obj.qname] = obj
 
         return result

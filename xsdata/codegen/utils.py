@@ -1,6 +1,7 @@
 import sys
 from typing import Iterator, List, Optional, Set
 
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.models import (
     Attr,
     AttrType,
@@ -11,7 +12,6 @@ from xsdata.codegen.models import (
     get_qname,
     get_slug,
 )
-from xsdata.exceptions import CodeGenerationError
 from xsdata.models.enums import DataType
 from xsdata.utils import collections, namespaces, text
 
@@ -36,7 +36,7 @@ class ClassUtils:
             if not attr.xml_type:
                 return attr
 
-        raise CodeGenerationError(f"Class has no value attr {source.qname}")
+        raise CodegenError("Class has no value attr", type=source.qname)
 
     @classmethod
     def remove_attribute(cls, target: Class, attr: Attr):
@@ -225,7 +225,7 @@ class ClassUtils:
             if inner.qname == qname:
                 return inner
 
-        raise CodeGenerationError(f"Missing inner class {source.qname}.{qname}")
+        raise CodegenError("Missing inner class", parent=source, qname=qname)
 
     @classmethod
     def find_attr(cls, source: Class, name: str) -> Optional[Attr]:

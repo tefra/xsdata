@@ -8,8 +8,11 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Callable, Dict, List, NamedTuple, Optional, Tuple
 
+from toposort import CircularDependencyError
+
 from xsdata.codegen import opener
 from xsdata.codegen.container import ClassContainer
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.mappers import (
     DefinitionsMapper,
     DictMapper,
@@ -23,7 +26,6 @@ from xsdata.codegen.parsers.definitions import DefinitionsParser
 from xsdata.codegen.parsers.schema import SchemaParser
 from xsdata.codegen.utils import ClassUtils
 from xsdata.codegen.writer import CodeWriter
-from xsdata.exceptions import CodeGenerationError
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.parsers import TreeParser
 from xsdata.logger import logger
@@ -132,7 +134,13 @@ class ResourceTransformer:
         if cache_file and not cache_file.exists():
             cache_file.write_bytes(pickle.dumps(self.classes))
 
-        self.process_classes()
+        try:
+            self.process_classes()
+        except CircularDependencyError:
+            raise CodegenError(
+                "Circular Dependencies Found",
+                help="Try a different structure style and enabling unnest classes.",
+            )
 
     def process_sources(self, uris: List[str]):
         """Process a list of resolved URI strings.
@@ -274,8 +282,6 @@ class ResourceTransformer:
                 writer.print(classes)
             else:
                 writer.write(classes)
-        else:
-            raise CodeGenerationError("Nothing to generate.")
 
     def convert_schema(self, schema: Schema):
         """Convert a schema instance to codegen classes.

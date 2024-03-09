@@ -4,8 +4,8 @@ from pathlib import Path
 from typing import Dict, Iterator, List, NamedTuple
 
 from xsdata import __version__
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.models import Class
-from xsdata.exceptions import CodeGenerationError
 from xsdata.models.config import GeneratorConfig
 from xsdata.utils.collections import group_by
 from xsdata.utils.package import module_path, package_path
@@ -86,7 +86,7 @@ class AbstractGenerator(abc.ABC):
         packages = {}
         for obj in classes:
             if obj.package is None or obj.module is None:
-                raise CodeGenerationError(
+                raise CodegenError(
                     f"Class `{obj.name}` has not been assigned to a package"
                 )
 

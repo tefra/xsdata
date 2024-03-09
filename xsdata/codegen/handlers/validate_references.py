@@ -1,8 +1,8 @@
 from typing import Set
 
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.mixins import ContainerHandlerInterface
 from xsdata.codegen.models import Class, get_qname
-from xsdata.exceptions import AnalyzerValueError
 from xsdata.utils import collections
 
 
@@ -31,7 +31,7 @@ class ValidateReferences(ContainerHandlerInterface):
                 duplicate_types.append(qname)
 
         if duplicate_types:
-            raise AnalyzerValueError("Duplicate types found", qnames=duplicate_types)
+            raise CodegenError("Duplicate types found", qnames=duplicate_types)
 
     def validate_unique_instances(self):
         """Validate all codegen instances are unique."""
@@ -39,7 +39,7 @@ class ValidateReferences(ContainerHandlerInterface):
         for item in self.container:
             item_references = {id(child) for child in item.children()}
             if item_references.intersection(references):
-                raise AnalyzerValueError("Cross reference detected", Class=item)
+                raise CodegenError("Cross reference detected", type=item.qname)
 
             references.update(item_references)
 
@@ -63,11 +63,11 @@ class ValidateReferences(ContainerHandlerInterface):
                     continue
 
                 if tp.reference not in references:
-                    raise AnalyzerValueError(
-                        "Unresolved reference detected", Class=item, AttrType=tp
+                    raise CodegenError(
+                        "Unresolved reference detected", cls=item.qname, type=tp.qname
                     )
 
                 if tp.qname != references[tp.reference]:
-                    raise AnalyzerValueError(
-                        "Misrepresented reference", Class=item, AttrType=tp
+                    raise CodegenError(
+                        "Misrepresented reference", cls=item.qname, type=tp.qname
                     )

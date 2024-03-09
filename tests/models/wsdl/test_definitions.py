@@ -2,7 +2,7 @@ import copy
 from typing import Generator
 from unittest import TestCase
 
-from xsdata.exceptions import DefinitionsValueError
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.models.wsdl import Binding, Definitions, Message, PortType, Service, Types
 from xsdata.models.xsd import Schema
@@ -29,10 +29,8 @@ class DefinitionsTests(TestCase):
 
         self.assertEqual(res, obj.find_binding("foo"))
 
-        with self.assertRaises(DefinitionsValueError) as cm:
+        with self.assertRaises(CodegenError):
             obj.find_binding("nope")
-
-        self.assertEqual("Unknown Binding name: nope", str(cm.exception))
 
     def test_find_message(self):
         res = Message(name="foo")
@@ -40,10 +38,8 @@ class DefinitionsTests(TestCase):
 
         self.assertEqual(res, obj.find_message("foo"))
 
-        with self.assertRaises(DefinitionsValueError) as cm:
+        with self.assertRaises(CodegenError):
             obj.find_message("nope")
-
-        self.assertEqual("Unknown Message name: nope", str(cm.exception))
 
     def test_find_port_type(self):
         res = PortType(name="foo")
@@ -51,10 +47,8 @@ class DefinitionsTests(TestCase):
 
         self.assertEqual(res, obj.find_port_type("foo"))
 
-        with self.assertRaises(DefinitionsValueError) as cm:
+        with self.assertRaises(CodegenError):
             obj.find_port_type("nope")
-
-        self.assertEqual("Unknown PortType name: nope", str(cm.exception))
 
     def test_merge(self):
         target = Definitions()

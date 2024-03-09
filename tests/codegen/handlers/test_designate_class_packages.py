@@ -1,6 +1,6 @@
 from xsdata.codegen.container import ClassContainer
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.handlers import DesignateClassPackages
-from xsdata.exceptions import CodeGenerationError
 from xsdata.models.config import (
     GeneratorConfig,
     GeneratorSubstitution,
@@ -177,14 +177,8 @@ class DesignateClassPackagesTests(FactoryTestCase):
         self.config.output.package = "models"
         self.container.extend(classes)
 
-        with self.assertRaises(CodeGenerationError) as cm:
+        with self.assertRaises(CodegenError):
             self.handler.run()
-
-        self.assertEqual(
-            "Found strongly connected classes from different namespaces, "
-            "grouping them is impossible!",
-            str(cm.exception),
-        )
 
     def test_combine_ns_package(self):
         namespace = "urn:foo-bar:add"

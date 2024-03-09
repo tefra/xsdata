@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field, fields
 from typing import Any, Callable, Dict, Iterator, List, Optional
 
-from xsdata.exceptions import SchemaValueError
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.models.enums import DataType, FormType, Namespace, NamespaceType
 from xsdata.utils import text
@@ -132,7 +132,9 @@ class ElementBase:
         if name:
             return text.suffix(name)
 
-        raise SchemaValueError(f"Schema class `{self.class_name}` unknown real name.")
+        raise CodegenError(
+            "Schema type can't be used as a class/field", type=self.class_name
+        )
 
     @property
     def attr_types(self) -> Iterator[str]:

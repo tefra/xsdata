@@ -42,6 +42,7 @@ def cli(ctx: click.Context, **kwargs: Any):
     """Xsdata command line interface."""
     logger.setLevel(logging.INFO)
     formatwarning_orig = warnings.formatwarning
+
     logger.info(
         "========= xsdata v%s / Python %s / Platform %s =========\n",
         __version__,

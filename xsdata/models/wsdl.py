@@ -1,8 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Dict, Iterator, List, Optional, TypeVar
 
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.models import get_name
-from xsdata.exceptions import DefinitionsValueError
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.models.enums import Namespace
 from xsdata.models.mixins import array_any_element, array_element, attribute, element
@@ -336,4 +336,4 @@ def find_or_die(items: List[T], name: str, type_name: str) -> T:
         if msg.name == name:
             return msg
 
-    raise DefinitionsValueError(f"Unknown {type_name} name: {name}")
+    raise CodegenError("Unknown WSDL Type", type=type_name, name=name)

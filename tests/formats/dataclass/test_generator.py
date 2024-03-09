@@ -2,8 +2,8 @@ import random
 from pathlib import Path
 from unittest import mock
 
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.resolver import DependenciesResolver
-from xsdata.exceptions import CodeGenerationError
 from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.models.config import GeneratorConfig
 from xsdata.utils.testing import ClassFactory, FactoryTestCase
@@ -218,7 +218,5 @@ class DataclassGeneratorTests(FactoryTestCase):
         file_path = Path(__file__)
 
         self.generator.config.output.max_line_length = 55
-        with self.assertRaises(CodeGenerationError) as cm:
+        with self.assertRaises(CodegenError):
             self.generator.ruff_code(src_code, file_path)
-
-        self.assertIn("Ruff failed", str(cm.exception))

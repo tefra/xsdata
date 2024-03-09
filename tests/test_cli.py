@@ -10,6 +10,7 @@ from click.testing import CliRunner
 from tests import fixtures_dir
 from xsdata import __version__
 from xsdata.cli import cli, resolve_source
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.transformer import ResourceTransformer
 from xsdata.codegen.writer import CodeWriter
 from xsdata.formats.dataclass.generator import DataclassGenerator
@@ -47,6 +48,16 @@ class CliTests(TestCase):
         self.assertFalse(config.output.relative_imports)
         self.assertEqual(StructureStyle.FILENAMES, config.output.structure_style)
         self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
+
+    @mock.patch.object(ResourceTransformer, "process")
+    def test_generate_with_error(self, mock_process):
+        mock_process.side_effect = CodegenError("Testing", foo="bar")
+
+        source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
+        result = self.runner.invoke(cli, [str(source), "--package", "foo"])
+        expected = "=========\n" "Error: Testing\n" "foo: bar\n"
+
+        self.assertIn(expected, result.output)
 
     @mock.patch.object(ResourceTransformer, "process")
     @mock.patch.object(ResourceTransformer, "__init__", return_value=None)

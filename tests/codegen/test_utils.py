@@ -2,9 +2,9 @@ import sys
 from typing import Generator
 from unittest import mock
 
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.models import Restrictions, Status
 from xsdata.codegen.utils import ClassUtils
-from xsdata.exceptions import CodeGenerationError
 from xsdata.models.enums import DataType, Tag
 from xsdata.utils.testing import (
     AttrFactory,
@@ -18,13 +18,11 @@ from xsdata.utils.testing import (
 class ClassUtilsTests(FactoryTestCase):
     def test_find_value_attr(self):
         target = ClassFactory.create()
-        with self.assertRaises(CodeGenerationError) as cm:
+        with self.assertRaises(CodegenError):
             ClassUtils.find_value_attr(target)
 
-        self.assertEqual("Class has no value attr {xsdata}class_B", str(cm.exception))
-
         target.attrs.append(AttrFactory.element())
-        with self.assertRaises(CodeGenerationError) as cm:
+        with self.assertRaises(CodegenError):
             ClassUtils.find_value_attr(target)
 
         target.attrs.append(AttrFactory.extension())
@@ -213,7 +211,7 @@ class ClassUtilsTests(FactoryTestCase):
         target = ClassFactory.create()
         attr_type = AttrTypeFactory.create(forward=True, qname=target.qname)
 
-        with self.assertRaises(CodeGenerationError):
+        with self.assertRaises(CodegenError):
             ClassUtils.copy_inner_class(source, target, attr_type)
 
     def test_find_inner(self):
@@ -223,10 +221,9 @@ class ClassUtilsTests(FactoryTestCase):
         third = ClassFactory.enumeration(2, qname="{d}d")
         obj.inner.extend((first, second, third))
 
-        with self.assertRaises(CodeGenerationError) as cm:
+        with self.assertRaises(CodegenError):
             self.assertIsNone(ClassUtils.find_inner(obj, "nope"))
 
-        self.assertEqual("Missing inner class {a}parent.nope", str(cm.exception))
         self.assertEqual(first, ClassUtils.find_inner(obj, "{a}a"))
         self.assertEqual(second, ClassUtils.find_inner(obj, "{c}c"))
         self.assertEqual(third, ClassUtils.find_inner(obj, "{d}d"))

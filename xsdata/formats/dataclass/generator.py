@@ -5,9 +5,9 @@ from typing import Iterator, List, Optional
 
 from jinja2 import Environment, FileSystemLoader
 
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.models import Class, Import
 from xsdata.codegen.resolver import DependenciesResolver
-from xsdata.exceptions import CodeGenerationError
 from xsdata.formats.dataclass.filters import Filters
 from xsdata.formats.mixins import AbstractGenerator, GeneratorResult
 from xsdata.models.config import GeneratorConfig
@@ -242,4 +242,4 @@ class DataclassGenerator(AbstractGenerator):
             return src_code_encoded.decode()
         except subprocess.CalledProcessError as e:
             error = indent(e.stderr.decode(), "  ")
-            raise CodeGenerationError(f"Ruff failed:\n{error}")
+            raise CodegenError("Ruff failed", details=error)

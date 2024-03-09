@@ -7,9 +7,9 @@ from urllib.parse import urlparse
 
 from toposort import toposort_flatten
 
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.mixins import ContainerHandlerInterface
 from xsdata.codegen.models import Class, get_location, get_target_namespace
-from xsdata.exceptions import CodeGenerationError
 from xsdata.models.config import ObjectType, StructureStyle
 from xsdata.models.enums import COMMON_SCHEMA_DIR
 from xsdata.utils import collections
@@ -108,10 +108,11 @@ class DesignateClassPackages(ContainerHandlerInterface):
         """Group strongly connected classes together by namespaces."""
         for group in self.strongly_connected_classes():
             classes = self.sort_classes(group)
-            if len(set(map(get_target_namespace, classes))) > 1:
-                raise CodeGenerationError(
-                    "Found strongly connected classes from different "
-                    "namespaces, grouping them is impossible!"
+            namespaces = set(map(get_target_namespace, classes))
+            if len(namespaces) > 1:
+                raise CodegenError(
+                    "Found strongly connected types from different namespaces",
+                    namespaces=namespaces,
                 )
 
             parts = self.combine_ns_package(classes[0].target_namespace)

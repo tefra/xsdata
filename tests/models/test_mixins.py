@@ -1,7 +1,7 @@
 from typing import Generator, Iterator
 from unittest import TestCase
 
-from xsdata.exceptions import SchemaValueError
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.models.enums import FormType, Namespace
 from xsdata.models.mixins import ElementBase
 from xsdata.models.xsd import Alternative, ComplexType, Element, SimpleType
@@ -145,7 +145,7 @@ class ElementBaseTests(TestCase):
     def test_property_real_name(self):
         element = ElementBase()
 
-        with self.assertRaises(SchemaValueError):
+        with self.assertRaises(CodegenError):
             element.real_name
 
         element.ref = "bar:foo"

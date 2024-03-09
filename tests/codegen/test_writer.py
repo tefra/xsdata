@@ -3,9 +3,9 @@ from tempfile import TemporaryDirectory
 from typing import Iterator, List
 from unittest import mock
 
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.models import Class
 from xsdata.codegen.writer import CodeWriter
-from xsdata.exceptions import CodeGenerationError
 from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.formats.mixins import AbstractGenerator, GeneratorResult
 from xsdata.models.config import GeneratorConfig
@@ -72,10 +72,8 @@ class CodeWriterTests(FactoryTestCase):
         CodeWriter.unregister_generator("dataclasses")
         config = GeneratorConfig()
 
-        with self.assertRaises(CodeGenerationError) as cm:
+        with self.assertRaises(CodegenError):
             CodeWriter.from_config(config)
-
-        self.assertEqual("Unknown output format: 'dataclasses'", str(cm.exception))
 
         CodeWriter.register_generator("dataclasses", DataclassGenerator)
         writer = CodeWriter.from_config(config)

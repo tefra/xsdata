@@ -1,10 +1,10 @@
 from unittest import mock
 
 from xsdata.codegen.container import ClassContainer
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.handlers import FlattenAttributeGroups
 from xsdata.codegen.models import Attr, Status
 from xsdata.codegen.utils import ClassUtils
-from xsdata.exceptions import AnalyzerValueError
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import Tag
 from xsdata.utils.testing import AttrFactory, ClassFactory, FactoryTestCase
@@ -91,7 +91,5 @@ class FlattenAttributeGroupsTests(FactoryTestCase):
         target = ClassFactory.create()
         target.attrs.append(group_attr)
 
-        with self.assertRaises(AnalyzerValueError) as cm:
+        with self.assertRaises(CodegenError):
             self.processor.process_attribute(target, group_attr)
-
-        self.assertEqual("Group attribute not found: `bar`", str(cm.exception))

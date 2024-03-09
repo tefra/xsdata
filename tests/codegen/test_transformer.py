@@ -3,7 +3,10 @@ import tempfile
 from pathlib import Path
 from unittest import mock
 
+from toposort import CircularDependencyError
+
 from xsdata.codegen.container import ClassContainer
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.mappers import (
     DefinitionsMapper,
     DictMapper,
@@ -15,7 +18,6 @@ from xsdata.codegen.parsers import DefinitionsParser, DtdParser
 from xsdata.codegen.transformer import ResourceTransformer
 from xsdata.codegen.utils import ClassUtils
 from xsdata.codegen.writer import CodeWriter
-from xsdata.exceptions import CodeGenerationError
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.parsers import TreeParser
 from xsdata.models.config import GeneratorConfig
@@ -103,6 +105,12 @@ class ResourceTransformerTests(FactoryTestCase):
 
             self.assertEqual(classes, pickle.loads(cache.read_bytes()))
             mock_process_classes.assert_called_once_with()
+
+    @mock.patch.object(ResourceTransformer, "process_classes")
+    def test_process_with_circular_dependencies_error(self, mock_process_classes):
+        mock_process_classes.side_effect = CircularDependencyError({})
+        with self.assertRaises(CodegenError):
+            self.transformer.process([])
 
     @mock.patch.object(ResourceTransformer, "convert_schema")
     @mock.patch.object(ResourceTransformer, "convert_definitions")
@@ -282,12 +290,6 @@ class ResourceTransformerTests(FactoryTestCase):
             ]
         )
 
-    def test_process_classes_with_zero_classes_after_analyze(self):
-        with self.assertRaises(CodeGenerationError) as cm:
-            self.transformer.process_classes()
-
-        self.assertEqual("Nothing to generate.", str(cm.exception))
-
     @mock.patch.object(ResourceTransformer, "convert_schema")
     @mock.patch.object(ResourceTransformer, "parse_schema")
     def test_process_schema(
@@ -456,8 +458,8 @@ class ResourceTransformerTests(FactoryTestCase):
 
     @mock.patch("xsdata.codegen.transformer.logger.warning")
     def test_load_resource_missing(self, mock_warning):
-        uri = "file://foo/bar.xsd"
-        result = self.transformer.load_resource(uri)
+        uri = Path.cwd().joinpath("foo/bar.xsd").as_uri()
+        result = self.transformer.process([uri])
         self.assertIsNone(result)
 
         mock_warning.assert_called_once_with("Resource not found %s", uri)

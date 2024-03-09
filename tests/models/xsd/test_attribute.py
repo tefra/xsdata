@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from xsdata.exceptions import SchemaValueError
+from xsdata.codegen.exceptions import CodegenError
 from xsdata.models.enums import Namespace, UseType
 from xsdata.models.xsd import Attribute, Length, Restriction, SimpleType
 
@@ -33,7 +33,7 @@ class AttributeTests(TestCase):
         obj.name = "foo"
         self.assertEqual("foo", obj.real_name)
 
-        with self.assertRaises(SchemaValueError):
+        with self.assertRaises(CodegenError):
             Attribute().real_name
 
     def test_get_restrictions(self):

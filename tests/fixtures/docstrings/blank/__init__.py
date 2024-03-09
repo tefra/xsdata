@@ -2,9 +2,9 @@ from tests.fixtures.docstrings.blank.schema import (
     DoubleQuotesDescription,
     DoubleQuotesSummary,
     Root,
-    RootEnum,
     RootB,
     RootD,
+    RootEnum,
 )
 
 __all__ = [

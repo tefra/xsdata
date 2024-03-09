@@ -24,7 +24,7 @@ class DataclassGenerator(AbstractGenerator):
         filters: The template filters instance
     """
 
-    __slots__ = ("env", "filters")
+    __slots__ = ("env", "filters", "ruff_config")
 
     package_template = "package.jinja2"
     module_template = "module.jinja2"
@@ -39,6 +39,7 @@ class DataclassGenerator(AbstractGenerator):
         self.env = Environment(loader=loader, autoescape=False)
         self.filters = self.init_filters(config)
         self.filters.register(self.env)
+        self.ruff_config = Path(__file__).parent / "ruff.toml"
 
     @classmethod
     def get_template_paths(cls) -> List[str]:
@@ -226,6 +227,19 @@ class DataclassGenerator(AbstractGenerator):
                 str(file_path),
                 "--line-length",
                 str(self.config.output.max_line_length),
+            ],
+            [
+                "ruff",
+                "checks",
+                "--stdin-filename",
+                str(file_path),
+                "--line-length",
+                str(self.config.output.max_line_length),
+                "--config",
+                str(self.ruff_config),
+                "--fix",
+                "--unsafe-fixes",
+                "--exit-zero",
             ],
         ]
         try:

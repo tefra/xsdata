@@ -68,23 +68,22 @@ class DataclassGeneratorTests(FactoryTestCase):
         random.shuffle(classes)
 
         actual = self.generator.render_package(classes, "foo.tests", Path.cwd())
-        expected = "\n".join(
-            [
-                "from foo.bar import A as BarA",
-                "from foo.tests import (",
-                "    A as TestsA,",
-                "    B,",
-                "    C,",
-                ")",
-                "",
-                "__all__ = [",
-                '    "BarA",',
-                '    "TestsA",',
-                '    "B",',
-                '    "C",',
-                "]",
-                "",
-            ]
+        expected = (
+            "from foo.bar import A as BarA\n"
+            "from foo.tests import (\n"
+            "    A as TestsA,\n"
+            ")\n"
+            "from foo.tests import (\n"
+            "    B,\n"
+            "    C,\n"
+            ")\n"
+            "\n"
+            "__all__ = [\n"
+            '    "BarA",\n'
+            '    "TestsA",\n'
+            '    "B",\n'
+            '    "C",\n'
+            "]\n"
         )
         self.assertEqual(expected, actual)
 

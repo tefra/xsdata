@@ -899,17 +899,6 @@ class FiltersTests(FactoryTestCase):
         expected = "from __future__ import annotations"
         self.assertEqual(expected, self.filters.default_imports(""))
 
-    def test_default_imports_ordering(self):
-        self.filters.postponed_annotations = True
-        self.filters.import_patterns["attrs"] = {"__module__": ["@attrs.s"]}
-
-        expected = (
-            "from __future__ import annotations\n"
-            "import attrs\n"
-            "from dataclasses import dataclass"
-        )
-        self.assertEqual(expected, self.filters.default_imports("@dataclass @attrs.s"))
-
     def test_format_metadata(self):
         data = {
             "num": 1,

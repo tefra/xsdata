@@ -1,8 +1,8 @@
 from tests.fixtures.series.series import (
-    Links,
     Country,
     Externals,
     Image,
+    Links,
     Network,
     Previousepisode,
     Rating,

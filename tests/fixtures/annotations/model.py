@@ -1,6 +1,8 @@
 from __future__ import annotations
+
 from dataclasses import dataclass, field
 from typing import Optional
+
 from tests.fixtures.annotations.units import unit
 
 __NAMESPACE__ = "http://domain.org/schema/model"

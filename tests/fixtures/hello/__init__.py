@@ -1,11 +1,11 @@
 from tests.fixtures.hello.hello import (
+    GetHelloAsString,
+    GetHelloAsStringResponse,
     HelloByeError,
     HelloError,
     HelloGetHelloAsString,
     HelloGetHelloAsStringInput,
     HelloGetHelloAsStringOutput,
-    GetHelloAsString,
-    GetHelloAsStringResponse,
 )
 
 __all__ = [

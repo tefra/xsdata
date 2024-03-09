@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from typing import List, Optional, Union
+
 from xsdata.models.datatype import XmlDate, XmlPeriod
 
 __NAMESPACE__ = "http://musicbrainz.org/ns/mmd-2.0#"

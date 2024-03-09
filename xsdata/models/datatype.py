@@ -283,11 +283,9 @@ class XmlDateTime(NamedTuple):
             - 2001-10-26T21:32:52.126
             - -2001-10-26T21:32:52.126Z
         """
-        return "{}T{}{}".format(
-            format_date(self.year, self.month, self.day),
-            format_time(self.hour, self.minute, self.second, self.fractional_second),
-            format_offset(self.offset),
-        )
+        date = format_date(self.year, self.month, self.day)
+        time = format_time(self.hour, self.minute, self.second, self.fractional_second)
+        return f"{date}T{time}{format_offset(self.offset)}"
 
     def __repr__(self) -> str:
         """Return the instance string representation."""
@@ -433,10 +431,8 @@ class XmlTime(NamedTuple):
             - 21:32:52.126789
             - 21:32:52.126Z
         """
-        return "{}{}".format(
-            format_time(self.hour, self.minute, self.second, self.fractional_second),
-            format_offset(self.offset),
-        )
+        time = format_time(self.hour, self.minute, self.second, self.fractional_second)
+        return f"{time}{format_offset(self.offset)}"
 
     def __repr__(self) -> str:
         """Return the instance string representation."""

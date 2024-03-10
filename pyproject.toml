@@ -3,7 +3,7 @@ requires = ["setuptools>=61.2"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["xsdata"]
+include = ["xsdata*"]
 
 [project]
 name = "xsdata"

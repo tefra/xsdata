@@ -73,17 +73,22 @@ Check the [documentation](https://xsdata.readthedocs.io) for more ✨✨✨
   - Support xinclude statements and unknown properties
   - Customize behaviour through config
 
-## Changelog: 24.2.1 (2024-02-19)
+## Changelog: 24.3 (2024-03-10)
 
-- Fixed FieldInfo type errors ([#949](https://github.com/tefra/xsdata/pull/949))
-- Fixed private package names ([#950](https://github.com/tefra/xsdata/pull/950))
+**Features**
 
-## Changelog: 24.2 (2024-02-17)
+- Avoid flattening root elements ([#945](https://github.com/tefra/xsdata/pull/945))
+- Avoid generating ambiguous choices ([#946](https://github.com/tefra/xsdata/pull/946))
+- Added various type reference validations
+  ([#966](https://github.com/tefra/xsdata/pull/966),
+  [#967](https://github.com/tefra/xsdata/pull/967),
+  [#968](https://github.com/tefra/xsdata/pull/968))
+- Calculate circular references more accurately
+  ([#969](https://github.com/tefra/xsdata/pull/969))
+- Prettify codegen errors ([#970](https://github.com/tefra/xsdata/pull/970))
+- Use Ruff to sort imports ([#972](https://github.com/tefra/xsdata/pull/972))
 
-- Added Dict encoder/decoder ([#921](https://github.com/tefra/xsdata/pull/921))
-- Deprecated Serializer config pretty_print/pretty_print_indentation
-  ([#942](https://github.com/tefra/xsdata/pull/942))
-- Fixed lxml event writer to respect the encoding configuration
-  ([#940](https://github.com/tefra/xsdata/pull/940))
-- Migrated documentation to mkdocs with markdown
-- Refactored project docstrings
+**Fixes**
+
+- Move ruff format in the code generator
+  ([#964](https://github.com/tefra/xsdata/pull/964))

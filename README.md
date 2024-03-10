@@ -73,6 +73,13 @@ Check the [documentation](https://xsdata.readthedocs.io) for more ✨✨✨
   - Support xinclude statements and unknown properties
   - Customize behaviour through config
 
+## Changelog: 24.3.1 (2024-03-10)
+
+**Fixes**
+
+- Unnest class with circular reference
+  ([#974](https://github.com/tefra/xsdata/pull/974))
+
 ## Changelog: 24.3 (2024-03-10)
 
 **Features**

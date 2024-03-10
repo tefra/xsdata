@@ -1,3 +1,10 @@
+## 24.3.1 (2024-03-10)
+
+**Fixes**
+
+- Unnest class with circular reference
+  ([#974](https://github.com/tefra/xsdata/pull/974))
+
 ## 24.3 (2024-03-10)
 
 **Features**

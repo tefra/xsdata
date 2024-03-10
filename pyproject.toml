@@ -42,7 +42,7 @@ content-type = "text/markdown"
 Homepage = "https://github.com/tefra/xsdata"
 Source = "https://github.com/tefra/xsdata"
 Documentation = "https://xsdata.readthedocs.io/"
-Changelog = "https://xsdata.readthedocs.io/en/latest/changelog.html"
+Changelog = "https://xsdata.readthedocs.io/en/latest/changelog/"
 
 [project.optional-dependencies]
 cli = [

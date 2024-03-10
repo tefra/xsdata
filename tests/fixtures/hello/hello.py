@@ -105,15 +105,15 @@ class HelloGetHelloAsStringOutput:
 
     @dataclass
     class Body:
-        get_hello_as_string_response: Optional[
-            GetHelloAsStringResponse
-        ] = field(
-            default=None,
-            metadata={
-                "name": "getHelloAsStringResponse",
-                "type": "Element",
-                "namespace": "http://hello/",
-            },
+        get_hello_as_string_response: Optional[GetHelloAsStringResponse] = (
+            field(
+                default=None,
+                metadata={
+                    "name": "getHelloAsStringResponse",
+                    "type": "Element",
+                    "namespace": "http://hello/",
+                },
+            )
         )
         fault: Optional["HelloGetHelloAsStringOutput.Body.Fault"] = field(
             default=None,

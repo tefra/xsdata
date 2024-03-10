@@ -62,6 +62,13 @@ class UnnestInnerClasses(RelativeHandlerInterface):
         clone = inner.clone()
         clone.local_type = True
         clone.qname = build_qname(inner.target_namespace, f"{name}_{inner.name}")
+
+        for attr in clone.attrs:
+            for tp in attr.types:
+                if tp.circular and tp.qname == inner.qname:
+                    tp.qname = clone.qname
+                    tp.reference = clone.ref
+
         return clone
 
     @classmethod

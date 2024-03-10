@@ -61,13 +61,32 @@ class UnnestInnerClassesTests(FactoryTestCase):
         self.assertFalse(attr.types[0].forward)
         self.assertEqual("{xsdata}class_C_class_B", attr.types[0].qname)
 
-    def test_clone_attr(self):
+    def test_clone_class(self):
         target = ClassFactory.create(qname="{a}b")
         actual = self.processor.clone_class(target, "parent")
 
         self.assertIsNot(target, actual)
         self.assertTrue(actual.local_type)
         self.assertEqual("{a}parent_b", actual.qname)
+
+    def test_clone_class_with_circular_reference(self):
+        target = ClassFactory.create(qname="{a}b")
+        target.attrs.append(
+            AttrFactory.create(
+                name="self",
+                types=[AttrTypeFactory.create(qname=target.qname, circular=True)],
+            )
+        )
+
+        actual = self.processor.clone_class(target, "parent")
+
+        self.assertIsNot(target, actual)
+        self.assertTrue(actual.local_type)
+        self.assertEqual("{a}parent_b", actual.qname)
+
+        self.assertTrue(actual.attrs[0].types[0].circular)
+        self.assertEqual(actual.ref, actual.attrs[0].types[0].reference)
+        self.assertEqual(actual.qname, actual.attrs[0].types[0].qname)
 
     def test_update_types(self):
         attr = AttrFactory.create(

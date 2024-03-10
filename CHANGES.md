@@ -1,3 +1,23 @@
+## 24.3 (2024-03-10)
+
+**Features**
+
+- Avoid flattening root elements ([#945](https://github.com/tefra/xsdata/pull/945))
+- Avoid generating ambiguous choices ([#946](https://github.com/tefra/xsdata/pull/946))
+- Added various type reference validations
+  ([#966](https://github.com/tefra/xsdata/pull/966),
+  [#967](https://github.com/tefra/xsdata/pull/967),
+  [#968](https://github.com/tefra/xsdata/pull/968))
+- Calculate circular references more accurately
+  ([#969](https://github.com/tefra/xsdata/pull/969))
+- Prettify codegen errors ([#970](https://github.com/tefra/xsdata/pull/970))
+- Use Ruff to sort imports ([#972](https://github.com/tefra/xsdata/pull/972))
+
+**Fixes**
+
+- Move ruff format in the code generator
+  ([#964](https://github.com/tefra/xsdata/pull/964))
+
 ## 24.2.1 (2024-02-19)
 
 - Fixed FieldInfo type errors ([#949](https://github.com/tefra/xsdata/pull/949))

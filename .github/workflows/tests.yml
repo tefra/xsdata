@@ -105,8 +105,8 @@ jobs:
     - uses: actions/setup-python@v5
     - uses: pre-commit/action@v3.0.1
   check-package:
-    name: Build & Inspect Package
+    name: Build & Inspect Package.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: hynek/build-and-inspect-python-package@v2
+      - uses: hynek/build-and-inspect-python-package@v1

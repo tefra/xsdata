@@ -116,6 +116,7 @@ nav:
   - JSON Parsing: data_binding/json_parsing.md
   - JSON Serializing: data_binding/json_serializing.md
   - Pycode Serializing: data_binding/pycode_serializing.md
+  - Tree Serializing: data_binding/tree_serializing.md
   - Dict Decoding: data_binding/dict_decoding.md
   - Dict Encoding: data_binding/dict_encoding.md
 - FAQ: faq.md

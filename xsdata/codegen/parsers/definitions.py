@@ -2,9 +2,9 @@ from dataclasses import dataclass
 from typing import Any, List, Optional
 
 from xsdata.codegen.parsers.schema import SchemaParser
-from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.parsers.bases import Parsed
 from xsdata.formats.dataclass.parsers.mixins import XmlNode
+from xsdata.formats.types import T
 from xsdata.models import wsdl
 
 

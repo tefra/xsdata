@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Optional, Type
 
-from xsdata.formats.bindings import T
+from xsdata.formats.types import T
 
 
 def default_class_factory(cls: Type[T], params: Dict[str, Any]) -> T:

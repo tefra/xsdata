@@ -6,8 +6,8 @@ from typing import Any, Dict, List, Optional, Set, Tuple, Type, TypeVar, Union
 from unittest import TestCase
 from xml.etree.ElementTree import QName
 
-from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.typing import evaluate
+from xsdata.formats.types import T
 from xsdata.models.datatype import XmlDate, XmlDateTime, XmlDuration, XmlPeriod, XmlTime
 from xsdata.models.enums import Namespace
 

@@ -3,10 +3,10 @@ from collections import defaultdict
 from typing import Any, Callable, Dict, Iterator, List, Optional, Set, Type
 
 from xsdata.exceptions import XmlContextError
-from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.compat import class_types
 from xsdata.formats.dataclass.models.builders import XmlMetaBuilder
 from xsdata.formats.dataclass.models.elements import XmlMeta
+from xsdata.formats.types import T
 from xsdata.models.enums import DataType
 from xsdata.utils.constants import return_input
 

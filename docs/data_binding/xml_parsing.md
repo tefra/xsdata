@@ -120,6 +120,17 @@ all the imported modules to find a matching dataclass.
 
 ```
 
+## Capture namespace prefixes
+
+```python
+>>> from tests.fixtures.books.books import Books
+>>> ns_map = {}
+>>> order = parser.parse("tests/fixtures/books/books.xml", Books, ns_map=ns_map)
+>>> ns_map
+{'brk': 'urn:books'}
+
+```
+
 ## Alternative handlers
 
 XmlHandlers read the xml source and push build events to create the target class. xsData

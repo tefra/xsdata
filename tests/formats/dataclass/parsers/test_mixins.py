@@ -16,7 +16,7 @@ class XmlHandlerTests(TestCase):
         self.assertEqual([], handler.objects)
 
         with self.assertRaises(NotImplementedError):
-            handler.parse(None)
+            handler.parse(None, {})
 
 
 class EventsHandlerTests(TestCase):

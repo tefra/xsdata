@@ -1,4 +1,4 @@
-from typing import Any, Iterable, Tuple
+from typing import Any, Dict, Iterable, Optional, Tuple
 
 from lxml import etree
 
@@ -12,12 +12,13 @@ EVENTS = (EventType.START, EventType.END, EventType.START_NS)
 class LxmlEventHandler(XmlHandler):
     """An lxml event handler."""
 
-    def parse(self, source: Any) -> Any:
+    def parse(self, source: Any, ns_map: Dict[Optional[str], str]) -> Any:
         """Parse the source XML document.
 
         Args:
             source: The xml source, can be a file resource or an input stream,
                 or a lxml tree/element.
+            ns_map: A namespace prefix-URI recorder map
 
         Returns:
             An instance of the class type representing the parsed content.
@@ -37,13 +38,18 @@ class LxmlEventHandler(XmlHandler):
                 load_dtd=self.parser.config.load_dtd,
             )
 
-        return self.process_context(ctx)
+        return self.process_context(ctx, ns_map)
 
-    def process_context(self, context: Iterable[Tuple[str, Any]]) -> Any:
+    def process_context(
+        self,
+        context: Iterable[Tuple[str, Any]],
+        ns_map: Dict[Optional[str], str],
+    ) -> Any:
         """Iterate context and push events to main parser.
 
         Args:
             context: The iterable lxml context
+            ns_map: A namespace prefix-URI recorder map
 
         Returns:
             An instance of the class type representing the parsed content.
@@ -69,7 +75,7 @@ class LxmlEventHandler(XmlHandler):
                 element.clear()
             elif event == EventType.START_NS:
                 prefix, uri = element
-                self.parser.register_namespace(prefix or None, uri)
+                self.parser.register_namespace(ns_map, prefix or None, uri)
             else:
                 raise XmlHandlerError(f"Unhandled event: `{event}`.")
 

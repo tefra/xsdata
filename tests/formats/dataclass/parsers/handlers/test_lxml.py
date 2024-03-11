@@ -58,7 +58,7 @@ class LxmlEventHandlerTests(TestCase):
         handler = LxmlEventHandler(clazz=Books, parser=self.parser)
 
         with self.assertRaises(XmlHandlerError) as cm:
-            handler.process_context([("reverse", "")])
+            handler.process_context([("reverse", "")], {})
 
         self.assertEqual("Unhandled event: `reverse`.", str(cm.exception))
 

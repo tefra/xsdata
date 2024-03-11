@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from xml.etree.ElementTree import Element, TreeBuilder
 
-from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.serializers.tree.mixins import TreeSerializer
+from xsdata.formats.types import T
 
 
 @dataclass

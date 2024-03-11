@@ -3,13 +3,13 @@ import warnings
 from typing import Any, Dict, List, Optional, Tuple, Type
 
 from xsdata.exceptions import ConverterWarning, ParserError
-from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.parsers.bases import NodeParser
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.mixins import EventsHandler, XmlNode
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
+from xsdata.formats.types import T
 from xsdata.utils.namespaces import target_uri
 
 

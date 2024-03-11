@@ -4,7 +4,6 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple, Type, cast
 
 from xsdata.exceptions import ConverterWarning, ParserError
-from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers.mixins import (
     EventsHandler,
@@ -13,6 +12,7 @@ from xsdata.formats.dataclass.parsers.mixins import (
     XmlNode,
 )
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
+from xsdata.formats.types import T
 from xsdata.models.enums import EventType
 
 Parsed = Tuple[Optional[str], Any]
@@ -33,7 +33,12 @@ class NodeParser(PushParser):
     context: XmlContext = field(default_factory=XmlContext)
     handler: Type[XmlHandler] = field(default=EventsHandler)
 
-    def parse(self, source: Any, clazz: Optional[Type[T]] = None) -> T:
+    def parse(
+        self,
+        source: Any,
+        clazz: Optional[Type[T]] = None,
+        ns_map: Optional[Dict[Optional[str], str]] = None,
+    ) -> T:
         """Parse the input file or stream into the target class type.
 
         If no clazz is provided, the binding context will try
@@ -42,6 +47,7 @@ class NodeParser(PushParser):
         Args:
             source: The source file or stream object to parse
             clazz: The target class type to parse the source bytes object
+            ns_map: A namespace prefix-URI map to record prefixes during parsing
 
         Returns:
             An instance of the specified class representing the parsed content.
@@ -53,7 +59,8 @@ class NodeParser(PushParser):
                 warnings.filterwarnings("error", category=ConverterWarning)
 
             try:
-                result = handler.parse(source)
+                ns_map = self.ns_map if ns_map is None else ns_map
+                result = handler.parse(source, ns_map)
             except (ConverterWarning, SyntaxError) as e:
                 raise ParserError(e)
 
@@ -210,14 +217,17 @@ class RecordParser(NodeParser):
         self.events.append((EventType.END, qname, text, tail))
         return super().end(queue, objects, qname, text, tail)
 
-    def register_namespace(self, prefix: Optional[str], uri: str):
-        """Register the uri prefix in the namespace registry.
+    def register_namespace(
+        self, ns_map: Dict[Optional[str], str], prefix: Optional[str], uri: str
+    ):
+        """Register the uri prefix in the namespace prefix-URI map.
 
-        Record the start-ns event for later processing
+        Record the start-ns event for later processing.
 
         Args:
-            prefix: Namespace prefix
-            uri: Namespace uri
+            ns_map: The namespace prefix-URI map
+            prefix: The namespace prefix
+            uri: The namespace uri
         """
         self.events.append((EventType.START_NS, prefix, uri))
-        super().register_namespace(prefix, uri)
+        super().register_namespace(ns_map, prefix, uri)

@@ -3,10 +3,10 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Type, Union
 from urllib.parse import urljoin
 
-from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.parsers.bases import Parsed
 from xsdata.formats.dataclass.parsers.mixins import XmlNode
 from xsdata.formats.dataclass.parsers.xml import UserXmlParser
+from xsdata.formats.types import T
 from xsdata.models import xsd
 from xsdata.models.enums import FormType, Mode, Namespace
 from xsdata.models.mixins import ElementBase

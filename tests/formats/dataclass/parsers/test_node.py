@@ -1,5 +1,5 @@
 from dataclasses import make_dataclass
-from typing import Any
+from typing import Any, Dict
 from unittest import mock
 from unittest.case import TestCase
 
@@ -25,11 +25,11 @@ class NodeParserTests(TestCase):
 
     def test_parse(self):
         class TestHandler(XmlHandler):
-            def parse(self, source: Any) -> Any:
+            def parse(self, source: Any, ns_map: Dict) -> Any:
                 return Books()
 
         self.parser.handler = TestHandler
-        self.assertEqual(Books(), self.parser.parse([], Books))
+        self.assertEqual(Books(), self.parser.parse([], Books, {}))
 
     def test_parse_when_result_type_is_wrong(self):
         parser = self.parser
@@ -199,12 +199,13 @@ class NodeParserTests(TestCase):
 
     def test_register_namespace(self):
         parser = NodeParser()
-        parser.register_namespace("bar", "foo")
-        parser.register_namespace("bar", "exists")
-        self.assertEqual({"bar": "foo"}, parser.ns_map)
+        ns_map = {}
+        parser.register_namespace(ns_map, "bar", "foo")
+        parser.register_namespace(ns_map, "bar", "exists")
+        self.assertEqual({"bar": "foo"}, ns_map)
 
-        parser.register_namespace(None, "a")
-        self.assertEqual({"bar": "foo", None: "a"}, parser.ns_map)
+        parser.register_namespace(ns_map, None, "a")
+        self.assertEqual({"bar": "foo", None: "a"}, ns_map)
 
-        parser.register_namespace(None, "b")
-        self.assertEqual({"bar": "foo", None: "a"}, parser.ns_map)
+        parser.register_namespace(ns_map, None, "b")
+        self.assertEqual({"bar": "foo", None: "a"}, ns_map)

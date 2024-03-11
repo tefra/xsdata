@@ -15,12 +15,13 @@ EVENTS = (EventType.START, EventType.END, EventType.START_NS)
 class XmlEventHandler(XmlHandler):
     """A native xml event handler."""
 
-    def parse(self, source: Any) -> Any:
+    def parse(self, source: Any, ns_map: Dict[Optional[str], str]) -> Any:
         """Parse the source XML document.
 
         Args:
             source: The xml source, can be a file resource or an input stream,
                 or a xml tree/element.
+            ns_map: A namespace prefix-URI recorder map
 
         Returns:
             An instance of the class type representing the parsed content.
@@ -40,18 +41,21 @@ class XmlEventHandler(XmlHandler):
         else:
             ctx = etree.iterparse(source, EVENTS)  # nosec
 
-        return self.process_context(ctx)
+        return self.process_context(ctx, ns_map)
 
-    def process_context(self, context: Iterable[Tuple[str, Any]]) -> Any:
+    def process_context(
+        self, context: Iterable[Tuple[str, Any]], ns_map: Dict[Optional[str], str]
+    ) -> Any:
         """Iterate context and push events to main parser.
 
         Args:
             context: The iterable xml context
+            ns_map: A namespace prefix-URI recorder map
 
         Returns:
             An instance of the class type representing the parsed content.
         """
-        ns_map: Dict = {}
+        element_ns_map: Dict = {}
         for event, element in context:
             if event == EventType.START:
                 self.parser.start(
@@ -60,9 +64,9 @@ class XmlEventHandler(XmlHandler):
                     self.objects,
                     element.tag,
                     element.attrib,
-                    self.merge_parent_namespaces(ns_map),
+                    self.merge_parent_namespaces(element_ns_map),
                 )
-                ns_map = {}
+                element_ns_map = {}
             elif event == EventType.END:
                 self.parser.end(
                     self.queue,
@@ -74,11 +78,40 @@ class XmlEventHandler(XmlHandler):
                 element.clear()
             elif event == EventType.START_NS:
                 prefix, uri = element
-                ns_map[prefix or None] = uri
+                prefix = prefix or None
+                element_ns_map[prefix] = uri
+                self.parser.register_namespace(ns_map, prefix, uri)
+
             else:
                 raise XmlHandlerError(f"Unhandled event: `{event}`.")
 
         return self.objects[-1][1] if self.objects else None
+
+    def merge_parent_namespaces(self, ns_map: Dict[Optional[str], str]) -> Dict:
+        """Merge the given prefix-URI map with the parent node map.
+
+        This method also registers new prefixes with the parser.
+
+        Args:
+            ns_map: The current element namespace prefix-URI map
+
+        Returns:
+            The new merged namespace prefix-URI map.
+        """
+        if self.queue:
+            parent_ns_map = self.queue[-1].ns_map
+
+            if not ns_map:
+                return parent_ns_map
+
+            result = parent_ns_map.copy() if parent_ns_map else {}
+        else:
+            result = {}
+
+        for prefix, uri in ns_map.items():
+            result[prefix] = uri
+
+        return result
 
 
 def iterwalk(element: etree.Element, ns_map: Dict) -> Iterator[Tuple[str, Any]]:

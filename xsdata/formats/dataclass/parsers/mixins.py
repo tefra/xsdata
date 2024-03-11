@@ -1,17 +1,17 @@
 import abc
+import io
+import pathlib
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple, Type
 
 from xsdata.exceptions import XmlHandlerError
-from xsdata.formats.bindings import AbstractParser
 from xsdata.formats.dataclass.parsers.config import ParserConfig
+from xsdata.formats.types import T
 from xsdata.models.enums import EventType
-
-NoneStr = Optional[str]
 
 
 @dataclass
-class PushParser(AbstractParser):
+class PushParser:
     """A generic interface for event based content handlers like sax.
 
     Args:
@@ -23,6 +23,90 @@ class PushParser(AbstractParser):
 
     config: ParserConfig = field(default_factory=ParserConfig)
     ns_map: Dict[Optional[str], str] = field(init=False, default_factory=dict)
+
+    def from_path(
+        self,
+        path: pathlib.Path,
+        clazz: Optional[Type[T]] = None,
+        ns_map: Optional[Dict[Optional[str], str]] = None,
+    ) -> T:
+        """Parse the input file into the target class type.
+
+        If no clazz is provided, the binding context will try
+        to locate it from imported dataclasses.
+
+        Args:
+            path: The path to the input file
+            clazz: The target class type to parse the file into
+            ns_map: A namespace prefix-URI map to record prefixes during parsing
+
+        Returns:
+            An instance of the specified class representing the parsed content.
+        """
+        return self.parse(str(path.resolve()), clazz, ns_map)
+
+    def from_string(
+        self,
+        source: str,
+        clazz: Optional[Type[T]] = None,
+        ns_map: Optional[Dict[Optional[str], str]] = None,
+    ) -> T:
+        """Parse the input source string into the target class type.
+
+        If no clazz is provided, the binding context will try
+        to locate it from imported dataclasses.
+
+        Args:
+            source: The source string to parse
+            clazz: The target class type to parse the source string into
+            ns_map: A namespace prefix-URI map to record prefixes during parsing
+
+        Returns:
+            An instance of the specified class representing the parsed content.
+        """
+        return self.from_bytes(source.encode(), clazz, ns_map)
+
+    def from_bytes(
+        self,
+        source: bytes,
+        clazz: Optional[Type[T]] = None,
+        ns_map: Optional[Dict[Optional[str], str]] = None,
+    ) -> T:
+        """Parse the input source bytes object into the target class type.
+
+        If no clazz is provided, the binding context will try
+        to locate it from imported dataclasses.
+
+        Args:
+            source: The source bytes object to parse
+            clazz: The target class type to parse the source bytes object
+            ns_map: A namespace prefix-URI map to record prefixes during parsing
+
+        Returns:
+            An instance of the specified class representing the parsed content.
+        """
+        return self.parse(io.BytesIO(source), clazz, ns_map)
+
+    @abc.abstractmethod
+    def parse(
+        self,
+        source: Any,
+        clazz: Optional[Type[T]] = None,
+        ns_map: Optional[Dict[Optional[str], str]] = None,
+    ) -> T:
+        """Parse the input file or stream into the target class type.
+
+        If no clazz is provided, the binding context will try
+        to locate it from imported dataclasses.
+
+        Args:
+            source: The source stream object to parse
+            clazz: The target class type to parse the source bytes object
+            ns_map: A namespace prefix-URI map to record prefixes during parsing
+
+        Returns:
+            An instance of the specified class representing the parsed content.
+        """
 
     @abc.abstractmethod
     def start(
@@ -51,8 +135,8 @@ class PushParser(AbstractParser):
         queue: List,
         objects: List,
         qname: str,
-        text: NoneStr,
-        tail: NoneStr,
+        text: Optional[str],
+        tail: Optional[str],
     ) -> bool:
         """Parse the last xml node and bind any intermediate objects.
 
@@ -67,15 +151,18 @@ class PushParser(AbstractParser):
             Whether the binding process was successful.
         """
 
-    def register_namespace(self, prefix: NoneStr, uri: str):
-        """Register the uri prefix in the namespace registry.
+    def register_namespace(
+        self, ns_map: Dict[Optional[str], str], prefix: Optional[str], uri: str
+    ):
+        """Register the uri prefix in the namespace prefix-URI map.
 
         Args:
-            prefix: Namespace prefix
-            uri: Namespace uri
+            ns_map: The namespace prefix-URI map
+            prefix: The namespace prefix
+            uri: The namespace uri
         """
-        if prefix not in self.ns_map:
-            self.ns_map[prefix] = uri
+        if prefix not in ns_map:
+            ns_map[prefix] = uri
 
 
 class XmlNode(abc.ABC):
@@ -109,8 +196,8 @@ class XmlNode(abc.ABC):
     def bind(
         self,
         qname: str,
-        text: NoneStr,
-        tail: NoneStr,
+        text: Optional[str],
+        tail: Optional[str],
         objects: List[Any],
     ) -> bool:
         """Bind the parsed data into an object for the ending element.
@@ -150,49 +237,23 @@ class XmlHandler:
         self.queue: List = []
         self.objects: List = []
 
-    def parse(self, source: Any) -> Any:
+    def parse(self, source: Any, ns_map: Dict[Optional[str], str]) -> Any:
         """Parse the source XML document.
 
         Args:
             source: The xml source, can be a file resource or an input stream.
+            ns_map: A dictionary to capture namespace prefixes.
 
         Returns:
             An instance of the class type representing the parsed content.
         """
         raise NotImplementedError("This method must be implemented!")
 
-    def merge_parent_namespaces(self, ns_map: Dict[Optional[str], str]) -> Dict:
-        """Merge the given prefix-URI map with the parent node map.
-
-        This method also registers new prefixes with the parser.
-
-        Args:
-            ns_map: The current element namespace prefix-URI map
-
-        Returns:
-            The new merged namespace prefix-URI map.
-        """
-        if self.queue:
-            parent_ns_map = self.queue[-1].ns_map
-
-            if not ns_map:
-                return parent_ns_map
-
-            result = parent_ns_map.copy() if parent_ns_map else {}
-        else:
-            result = {}
-
-        for prefix, uri in ns_map.items():
-            self.parser.register_namespace(prefix, uri)
-            result[prefix] = uri
-
-        return result
-
 
 class EventsHandler(XmlHandler):
     """Sax content handler for pre-recorded events."""
 
-    def parse(self, source: List[Tuple]) -> Any:
+    def parse(self, source: List[Tuple], ns_map: Dict[Optional[str], str]) -> Any:
         """Forward the pre-recorded events to the main parser.
 
         Args:
@@ -203,21 +264,21 @@ class EventsHandler(XmlHandler):
         """
         for event, *args in source:
             if event == EventType.START:
-                qname, attrs, ns_map = args
+                qname, attrs, element_ns_map = args
                 self.parser.start(
                     self.clazz,
                     self.queue,
                     self.objects,
                     qname,
                     attrs,
-                    ns_map,
+                    element_ns_map,
                 )
             elif event == EventType.END:
                 qname, text, tail = args
                 self.parser.end(self.queue, self.objects, qname, text, tail)
             elif event == EventType.START_NS:
                 prefix, uri = args
-                self.parser.register_namespace(prefix or None, uri)
+                self.parser.register_namespace(ns_map, prefix or None, uri)
             else:
                 raise XmlHandlerError(f"Unhandled event: `{event}`.")
 

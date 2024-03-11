@@ -3,8 +3,8 @@ from dataclasses import dataclass
 from typing import Any, Dict, Protocol
 
 from xsdata.exceptions import XmlHandlerError
-from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.serializers.mixins import EventGenerator, XmlWriterEvent
+from xsdata.formats.types import T
 from xsdata.models.enums import EventType
 
 

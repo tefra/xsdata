@@ -2,8 +2,8 @@ from dataclasses import dataclass
 
 from lxml.etree import Element, TreeBuilder
 
-from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.serializers.tree.mixins import TreeSerializer
+from xsdata.formats.types import T
 
 
 @dataclass

@@ -3,12 +3,11 @@ from dataclasses import dataclass, field
 from io import StringIO
 from typing import Any, Callable, TextIO
 
-from xsdata.formats.bindings import AbstractSerializer
 from xsdata.formats.dataclass.serializers import DictEncoder
 
 
 @dataclass
-class JsonSerializer(DictEncoder, AbstractSerializer):
+class JsonSerializer(DictEncoder):
     """Json serializer for data classes.
 
     Args:

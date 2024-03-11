@@ -1,39 +1,23 @@
 from dataclasses import dataclass, field
-from enum import Enum
 from io import StringIO
 from typing import (
     Any,
     Dict,
-    Iterable,
-    Iterator,
-    List,
     Optional,
     TextIO,
-    Tuple,
     Type,
 )
-from xml.etree.ElementTree import QName
 
-from xsdata.exceptions import SerializerError
-from xsdata.formats.bindings import AbstractSerializer
-from xsdata.formats.converter import converter
-from xsdata.formats.dataclass.context import XmlContext
-from xsdata.formats.dataclass.models.elements import XmlMeta, XmlVar
-from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.formats.dataclass.serializers.mixins import (
     EventGenerator,
-    EventIterator,
     XmlWriter,
-    XmlWriterEvent,
 )
 from xsdata.formats.dataclass.serializers.writers import default_writer
-from xsdata.models.enums import DataType, QNames
-from xsdata.utils import collections, namespaces
-from xsdata.utils.constants import EMPTY_MAP
+from xsdata.utils import namespaces
 
 
 @dataclass
-class XmlSerializer(EventGenerator, AbstractSerializer):
+class XmlSerializer(EventGenerator):
     """Xml serializer for data classes.
 
     Args:

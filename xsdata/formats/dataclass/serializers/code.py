@@ -3,7 +3,6 @@ from enum import Enum
 from io import StringIO
 from typing import Any, Iterator, List, Mapping, Set, TextIO, Tuple, Type, Union
 
-from xsdata.formats.bindings import AbstractSerializer
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.utils import collections
 from xsdata.utils.objects import literal_value
@@ -15,7 +14,7 @@ unset = object()
 
 
 @dataclass
-class PycodeSerializer(AbstractSerializer):
+class PycodeSerializer:
     """Pycode serializer for data class instances.
 
     Generate python pretty representation code from a model instance.

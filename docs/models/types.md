@@ -225,7 +225,7 @@ The fields must provide the `format` metadata property.
 
 ## User Types
 
-You can register you own custom types as well as long as they are not dataclasses.
+You can register your own custom types as well as long as they are not dataclasses.
 
 ```python
 >>> from dataclasses import dataclass, field
@@ -263,5 +263,65 @@ You can register you own custom types as well as long as they are not dataclasse
 </Example>
 >>> XmlParser().from_string(output)
 Example(good=11.0, bad=-9.9827632)
+
+```
+
+### Overriding standard type converters
+
+It is also possible to override the converter for any of the standard types.
+For example, we can override the standard serialize function for `XmlDateTime`.
+
+```python
+>>> from dataclasses import dataclass
+>>> from typing import Any, Optional
+>>>
+>>> from xsdata.formats.converter import Converter, converter
+>>> from xsdata.formats.dataclass.parsers import XmlParser
+>>> from xsdata.formats.dataclass.serializers import XmlSerializer
+>>> from xsdata.formats.dataclass.serializers.config import SerializerConfig
+>>> from xsdata.models.datatype import XmlDateTime
+...
+>>> serializer = XmlSerializer(config=SerializerConfig(xml_declaration=False))
+...
+...
+>>> @dataclass
+... class DateTimeObject:
+...     datetime: XmlDateTime
+...
+...
+>>> datetime_obj = DateTimeObject(
+...     datetime=XmlDateTime(
+...         year=2023,
+...         month=11,
+...         day=24,
+...         hour=10,
+...         minute=38,
+...         second=56,
+...         fractional_second=123_000_000,
+...     )
+... )
+...
+>>> print(serializer.render(datetime_obj))
+<DateTimeObject>2023-11-24T10:38:56.123</DateTimeObject>
+...
+...
+>>> class MyXmlDateTimeConverter(Converter):
+...     def deserialize(self, value: Any, **kwargs: Any) -> XmlDateTime:
+...         return XmlDateTime.from_string(value)
+...
+...     def serialize(self, value: Any, **kwargs: Any) -> Optional[str]:
+...         if isinstance(value, XmlDateTime):
+...             # Can be anything you like
+...             return (
+...                 f"{value.day}-{value.month}-{value.year}"
+...                 f"T{value.hour}:{value.minute}:{value.second}"
+...             )
+...
+...
+>>> converter.register_converter(XmlDateTime, MyXmlDateTimeConverter())
+>>> print(serializer.render(datetime_obj))
+<DateTimeObject>24-11-2023T10:38:56</DateTimeObject>
+...
+>>> converter.unregister_converter(XmlDateTime)
 
 ```

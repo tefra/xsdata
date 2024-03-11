@@ -139,7 +139,8 @@ them through config.
 ```
 
 ## Custom serialization for specific data types
-If you wish to specify some custom serialization function, for example to change the way a datetime is formatted, you can register a custom converter.
+If you wish to specify some custom serialization function, for example to change the way
+a datetime is formatted, you can register a custom converter.
 
 ```python
 >>> from dataclasses import dataclass
@@ -156,7 +157,7 @@ If you wish to specify some custom serialization function, for example to change
 
 
 >>> @dataclass
->>> class DateTimeObject:
+... class DateTimeObject:
 ...     datetime: XmlDateTime
 
 

@@ -268,8 +268,8 @@ Example(good=11.0, bad=-9.9827632)
 
 ### Overriding standard type converters
 
-It is also possible to override the converter for any of the standard types.
-For example, we can override the standard serialize function for `XmlDateTime`.
+It is also possible to override the converter for any of the standard types. For
+example, we can override the standard serialize function for `XmlDateTime`.
 
 ```python
 >>> from dataclasses import dataclass
@@ -303,8 +303,8 @@ For example, we can override the standard serialize function for `XmlDateTime`.
 ...
 >>> print(serializer.render(datetime_obj))
 <DateTimeObject>2023-11-24T10:38:56.123</DateTimeObject>
-...
-...
+>>>
+>>>
 >>> class MyXmlDateTimeConverter(Converter):
 ...     def deserialize(self, value: Any, **kwargs: Any) -> XmlDateTime:
 ...         return XmlDateTime.from_string(value)
@@ -321,7 +321,7 @@ For example, we can override the standard serialize function for `XmlDateTime`.
 >>> converter.register_converter(XmlDateTime, MyXmlDateTimeConverter())
 >>> print(serializer.render(datetime_obj))
 <DateTimeObject>24-11-2023T10:38:56</DateTimeObject>
-...
+>>>
 >>> converter.unregister_converter(XmlDateTime)
 
 ```

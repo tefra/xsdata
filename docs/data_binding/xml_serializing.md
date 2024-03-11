@@ -138,6 +138,57 @@ them through config.
 
 ```
 
+## Custom serialization for specific data types
+If you wish to specify some custom serialization function, for example to change the way a datetime is formatted, you can register a custom converter.
+
+```python
+>>> from dataclasses import dataclass
+>>> from typing import Any, Optional
+
+>>> from xsdata.formats.converter import Converter, converter
+>>> from xsdata.formats.dataclass.parsers import XmlParser
+>>> from xsdata.formats.dataclass.serializers import XmlSerializer
+>>> from xsdata.formats.dataclass.serializers.config import SerializerConfig
+>>> from xsdata.models.datatype import XmlDateTime
+
+>>> parser = XmlParser()
+>>> serializer = XmlSerializer(config=SerializerConfig(xml_declaration=False))
+
+
+>>> @dataclass
+>>> class DateTimeObject:
+...     datetime: XmlDateTime
+
+
+>>> xml_obj = parser.from_string(
+...     "<datetime>2023-11-24T10:38:56.123</datetime>", DateTimeObject
+... )
+
+>>> print(serializer.render(xml_obj))
+<DateTimeObject>2023-11-24T10:38:56.123</DateTimeObject>
+
+
+>>> class MyXmlDateTimeConverter(Converter):
+... 
+...     def deserialize(self, value: Any, **kwargs: Any) -> Any:
+...         return XmlDateTime.from_string(value)
+... 
+...     def serialize(self, value: Any, **kwargs: Any) -> Optional[str]:
+...        if isinstance(value, XmlDateTime):
+...            # Can be anything you like
+...            return (
+...                 f"{value.day}-{value.month}-{value.year}"
+...                 f"T{value.hour}:{value.minute}:{value.second}"
+...             )
+
+
+>>> converter.register_converter(XmlDateTime, MyXmlDateTimeConverter())
+
+>>> print(serializer.render(xml_obj))
+<DateTimeObject>24-11-2023T10:38:56</DateTimeObject>
+
+```
+
 ## Alternative writers
 
 There are two writers based on lxml and native python that may vary in performance in

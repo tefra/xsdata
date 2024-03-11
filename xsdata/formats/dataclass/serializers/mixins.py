@@ -1,8 +1,11 @@
 import abc
+from dataclasses import dataclass, field
+from enum import Enum
 from typing import (
     Any,
     Dict,
     Final,
+    Iterable,
     Iterator,
     List,
     Literal,
@@ -16,10 +19,13 @@ from xml.sax.handler import ContentHandler
 
 from typing_extensions import TypeAlias
 
-from xsdata.exceptions import XmlWriterError
+from xsdata.exceptions import SerializerError, XmlWriterError
 from xsdata.formats.converter import converter
+from xsdata.formats.dataclass.context import XmlContext
+from xsdata.formats.dataclass.models.elements import XmlMeta, XmlVar
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.models.enums import DataType, Namespace, QNames
+from xsdata.utils import collections, namespaces
 from xsdata.utils.constants import EMPTY_MAP
 from xsdata.utils.namespaces import generate_prefix, prefix_exists, split_qname
 
@@ -340,3 +346,565 @@ class XmlWriter(abc.ABC):
             return None
 
         return converter.serialize(data, ns_map=self.ns_map)
+
+
+@dataclass
+class EventGenerator:
+    context: XmlContext = field(default_factory=XmlContext)
+    config: SerializerConfig = field(default_factory=SerializerConfig)
+
+    def generate(self, obj: Any) -> EventIterator:
+        """Convert a user model, or derived element instance to sax events.
+
+        Args:
+            obj: A user model, or derived element instance
+
+        Yields:
+            An iterator of sax events.
+        """
+        qname = xsi_type = None
+        if isinstance(obj, self.context.class_type.derived_element):
+            meta = self.context.build(
+                obj.value.__class__, globalns=self.config.globalns
+            )
+            qname = obj.qname
+            obj = obj.value
+            xsi_type = self.real_xsi_type(qname, meta.target_qname)
+
+        yield from self.convert_dataclass(obj, qname=qname, xsi_type=xsi_type)
+
+    def convert_dataclass(
+        self,
+        obj: Any,
+        namespace: Optional[str] = None,
+        qname: Optional[str] = None,
+        nillable: bool = False,
+        xsi_type: Optional[str] = None,
+    ) -> EventIterator:
+        """Convert a model instance to sax events.
+
+        Optionally override the qualified name and the
+        xsi attributes type and nil.
+
+        Args:
+            obj: A model instance
+            namespace: The field namespace URI
+            qname: Override the field qualified name
+            nillable: Specifies whether the field is nillable
+            xsi_type: Override the field xsi type
+
+        Yields:
+            An iterator of sax events.
+        """
+        meta = self.context.build(
+            obj.__class__,
+            namespace,
+            globalns=self.config.globalns,
+        )
+        qname = qname or meta.qname
+        nillable = nillable or meta.nillable
+        namespace, tag = namespaces.split_qname(qname)
+
+        yield XmlWriterEvent.START, qname
+
+        for key, value in self.next_attribute(
+            obj, meta, nillable, xsi_type, self.config.ignore_default_attributes
+        ):
+            yield XmlWriterEvent.ATTR, key, value
+
+        for var, value in self.next_value(obj, meta):
+            yield from self.convert_value(value, var, namespace)
+
+        yield XmlWriterEvent.END, qname
+
+    def convert_xsi_type(
+        self,
+        value: Any,
+        var: XmlVar,
+        namespace: Optional[str],
+    ) -> EventIterator:
+        """Convert a xsi:type value to sax events.
+
+        The value can be assigned to wildcard, element or compound fields
+
+        Args:
+            value: A model instance
+            var: The field metadata instance
+            namespace: The field namespace URI
+
+        Yields:
+            An iterator of sax events.
+        """
+        if var.is_wildcard:
+            choice = var.find_value_choice(value, True)
+            if choice:
+                yield from self.convert_value(value, choice, namespace)
+            else:
+                yield from self.convert_dataclass(value, namespace)
+        elif var.is_element:
+            xsi_type = self.xsi_type(var, value, namespace)
+            yield from self.convert_dataclass(
+                value,
+                namespace,
+                var.qname,
+                var.nillable,
+                xsi_type,
+            )
+        else:
+            # var elements/compound
+            meta = self.context.fetch(value.__class__, namespace)
+            yield from self.convert_dataclass(value, qname=meta.target_qname)
+
+    def convert_value(
+        self, value: Any, var: XmlVar, namespace: Optional[str]
+    ) -> EventIterator:
+        """Convert any value to sax events according to the var instance.
+
+        The order of the checks is important as more than one condition
+        can be true.
+
+        Args:
+            value: The input value
+            var: The field metadata instance
+            namespace: The class namespace URI
+
+        Yields:
+            An iterator of sax events.
+        """
+        if var.mixed:
+            yield from self.convert_mixed_content(value, var, namespace)
+        elif var.is_text:
+            yield from self.convert_data(value, var)
+        elif var.tokens:
+            yield from self.convert_tokens(value, var, namespace)
+        elif var.is_elements:
+            yield from self.convert_elements(value, var, namespace)
+        elif var.list_element and collections.is_array(value):
+            yield from self.convert_list(value, var, namespace)
+        else:
+            yield from self.convert_any_type(value, var, namespace)
+
+    def convert_list(
+        self,
+        values: Iterable,
+        var: XmlVar,
+        namespace: Optional[str],
+    ) -> EventIterator:
+        """Convert an array of values to sax events.
+
+        Args:
+            values: A list, set, tuple instance
+            var: The field metadata instance
+            namespace: The class namespace
+
+        Yields:
+            An iterator of sax events.
+        """
+        if var.wrapper is not None:
+            yield XmlWriterEvent.START, var.wrapper
+            for value in values:
+                yield from self.convert_value(value, var, namespace)
+            yield XmlWriterEvent.END, var.wrapper
+        else:
+            for value in values:
+                yield from self.convert_value(value, var, namespace)
+
+    def convert_tokens(
+        self, value: Any, var: XmlVar, namespace: Optional[str]
+    ) -> EventIterator:
+        """Convert an array of token values to sax events.
+
+        Args:
+            value: A list, set, tuple instance
+            var: The field metadata instance
+            namespace: The class namespace
+
+        Yields:
+            An iterator of sax events.
+        """
+        if value or var.nillable or var.required:
+            if value and collections.is_array(value[0]):
+                for val in value:
+                    yield from self.convert_element(val, var, namespace)
+            else:
+                yield from self.convert_element(value, var, namespace)
+
+    def convert_mixed_content(
+        self,
+        values: List,
+        var: XmlVar,
+        namespace: Optional[str],
+    ) -> EventIterator:
+        """Convert mixed content values to sax events.
+
+        Args:
+            values: A list instance of mixed type values
+            var: The field metadata instance
+            namespace: The class namespace
+
+        Yields:
+            An iterator of sax events.
+        """
+        for value in values:
+            yield from self.convert_any_type(value, var, namespace)
+
+    def convert_any_type(
+        self, value: Any, var: XmlVar, namespace: Optional[str]
+    ) -> EventIterator:
+        """Convert a value assigned to a xs:anyType field to sax events.
+
+        Args:
+            value: A list instance of mixed type values
+            var: The field metadata instance
+            namespace: The class namespace
+
+        Yields:
+            An iterator of sax events.
+        """
+        if isinstance(value, self.context.class_type.any_element):
+            yield from self.convert_any_element(value, var, namespace)
+        elif isinstance(value, self.context.class_type.derived_element):
+            yield from self.convert_derived_element(value, namespace)
+        elif self.context.class_type.is_model(value):
+            yield from self.convert_xsi_type(value, var, namespace)
+        elif var.is_element:
+            yield from self.convert_element(value, var, namespace)
+        else:
+            yield from self.convert_data(value, var)
+
+    def convert_derived_element(
+        self, value: Any, namespace: Optional[str]
+    ) -> EventIterator:
+        """Convert a derived element instance to sax events.
+
+        Args:
+            value: A list instance of mixed type values
+            namespace: The class namespace
+
+        Yields:
+            An iterator of sax events.
+        """
+        if self.context.class_type.is_model(value.value):
+            meta = self.context.fetch(value.value.__class__)
+            qname = value.qname
+            xsi_type = self.real_xsi_type(qname, meta.target_qname)
+
+            yield from self.convert_dataclass(
+                value.value, namespace, qname=qname, xsi_type=xsi_type
+            )
+        else:
+            datatype = DataType.from_value(value.value)
+
+            yield XmlWriterEvent.START, value.qname
+            yield XmlWriterEvent.ATTR, QNames.XSI_TYPE, QName(str(datatype))
+            yield XmlWriterEvent.DATA, value.value
+            yield XmlWriterEvent.END, value.qname
+
+    def convert_any_element(
+        self, value: Any, var: XmlVar, namespace: Optional[str]
+    ) -> EventIterator:
+        """Convert a generic any element instance to sax events.
+
+        Args:
+            value: A list instance of mixed type values
+            var: The field metadata instance
+            namespace: The class namespace
+
+        Yields:
+            An iterator of sax events.
+        """
+        if value.qname:
+            namespace, tag = namespaces.split_qname(value.qname)
+            yield XmlWriterEvent.START, value.qname
+
+        for key, val in value.attributes.items():
+            yield XmlWriterEvent.ATTR, key, val
+
+        yield XmlWriterEvent.DATA, value.text
+
+        for child in value.children:
+            yield from self.convert_any_type(child, var, namespace)
+
+        if value.qname:
+            yield XmlWriterEvent.END, value.qname
+
+        if value.tail:
+            yield XmlWriterEvent.DATA, value.tail
+
+    def xsi_type(
+        self, var: XmlVar, value: Any, namespace: Optional[str]
+    ) -> Optional[str]:
+        """Return the xsi:type for the given value and field metadata instance.
+
+        If the value type is either a child or parent for one of the var types,
+        we need to declare it as n xsi:type.
+
+        Args:
+            value: A list instance of mixed type values
+            var: The field metadata instance
+            namespace: The class namespace
+
+        Raises:
+            SerializerError: If the value type is completely unrelated to
+                the field types.
+        """
+        if not value or value.__class__ in var.types:
+            return None
+
+        clazz = var.clazz
+        if clazz is None or self.context.is_derived(value, clazz):
+            meta = self.context.fetch(value.__class__, namespace)
+            return self.real_xsi_type(var.qname, meta.target_qname)
+
+        raise SerializerError(
+            f"{value.__class__.__name__} is not derived from {clazz.__name__}"
+        )
+
+    def convert_elements(
+        self, value: Any, var: XmlVar, namespace: Optional[str]
+    ) -> EventIterator:
+        """Convert the value assigned to a compound field to sax events.
+
+        Args:
+            value: A list instance of mixed type values
+            var: The field metadata instance
+            namespace: The class namespace
+
+        Yields:
+            An iterator of sax events.
+        """
+        if collections.is_array(value):
+            for val in value:
+                yield from self.convert_choice(val, var, namespace)
+        else:
+            yield from self.convert_choice(value, var, namespace)
+
+    def convert_choice(
+        self, value: Any, var: XmlVar, namespace: Optional[str]
+    ) -> EventIterator:
+        """Convert a single value assigned to a compound field to sax events.
+
+        Args:
+            value: A list instance of mixed type values
+            var: The field metadata instance
+            namespace: The class namespace
+
+        Yields:
+            An iterator of sax events.
+
+        Raises:
+            SerializerError: If the value doesn't match any choice field.
+        """
+        if isinstance(value, self.context.class_type.derived_element):
+            choice = var.find_choice(value.qname)
+            value = value.value
+
+            if self.context.class_type.is_model(value):
+                func = self.convert_xsi_type
+            else:
+                func = self.convert_element
+
+        elif isinstance(value, self.context.class_type.any_element) and value.qname:
+            choice = var.find_choice(value.qname)
+            func = self.convert_any_type
+        else:
+            check_subclass = self.context.class_type.is_model(value)
+            choice = var.find_value_choice(value, check_subclass)
+            func = self.convert_value
+
+            if not choice and check_subclass:
+                func = self.convert_xsi_type
+                choice = var
+
+        if not choice:
+            raise SerializerError(
+                f"XmlElements undefined choice: `{var.name}` for `{type(value)}`"
+            )
+
+        yield from func(value, choice, namespace)
+
+    def convert_element(
+        self,
+        value: Any,
+        var: XmlVar,
+        namespace: Optional[str],
+    ) -> EventIterator:
+        """Convert a value assigned to an element field to sax events.
+
+        Args:
+            value: A list instance of mixed type values
+            var: The field metadata instance
+            namespace: The class namespace (unused)
+
+        Yields:
+            An iterator of sax events.
+        """
+        yield XmlWriterEvent.START, var.qname
+
+        if var.nillable:
+            yield XmlWriterEvent.ATTR, QNames.XSI_NIL, "true"
+
+        if value is not None and value != "" and var.any_type:
+            datatype = DataType.from_value(value)
+            if datatype != DataType.STRING:
+                yield XmlWriterEvent.ATTR, QNames.XSI_TYPE, QName(str(datatype))
+
+        yield XmlWriterEvent.DATA, self.encode_primitive(value, var)
+        yield XmlWriterEvent.END, var.qname
+
+    @classmethod
+    def convert_data(cls, value: Any, var: XmlVar) -> EventIterator:
+        """Convert a value assigned to a text field to sax events.
+
+        Args:
+            value: A list instance of mixed type values
+            var: The field metadata instance
+
+        Yields:
+            An iterator of sax events.
+        """
+        yield XmlWriterEvent.DATA, cls.encode_primitive(value, var)
+
+    @classmethod
+    def next_value(cls, obj: Any, meta: XmlMeta) -> Iterator[Tuple[XmlVar, Any]]:
+        """Produce the next non attribute value of a model instance to convert.
+
+        The generator will produce the values in the order the fields
+        are defined in the model or by their sequence number.
+
+        Sequential fields need to be rendered together in parallel order
+        eg: <a1/><a2/><a1/><a/2></a1>
+
+        Args:
+            obj: The input model instance
+            meta: The model metadata instance
+
+        Yields:
+            An iterator of field metadata instance and value tuples.
+        """
+        index = 0
+        attrs = meta.get_element_vars()
+        stop = len(attrs)
+        while index < stop:
+            var = attrs[index]
+
+            if var.sequence is None:
+                value = getattr(obj, var.name)
+                if value is not None or var.nillable:
+                    yield var, value
+                index += 1
+                continue
+
+            indices = range(index, stop)
+            end = next(
+                i for i in indices[::-1] if attrs[i].sequence == var.sequence
+            )  # pragma: no cover
+            sequence = attrs[index : end + 1]
+            index = end + 1
+            j = 0
+
+            rolling = True
+            while rolling:
+                rolling = False
+                for var in sequence:
+                    values = getattr(obj, var.name)
+                    if collections.is_array(values):
+                        if j < len(values):
+                            rolling = True
+                            value = values[j]
+                            if value is not None or var.nillable:
+                                yield var, value
+                    elif j == 0:
+                        rolling = True
+                        if values is not None or var.nillable:
+                            yield var, values
+
+                j += 1
+
+    @classmethod
+    def next_attribute(
+        cls,
+        obj: Any,
+        meta: XmlMeta,
+        nillable: bool,
+        xsi_type: Optional[str],
+        ignore_optionals: bool,
+    ) -> Iterator[Tuple[str, Any]]:
+        """Produce the next attribute value to convert.
+
+        Args:
+            obj: The input model instance
+            meta: The model metadata instance
+            nillable: Specifies if the current element supports nillable content
+            xsi_type: The real xsi:type of the object
+            ignore_optionals: Specifies if optional attributes with default
+                values should be ignored.
+
+        Yields:
+            An iterator of attribute name-value pairs.
+        """
+        for var in meta.get_attribute_vars():
+            if var.is_attribute:
+                value = getattr(obj, var.name)
+                if (
+                    value is None
+                    or (collections.is_array(value) and not value)
+                    or (ignore_optionals and var.is_optional(value))
+                ):
+                    continue
+
+                yield var.qname, cls.encode_primitive(value, var)
+            else:
+                yield from getattr(obj, var.name, EMPTY_MAP).items()
+
+        if xsi_type:
+            yield QNames.XSI_TYPE, QName(xsi_type)
+
+        if nillable:
+            yield QNames.XSI_NIL, "true"
+
+    @classmethod
+    def encode_primitive(cls, value: Any, var: XmlVar) -> Any:
+        """Encode a value for xml serialization.
+
+        Converts values to strings. QName instances is an exception,
+        those values need to wait until the XmlWriter assigns prefixes
+        to namespaces per element node. Enums and Tokens may contain
+        QName(s) so they also get a special treatment.
+
+        We can't do all the conversions in the writer because we would
+        need to carry the xml vars inside the writer. Instead of that we
+        do the easy encoding here and leave the qualified names for
+        later.
+
+        Args:
+            value: The simple type vale to encode
+            var: The field metadata instance
+
+        Returns:
+            The encoded value.
+        """
+        if isinstance(value, (str, QName)) or var is None:
+            return value
+
+        if collections.is_array(value):
+            return [cls.encode_primitive(v, var) for v in value]
+
+        if isinstance(value, Enum):
+            return cls.encode_primitive(value.value, var)
+
+        return converter.serialize(value, format=var.format)
+
+    @classmethod
+    def real_xsi_type(cls, qname: str, target_qname: Optional[str]) -> Optional[str]:
+        """Compare the qname with the target qname and return the real xsi:type.
+
+        Args:
+            qname: The field type qualified name
+            target_qname: The value type qualified name
+
+        Returns:
+            None if the qname and target qname match, otherwise
+            return the target qname.
+        """
+        return target_qname if target_qname != qname else None

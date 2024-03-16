@@ -267,6 +267,7 @@ class AttrFactory(Factory):
         choices: Optional[List[Attr]] = None,
         tag: Optional[str] = None,
         namespace: Optional[str] = None,
+        wrapper: Optional[str] = None,
         default: Optional[Any] = None,
         fixed: bool = False,
         mixed: bool = False,
@@ -282,6 +283,7 @@ class AttrFactory(Factory):
             choices=choices or [],
             tag=tag or random.choice(cls.tags),
             namespace=namespace,
+            wrapper=wrapper,
             default=default,
             fixed=fixed,
             mixed=mixed,
@@ -290,14 +292,28 @@ class AttrFactory(Factory):
         )
 
     @classmethod
-    def reference(cls, qname: str, tag: str = Tag.ELEMENT, **kwargs: Any) -> Attr:
+    def reference(
+        cls,
+        qname: str,
+        tag: str = Tag.ELEMENT,
+        name: Optional[str] = None,
+        **kwargs: Any,
+    ) -> Attr:
         return cls.create(
-            tag=tag, types=[AttrTypeFactory.create(qname=qname, **kwargs)]
+            name=name, tag=tag, types=[AttrTypeFactory.create(qname=qname, **kwargs)]
         )
 
     @classmethod
-    def native(cls, datatype: DataType, tag: str = Tag.ELEMENT, **kwargs: Any) -> Attr:
-        return cls.create(tag=tag, types=[AttrTypeFactory.native(datatype)], **kwargs)
+    def native(
+        cls,
+        datatype: DataType,
+        tag: str = Tag.ELEMENT,
+        name: Optional[str] = None,
+        **kwargs: Any,
+    ) -> Attr:
+        return cls.create(
+            name=name, tag=tag, types=[AttrTypeFactory.native(datatype)], **kwargs
+        )
 
     @classmethod
     def enumeration(cls, **kwargs: Any) -> Attr:

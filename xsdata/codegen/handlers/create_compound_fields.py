@@ -133,24 +133,20 @@ class CreateCompoundFields(RelativeHandlerInterface):
 
         min_occurs, max_occurs = self.sum_counters(counters)
         name = self.choose_name(target, names, list(filter(None, substitutions)))
-        types = collections.unique_sequence(
-            t.clone() for attr in attrs for t in attr.types
-        )
 
-        target.attrs.insert(
-            pos,
-            Attr(
-                name=name,
-                index=0,
-                types=types,
-                tag=Tag.CHOICE,
-                restrictions=Restrictions(
-                    min_occurs=sum(min_occurs),
-                    max_occurs=max(max_occurs) if choice > 0 else sum(max_occurs),
-                ),
-                choices=choices,
+        compound_attr = Attr(
+            name=name,
+            index=0,
+            types=[],
+            tag=Tag.CHOICE,
+            restrictions=Restrictions(
+                min_occurs=sum(min_occurs),
+                max_occurs=max(max_occurs) if choice > 0 else sum(max_occurs),
             ),
+            choices=choices,
         )
+        ClassUtils.reset_choice_types(compound_attr)
+        target.attrs.insert(pos, compound_attr)
 
     def sum_counters(self, counters: Dict) -> Tuple[List[int], List[int]]:
         """Sum the min/max occurrences for the compound attr.

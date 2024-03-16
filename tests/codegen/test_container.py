@@ -57,6 +57,7 @@ class ClassContainerTests(FactoryTestCase):
             60: [
                 "DetectCircularReferences",
                 "CreateCompoundFields",
+                "CreateWrapperFields",
                 "DisambiguateChoices",
                 "ResetAttributeSequenceNumbers",
             ],

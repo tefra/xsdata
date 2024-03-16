@@ -96,8 +96,8 @@ class DisambiguateChoicesTest(FactoryTestCase):
         compound = AttrFactory.any()
         target = ClassFactory.create()
         target.attrs.append(compound)
-        compound.choices.append(AttrFactory.reference(name="a", qname="myint"))
-        compound.choices.append(AttrFactory.reference(name="b", qname="myint"))
+        compound.choices.append(AttrFactory.reference(qname="myint"))
+        compound.choices.append(AttrFactory.reference(qname="myint"))
         self.container.add(target)
 
         self.handler.process(target)

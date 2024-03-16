@@ -3,6 +3,7 @@ from typing import Iterator
 
 from xsdata.codegen.mixins import ContainerInterface, RelativeHandlerInterface
 from xsdata.codegen.models import Attr, AttrType, Class, Extension, Restrictions
+from xsdata.codegen.utils import ClassUtils
 from xsdata.models.enums import DataType, Tag
 from xsdata.utils import collections, text
 from xsdata.utils.constants import DEFAULT_ATTR_NAME
@@ -62,9 +63,7 @@ class DisambiguateChoices(RelativeHandlerInterface):
         for choice in self.find_ambiguous_choices(attr):
             self.disambiguate_choice(target, choice)
 
-        if attr.tag == Tag.CHOICE:
-            types = (tp for choice in attr.choices for tp in choice.types)
-            attr.types = collections.unique_sequence(x.clone() for x in types)
+        ClassUtils.reset_choice_types(attr)
 
     @classmethod
     def merge_wildcard_choices(cls, attr: Attr):

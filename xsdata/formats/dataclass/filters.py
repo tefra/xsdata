@@ -441,6 +441,7 @@ class Filters:
         restrictions = attr.restrictions.asdict(attr.native_types)
 
         metadata = {
+            "wrapper": attr.wrapper,
             "name": name,
             "type": attr.xml_type,
             "namespace": namespace,

@@ -160,7 +160,11 @@ class Restrictions(CodegenModel):
                 result["min_occurs"] = self.min_occurs
             if self.max_occurs is not None and self.max_occurs < sys.maxsize:
                 result["max_occurs"] = self.max_occurs
-        elif self.min_occurs == self.max_occurs == 1 and not self.nillable:
+        elif (
+            self.min_occurs == self.max_occurs == 1
+            and not self.nillable
+            and not self.tokens
+        ):
             result["required"] = True
 
         for key, value in asdict(self).items():

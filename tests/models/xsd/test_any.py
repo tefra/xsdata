@@ -1,3 +1,4 @@
+import sys
 from unittest import TestCase
 
 from xsdata.models.enums import Namespace, NamespaceType
@@ -5,6 +6,15 @@ from xsdata.models.xsd import Any
 
 
 class AnyTests(TestCase):
+    def test_normalize_max_occurs(self):
+        obj = Any(min_occurs=3, max_occurs=2)
+        self.assertEqual(3, obj.max_occurs)
+        self.assertEqual(3, obj.min_occurs)
+
+        obj = Any(min_occurs=3, max_occurs="unbounded")
+        self.assertEqual(sys.maxsize, obj.max_occurs)
+        self.assertEqual(3, obj.min_occurs)
+
     def test_property_is_property(self):
         self.assertTrue(Any().is_property)
 

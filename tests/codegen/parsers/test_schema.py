@@ -416,15 +416,11 @@ class SchemaParserTests(TestCase):
         schema.elements.append(Element())
         schema.elements.append(Element())
 
-        for el in schema.elements:
-            self.assertEqual(1, el.min_occurs)
-            self.assertEqual(1, el.max_occurs)
-
         self.parser.end_schema(schema)
 
         for el in schema.elements:
-            self.assertIsNone(el.min_occurs)
-            self.assertIsNone(el.max_occurs)
+            self.assertEqual(1, el.min_occurs)
+            self.assertEqual(1, el.max_occurs)
 
         self.parser.end_schema(ComplexType())
 

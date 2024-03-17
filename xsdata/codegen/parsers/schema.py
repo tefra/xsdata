@@ -129,7 +129,6 @@ class SchemaParser(UserXmlParser):
             self.set_schema_namespaces(obj)
             self.add_default_imports(obj)
             self.resolve_schemas_locations(obj)
-            self.reset_element_occurs(obj)
 
     def end_attribute(self, obj: T):
         """End attribute element entrypoint.
@@ -411,16 +410,3 @@ class SchemaParser(UserXmlParser):
         xsi_ns = Namespace.XSI.uri
         if xsi_ns in obj.ns_map.values() and xsi_ns not in imp_namespaces:
             obj.imports.insert(0, xsd.Import(namespace=xsi_ns))
-
-    @classmethod
-    def reset_element_occurs(cls, obj: xsd.Schema):
-        """Reset the root elements occurs restrictions.
-
-        The root elements don't get those.
-
-        Args:
-            obj: The xsd schema instance
-        """
-        for element in obj.elements:
-            element.min_occurs = None
-            element.max_occurs = None

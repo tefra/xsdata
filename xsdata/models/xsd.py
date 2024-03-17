@@ -33,6 +33,16 @@ docstring_serializer = XmlSerializer(
 )
 
 
+def validate_max_occurs(min_occurs: int, max_occurs: UnionType[str, int]) -> int:
+    """Validate max occurs."""
+    if max_occurs == "unbounded":
+        max_occurs = sys.maxsize
+
+    assert isinstance(max_occurs, int)
+
+    return max(max_occurs, min_occurs)
+
+
 @dataclass(frozen=True)
 class Docstring:
     """Docstring model representation.
@@ -121,7 +131,7 @@ class AnyAttribute(AnnotationBase):
     )
 
     def __post_init__(self):
-        """Clean the namespace value."""
+        """Post initialization validations."""
         self.namespace = " ".join(unique_sequence(self.namespace.split()))
 
     @property
@@ -351,14 +361,15 @@ class Any(AnnotationBase):
 
     namespace: str = attribute(default="##any")
     min_occurs: int = attribute(default=1, name="minOccurs")
-    max_occurs: UnionType[int, str] = attribute(default=1, name="maxOccurs")
+    max_occurs: UnionType[str, int] = attribute(default=1, name="maxOccurs")
     process_contents: ProcessType = attribute(
         default=ProcessType.STRICT, name="processContents"
     )
 
     def __post_init__(self):
-        """Clean the namespace value."""
+        """Post initialization validations."""
         self.namespace = " ".join(unique_sequence(self.namespace.split()))
+        self.max_occurs = validate_max_occurs(self.min_occurs, self.max_occurs)
 
     @property
     def is_property(self) -> bool:
@@ -397,17 +408,19 @@ class All(AnnotationBase):
     """XSD All model representation."""
 
     min_occurs: int = attribute(default=1, name="minOccurs")
-    max_occurs: UnionType[int, str] = attribute(default=1, name="maxOccurs")
+    max_occurs: UnionType[str, int] = attribute(default=1, name="maxOccurs")
     any: Array[Any] = array_element(name="any")
     elements: Array["Element"] = array_element(name="element")
     groups: Array["Group"] = array_element(name="group")
 
+    def __post_init__(self):
+        """Post initialization validations."""
+        self.max_occurs = validate_max_occurs(self.min_occurs, self.max_occurs)
+
     def get_restrictions(self) -> Dict[str, Anything]:
         """Return the restrictions dictionary of this element."""
-        max_occurs = sys.maxsize if self.max_occurs == "unbounded" else self.max_occurs
-
         return {
-            "path": [("a", id(self), self.min_occurs, max_occurs)],
+            "path": [("a", id(self), self.min_occurs, self.max_occurs)],
         }
 
 
@@ -416,19 +429,21 @@ class Sequence(AnnotationBase):
     """XSD Sequence model representation."""
 
     min_occurs: int = attribute(default=1, name="minOccurs")
-    max_occurs: UnionType[int, str] = attribute(default=1, name="maxOccurs")
+    max_occurs: UnionType[str, int] = attribute(default=1, name="maxOccurs")
     elements: Array["Element"] = array_element(name="element")
     groups: Array["Group"] = array_element(name="group")
     choices: Array["Choice"] = array_element(name="choice")
     sequences: Array["Sequence"] = array_element(name="sequence")
     any: Array["Any"] = array_element()
 
+    def __post_init__(self):
+        """Post initialization validations."""
+        self.max_occurs = validate_max_occurs(self.min_occurs, self.max_occurs)
+
     def get_restrictions(self) -> Dict[str, Anything]:
         """Return the restrictions dictionary of this element."""
-        max_occurs = sys.maxsize if self.max_occurs == "unbounded" else self.max_occurs
-
         return {
-            "path": [("s", id(self), self.min_occurs, max_occurs)],
+            "path": [("s", id(self), self.min_occurs, self.max_occurs)],
         }
 
 
@@ -437,19 +452,21 @@ class Choice(AnnotationBase):
     """XSD Choice model representation."""
 
     min_occurs: int = attribute(default=1, name="minOccurs")
-    max_occurs: UnionType[int, str] = attribute(default=1, name="maxOccurs")
+    max_occurs: UnionType[str, int] = attribute(default=1, name="maxOccurs")
     elements: Array["Element"] = array_element(name="element")
     groups: Array["Group"] = array_element(name="group")
     choices: Array["Choice"] = array_element(name="choice")
     sequences: Array[Sequence] = array_element(name="sequence")
     any: Array["Any"] = array_element()
 
+    def __post_init__(self):
+        """Post initialization validations."""
+        self.max_occurs = validate_max_occurs(self.min_occurs, self.max_occurs)
+
     def get_restrictions(self) -> Dict[str, Anything]:
         """Return the restrictions dictionary of this element."""
-        max_occurs = sys.maxsize if self.max_occurs == "unbounded" else self.max_occurs
-
         return {
-            "path": [("c", id(self), self.min_occurs, max_occurs)],
+            "path": [("c", id(self), self.min_occurs, self.max_occurs)],
         }
 
 
@@ -460,10 +477,14 @@ class Group(AnnotationBase):
     name: Optional[str] = attribute()
     ref: str = attribute(default="")
     min_occurs: int = attribute(default=1, name="minOccurs")
-    max_occurs: UnionType[int, str] = attribute(default=1, name="maxOccurs")
+    max_occurs: UnionType[str, int] = attribute(default=1, name="maxOccurs")
     all: Optional[All] = element()
     choice: Optional[Choice] = element()
     sequence: Optional[Sequence] = element()
+
+    def __post_init__(self):
+        """Post initialization validations."""
+        self.max_occurs = validate_max_occurs(self.min_occurs, self.max_occurs)
 
     @property
     def is_property(self) -> bool:
@@ -478,10 +499,8 @@ class Group(AnnotationBase):
 
     def get_restrictions(self) -> Dict[str, Anything]:
         """Return the restrictions dictionary of this element."""
-        max_occurs = sys.maxsize if self.max_occurs == "unbounded" else self.max_occurs
-
         return {
-            "path": [("g", id(self), self.min_occurs, max_occurs)],
+            "path": [("g", id(self), self.min_occurs, self.max_occurs)],
         }
 
 
@@ -862,10 +881,14 @@ class Element(AnnotationBase):
     uniques: Array[Unique] = array_element(name="unique")
     keys: Array[Key] = array_element(name="key")
     keyrefs: Array[Keyref] = array_element(name="keyref")
-    min_occurs: Optional[int] = attribute(default=1, name="minOccurs")
-    max_occurs: UnionType[None, int, str] = attribute(default=1, name="maxOccurs")
+    min_occurs: int = attribute(default=1, name="minOccurs")
+    max_occurs: UnionType[str, int] = attribute(default=1, name="maxOccurs")
     nillable: bool = attribute(default=False)
     abstract: bool = attribute(default=False)
+
+    def __post_init__(self):
+        """Post initialization validations."""
+        self.max_occurs = validate_max_occurs(self.min_occurs, self.max_occurs)
 
     @property
     def bases(self) -> Iterator[str]:
@@ -910,11 +933,9 @@ class Element(AnnotationBase):
 
     def get_restrictions(self) -> Dict[str, Anything]:
         """Return the restrictions dictionary of this element."""
-        max_occurs = sys.maxsize if self.max_occurs == "unbounded" else self.max_occurs
-
         restrictions = {
             "min_occurs": self.min_occurs,
-            "max_occurs": max_occurs,
+            "max_occurs": self.max_occurs,
         }
 
         if self.simple_type:

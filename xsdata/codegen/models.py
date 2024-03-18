@@ -1,6 +1,7 @@
+import copy
 import operator
 import sys
-from dataclasses import asdict, dataclass, field, replace
+from dataclasses import asdict, dataclass, field, fields, replace
 from enum import IntEnum
 from typing import Any, Dict, Iterator, List, Optional, Tuple, Type
 
@@ -31,6 +32,17 @@ GLOBAL_TYPES = (
 @dataclass
 class CodegenModel:
     """Base codegen model."""
+
+    def clone(self, **kwargs: Any) -> "CodegenModel":
+        """Return a deep cloned instance."""
+        clone = copy.deepcopy(self)
+        return replace(clone, **kwargs) if kwargs else clone
+
+    def swap(self, source: "CodegenModel"):
+        """Swap the instance attributes from the source instance."""
+        for f in fields(self):
+            value = copy.deepcopy(getattr(source, f.name))
+            setattr(self, f.name, value)
 
 
 @dataclass
@@ -187,10 +199,6 @@ class Restrictions(CodegenModel):
 
         return result
 
-    def clone(self, **kwargs: Any) -> "Restrictions":
-        """Return a deep cloned instance and replace any args."""
-        return replace(self, **kwargs)
-
     @classmethod
     def from_element(cls, element: ElementBase) -> "Restrictions":
         """Static constructor from a xsd model.
@@ -251,10 +259,6 @@ class AttrType(CodegenModel):
         return not (
             self.forward or self.native or (not allow_circular and self.circular)
         )
-
-    def clone(self, **kwargs: Any) -> "AttrType":
-        """Return a deep cloned instance."""
-        return replace(self, **kwargs)
 
 
 @dataclass
@@ -320,6 +324,11 @@ class Attr(CodegenModel):
     def is_attribute(self) -> bool:
         """Return whether this attr represents a xml attribute node."""
         return self.tag in (Tag.ATTRIBUTE, Tag.ANY_ATTRIBUTE)
+
+    @property
+    def is_element(self) -> bool:
+        """Return whether this attr represents a xml element."""
+        return self.tag == Tag.ELEMENT
 
     @property
     def is_enumeration(self) -> bool:
@@ -423,14 +432,6 @@ class Attr(CodegenModel):
         """Return the xml type this attribute is mapped to."""
         return xml_type_map.get(self.tag)
 
-    def clone(self) -> "Attr":
-        """Return a deep cloned instance."""
-        return replace(
-            self,
-            types=[x.clone() for x in self.types],
-            restrictions=self.restrictions.clone(),
-        )
-
     def get_native_types(self) -> Iterator[Type]:
         """Yield an iterator of all the native attr types."""
         for tp in self.types:
@@ -456,14 +457,6 @@ class Extension(CodegenModel):
     tag: str
     type: AttrType
     restrictions: Restrictions = field(hash=False)
-
-    def clone(self) -> "Extension":
-        """Return a deep cloned instance."""
-        return replace(
-            self,
-            type=self.type.clone(),
-            restrictions=self.restrictions.clone(),
-        )
 
 
 class Status(IntEnum):
@@ -633,13 +626,6 @@ class Class(CodegenModel):
         raise CodegenError(
             "Type has not been assigned to a module yet!", type=self.qname
         )
-
-    def clone(self) -> "Class":
-        """Return a deep cloned instance."""
-        inners = [inner.clone() for inner in self.inner]
-        extensions = [extension.clone() for extension in self.extensions]
-        attrs = [attr.clone() for attr in self.attrs]
-        return replace(self, inner=inners, extensions=extensions, attrs=attrs)
 
     def dependencies(self, allow_circular: bool = False) -> Iterator[str]:
         """Yields all class dependencies.

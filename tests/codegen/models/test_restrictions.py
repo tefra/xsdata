@@ -137,10 +137,3 @@ class RestrictionsTests(TestCase):
 
         restrictions.process_contents = "strict"
         self.assertEqual({}, restrictions.asdict())
-
-    def test_clone(self):
-        restrictions = Restrictions(max_occurs=2)
-        clone = restrictions.clone()
-
-        self.assertEqual(clone, restrictions)
-        self.assertIsNot(clone, restrictions)

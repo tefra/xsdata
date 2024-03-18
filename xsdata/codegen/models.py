@@ -3,7 +3,7 @@ import operator
 import sys
 from dataclasses import asdict, dataclass, field, fields, replace
 from enum import IntEnum
-from typing import Any, Dict, Iterator, List, Optional, Tuple, Type
+from typing import Any, Dict, Iterator, List, Optional, Tuple, Type, TypeVar
 
 from xsdata.codegen.exceptions import CodegenError
 from xsdata.formats.converter import converter
@@ -28,12 +28,14 @@ GLOBAL_TYPES = (
     Tag.MESSAGE,
 )
 
+T = TypeVar("T", bound="CodegenModel")
+
 
 @dataclass
 class CodegenModel:
     """Base codegen model."""
 
-    def clone(self, **kwargs: Any) -> "CodegenModel":
+    def clone(self: T, **kwargs: Any) -> T:
         """Return a deep cloned instance."""
         clone = copy.deepcopy(self)
         return replace(clone, **kwargs) if kwargs else clone

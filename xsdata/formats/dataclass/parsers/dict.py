@@ -130,13 +130,15 @@ class DictDecoder:
 
         params = {}
         for key, value in data.items():
-            is_array = collections.is_array(value)
-            var = self.find_var(xml_vars, key, is_array)
+            var = self.find_var(xml_vars, key, value)
 
             if var is None and self.config.fail_on_unknown_properties:
                 raise ParserError(f"Unknown property {clazz.__qualname__}.{key}")
 
             if var and var.init:
+                if var.wrapper:
+                    value = value[var.local_name]
+
                 params[var.name] = self.bind_value(meta, var, value)
 
         try:
@@ -410,23 +412,30 @@ class DictDecoder:
     def find_var(
         cls,
         xml_vars: List[XmlVar],
-        local_name: str,
-        is_list: bool = False,
+        key: str,
+        value: Any,
     ) -> Optional[XmlVar]:
         """Match the name to a xml variable.
 
         Args:
             xml_vars: A list of xml vars
-            local_name: A key from the loaded data
-            is_list: Whether the data value is an array
+            key: A key from the loaded data
+            value: The data assigned to the key
 
         Returns:
             One of the xml vars, if all search attributes match, None otherwise.
         """
         for var in xml_vars:
-            if var.local_name == local_name:
+            if var.local_name == key:
                 var_is_list = var.list_element or var.tokens
-                if is_list == var_is_list or var.clazz is None:
+                is_array = collections.is_array(value)
+                if is_array == var_is_list or var.clazz is None:
                     return var
-
+            elif var.wrapper_local_name == key:
+                if isinstance(value, dict) and var.local_name in value:
+                    val = value[var.local_name]
+                    var_is_list = var.list_element or var.tokens
+                    is_array = collections.is_array(val)
+                    if is_array == var_is_list or var.clazz is None:
+                        return var
         return None

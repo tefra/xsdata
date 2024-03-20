@@ -128,6 +128,7 @@ class XmlVar(MetaMixin):
         "namespace_matches",
         "is_clazz_union",
         "local_name",
+        "wrapper_local_name",
     )
 
     def __init__(
@@ -183,6 +184,10 @@ class XmlVar(MetaMixin):
 
         self.is_clazz_union = self.clazz and len(types) > 1
         self.local_name = local_name(qname)
+
+        self.wrapper_local_name = None
+        if wrapper:
+            self.wrapper_local_name = local_name(wrapper)
 
         self.is_text = False
         self.is_element = False
@@ -417,7 +422,7 @@ class XmlMeta(MetaMixin):
         wildcards: Sequence[XmlVar],
         attributes: Mapping[str, XmlVar],
         any_attributes: Sequence[XmlVar],
-        wrappers: Mapping[str, Sequence[XmlVar]],
+        wrappers: Mapping[str, str],
         **kwargs: Any,
     ):
         self.clazz = clazz

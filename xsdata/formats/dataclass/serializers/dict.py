@@ -41,7 +41,9 @@ class DictEncoder:
     context: XmlContext = field(default_factory=XmlContext)
     dict_factory: Callable = field(default=dict)
 
-    def encode(self, value: Any, var: Optional[XmlVar] = None) -> Any:
+    def encode(
+        self, value: Any, var: Optional[XmlVar] = None, wrapped: bool = False
+    ) -> Any:
         """Convert a value to a dictionary object.
 
         Args:
@@ -51,20 +53,30 @@ class DictEncoder:
         Returns:
             The converted json serializable value.
         """
-        if var is None or self.context.class_type.is_model(value):
+
+        if value is None:
+            return None
+
+        if var is None:
             if collections.is_array(value):
                 return list(map(self.encode, value))
 
             return self.dict_factory(self.next_value(value))
 
+        if var and var.wrapper and not wrapped:
+            return self.dict_factory(((var.local_name, self.encode(value, var, True)),))
+
+        if self.context.class_type.is_model(value):
+            return self.dict_factory(self.next_value(value))
+
         if collections.is_array(value):
-            return type(value)(self.encode(val, var) for val in value)
+            return type(value)(self.encode(val, var, wrapped) for val in value)
 
         if isinstance(value, (dict, int, float, str, bool)):
             return value
 
         if isinstance(value, Enum):
-            return self.encode(value.value, var)
+            return self.encode(value.value, var, wrapped)
 
         return converter.serialize(value, format=var.format)
 
@@ -87,4 +99,7 @@ class DictEncoder:
                 or not ignore_optionals
                 or not var.is_optional(value)
             ):
-                yield var.local_name, self.encode(value, var)
+                if var.wrapper:
+                    yield var.wrapper_local_name, self.encode(value, var)
+                else:
+                    yield var.local_name, self.encode(value, var)

@@ -19,6 +19,7 @@ from tests.fixtures.models import (
     TypeD,
     UnionType,
 )
+from tests.fixtures.wrapper import Wrapper
 from xsdata.exceptions import ParserError
 from xsdata.formats.dataclass.models.generics import AnyElement, DerivedElement
 from xsdata.formats.dataclass.parsers import DictDecoder
@@ -103,6 +104,13 @@ class DictDecoderTests(FactoryTestCase):
             "Failed to convert value `foo` to one of (<class 'int'>,)",
             str(cm.exception),
         )
+
+    def test_decode_wrapper(self):
+        data = {"alphas": {"alpha": "value"}}
+
+        actual = self.decoder.decode(data, Wrapper)
+        expected = Wrapper(alpha="value")
+        self.assertEqual(expected, actual)
 
     def test_verify_type(self):
         invalid_cases = [
@@ -368,10 +376,10 @@ class DictDecoderTests(FactoryTestCase):
         meta = self.decoder.context.build(TypeB)
         xml_vars = meta.get_all_vars()
 
-        self.assertEqual(xml_vars[0], self.decoder.find_var(xml_vars, "x"))
-        self.assertEqual(xml_vars[0], self.decoder.find_var(xml_vars, "x", True))
+        self.assertEqual(xml_vars[0], self.decoder.find_var(xml_vars, "x", 1))
+        self.assertEqual(xml_vars[0], self.decoder.find_var(xml_vars, "x", [1, 2]))
 
         meta = self.decoder.context.build(ExtendedType)
         xml_vars = meta.get_all_vars()
-        self.assertIsNone(self.decoder.find_var(xml_vars, "a", True))
-        self.assertEqual(xml_vars[0], self.decoder.find_var(xml_vars, "a"))
+        self.assertIsNone(self.decoder.find_var(xml_vars, "a", [1, 2]))
+        self.assertEqual(xml_vars[0], self.decoder.find_var(xml_vars, "a", {"x": 1}))

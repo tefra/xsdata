@@ -1,0 +1,23 @@
+{
+  "alphas": {
+    "alpha": "\u03b1\u03b1\u03b1"
+  },
+  "bravos": {
+    "bravo": [
+      1,
+      2
+    ]
+  },
+  "charlies": {
+    "charlie": [
+      {
+        "value": "\u03b4\u03b4\u03b4",
+        "lang": "en"
+      },
+      {
+        "value": "eee",
+        "lang": "en"
+      }
+    ]
+  }
+}

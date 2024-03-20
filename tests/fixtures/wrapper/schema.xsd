@@ -1,0 +1,41 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xd="xsdata" targetNamespace="xsdata" elementFormDefault="qualified">
+    <xsd:element name="wrapper">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="xd:alphas"/>
+                <xsd:element ref="xd:bravos"/>
+                <xsd:element ref="xd:charlies"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="alphas">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="alpha" type="xsd:string"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="bravos">
+        <xsd:complexType>
+            <xsd:sequence maxOccurs="unbounded">
+                <xsd:element name="bravo" type="xsd:int"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="charlies">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="xd:charlie" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="charlie">
+        <xsd:complexType>
+            <xsd:simpleContent>
+                <xsd:extension base="xsd:string">
+                    <xsd:attribute name="lang"/>
+                </xsd:extension>
+            </xsd:simpleContent>
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>

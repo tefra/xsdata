@@ -143,8 +143,8 @@ class RenameDuplicateClassesTests(FactoryTestCase):
         self.processor.update_class_references(target, replacements, 5)
         self.assertEqual([5, 5, 5, 5], list(target.references))
 
-    @mock.patch.object(RenameDuplicateClasses, "rename_class")
-    def test_rename_classes(self, mock_rename_class):
+    @mock.patch.object(RenameDuplicateClasses, "add_numeric_suffix")
+    def test_rename_classes(self, mock_add_numeric_suffix):
         classes = [
             ClassFactory.create(qname="_a", tag=Tag.ELEMENT),
             ClassFactory.create(qname="_A", tag=Tag.ELEMENT),
@@ -153,7 +153,7 @@ class RenameDuplicateClassesTests(FactoryTestCase):
         self.processor.rename_classes(classes, False)
         self.processor.rename_classes(classes, True)
 
-        mock_rename_class.assert_has_calls(
+        mock_add_numeric_suffix.assert_has_calls(
             [
                 mock.call(classes[1], False),
                 mock.call(classes[0], False),
@@ -164,7 +164,17 @@ class RenameDuplicateClassesTests(FactoryTestCase):
             ]
         )
 
-    @mock.patch.object(RenameDuplicateClasses, "rename_class")
+    @mock.patch.object(RenameDuplicateClasses, "add_abstract_suffix")
+    def test_rename_classes_with_abstract_type(self, mock_add_abstract_suffix):
+        classes = [
+            ClassFactory.create(qname="_a", tag=Tag.ELEMENT),
+            ClassFactory.create(qname="_A", tag=Tag.ELEMENT, abstract=True),
+        ]
+        self.processor.rename_classes(classes, True)
+
+        mock_add_abstract_suffix.assert_called_once_with(classes[1])
+
+    @mock.patch.object(RenameDuplicateClasses, "add_numeric_suffix")
     def test_rename_classes_protects_single_element(self, mock_rename_class):
         classes = [
             ClassFactory.create(qname="_a", tag=Tag.ELEMENT),
@@ -175,13 +185,13 @@ class RenameDuplicateClassesTests(FactoryTestCase):
         mock_rename_class.assert_called_once_with(classes[1], False)
 
     @mock.patch.object(RenameDuplicateClasses, "rename_class_dependencies")
-    def test_rename_class(self, mock_rename_class_dependencies):
+    def test_add_numeric_suffix_by_slug(self, mock_rename_class_dependencies):
         target = ClassFactory.create(qname="{foo}_a")
         self.processor.container.add(target)
         self.processor.container.add(ClassFactory.create(qname="{foo}a_1"))
         self.processor.container.add(ClassFactory.create(qname="{foo}A_2"))
         self.processor.container.add(ClassFactory.create(qname="{bar}a_3"))
-        self.processor.rename_class(target, False)
+        self.processor.add_numeric_suffix(target, False)
 
         self.assertEqual("{foo}_a_3", target.qname)
         self.assertEqual("_a", target.meta_name)
@@ -195,13 +205,13 @@ class RenameDuplicateClassesTests(FactoryTestCase):
         self.assertEqual([], self.container.data["{foo}_a"])
 
     @mock.patch.object(RenameDuplicateClasses, "rename_class_dependencies")
-    def test_rename_class_by_name(self, mock_rename_class_dependencies):
+    def test_add_numeric_suffix_by_name(self, mock_rename_class_dependencies):
         target = ClassFactory.create(qname="{foo}_a")
         self.processor.container.add(target)
         self.processor.container.add(ClassFactory.create(qname="{bar}a_1"))
         self.processor.container.add(ClassFactory.create(qname="{thug}A_2"))
         self.processor.container.add(ClassFactory.create(qname="{bar}a_3"))
-        self.processor.rename_class(target, True)
+        self.processor.add_numeric_suffix(target, True)
 
         self.assertEqual("{foo}_a_4", target.qname)
         self.assertEqual("_a", target.meta_name)
@@ -213,6 +223,15 @@ class RenameDuplicateClassesTests(FactoryTestCase):
 
         self.assertEqual([target], self.container.data["{foo}_a_4"])
         self.assertEqual([], self.container.data["{foo}_a"])
+
+    def test_add_abstract_suffix(self):
+        target = ClassFactory.create(qname="{xsdata}line", abstract=True)
+        self.processor.container.add(target)
+
+        self.processor.add_abstract_suffix(target)
+
+        self.assertEqual("{xsdata}line_abstract", target.qname)
+        self.assertEqual("line", target.meta_name)
 
     def test_rename_class_dependencies(self):
         attr_type = AttrTypeFactory.create(qname="{foo}bar", reference=1)

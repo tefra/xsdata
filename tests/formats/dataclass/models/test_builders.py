@@ -343,6 +343,7 @@ class XmlVarBuilderTests(TestCase):
                     types=(Decimal,),
                     tokens_factory=list,
                     derived=True,
+                    default=list,
                     factory=list,
                     namespaces=("bar",),
                 ),

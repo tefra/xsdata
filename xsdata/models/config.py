@@ -221,7 +221,7 @@ class GeneratorOutput:
         docstring_style: Docstring style
         relative_imports: Use relative imports
         compound_fields: Use compound fields for repeatable elements
-        wrapper_fields: Generate wrapper fields for element lists
+        wrapper_fields: Generate wrapper fields
         max_line_length: Adjust the maximum line length
         subscriptable_types: Use PEP-585 generics for standard
             collections, python>=3.9 Only

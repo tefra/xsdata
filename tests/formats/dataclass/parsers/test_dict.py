@@ -19,7 +19,7 @@ from tests.fixtures.models import (
     TypeD,
     UnionType,
 )
-from tests.fixtures.wrapper import Wrapper
+from tests.fixtures.wrapper import Charlie, Wrapper
 from xsdata.exceptions import ParserError
 from xsdata.formats.dataclass.models.generics import AnyElement, DerivedElement
 from xsdata.formats.dataclass.parsers import DictDecoder
@@ -106,10 +106,26 @@ class DictDecoderTests(FactoryTestCase):
         )
 
     def test_decode_wrapper(self):
-        data = {"alphas": {"alpha": "value"}}
+        data = {
+            "alphas": {"alpha": "value"},
+            "bravos": {"bravo": [1, 2]},
+            "charlies": {
+                "charlie": [
+                    {"value": "first", "lang": "en"},
+                    {"value": "second", "lang": "en"},
+                ]
+            },
+        }
 
         actual = self.decoder.decode(data, Wrapper)
-        expected = Wrapper(alpha="value")
+        expected = Wrapper(
+            alpha="value",
+            bravo=[1, 2],
+            charlie=[
+                Charlie(value="first", lang="en"),
+                Charlie(value="second", lang="en"),
+            ],
+        )
         self.assertEqual(expected, actual)
 
     def test_verify_type(self):
@@ -377,9 +393,17 @@ class DictDecoderTests(FactoryTestCase):
         xml_vars = meta.get_all_vars()
 
         self.assertEqual(xml_vars[0], self.decoder.find_var(xml_vars, "x", 1))
-        self.assertEqual(xml_vars[0], self.decoder.find_var(xml_vars, "x", [1, 2]))
+        self.assertIsNone(self.decoder.find_var(xml_vars, "x", [1, 2]))
 
         meta = self.decoder.context.build(ExtendedType)
         xml_vars = meta.get_all_vars()
         self.assertIsNone(self.decoder.find_var(xml_vars, "a", [1, 2]))
         self.assertEqual(xml_vars[0], self.decoder.find_var(xml_vars, "a", {"x": 1}))
+
+        meta = self.decoder.context.build(Wrapper)
+        xml_vars = meta.get_all_vars()
+        self.assertIsNone(self.decoder.find_var(xml_vars, "charlies", {}))
+        self.assertIsNone(self.decoder.find_var(xml_vars, "bravos", {"bravo": 1}))
+        self.assertEqual(
+            xml_vars[0], self.decoder.find_var(xml_vars, "alphas", {"alpha": "foo"})
+        )

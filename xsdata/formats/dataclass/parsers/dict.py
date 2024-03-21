@@ -429,13 +429,13 @@ class DictDecoder:
             if var.local_name == key:
                 var_is_list = var.list_element or var.tokens
                 is_array = collections.is_array(value)
-                if is_array == var_is_list or var.clazz is None:
+                if is_array == var_is_list:
                     return var
             elif var.wrapper_local_name == key:
                 if isinstance(value, dict) and var.local_name in value:
                     val = value[var.local_name]
                     var_is_list = var.list_element or var.tokens
                     is_array = collections.is_array(val)
-                    if is_array == var_is_list or var.clazz is None:
+                    if is_array == var_is_list:
                         return var
         return None

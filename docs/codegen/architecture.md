@@ -141,6 +141,7 @@ pass through each step before next one starts. The order of the steps is very im
 
 - [DetectCircularReferences][xsdata.codegen.handlers.DetectCircularReferences]
 - [CreateCompoundFields][xsdata.codegen.handlers.CreateCompoundFields]
+- [CreateWrapperFields][xsdata.codegen.handlers.CreateWrapperFields]
 - [DisambiguateChoices][xsdata.codegen.handlers.DisambiguateChoices]
 - [ResetAttributeSequenceNumbers][xsdata.codegen.handlers.ResetAttributeSequenceNumbers]
 

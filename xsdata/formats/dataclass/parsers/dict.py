@@ -431,7 +431,7 @@ class DictDecoder:
                 is_array = collections.is_array(value)
                 if is_array == var_is_list:
                     return var
-            elif var.wrapper_local_name == key:
+            elif var.wrapper == key:
                 if isinstance(value, dict) and var.local_name in value:
                     val = value[var.local_name]
                     var_is_list = var.list_element or var.tokens

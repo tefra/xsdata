@@ -21,7 +21,7 @@ class WildcardNodeTests(TestCase):
             children=[1, 2, 3],
         )
 
-        var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo", qname="a")
+        var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo", local_name="a")
         node = WildcardNode(
             position=0, var=var, attrs=attrs, ns_map=ns_map, factory=AnyElement
         )
@@ -49,7 +49,7 @@ class WildcardNodeTests(TestCase):
     def test_child(self):
         attrs = {"id": "1"}
         ns_map = {"ns0": "xsdata"}
-        var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo", qname="foo")
+        var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo")
         node = WildcardNode(
             position=0, var=var, attrs={}, ns_map={}, factory=AnyElement
         )

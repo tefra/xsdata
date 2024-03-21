@@ -100,7 +100,6 @@ class DictEncoder:
                 or not var.is_optional(value)
             ):
                 if var.wrapper:
-                    assert var.wrapper_local_name is not None
-                    yield var.wrapper_local_name, self.encode(value, var)
+                    yield var.wrapper, self.encode(value, var)
                 else:
                     yield var.local_name, self.encode(value, var)

@@ -181,7 +181,7 @@ class NodeParserTests(TestCase):
         parser = NodeParser()
         objects = [("q", "result")]
         queue = []
-        var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo", qname="foo")
+        var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo")
         queue.append(PrimitiveNode(var, {}, False))
 
         self.assertTrue(parser.end(queue, objects, "author", "foobar", None))

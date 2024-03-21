@@ -413,13 +413,13 @@ class EventGenerator:
             yield XmlWriterEvent.ATTR, key, value
 
         for var, value in self.next_value(obj, meta):
-            if var.wrapper:
-                yield XmlWriterEvent.START, var.wrapper
+            if var.wrapper_qname:
+                yield XmlWriterEvent.START, var.wrapper_qname
 
             yield from self.convert_value(value, var, namespace)
 
-            if var.wrapper:
-                yield XmlWriterEvent.END, var.wrapper
+            if var.wrapper_qname:
+                yield XmlWriterEvent.END, var.wrapper_qname
 
         yield XmlWriterEvent.END, qname
 

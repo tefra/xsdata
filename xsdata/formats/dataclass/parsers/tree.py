@@ -6,6 +6,7 @@ from xsdata.formats.dataclass.parsers.bases import NodeParser, Parsed
 from xsdata.formats.dataclass.parsers.handlers import default_handler
 from xsdata.formats.dataclass.parsers.mixins import XmlHandler, XmlNode
 from xsdata.formats.dataclass.parsers.nodes.wildcard import WildcardNode
+from xsdata.utils import namespaces
 
 
 @dataclass
@@ -37,9 +38,11 @@ class TreeParser(NodeParser):
             item = queue[-1]
             child = item.child(qname, attrs, ns_map, len(objects))
         except IndexError:
+            namespace, name = namespaces.split_qname(qname)
             var = XmlVar(
-                name=qname,
-                qname=qname,
+                name=name,
+                local_name=name,
+                wrapper=None,
                 xml_type=XmlType.WILDCARD,
                 index=0,
                 types=(object,),
@@ -56,7 +59,7 @@ class TreeParser(NodeParser):
                 nillable=False,
                 sequence=None,
                 default=None,
-                namespaces=(),
+                namespaces=(namespace,),
                 elements={},
                 wildcards=(),
             )

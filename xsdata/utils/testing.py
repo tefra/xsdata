@@ -379,7 +379,8 @@ class XmlVarFactory(Factory):
     def create(
         cls,
         name: Optional[str] = None,
-        qname: Optional[str] = None,
+        local_name: Optional[str] = None,
+        wrapper: Optional[str] = None,
         index: int = 0,
         types: Optional[Sequence[Type]] = None,
         clazz: Optional[Type] = None,
@@ -403,8 +404,8 @@ class XmlVarFactory(Factory):
     ) -> XmlVar:
         name = name or f"{prefix}{cls.next_letter()}"
 
-        if qname is None:
-            qname = name
+        if local_name is None:
+            local_name = name
 
         if types is None:
             types = ()
@@ -418,7 +419,8 @@ class XmlVarFactory(Factory):
         return XmlVar(
             index=index,
             name=name,
-            qname=qname,
+            local_name=local_name,
+            wrapper=wrapper,
             types=types,
             clazz=clazz or first(tp for tp in types if is_dataclass(tp)),
             init=init,
@@ -437,7 +439,6 @@ class XmlVarFactory(Factory):
             namespaces=namespaces,
             elements=elements,
             wildcards=wildcards,
-            wrapper=None,
         )
 
 

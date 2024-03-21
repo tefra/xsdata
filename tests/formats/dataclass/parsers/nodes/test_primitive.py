@@ -12,7 +12,7 @@ class PrimitiveNodeTests(TestCase):
     def test_bind(self, mock_parse_value):
         mock_parse_value.return_value = 13
         var = XmlVarFactory.create(
-            xml_type=XmlType.TEXT, name="foo", qname="foo", types=(int,), format="Nope"
+            xml_type=XmlType.TEXT, name="foo", types=(int,), format="Nope"
         )
         ns_map = {"foo": "bar"}
         node = PrimitiveNode(var, ns_map, False)
@@ -32,7 +32,7 @@ class PrimitiveNodeTests(TestCase):
 
     def test_bind_nillable_content(self):
         var = XmlVarFactory.create(
-            xml_type=XmlType.TEXT, name="foo", qname="foo", types=(str,), nillable=False
+            xml_type=XmlType.TEXT, name="foo", types=(str,), nillable=False
         )
         ns_map = {"foo": "bar"}
         node = PrimitiveNode(var, ns_map, False)
@@ -49,7 +49,6 @@ class PrimitiveNodeTests(TestCase):
         var = XmlVarFactory.create(
             xml_type=XmlType.TEXT,
             name="foo",
-            qname="foo",
             types=(bytes,),
             nillable=False,
         )
@@ -82,7 +81,7 @@ class PrimitiveNodeTests(TestCase):
         self.assertEqual(13, objects[-1][1])
 
     def test_child(self):
-        var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo", qname="foo")
+        var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo")
         node = PrimitiveNode(var, {}, False)
 
         with self.assertRaises(XmlContextError):

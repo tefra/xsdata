@@ -43,7 +43,7 @@ class XmlMetaBuilderTests(FactoryTestCase):
     @mock.patch.object(XmlMetaBuilder, "build_vars")
     def test_build(self, mock_build_vars):
         var = XmlVarFactory.create(
-            xml_type=XmlType.ELEMENT, name="foo", qname="{foo}bar", types=(int,)
+            xml_type=XmlType.ELEMENT, name="foo", namespaces=("foo",), types=(int,)
         )
         mock_build_vars.return_value = [var]
 
@@ -146,7 +146,7 @@ class XmlMetaBuilderTests(FactoryTestCase):
                 xml_type=XmlType.ELEMENT,
                 index=1,
                 name="author",
-                qname="Author",
+                local_name="Author",
                 types=(str,),
                 required=True,
             ),
@@ -154,7 +154,7 @@ class XmlMetaBuilderTests(FactoryTestCase):
                 xml_type=XmlType.ELEMENT,
                 index=2,
                 name="title",
-                qname="Title",
+                local_name="Title",
                 types=(str,),
                 required=True,
             ),
@@ -162,7 +162,7 @@ class XmlMetaBuilderTests(FactoryTestCase):
                 xml_type=XmlType.ELEMENT,
                 index=3,
                 name="genre",
-                qname="Genre",
+                local_name="Genre",
                 types=(str,),
                 required=True,
             ),
@@ -170,7 +170,7 @@ class XmlMetaBuilderTests(FactoryTestCase):
                 xml_type=XmlType.ELEMENT,
                 index=4,
                 name="price",
-                qname="Price",
+                local_name="Price",
                 types=(float,),
                 required=True,
             ),
@@ -178,7 +178,7 @@ class XmlMetaBuilderTests(FactoryTestCase):
                 xml_type=XmlType.ELEMENT,
                 index=5,
                 name="pub_date",
-                qname="PubDate",
+                local_name="PubDate",
                 types=(XmlDate,),
                 required=True,
             ),
@@ -186,18 +186,22 @@ class XmlMetaBuilderTests(FactoryTestCase):
                 xml_type=XmlType.ELEMENT,
                 index=6,
                 name="review",
-                qname="Review",
+                local_name="Review",
                 types=(str,),
                 required=True,
             ),
             XmlVarFactory.create(
-                xml_type=XmlType.ATTRIBUTE, index=7, name="id", qname="ID", types=(str,)
+                xml_type=XmlType.ATTRIBUTE,
+                index=7,
+                name="id",
+                local_name="ID",
+                types=(str,),
             ),
             XmlVarFactory.create(
                 xml_type=XmlType.ATTRIBUTE,
                 index=8,
                 name="lang",
-                qname="LANG",
+                local_name="LANG",
                 types=(str,),
                 init=False,
                 default="en",
@@ -288,7 +292,7 @@ class XmlVarBuilderTests(TestCase):
                 "{bar}a": XmlVarFactory.create(
                     index=2,
                     name="choice",
-                    qname="{bar}a",
+                    local_name="a",
                     types=(TypeA,),
                     clazz=TypeA,
                     factory=list,
@@ -297,7 +301,7 @@ class XmlVarBuilderTests(TestCase):
                 "{bar}b": XmlVarFactory.create(
                     index=3,
                     name="choice",
-                    qname="{bar}b",
+                    local_name="b",
                     types=(TypeB,),
                     clazz=TypeB,
                     factory=list,
@@ -306,7 +310,7 @@ class XmlVarBuilderTests(TestCase):
                 "{bar}int": XmlVarFactory.create(
                     index=4,
                     name="choice",
-                    qname="{bar}int",
+                    local_name="int",
                     types=(int,),
                     factory=list,
                     namespaces=("bar",),
@@ -314,7 +318,7 @@ class XmlVarBuilderTests(TestCase):
                 "{bar}float": XmlVarFactory.create(
                     index=5,
                     name="choice",
-                    qname="{bar}float",
+                    local_name="float",
                     types=(float,),
                     factory=list,
                     namespaces=("bar",),
@@ -322,7 +326,7 @@ class XmlVarBuilderTests(TestCase):
                 "{bar}qname": XmlVarFactory.create(
                     index=6,
                     name="choice",
-                    qname="{bar}qname",
+                    local_name="qname",
                     types=(QName,),
                     factory=list,
                     namespaces=("bar",),
@@ -330,7 +334,7 @@ class XmlVarBuilderTests(TestCase):
                 "{foo}union": XmlVarFactory.create(
                     index=7,
                     name="choice",
-                    qname="{foo}union",
+                    local_name="union",
                     types=(UnionType,),
                     clazz=UnionType,
                     factory=list,
@@ -339,7 +343,7 @@ class XmlVarBuilderTests(TestCase):
                 "{bar}tokens": XmlVarFactory.create(
                     index=8,
                     name="choice",
-                    qname="{bar}tokens",
+                    local_name="tokens",
                     types=(Decimal,),
                     tokens_factory=list,
                     derived=True,
@@ -353,7 +357,7 @@ class XmlVarBuilderTests(TestCase):
                     index=9,
                     name="choice",
                     xml_type=XmlType.WILDCARD,
-                    qname="{http://www.w3.org/1999/xhtml}any",
+                    local_name="any",
                     types=(object,),
                     factory=list,
                     default=None,

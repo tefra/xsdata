@@ -467,6 +467,13 @@ class FiltersTests(FactoryTestCase):
         actual = self.filters.field_metadata(attr, None, ["cls"])
         self.assertNotIn("name", actual)
 
+    def test_field_metadata_wrapper(self):
+        attr = AttrFactory.element(wrapper="foo")
+        expected = {"name": "attr_B", "wrapper": "foo", "type": "Element"}
+
+        actual = self.filters.field_metadata(attr, None, ["cls"])
+        self.assertEqual(expected, actual)
+
     def test_field_metadata_restrictions(self):
         attr = AttrFactory.create(tag=Tag.RESTRICTION)
         attr.types.append(AttrTypeFactory.native(DataType.INT))

@@ -120,19 +120,19 @@ class XmlMetaBuilder:
 
         attributes = {}
         elements: Dict[str, List[XmlVar]] = defaultdict(list)
+        wrappers: Dict[str, str] = {}
         choices = []
         any_attributes = []
         wildcards = []
-        wrappers: Dict[str, List[XmlVar]] = defaultdict(list)
         text = None
 
         for var in class_vars:
-            if var.wrapper is not None:
-                wrappers[var.wrapper].append(var)
             if var.is_attribute:
                 attributes[var.qname] = var
             elif var.is_element:
                 elements[var.qname].append(var)
+                if var.wrapper:
+                    wrappers[var.wrapper] = var.qname
             elif var.is_elements:
                 choices.append(var)
             elif var.is_attributes:
@@ -389,14 +389,6 @@ class XmlVarBuilder:
             raise XmlContextError(
                 f"Error on {model.__qualname__}::{name}: "
                 f"Xml {xml_type} does not support typing `{type_hint}`"
-            )
-
-        if wrapper is not None and (
-            not isinstance(origin, type) or not issubclass(origin, (list, set, tuple))
-        ):
-            raise XmlContextError(
-                f"Error on {model.__qualname__}::{name}: "
-                f"A wrapper field requires a collection type"
             )
 
         local_name = local_name or self.build_local_name(xml_type, name)

@@ -4,6 +4,7 @@ from xsdata.codegen.handlers import (
     AddAttributeSubstitutions,
     CalculateAttributePaths,
     CreateCompoundFields,
+    CreateWrapperFields,
     DesignateClassPackages,
     DetectCircularReferences,
     DisambiguateChoices,
@@ -99,6 +100,7 @@ class ClassContainer(ContainerInterface):
             Steps.FINALIZE: [
                 DetectCircularReferences(self),
                 CreateCompoundFields(self),
+                CreateWrapperFields(self),
                 DisambiguateChoices(self),
                 ResetAttributeSequenceNumbers(self),
             ],

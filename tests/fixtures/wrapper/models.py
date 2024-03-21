@@ -1,0 +1,101 @@
+from dataclasses import dataclass, field
+from typing import List, Optional
+
+__NAMESPACE__ = "xsdata"
+
+
+@dataclass
+class Alphas:
+    class Meta:
+        name = "alphas"
+        namespace = "xsdata"
+
+    alpha: Optional[str] = field(
+        default=None,
+        metadata={
+            "type": "Element",
+            "required": True,
+        },
+    )
+
+
+@dataclass
+class Bravos:
+    class Meta:
+        name = "bravos"
+        namespace = "xsdata"
+
+    bravo: List[int] = field(
+        default_factory=list,
+        metadata={
+            "type": "Element",
+            "min_occurs": 1,
+        },
+    )
+
+
+@dataclass
+class Charlie:
+    class Meta:
+        name = "charlie"
+        namespace = "xsdata"
+
+    value: str = field(
+        default="",
+        metadata={
+            "required": True,
+        },
+    )
+    lang: Optional[object] = field(
+        default=None,
+        metadata={
+            "type": "Attribute",
+        },
+    )
+
+
+@dataclass
+class Charlies:
+    class Meta:
+        name = "charlies"
+        namespace = "xsdata"
+
+    charlie: List[Charlie] = field(
+        default_factory=list,
+        metadata={
+            "type": "Element",
+            "min_occurs": 1,
+        },
+    )
+
+
+@dataclass
+class Wrapper:
+    class Meta:
+        name = "wrapper"
+        namespace = "xsdata"
+
+    alpha: Optional[str] = field(
+        default=None,
+        metadata={
+            "wrapper": "alphas",
+            "type": "Element",
+            "required": True,
+        },
+    )
+    bravo: List[int] = field(
+        default_factory=list,
+        metadata={
+            "wrapper": "bravos",
+            "type": "Element",
+            "min_occurs": 1,
+        },
+    )
+    charlie: List[Charlie] = field(
+        default_factory=list,
+        metadata={
+            "wrapper": "charlies",
+            "type": "Element",
+            "min_occurs": 1,
+        },
+    )

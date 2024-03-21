@@ -221,6 +221,7 @@ class GeneratorOutput:
         docstring_style: Docstring style
         relative_imports: Use relative imports
         compound_fields: Use compound fields for repeatable elements
+        wrapper_fields: Generate wrapper fields
         max_line_length: Adjust the maximum line length
         subscriptable_types: Use PEP-585 generics for standard
             collections, python>=3.9 Only
@@ -239,6 +240,7 @@ class GeneratorOutput:
     docstring_style: DocstringStyle = element(default=DocstringStyle.RST)
     relative_imports: bool = element(default=False)
     compound_fields: CompoundFields = element(default_factory=CompoundFields)
+    wrapper_fields: bool = element(default=False)
     max_line_length: int = attribute(default=79)
     subscriptable_types: bool = attribute(default=False)
     union_type: bool = attribute(default=False)

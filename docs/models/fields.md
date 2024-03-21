@@ -332,8 +332,8 @@ declared with `init=False` or with a default value otherwise data binding will f
 
 ### `wrapper`
 
-The element name to wrap a collection of elements or primitives, in order to avoid
-having a dedicated wrapper class.
+The element name to wrap a single or a collection of elements or primitives, in order to
+avoid having a dedicated wrapper class.
 
 ```python
 >>> from dataclasses import dataclass, field

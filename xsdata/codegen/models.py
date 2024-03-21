@@ -287,6 +287,7 @@ class Attr(CodegenModel):
     tag: str
     name: str = field(compare=False)
     local_name: str = field(init=False)
+    wrapper: Optional[str] = field(default=None)
     index: int = field(compare=False, default_factory=int)
     default: Optional[str] = field(default=None, compare=False)
     fixed: bool = field(default=False, compare=False)

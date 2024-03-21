@@ -99,7 +99,7 @@ class ChoiceType:
                 {"name": "float", "type": float},
                 {"name": "qname", "type": QName},
                 {"name": "union", "type": Type["UnionType"], "namespace": "foo"},
-                {"name": "tokens", "type": List[Decimal], "tokens": True},
+                {"name": "tokens", "type": List[Decimal], "tokens": True, "default_factory": list},
                 {
                     "wildcard": True,
                     "type": object,

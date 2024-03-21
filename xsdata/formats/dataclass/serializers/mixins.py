@@ -413,7 +413,13 @@ class EventGenerator:
             yield XmlWriterEvent.ATTR, key, value
 
         for var, value in self.next_value(obj, meta):
+            if var.wrapper:
+                yield XmlWriterEvent.START, var.wrapper
+
             yield from self.convert_value(value, var, namespace)
+
+            if var.wrapper:
+                yield XmlWriterEvent.END, var.wrapper
 
         yield XmlWriterEvent.END, qname
 
@@ -500,14 +506,8 @@ class EventGenerator:
         Yields:
             An iterator of sax events.
         """
-        if var.wrapper is not None:
-            yield XmlWriterEvent.START, var.wrapper
-            for value in values:
-                yield from self.convert_value(value, var, namespace)
-            yield XmlWriterEvent.END, var.wrapper
-        else:
-            for value in values:
-                yield from self.convert_value(value, var, namespace)
+        for value in values:
+            yield from self.convert_value(value, var, namespace)
 
     def convert_tokens(
         self, value: Any, var: XmlVar, namespace: Optional[str]

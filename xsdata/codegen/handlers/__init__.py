@@ -1,6 +1,7 @@
 from .add_attribute_substitutions import AddAttributeSubstitutions
 from .calculate_attribute_paths import CalculateAttributePaths
 from .create_compound_fields import CreateCompoundFields
+from .create_wrapper_fields import CreateWrapperFields
 from .designate_class_packages import DesignateClassPackages
 from .detect_circular_references import DetectCircularReferences
 from .disambiguate_choices import DisambiguateChoices
@@ -26,6 +27,7 @@ __all__ = [
     "AddAttributeSubstitutions",
     "CalculateAttributePaths",
     "CreateCompoundFields",
+    "CreateWrapperFields",
     "DesignateClassPackages",
     "DetectCircularReferences",
     "DisambiguateChoices",

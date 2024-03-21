@@ -2,7 +2,7 @@ from unittest.case import TestCase
 
 from tests.fixtures.books import BookForm, Books
 from tests.fixtures.datatypes import Telephone
-from xsdata.exceptions import XmlContextError
+from tests.fixtures.wrapper import Wrapper
 from xsdata.formats.dataclass.serializers import DictEncoder, DictFactory
 from xsdata.models.datatype import XmlDate
 from xsdata.models.xsd import Attribute
@@ -61,10 +61,6 @@ class DictEncoderTests(TestCase):
         actual = self.encoder.encode(self.books)
         self.assertEqual(self.expected, actual)
 
-    def test_encode_a_none_dataclass_object(self):
-        with self.assertRaises(XmlContextError):
-            DictEncoder().encode(1)
-
     def test_encode_list_of_objects(self):
         actual = self.encoder.encode(self.books.book)
         self.assertEqual(self.expected["book"], actual)
@@ -79,6 +75,17 @@ class DictEncoderTests(TestCase):
         var = XmlVarFactory.create(types=(Telephone,))
         actual = self.encoder.encode(Telephone(30, 234, 56783), var)
         self.assertEqual("30-234-56783", actual)
+
+    def test_convert_wrapper(self):
+        obj = Wrapper(alpha=["value"])
+        value = self.encoder.encode(obj)
+        expected = {
+            "alphas": {"alpha": ["value"]},
+            "bravos": {"bravo": []},
+            "charlies": {"charlie": []},
+        }
+
+        self.assertEqual(expected, value)
 
     def test_next_value(self):
         book = self.books.book[0]

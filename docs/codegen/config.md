@@ -184,6 +184,47 @@ hat_or_bat_cat: list[str | int | float] = field(...)
 product: list[Shoe | Shirt | Hat] = field(...)
 ```
 
+### WrapperFields
+
+Generate wrapper fields whenever possible for single or collections of simple and
+complex elements.
+
+The wrapper and wrapped elements can't be optional. If the wrapped value is a list it
+must have minimum `occurs >= 1`.
+
+```xml show_lines="2:17"
+--8<-- "tests/fixtures/wrapper/schema.xsd"
+```
+
+**Default Value:** `False`
+
+**CLI Option:** `--wrapper-fields / --no-wrapper-fields`
+
+**Examples:**
+
+```python
+alpha: str = field(
+    metadata={
+        "wrapper": "alphas",
+        "type": "Element",
+    },
+)
+bravo: List[int] = field(
+    default_factory=list,
+    metadata={
+        "wrapper": "bravos",
+        "type": "Element",
+    },
+)
+charlie: List[Charlie] = field(
+    default_factory=list,
+    metadata={
+        "wrapper": "charlies",
+        "type": "Element",
+    },
+)
+```
+
 ### PostponedAnnotations
 
 Use [PEP-563](https://peps.python.org/pep-0563/), postponed evaluation of annotations.

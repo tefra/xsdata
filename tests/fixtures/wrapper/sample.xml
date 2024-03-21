@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns0:wrapper xmlns:ns0="xsdata">
+  <ns0:alphas>
+    <ns0:alpha>ααα</ns0:alpha>
+  </ns0:alphas>
+  <ns0:bravos>
+    <ns0:bravo>1</ns0:bravo>
+    <ns0:bravo>2</ns0:bravo>
+  </ns0:bravos>
+  <ns0:charlies>
+    <ns0:charlie lang="en">δδδ</ns0:charlie>
+    <ns0:charlie lang="en">eee</ns0:charlie>
+  </ns0:charlies>
+</ns0:wrapper>

@@ -22,7 +22,7 @@ class UnionNodeTests(TestCase):
     def test_child(self):
         attrs = {"id": "1"}
         ns_map = {"ns0": "xsdata"}
-        var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo", qname="foo")
+        var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo")
         node = UnionNode(
             position=0,
             var=var,
@@ -38,7 +38,7 @@ class UnionNodeTests(TestCase):
         self.assertIsNot(attrs, node.events[0][2])
 
     def test_bind_appends_end_event_when_level_not_zero(self):
-        var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo", qname="foo")
+        var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo")
         node = UnionNode(
             position=0,
             var=var,

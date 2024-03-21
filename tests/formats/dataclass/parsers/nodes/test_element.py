@@ -291,7 +291,7 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual(fixture("foo"), actual)
 
     def test_child(self):
-        var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, qname="a", types=(TypeC,))
+        var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, name="a", types=(TypeC,))
         attrs = {"a": "b"}
         ns_map = {"ns0": "xsdata"}
         position = 1
@@ -305,10 +305,10 @@ class ElementNodeTests(FactoryTestCase):
 
     def test_child_with_unique_element(self):
         single = XmlVarFactory.create(
-            index=1, xml_type=XmlType.ELEMENT, qname="cc", types=(TypeC,)
+            index=1, xml_type=XmlType.ELEMENT, name="cc", types=(TypeC,)
         )
         wildcard = XmlVarFactory.create(
-            index=2, xml_type=XmlType.WILDCARD, qname="cc", types=(object,)
+            index=2, xml_type=XmlType.WILDCARD, name="cc", types=(object,)
         )
         self.meta.elements[single.qname] = [single]
         self.meta.wildcards.append(wildcard)
@@ -328,8 +328,8 @@ class ElementNodeTests(FactoryTestCase):
     @mock.patch.object(ElementNode, "build_node")
     def test_child_when_failed_to_build_next_node(self, mock_build_node):
         mock_build_node.return_value = None
-        element = XmlVarFactory.create(xml_type=XmlType.ELEMENT, qname="a")
-        wildcard = XmlVarFactory.create(xml_type=XmlType.WILDCARD, qname="a")
+        element = XmlVarFactory.create(xml_type=XmlType.ELEMENT, name="a")
+        wildcard = XmlVarFactory.create(xml_type=XmlType.WILDCARD, name="a")
 
         self.meta.elements[element.qname] = [element]
         self.meta.wildcards.append(wildcard)
@@ -348,7 +348,6 @@ class ElementNodeTests(FactoryTestCase):
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT,
             name="a",
-            qname="a",
             types=(TypeC, TypeB),
         )
         attrs = {"a": "b"}
@@ -369,7 +368,6 @@ class ElementNodeTests(FactoryTestCase):
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT,
             name="a",
-            qname="a",
             types=(TypeC,),
         )
         xsi_type = "foo"
@@ -396,7 +394,6 @@ class ElementNodeTests(FactoryTestCase):
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT,
             name="a",
-            qname="a",
             types=(TypeB,),
             derived=False,
         )
@@ -419,7 +416,7 @@ class ElementNodeTests(FactoryTestCase):
 
     @mock.patch.object(XmlContext, "fetch")
     def test_build_node_with_dataclass_var_validates_nillable(self, mock_ctx_fetch):
-        var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, qname="a", types=(TypeC,))
+        var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, name="a", types=(TypeC,))
         ns_map = {}
         nillable_meta = copy.deepcopy(self.meta)
         nillable_meta.nillable = True
@@ -438,7 +435,6 @@ class ElementNodeTests(FactoryTestCase):
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT,
             name="a",
-            qname="a",
             types=(object,),
             any_type=True,
         )
@@ -457,7 +453,6 @@ class ElementNodeTests(FactoryTestCase):
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT,
             name="a",
-            qname="a",
             types=(object,),
             any_type=True,
         )
@@ -474,7 +469,7 @@ class ElementNodeTests(FactoryTestCase):
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT,
             name="a",
-            qname="aaa",
+            local_name="aaa",
             types=(object,),
             any_type=True,
         )
@@ -491,7 +486,7 @@ class ElementNodeTests(FactoryTestCase):
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT,
             name="a",
-            qname="aaaa",
+            local_name="aaaa",
             types=(object,),
             any_type=True,
         )
@@ -508,7 +503,7 @@ class ElementNodeTests(FactoryTestCase):
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT,
             name="a",
-            qname="a",
+            local_name="a",
             types=(object,),
             any_type=True,
         )
@@ -524,7 +519,7 @@ class ElementNodeTests(FactoryTestCase):
         self.assertFalse(actual.mixed)
 
     def test_build_node_with_wildcard_var(self):
-        var = XmlVarFactory.create(xml_type=XmlType.WILDCARD, qname="aaaaa")
+        var = XmlVarFactory.create(xml_type=XmlType.WILDCARD, local_name="aaaaa")
         var.process_contents = "skip"
 
         actual = self.node.build_node(var.qname, var, {}, {}, 10)
@@ -535,7 +530,7 @@ class ElementNodeTests(FactoryTestCase):
 
     def test_build_node_with_primitive_var(self):
         var = XmlVarFactory.create(
-            xml_type=XmlType.TEXT, qname="a", types=(int,), default=100
+            xml_type=XmlType.TEXT, name="a", types=(int,), default=100
         )
         attrs = {"a": "b"}
         ns_map = {"ns0": "xsdata"}

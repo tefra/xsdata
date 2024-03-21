@@ -131,8 +131,8 @@ class XmlMetaBuilder:
                 attributes[var.qname] = var
             elif var.is_element:
                 elements[var.qname].append(var)
-                if var.wrapper:
-                    wrappers[var.wrapper] = var.qname
+                if var.wrapper_qname:
+                    wrappers[var.wrapper_qname] = var.qname
             elif var.is_elements:
                 choices.append(var)
             elif var.is_attributes:
@@ -403,10 +403,6 @@ class XmlVarBuilder:
         any_type = self.is_any_type(types, xml_type)
         clazz = first(tp for tp in types if self.class_type.is_model(tp))
         namespaces = self.resolve_namespaces(xml_type, namespace, parent_namespace)
-        default_namespace = self.default_namespace(namespaces)
-        qname = build_qname(default_namespace, local_name)
-        if wrapper is not None:
-            wrapper = build_qname(default_namespace, wrapper)
 
         elements = {}
         wildcards = []
@@ -423,7 +419,8 @@ class XmlVarBuilder:
         return XmlVar(
             index=cur_index,
             name=name,
-            qname=qname,
+            local_name=local_name,
+            wrapper=wrapper,
             init=init,
             mixed=mixed,
             format=format_str,
@@ -441,7 +438,6 @@ class XmlVarBuilder:
             wildcards=wildcards,
             namespaces=namespaces,
             xml_type=xml_type,
-            wrapper=wrapper,
         )
 
     def build_choices(

@@ -24,9 +24,15 @@ class XmlValTests(TestCase):
     def setUp(self) -> None:
         self.context = XmlContext()
 
-    def test_property_local_name(self):
-        var = XmlVarFactory.create(name="a", qname="{B}A")
-        self.assertEqual("A", var.local_name)
+    def test_property_qname(self):
+        var = XmlVarFactory.create(name="a", local_name="A", namespaces=("B",))
+        self.assertEqual("{B}A", var.qname)
+
+    def test_property_wrapper_qname(self):
+        var = XmlVarFactory.create(
+            name="a", local_name="A", wrapper="AA", namespaces=("B",)
+        )
+        self.assertEqual("{B}AA", var.wrapper_qname)
 
     def test_property_clazz(self):
         var = XmlVarFactory.create(name="foo")
@@ -53,14 +59,11 @@ class XmlValTests(TestCase):
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENTS,
             name="foo",
-            qname="foo",
             elements={
                 "{a}a": XmlVarFactory.create(
-                    xml_type=XmlType.ELEMENT, name="a", qname="{a}a"
+                    xml_type=XmlType.ELEMENT, name="a", namespaces=("a",)
                 ),
-                "b": XmlVarFactory.create(
-                    xml_type=XmlType.ELEMENT, name="b", qname="b"
-                ),
+                "b": XmlVarFactory.create(xml_type=XmlType.ELEMENT, name="b"),
             },
         )
 
@@ -192,9 +195,9 @@ class XmlMetaTests(TestCase):
         mock_match_namespace.side_effect = [False, False, False, True]
 
         attributes = [
-            XmlVarFactory.create(xml_type=XmlType.ATTRIBUTES, qname="any", name="any"),
+            XmlVarFactory.create(xml_type=XmlType.ATTRIBUTES, name="any"),
             XmlVarFactory.create(
-                xml_type=XmlType.ATTRIBUTES, qname="other", name="any"
+                xml_type=XmlType.ATTRIBUTES, local_name="other", name="any"
             ),
         ]
         self.meta.any_attributes = attributes
@@ -213,7 +216,7 @@ class XmlMetaTests(TestCase):
                 namespaces=["##any"],
                 elements={
                     "{c}root": XmlVarFactory.create(
-                        xml_type=XmlType.ELEMENT, name="root", qname="{c}root"
+                        xml_type=XmlType.ELEMENT, name="root", namespaces=("c",)
                     ),
                 },
             ),

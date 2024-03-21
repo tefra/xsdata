@@ -18,7 +18,7 @@ from typing import (
 from xsdata.formats.converter import converter
 from xsdata.models.enums import NamespaceType
 from xsdata.utils import collections
-from xsdata.utils.namespaces import local_name, target_uri
+from xsdata.utils.namespaces import build_qname, local_name, target_uri
 
 NoneType = type(None)
 
@@ -55,13 +55,32 @@ class MetaMixin:
         return f"{self.__class__.__qualname__}({', '.join(params)})"
 
 
+def default_namespace(namespaces: Sequence[str]) -> Optional[str]:
+    """Return the first valid namespace uri or None.
+
+    Args:
+        namespaces: A list of namespace options which may include
+            valid uri(s) or a placeholder e.g. ##any, ##other,
+            ##targetNamespace, ##local
+
+    Returns:
+        A namespace uri or None if there isn't any.
+    """
+    for namespace in namespaces:
+        if namespace and not namespace.startswith("#"):
+            return namespace
+
+    return None
+
+
 class XmlVar(MetaMixin):
     """Class field binding metadata.
 
     Args:
         index: Position index of the variable
         name: Name of the variable
-        qname: Namespace-qualified name of the variable
+        local_name: Local name of the variable
+        wrapper: The element wrapper name
         types: Supported types for the variable
         clazz: Target class type
         init: Indicates if the field should be included in the constructor
@@ -79,14 +98,14 @@ class XmlVar(MetaMixin):
         namespaces: List of supported namespaces
         elements: Mapping of qualified name-repeatable elements
         wildcards: List of repeatable wildcards
-        wrapper: Name for the wrapper (applies for list types only)
 
     Attributes:
+        qname: Namespace-qualified name of the variable
+        wrapper_qname: Namespace-qualified name of the variable wrapper
         tokens: Indicates if the field has associated tokens
         list_element: Indicates if the field is a list or tuple element
         namespace_matches: Matching namespaces information
         is_clazz_union: Indicates if the field is a union of multiple types
-        local_name: Local name extracted from the qualified name
         is_text: Indicates if the field represents text content
         is_element: Indicates if the field represents an XML element
         is_elements: Indicates if the field represents a sequence of XML elements
@@ -98,7 +117,8 @@ class XmlVar(MetaMixin):
     __slots__ = (
         "index",
         "name",
-        "qname",
+        "local_name",
+        "wrapper",
         "types",
         "clazz",
         "init",
@@ -115,8 +135,9 @@ class XmlVar(MetaMixin):
         "namespaces",
         "elements",
         "wildcards",
-        "wrapper",
         # Calculated
+        "qname",
+        "wrapper_qname",
         "tokens",
         "list_element",
         "is_text",
@@ -127,15 +148,14 @@ class XmlVar(MetaMixin):
         "is_attributes",
         "namespace_matches",
         "is_clazz_union",
-        "local_name",
-        "wrapper_local_name",
     )
 
     def __init__(
         self,
         index: int,
         name: str,
-        qname: str,
+        local_name: str,
+        wrapper: Optional[str],
         types: Sequence[Type],
         clazz: Optional[Type],
         init: bool,
@@ -153,12 +173,12 @@ class XmlVar(MetaMixin):
         namespaces: Sequence[str],
         elements: Mapping[str, "XmlVar"],
         wildcards: Sequence["XmlVar"],
-        wrapper: Optional[str] = None,
         **kwargs: Any,
     ):
         self.index = index
         self.name = name
-        self.qname = qname
+        self.local_name = local_name
+        self.wrapper = wrapper
         self.types = types
         self.clazz = clazz
         self.init = init
@@ -176,18 +196,18 @@ class XmlVar(MetaMixin):
         self.elements = elements
         self.wildcards = wildcards
         self.wrapper = wrapper
-
         self.factory = factory
         self.tokens_factory = tokens_factory
 
         self.namespace_matches: Optional[Dict[str, bool]] = None
-
         self.is_clazz_union = self.clazz and len(types) > 1
-        self.local_name = local_name(qname)
 
-        self.wrapper_local_name = None
+        namespace = default_namespace(namespaces)
+
+        self.qname = build_qname(namespace, local_name)
+        self.wrapper_qname = None
         if wrapper:
-            self.wrapper_local_name = local_name(wrapper)
+            self.wrapper_qname = build_qname(namespace, wrapper)
 
         self.is_text = False
         self.is_element = False

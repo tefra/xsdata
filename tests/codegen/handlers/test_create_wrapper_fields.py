@@ -38,6 +38,16 @@ class CreateWrapperFieldsTests(FactoryTestCase):
         self.processor.process(self.target)
         self.assertEqual("items", self.target.attrs[0].wrapper)
 
+    def test_process_with_forward_reference(self):
+        self.container.remove(self.source)
+        self.target.inner.append(self.source)
+        self.target.attrs[0].types[0].forward = True
+
+        self.processor.process(self.target)
+        self.assertEqual("items", self.target.attrs[0].wrapper)
+        self.assertFalse(self.target.attrs[0].types[0].forward)
+        self.assertEqual(0, len(self.target.inner))
+
     def test_process_with_invalid_attr(self):
         self.target.attrs[0].tag = Tag.EXTENSION
         self.processor.process(self.target)
@@ -55,18 +65,10 @@ class CreateWrapperFieldsTests(FactoryTestCase):
         attr = AttrFactory.create()
         wrapper = attr.local_name
 
-        self.processor.wrap_field(source, attr)
+        self.processor.wrap_field(source, attr, False)
         self.assertEqual(source.name, attr.name)
         self.assertEqual(source.local_name, attr.local_name)
         self.assertEqual(wrapper, attr.wrapper)
-
-    def test_find_source_with_forward_reference(self):
-        tp = self.target.attrs[0].types[0]
-        tp.forward = True
-        self.target.inner.append(self.source)
-
-        actual = self.processor.find_source(self.target, tp)
-        self.assertEqual(self.source, actual)
 
     def test_validate_attr(self):
         # Not an element
@@ -100,6 +102,7 @@ class CreateWrapperFieldsTests(FactoryTestCase):
 
         # Has forwarded references
         source.attrs.pop(0)
+        source.attrs[0].tag = Tag.EXTENSION
         source.attrs[0].types[0].forward = True
         self.assertFalse(self.processor.validate_source(source, None))
 
@@ -107,6 +110,14 @@ class CreateWrapperFieldsTests(FactoryTestCase):
         source.attrs[0].types[0].forward = False
         self.assertFalse(self.processor.validate_source(source, "bar"))
 
-        # Not any of the above issues
+        # Optional
         source.attrs[0].namespace = "bar"
+        self.assertFalse(self.processor.validate_source(source, "bar"))
+
+        # Not Element
+        source.attrs[0].restrictions.min_occurs = 1
+        self.assertFalse(self.processor.validate_source(source, "bar"))
+
+        # All rules pass
+        source.attrs[0].tag = Tag.ELEMENT
         self.assertTrue(self.processor.validate_source(source, "bar"))

@@ -63,22 +63,33 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
             self.update_class_references(item, search, replace)
 
     def rename_classes(self, classes: List[Class], use_name: bool):
-        """Rename all the classes in the list.
+        """Rename the classes in the list.
 
-        Protect classes derived from xs:element if there is only one in
-        the list.
+        Cases:
+            - Two classes, one abstract append the abstract suffix
+            - One element, add numeric suffixes to the rest of the classes
+            - Add numeric suffixes to all classes.
 
         Args:
             classes: A list of classes with duplicate names
             use_name: Whether simple or qualified names should be used
                 during renaming
         """
-        total_elements = sum(x.is_element for x in classes)
-        for target in sorted(classes, key=get_name):
-            if not target.is_element or total_elements > 1:
-                self.rename_class(target, use_name)
+        abstract = [x for x in classes if x.abstract]
+        if len(classes) == 2 and len(abstract) == 1:
+            self.add_abstract_suffix(abstract[0])
+        else:
+            total_elements = sum(x.is_element for x in classes)
+            for target in sorted(classes, key=get_name):
+                if not target.is_element or total_elements > 1:
+                    self.add_numeric_suffix(target, use_name)
 
-    def rename_class(self, target: Class, use_name: bool):
+    def add_abstract_suffix(self, target: Class):
+        """Add the abstract suffix to class name."""
+        new_qname = f"{target.qname}_abstract"
+        self.rename_class(target, new_qname)
+
+    def add_numeric_suffix(self, target: Class, use_name: bool):
         """Find the next available class name.
 
         Save the original name in the class metadata and update
@@ -90,14 +101,25 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
             use_name: Whether simple or qualified names should be
                 used during renaming
         """
-        qname = target.qname
         namespace, name = namespaces.split_qname(target.qname)
-        target.qname = self.next_qname(namespace, name, use_name)
-        target.meta_name = name
+        new_qname = self.next_qname(namespace, name, use_name)
+        self.rename_class(target, new_qname)
+
+    def rename_class(self, target: Class, new_qname: str):
+        """Update the class qualified name and update references.
+
+        Args:
+            target: The target class to update
+            new_qname: The new class qualified name
+        """
+        qname = target.qname
+        target.qname = new_qname
+        target.meta_name = namespaces.local_name(qname)
+
         self.container.reset(target, qname)
 
         for item in self.container:
-            self.rename_class_dependencies(item, id(target), target.qname)
+            self.rename_class_dependencies(item, id(target), new_qname)
 
     def next_qname(self, namespace: str, name: str, use_name: bool) -> str:
         """Use int suffixes to get the next available qualified name.

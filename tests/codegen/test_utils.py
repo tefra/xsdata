@@ -307,6 +307,46 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual(4, c.restrictions.max_occurs)
         self.assertEqual(1, c.restrictions.sequence)
 
+    def test_rename_duplicate_attributes(self):
+        attrs = [
+            AttrFactory.create(name="a", tag=Tag.ELEMENT),
+            AttrFactory.create(name="a", tag=Tag.ATTRIBUTE),
+            AttrFactory.create(name="b", tag=Tag.ATTRIBUTE),
+            AttrFactory.create(name="c", tag=Tag.ATTRIBUTE),
+            AttrFactory.create(name="c", tag=Tag.ELEMENT),
+            AttrFactory.create(name="d", tag=Tag.ELEMENT),
+            AttrFactory.create(name="d", tag=Tag.ELEMENT),
+            AttrFactory.create(name="e", tag=Tag.ELEMENT, namespace="b"),
+            AttrFactory.create(name="e", tag=Tag.ELEMENT),
+            AttrFactory.create(name="f", tag=Tag.ELEMENT),
+            AttrFactory.create(name="f", tag=Tag.ELEMENT, namespace="a"),
+            AttrFactory.create(name="gA", tag=Tag.ENUMERATION),
+            AttrFactory.create(name="g[A]", tag=Tag.ENUMERATION),
+            AttrFactory.create(name="g_a", tag=Tag.ENUMERATION),
+            AttrFactory.create(name="g_a_1", tag=Tag.ENUMERATION),
+        ]
+        target = ClassFactory.create(attrs=attrs)
+
+        ClassUtils.rename_duplicate_attributes(target)
+        expected = [
+            "a",
+            "a_Attribute",
+            "b",
+            "c_Attribute",
+            "c",
+            "d_Element",
+            "d",
+            "b_e",
+            "e",
+            "f",
+            "a_f",
+            "gA",
+            "g[A]_2",
+            "g_a_3",
+            "g_a_1",
+        ]
+        self.assertEqual(expected, [x.name for x in attrs])
+
     def test_rename_attribute_by_preference(self):
         one = AttrFactory.create(name="a", tag=Tag.ELEMENT)
         two = AttrFactory.create(name="a", tag=Tag.ATTRIBUTE)

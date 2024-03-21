@@ -384,6 +384,17 @@ class ClassUtils:
             target.restrictions.sequence = source.restrictions.sequence
 
     @classmethod
+    def rename_duplicate_attributes(cls, target: Class):
+        """Find and rename attributes with the same slug."""
+        grouped = collections.group_by(target.attrs, key=get_slug)
+        for items in grouped.values():
+            total = len(items)
+            if total == 2 and not items[0].is_enumeration:
+                cls.rename_attribute_by_preference(*items)
+            elif total > 1:
+                cls.rename_attributes_by_index(target.attrs, items)
+
+    @classmethod
     def rename_attribute_by_preference(cls, a: Attr, b: Attr):
         """Decide and rename one of the two given attributes.
 

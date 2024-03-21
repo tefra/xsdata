@@ -1,6 +1,8 @@
+from unittest import mock
+
 from xsdata.codegen.handlers import RenameDuplicateAttributes
-from xsdata.models.enums import Tag
-from xsdata.utils.testing import AttrFactory, ClassFactory, FactoryTestCase
+from xsdata.codegen.utils import ClassUtils
+from xsdata.utils.testing import ClassFactory, FactoryTestCase
 
 
 class RenameDuplicateAttributesTests(FactoryTestCase):
@@ -9,42 +11,9 @@ class RenameDuplicateAttributesTests(FactoryTestCase):
 
         self.processor = RenameDuplicateAttributes()
 
-    def test_process(self):
-        attrs = [
-            AttrFactory.create(name="a", tag=Tag.ELEMENT),
-            AttrFactory.create(name="a", tag=Tag.ATTRIBUTE),
-            AttrFactory.create(name="b", tag=Tag.ATTRIBUTE),
-            AttrFactory.create(name="c", tag=Tag.ATTRIBUTE),
-            AttrFactory.create(name="c", tag=Tag.ELEMENT),
-            AttrFactory.create(name="d", tag=Tag.ELEMENT),
-            AttrFactory.create(name="d", tag=Tag.ELEMENT),
-            AttrFactory.create(name="e", tag=Tag.ELEMENT, namespace="b"),
-            AttrFactory.create(name="e", tag=Tag.ELEMENT),
-            AttrFactory.create(name="f", tag=Tag.ELEMENT),
-            AttrFactory.create(name="f", tag=Tag.ELEMENT, namespace="a"),
-            AttrFactory.create(name="gA", tag=Tag.ENUMERATION),
-            AttrFactory.create(name="g[A]", tag=Tag.ENUMERATION),
-            AttrFactory.create(name="g_a", tag=Tag.ENUMERATION),
-            AttrFactory.create(name="g_a_1", tag=Tag.ENUMERATION),
-        ]
-        target = ClassFactory.create(attrs=attrs)
-
+    @mock.patch.object(ClassUtils, "rename_duplicate_attributes")
+    def test_process(self, mock_rename_duplicate_attributes):
+        target = ClassFactory.create()
         self.processor.process(target)
-        expected = [
-            "a",
-            "a_Attribute",
-            "b",
-            "c_Attribute",
-            "c",
-            "d_Element",
-            "d",
-            "b_e",
-            "e",
-            "f",
-            "a_f",
-            "gA",
-            "g[A]_2",
-            "g_a_3",
-            "g_a_1",
-        ]
-        self.assertEqual(expected, [x.name for x in attrs])
+
+        mock_rename_duplicate_attributes.assert_called_once_with(target)

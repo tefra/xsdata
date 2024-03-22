@@ -652,17 +652,24 @@ class Class(CodegenModel):
 
     def types(self) -> Iterator[AttrType]:
         """Yields all class types."""
+        for _, tp in self.types_with_parents():
+            yield tp
+
+    def types_with_parents(self) -> Iterator[Tuple[CodegenModel, AttrType]]:
+        """Yields all class types with their parent codegen instance."""
         for ext in self.extensions:
-            yield ext.type
+            yield ext, ext.type
 
         for attr in self.attrs:
-            yield from attr.types
+            for tp in attr.types:
+                yield attr, tp
 
             for choice in attr.choices:
-                yield from choice.types
+                for tp in choice.types:
+                    yield choice, tp
 
         for inner in self.inner:
-            yield from inner.types()
+            yield from inner.types_with_parents()
 
     def children(self) -> Iterator[CodegenModel]:
         """Yield all codegen children."""

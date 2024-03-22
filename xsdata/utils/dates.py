@@ -267,7 +267,7 @@ class DateTimeParser:
             self.vidx += 1
             return 0
 
-        if ctrl == "-" or ctrl == "+":
+        if ctrl in ("-", "+"):
             self.vidx += 1
             offset = self.parse_digits(2) * 60
             self.skip(":")

@@ -24,6 +24,7 @@ from xsdata.codegen.models import Class
 from xsdata.codegen.parsers import DtdParser
 from xsdata.codegen.parsers.definitions import DefinitionsParser
 from xsdata.codegen.parsers.schema import SchemaParser
+from xsdata.codegen.stopwatch import stopwatch, stopwatches
 from xsdata.codegen.utils import ClassUtils
 from xsdata.codegen.writer import CodeWriter
 from xsdata.formats.dataclass.models.generics import AnyElement
@@ -141,6 +142,9 @@ class ResourceTransformer:
                 "Circular Dependencies Found",
                 help="Try a different structure style and enabling unnest classes.",
             )
+
+        for name, times in stopwatches.items():
+            logger.debug(f"{name} - {sum(times) / 1e9}s")
 
     def process_sources(self, uris: List[str]):
         """Process a list of resolved URI strings.
@@ -278,10 +282,11 @@ class ResourceTransformer:
             )
 
             writer = CodeWriter.from_config(self.config)
-            if self.print:
-                writer.print(classes)
-            else:
-                writer.write(classes)
+            with stopwatch(CodeWriter.__name__):
+                if self.print:
+                    writer.print(classes)
+                else:
+                    writer.write(classes)
 
     def convert_schema(self, schema: Schema):
         """Convert a schema instance to codegen classes.

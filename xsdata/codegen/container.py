@@ -28,6 +28,7 @@ from xsdata.codegen.handlers import (
 )
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.models import Class, Status
+from xsdata.codegen.stopwatch import stopwatch
 from xsdata.codegen.utils import ClassUtils
 from xsdata.codegen.validator import ClassValidator
 from xsdata.models.config import GeneratorConfig
@@ -186,7 +187,8 @@ class ClassContainer(ContainerInterface):
 
     def validate_classes(self):
         """Merge redefined classes."""
-        ClassValidator(self).process()
+        with stopwatch("ClassValidator"):
+            ClassValidator(self).process()
 
     def process_classes(self, step: int):
         """Run the given step processors for all classes.
@@ -210,7 +212,8 @@ class ClassContainer(ContainerInterface):
         """
         target.status = Status(step)
         for processor in self.processors.get(step, []):
-            processor.process(target)
+            with stopwatch(processor.__class__.__name__):
+                processor.process(target)
 
         for inner in target.inner:
             if inner.status < step:
@@ -227,11 +230,13 @@ class ClassContainer(ContainerInterface):
         ]
 
         for designator in designators:
-            designator.run()
+            with stopwatch(designator.__class__.__name__):
+                designator.run()
 
     def filter_classes(self):
         """Filter the classes to be generated."""
-        FilterClasses(self).run()
+        with stopwatch(FilterClasses.__name__):
+            FilterClasses(self).run()
 
     def remove_groups(self):
         """Remove xs:groups and xs:attributeGroups from the container."""

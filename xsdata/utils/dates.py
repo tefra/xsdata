@@ -153,7 +153,7 @@ class DateTimeParser:
                     yield from self.parse_var(var)
 
             if self.vidx != self.vlen:
-                raise ValueError()
+                raise ValueError
 
         except Exception:
             raise ValueError(
@@ -177,7 +177,7 @@ class DateTimeParser:
     def skip(self, char: str):
         """Validate and skip over the given char."""
         if not self.has_more() or self.peek() != char:
-            raise ValueError()
+            raise ValueError
 
         self.vidx += 1
 
@@ -194,7 +194,7 @@ class DateTimeParser:
         elif var == "z":
             yield self.parse_offset()
         else:
-            raise ValueError()
+            raise ValueError
 
     def parse_year(self) -> int:
         """Parse the year argument."""
@@ -216,7 +216,7 @@ class DateTimeParser:
             or (leading_zeros == 4 and year > 0)
             or (leading_zeros > 4)
         ):
-            raise ValueError()
+            raise ValueError
 
         if negative:
             return -year
@@ -228,8 +228,8 @@ class DateTimeParser:
         if self.has_more() and self.peek() == ".":
             self.vidx += 1
             return self.parse_fixed_digits(9)
-        else:
-            return 0
+
+        return 0
 
     def parse_digits(self, digits: int) -> int:
         """Parse the given number of digits."""
@@ -275,4 +275,4 @@ class DateTimeParser:
             offset *= -1 if ctrl == "-" else 1
             return offset
 
-        raise ValueError()
+        raise ValueError

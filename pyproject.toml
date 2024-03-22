@@ -133,9 +133,6 @@ isort = { known-first-party = ['xsdata', 'tests'] }
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
-[tool.doc8]
-max-line-length = 88
-
 [tool.pytest.ini_options]
 addopts = "--color=yes --benchmark-skip"
 doctest_optionflags = "NORMALIZE_WHITESPACE"

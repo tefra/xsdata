@@ -41,6 +41,13 @@ DEFAULT_NS_MAP = {
 }
 
 
+def filter_none(d: Any) -> Any:
+    if not isinstance(d, dict):
+        return d
+
+    return {k: filter_none(v) for k, v in d.items() if v is not None}
+
+
 def load_class(output: str, clazz_name: str) -> Any:
     search = "Generating package: "
     start = len(search)

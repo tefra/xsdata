@@ -105,6 +105,10 @@ select = [
     "I",
     # pydocstyle
     "D",
+    # flake-raise
+    "RSE",
+    # flake-return
+    "RET",
 ]
 
 ignore = [

@@ -478,7 +478,7 @@ class DecimalConverter(Converter):
         try:
             return Decimal(value)
         except InvalidOperation:
-            raise ConverterError()
+            raise ConverterError
 
     def serialize(self, value: Decimal, **kwargs: Any) -> str:
         """Convert a decimal value sto string.
@@ -585,13 +585,13 @@ class QNameConverter(Converter):
         value = value.strip()
 
         if not value:
-            raise ConverterError()
+            raise ConverterError
 
         if value[0] == "{":
             uri, name = text.split(value[1:], "}")
 
             if not namespaces.is_uri(uri):
-                raise ConverterError()
+                raise ConverterError
         else:
             prefix, name = text.split(value, ":")
             uri = ns_map.get(prefix) if ns_map else None
@@ -599,7 +599,7 @@ class QNameConverter(Converter):
                 raise ConverterError(f"Unknown namespace prefix: `{prefix}`")
 
         if " " in name or not namespaces.is_ncname(name):
-            raise ConverterError()
+            raise ConverterError
 
         return uri, name
 
@@ -648,7 +648,7 @@ class EnumConverter(Converter):
             if self.match(value, values, length, member.value, **kwargs):
                 return member
 
-        raise ConverterError()
+        raise ConverterError
 
     @classmethod
     def match(

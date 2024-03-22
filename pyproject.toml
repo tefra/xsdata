@@ -123,8 +123,6 @@ ignore = [
     "D107"
 ]
 
-isort = { known-first-party = ['xsdata', 'tests'] }
-
 [tool.ruff.lint.per-file-ignores]
 "**/{tests}/*" = ["ANN001", "ANN002", "ANN003", "E501", "B018", "D"]
 "**/utils/testing.py" = ["D"]

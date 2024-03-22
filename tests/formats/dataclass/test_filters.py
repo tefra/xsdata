@@ -883,11 +883,8 @@ class FiltersTests(FactoryTestCase):
             "    field: Optional[str] = field(default=None)"
         )
 
-        expected = "\n".join(
-            (
-                "from dataclasses import dataclass, field",
-                "from typing import Optional",
-            )
+        expected = (
+            "from dataclasses import dataclass, field\nfrom typing import Optional"
         )
 
         self.assertEqual(expected, self.filters.default_imports(output))

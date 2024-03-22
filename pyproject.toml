@@ -109,6 +109,8 @@ select = [
     "RSE",
     # flake-return
     "RET",
+    # Ruff rules
+    "RUF",
 ]
 
 ignore = [
@@ -124,7 +126,9 @@ ignore = [
     "B904",
     "D100",
     "D104",
-    "D107"
+    "D107",
+    "RUF009",
+    "RUF012",
 ]
 
 [tool.ruff.lint.per-file-ignores]

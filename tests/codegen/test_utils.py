@@ -324,6 +324,8 @@ class ClassUtilsTests(FactoryTestCase):
             AttrFactory.create(name="g[A]", tag=Tag.ENUMERATION),
             AttrFactory.create(name="g_a", tag=Tag.ENUMERATION),
             AttrFactory.create(name="g_a_1", tag=Tag.ENUMERATION),
+            AttrFactory.create(name="%", tag=Tag.ENUMERATION),
+            AttrFactory.create(name="$", tag=Tag.ENUMERATION),
         ]
         target = ClassFactory.create(attrs=attrs)
 
@@ -344,6 +346,8 @@ class ClassUtilsTests(FactoryTestCase):
             "g[A]_2",
             "g_a_3",
             "g_a_1",
+            "%",
+            "$_1",
         ]
         self.assertEqual(expected, [x.name for x in attrs])
 

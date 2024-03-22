@@ -10,6 +10,7 @@ from typing import Callable, Dict, List, NamedTuple, Optional, Tuple
 
 from toposort import CircularDependencyError
 
+from xsdata import __version__
 from xsdata.codegen import opener
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.exceptions import CodegenError
@@ -445,4 +446,4 @@ class ResourceTransformer:
         """
         key = hashlib.md5("".join(uris).encode()).hexdigest()
         tempdir = tempfile.gettempdir()
-        return Path(tempdir).joinpath(f"{key}.cache")
+        return Path(tempdir).joinpath(f"xsdata.{__version__}.{key}.cache")

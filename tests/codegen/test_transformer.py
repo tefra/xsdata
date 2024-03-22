@@ -5,6 +5,7 @@ from unittest import mock
 
 from toposort import CircularDependencyError
 
+from xsdata import __version__
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.mappers import (
@@ -483,6 +484,8 @@ class ResourceTransformerTests(FactoryTestCase):
         uris = ["a.xml", "b.json"]
         actual = self.transformer.get_cache_file(uris)
         tempdir = Path(tempfile.gettempdir())
-        expected = tempdir.joinpath("ae1bed744d3d3611e698a2d2ef5335d2.cache")
+        expected = tempdir.joinpath(
+            f"xsdata.{__version__}.ae1bed744d3d3611e698a2d2ef5335d2.cache"
+        )
 
         self.assertEqual(expected, actual)

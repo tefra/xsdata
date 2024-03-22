@@ -39,7 +39,7 @@ class AttrTests(FactoryTestCase):
         attr = AttrFactory.attribute(name="a", namespace="b")
         self.assertEqual("{b}a", attr.qname)
 
-    def test_property_is_property(self):
+    def test_property_is_attribute(self):
         self.assertTrue(AttrFactory.attribute().is_attribute)
         self.assertTrue(AttrFactory.any_attribute().is_attribute)
         self.assertFalse(AttrFactory.element().is_attribute)

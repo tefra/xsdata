@@ -14,6 +14,7 @@ from xsdata.codegen.models import (
 )
 from xsdata.models.enums import DataType, Tag
 from xsdata.utils import collections, namespaces, text
+from xsdata.utils.constants import DEFAULT_ATTR_NAME
 
 
 class ClassUtils:
@@ -386,7 +387,9 @@ class ClassUtils:
     @classmethod
     def rename_duplicate_attributes(cls, target: Class):
         """Find and rename attributes with the same slug."""
-        grouped = collections.group_by(target.attrs, key=get_slug)
+        grouped = collections.group_by(
+            target.attrs, key=lambda x: x.slug or DEFAULT_ATTR_NAME
+        )
         for items in grouped.values():
             total = len(items)
             if total == 2 and not items[0].is_enumeration:

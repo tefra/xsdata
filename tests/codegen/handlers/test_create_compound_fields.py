@@ -237,7 +237,8 @@ class CreateCompoundFieldsTests(FactoryTestCase):
 
         actual = self.processor.build_attr_choice(attr)
 
-        self.assertEqual(attr.local_name, actual.name)
+        self.assertEqual(attr.name, actual.name)
+        self.assertEqual(attr.local_name, actual.local_name)
         self.assertEqual(attr.namespace, actual.namespace)
         self.assertIsNone(actual.default)
         self.assertEqual(attr.tag, actual.tag)

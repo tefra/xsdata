@@ -252,7 +252,8 @@ class CreateCompoundFields(RelativeHandlerInterface):
         restrictions.sequence = None
 
         return Attr(
-            name=attr.local_name,
+            name=attr.name,
+            local_name=attr.local_name,
             namespace=attr.namespace,
             types=[x.clone() for x in attr.types],
             tag=attr.tag,

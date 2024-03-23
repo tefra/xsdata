@@ -456,7 +456,10 @@ class Filters:
         return self.filter_metadata(metadata)
 
     def field_choices(
-        self, attr: Attr, parent_namespace: Optional[str], parents: List[str]
+        self,
+        attr: Attr,
+        parent_namespace: Optional[str],
+        parents: List[str],
     ) -> Optional[Tuple]:
         """Return a tuple of field metadata if the attr has choices."""
         if not attr.choices:
@@ -471,7 +474,7 @@ class Filters:
             )
 
             metadata = {
-                "name": choice.name,
+                "name": choice.local_name,
                 "wildcard": choice.is_wildcard,
                 "type": self.choice_type(choice, parents),
                 "namespace": namespace,

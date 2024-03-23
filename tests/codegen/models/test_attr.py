@@ -6,6 +6,15 @@ from xsdata.utils.testing import AttrFactory, AttrTypeFactory, FactoryTestCase
 
 
 class AttrTests(FactoryTestCase):
+    def test__post__init__(self):
+        attr = AttrFactory.create(name="$")
+        self.assertEqual("$", attr.local_name)
+        self.assertEqual("DOLLAR SIGN", attr.name)
+
+        attr = AttrFactory.create(local_name="$", name="dollar")
+        self.assertEqual("$", attr.local_name)
+        self.assertEqual("dollar", attr.name)
+
     def test__eq__(self):
         attr = AttrFactory.element()
         clone = attr.clone()

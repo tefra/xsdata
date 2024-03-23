@@ -1,6 +1,7 @@
 import copy
 import operator
 import sys
+import unicodedata
 from dataclasses import asdict, dataclass, field, fields, replace
 from enum import IntEnum
 from typing import Any, Dict, Iterator, List, Optional, Tuple, Type, TypeVar
@@ -271,6 +272,7 @@ class Attr(CodegenModel):
         tag: The xml tag that produced this attr
         name: The final attr name
         local_name: The original attr name
+        wrapper: The wrapper element name
         index: The index position of this attr in the class
         default: The default value
         fixed: Specifies if the default value is fixed
@@ -286,7 +288,7 @@ class Attr(CodegenModel):
 
     tag: str
     name: str = field(compare=False)
-    local_name: str = field(init=False)
+    local_name: str = field(default="")
     wrapper: Optional[str] = field(default=None)
     index: int = field(compare=False, default_factory=int)
     default: Optional[str] = field(default=None, compare=False)
@@ -301,8 +303,12 @@ class Attr(CodegenModel):
     substitution: Optional[str] = field(default=None, compare=False)
 
     def __post_init__(self):
-        """Set the original attr name on init."""
-        self.local_name = self.name
+        """Post init processing."""
+        if not self.local_name:
+            self.local_name = self.name
+
+        if text.alnum(self.name) == "":
+            self.name = "_".join(unicodedata.name(char) for char in self.name)
 
     @property
     def key(self) -> str:

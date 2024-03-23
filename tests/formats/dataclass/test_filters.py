@@ -517,6 +517,7 @@ class FiltersTests(FactoryTestCase):
         attr = AttrFactory.create(
             choices=[
                 AttrFactory.element(
+                    name="$",
                     namespace="foo",
                     types=[type_float],
                     restrictions=Restrictions(max_exclusive="10"),
@@ -530,8 +531,8 @@ class FiltersTests(FactoryTestCase):
 
         actual = self.filters.field_choices(attr, "foo", ["a", "b"])
         expected = (
-            {"name": "attr_B", "type": "Type[float]", "max_exclusive": 10.0},
-            {"name": "attr_C", "namespace": "bar", "type": "Type[str]"},
+            {"name": "$", "type": "Type[float]", "max_exclusive": 10.0},
+            {"name": "attr_B", "namespace": "bar", "type": "Type[str]"},
             {
                 "namespace": "##other",
                 "wildcard": True,

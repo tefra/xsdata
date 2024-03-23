@@ -483,8 +483,9 @@ class Filters:
             if choice.is_nameless:
                 del metadata["name"]
 
-            default_key = self.FACTORY_KEY if choice.is_factory else self.DEFAULT_KEY
-            metadata[default_key] = self.field_default_value(choice)
+            if choice.is_tokens:
+                metadata[self.FACTORY_KEY] = self.field_default_value(choice)
+
             metadata.update(restrictions)
 
             if self.docstring_style == DocstringStyle.ACCESSIBLE and choice.help:

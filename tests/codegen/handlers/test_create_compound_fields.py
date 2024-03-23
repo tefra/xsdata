@@ -230,10 +230,7 @@ class CreateCompoundFieldsTests(FactoryTestCase):
             choice="abc",
             sequence=1,
         )
-        expected_res = attr.restrictions.clone()
-        expected_res.min_occurs = None
-        expected_res.max_occurs = None
-        expected_res.sequence = None
+        expected_res = attr.restrictions.clone(min_occurs=0, sequence=None)
 
         actual = self.processor.build_attr_choice(attr)
 

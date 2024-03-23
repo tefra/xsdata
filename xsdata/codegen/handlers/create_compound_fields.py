@@ -246,10 +246,7 @@ class CreateCompoundFields(RelativeHandlerInterface):
         Returns:
             The new choice attr for the compound attr.
         """
-        restrictions = attr.restrictions.clone()
-        restrictions.min_occurs = None
-        restrictions.max_occurs = None
-        restrictions.sequence = None
+        restrictions = attr.restrictions.clone(min_occurs=0, sequence=None)
 
         return Attr(
             name=attr.name,

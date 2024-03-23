@@ -538,7 +538,7 @@ class FiltersTests(FactoryTestCase):
                 "wildcard": True,
                 "type": "Type[object]",
             },
-            {"default": "'aa'", "name": "bar", "type": "Type[str]"},
+            {"name": "bar", "type": "Type[str]"},
             {
                 "default_factory": "list",
                 "name": "tok",

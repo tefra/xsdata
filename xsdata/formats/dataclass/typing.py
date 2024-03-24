@@ -138,7 +138,6 @@ def _evaluate_tuple(tp: Any) -> Iterator[Type]:
 
 
 def _evaluate_union(tp: Any) -> Iterator[Type]:
-    origin_locked = False
     for arg in get_args(tp):
         if arg is NONE_TYPE:
             continue
@@ -147,9 +146,10 @@ def _evaluate_union(tp: Any) -> Iterator[Type]:
             yield from _evaluate_typevar(arg)
         else:
             origin = get_origin(arg)
-            if origin is list and not origin_locked:
+            if origin is list:
                 yield from _evaluate_list(arg)
-                origin_locked = True
+            elif origin is tuple:
+                yield from _evaluate_tuple(arg)
             elif origin is None and not is_from_typing(arg):
                 yield arg
             else:

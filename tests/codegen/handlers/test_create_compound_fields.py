@@ -5,7 +5,6 @@ from xsdata.codegen.handlers import CreateCompoundFields
 from xsdata.codegen.models import Restrictions
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import Tag
-from xsdata.utils import collections
 from xsdata.utils.testing import (
     AttrFactory,
     ClassFactory,
@@ -93,9 +92,7 @@ class CreateCompoundFieldsTests(FactoryTestCase):
             name="choice",
             tag="Choice",
             index=0,
-            types=collections.unique_sequence(
-                t for attr in target.attrs for t in attr.types
-            ),
+            types=[],
             choices=[
                 AttrFactory.create(
                     tag=target.attrs[0].tag,

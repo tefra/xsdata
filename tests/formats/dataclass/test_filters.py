@@ -734,6 +734,37 @@ class FiltersTests(FactoryTestCase):
 
         self.assertEqual("Any", self.filters.field_type(attr, ["a", "b"]))
 
+    def test_field_type_with_compound_attr(self):
+        attr = AttrFactory.create(
+            tag=Tag.CHOICE,
+            choices=[
+                AttrFactory.create(
+                    name="a", types=[AttrTypeFactory.native(DataType.STRING)]
+                ),
+                AttrFactory.create(
+                    name="b", types=[AttrTypeFactory.native(DataType.INT)]
+                ),
+                AttrFactory.create(
+                    name="c",
+                    types=[AttrTypeFactory.native(DataType.DECIMAL)],
+                    restrictions=Restrictions(tokens=True),
+                ),
+            ],
+            restrictions=Restrictions(min_occurs=0, max_occurs=1),
+        )
+
+        expected = "Optional[Union[str, int, List[Decimal]]]"
+        self.assertEqual(expected, self.filters.field_type(attr, []))
+
+        attr.restrictions.max_occurs = 2
+        expected = "List[Union[str, int, List[Decimal]]]"
+        self.assertEqual(expected, self.filters.field_type(attr, []))
+
+        attr.restrictions.min_occurs = attr.restrictions.max_occurs = 1
+        self.filters.format.kw_only = True
+        expected = "Union[str, int, List[Decimal]]"
+        self.assertEqual(expected, self.filters.field_type(attr, []))
+
     def test_choice_type(self):
         choice = AttrFactory.create(types=[AttrTypeFactory.create("foobar")])
         actual = self.filters.choice_type(choice, ["a", "b"])

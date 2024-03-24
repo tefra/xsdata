@@ -4,7 +4,7 @@ from tests.fixtures.compound.models import Root
 
 
 obj = Root(
-    alpha_or_bravo=[
+    alpha_or_bravo_or_charlie=[
         Alpha(
 
         ),
@@ -26,8 +26,18 @@ obj = Root(
         Alpha(
 
         ),
+        [
+            'a',
+            'b',
+            'c',
+        ],
         Bravo(
 
         ),
+        [
+            'd',
+            'e',
+            'f',
+        ],
     ]
 )

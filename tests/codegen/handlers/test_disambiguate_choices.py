@@ -51,7 +51,8 @@ class DisambiguateChoicesTest(FactoryTestCase):
         self.assertEqual(4, wildcard.restrictions.max_occurs)
 
     def test_process_with_duplicate_simple_types(self):
-        compound = AttrFactory.create(tag=Tag.CHOICE, types=[])
+        compound = AttrFactory.create(tag=Tag.CHOICE)
+        compound.types.clear()
         target = ClassFactory.create()
         target.attrs.append(compound)
         compound.choices.append(AttrFactory.native(DataType.STRING, name="a"))
@@ -70,7 +71,7 @@ class DisambiguateChoicesTest(FactoryTestCase):
         self.assertEqual("a", target.inner[0].qname)
         self.assertEqual("{xs}b", target.inner[1].qname)
 
-        self.assertEqual(["a", "{xs}b"], [x.qname for x in compound.types])
+        self.assertEqual([], [x.qname for x in compound.types])
 
     def test_process_with_duplicate_any_types(self):
         compound = AttrFactory.create(tag=Tag.CHOICE, types=[])

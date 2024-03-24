@@ -29,6 +29,7 @@ from xsdata.models.config import (
     ObjectType,
     OutputFormat,
 )
+from xsdata.models.enums import Tag
 from xsdata.utils import collections, namespaces, text
 from xsdata.utils.objects import literal_value
 
@@ -745,6 +746,9 @@ class Filters:
         if attr.is_prohibited:
             return "Any"
 
+        if attr.tag == Tag.CHOICE:
+            return self.compound_field_types(attr, parents)
+
         result = self._field_type_names(attr, parents, choice=False)
 
         iterable_fmt = self._get_iterable_format()
@@ -763,6 +767,34 @@ class Filters:
         if attr.is_nillable or (
             attr.default is None and (attr.is_optional or not self.format.kw_only)
         ):
+            return f"None | {result}" if self.union_type else f"Optional[{result}]"
+
+        return result
+
+    def compound_field_types(self, attr: Attr, parents: List[str]):
+        """Generate type hint for a compound field.
+
+        Args:
+            attr: The compound attr instance
+            parents: A list of the parent class names
+
+        Returns:
+            The string representation of the type hint.
+        """
+        results = []
+        iterable_fmt = self._get_iterable_format()
+        for choice in attr.choices:
+            names = self._field_type_names(choice, parents, choice=False)
+            if choice.is_tokens:
+                names = iterable_fmt.format(names)
+            results.append(names)
+
+        result = self._join_type_names(results)
+
+        if attr.is_list:
+            return iterable_fmt.format(result)
+
+        if attr.is_optional or not self.format.kw_only:
             return f"None | {result}" if self.union_type else f"Optional[{result}]"
 
         return result

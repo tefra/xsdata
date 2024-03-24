@@ -1,5 +1,5 @@
 {
-  "alpha_or_bravo": [
+  "alpha_or_bravo_or_charlie": [
     {
       "a": true
     },
@@ -21,8 +21,18 @@
     {
       "a": true
     },
+    [
+      "a",
+      "b",
+      "c"
+    ],
     {
       "b": true
-    }
+    },
+    [
+      "d",
+      "e",
+      "f"
+    ]
   ]
 }

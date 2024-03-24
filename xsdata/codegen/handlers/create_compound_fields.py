@@ -145,7 +145,6 @@ class CreateCompoundFields(RelativeHandlerInterface):
             ),
             choices=choices,
         )
-        ClassUtils.reset_choice_types(compound_attr)
         target.attrs.insert(pos, compound_attr)
 
     def sum_counters(self, counters: Dict) -> Tuple[List[int], List[int]]:

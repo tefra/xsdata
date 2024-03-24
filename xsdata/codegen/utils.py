@@ -12,7 +12,7 @@ from xsdata.codegen.models import (
     get_qname,
     get_slug,
 )
-from xsdata.models.enums import DataType, Tag
+from xsdata.models.enums import DataType
 from xsdata.utils import collections, namespaces, text
 from xsdata.utils.constants import DEFAULT_ATTR_NAME
 
@@ -453,13 +453,6 @@ class ClassUtils:
             return f"{name}_{index}"
 
         return name
-
-    @classmethod
-    def reset_choice_types(cls, attr: Attr):
-        """Reset the choice types."""
-        if attr.tag == Tag.CHOICE:
-            types = (tp for choice in attr.choices for tp in choice.types)
-            attr.types = collections.unique_sequence(x.clone() for x in types)
 
     @classmethod
     def cleanup_class(cls, target: Class):

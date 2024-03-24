@@ -35,7 +35,7 @@ class Root:
     class Meta:
         name = "root"
 
-    alpha_or_bravo: List[Union[Alpha, Bravo]] = field(
+    alpha_or_bravo_or_charlie: List[Union[Alpha, Bravo, List[str]]] = field(
         default_factory=list,
         metadata={
             "type": "Elements",
@@ -47,6 +47,13 @@ class Root:
                 {
                     "name": "bravo",
                     "type": Bravo,
+                },
+                {
+                    "name": "charlie",
+                    "type": List[str],
+                    "namespace": "",
+                    "default_factory": list,
+                    "tokens": True,
                 },
             ),
         },

@@ -159,7 +159,9 @@ class TypingTests(TestCase):
             Optional[List[Union[int, float]]]: (list, int, float),
             Optional[A]: (int, str),
             Union[List[int], None]: (list, int),
-            Union[List[int], List[str]]: False,
+            Union[Tuple[int, ...], None]: (tuple, int),
+            Union[List[int], List[str]]: (list, int, list, str),
+            Union[List[Dict]]: False,
         }
 
         if sys.version_info[:2] >= (3, 10):
@@ -169,7 +171,8 @@ class TypingTests(TestCase):
                     None | List[int | float]: (list, int, float),
                     None | A: (int, str),
                     List[int] | None: (list, int),
-                    List[int] | List[str]: False,
+                    Tuple[int, ...] | None: (tuple, int),
+                    List[int] | List[str]: (list, int, list, str),
                 }
             )
 

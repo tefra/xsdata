@@ -18,7 +18,7 @@ from typing import (
 from xsdata.formats.converter import converter
 from xsdata.models.enums import NamespaceType
 from xsdata.utils import collections
-from xsdata.utils.namespaces import build_qname, local_name, target_uri
+from xsdata.utils.namespaces import build_qname, target_uri
 
 NoneType = type(None)
 

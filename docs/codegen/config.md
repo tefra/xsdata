@@ -154,7 +154,7 @@ xsdata relies on the field ordering for serialization. This process fails for re
 choice or complex sequence elements. When you enable compound fields, these elements are
 grouped into a single field.
 
-```xml show_lines="2:9"
+```xml show_lines="2:10"
 --8<-- "tests/fixtures/compound/schema.xsd"
 ```
 

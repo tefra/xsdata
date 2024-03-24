@@ -391,6 +391,10 @@ class XmlVarBuilder:
                 f"Xml {xml_type} does not support typing `{type_hint}`"
             )
 
+        if xml_type == XmlType.ELEMENTS:
+            sub_origin = None
+            types = (object,)
+
         local_name = local_name or self.build_local_name(xml_type, name)
 
         if tokens and sub_origin is None:
@@ -586,7 +590,11 @@ class XmlVarBuilder:
 
     @classmethod
     def analyze_types(
-        cls, model: Type, name: str, type_hint: Any, globalns: Any
+        cls,
+        model: Type,
+        name: str,
+        type_hint: Any,
+        globalns: Any,
     ) -> Tuple[Any, Any, Tuple[Type, ...]]:
         """Analyze a type hint and return the origin, sub origin and the type args.
 
@@ -646,6 +654,9 @@ class XmlVarBuilder:
         if object in types and xml_type != XmlType.ELEMENTS:
             # Any type, secondary types are not allowed except for 'Elements' XML type
             return len(types) == 1
+
+        if xml_type == XmlType.ELEMENTS:
+            return True
 
         return self.is_typing_supported(types)
 

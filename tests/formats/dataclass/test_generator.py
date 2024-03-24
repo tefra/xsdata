@@ -212,10 +212,39 @@ class DataclassGeneratorTests(FactoryTestCase):
 
         self.assertEqual("", self.generator.package_name(""))
 
-    def test_format_with_invalid_code(self):
-        src_code = """a = "1"""
+    def test_ruff_code_with_invalid_code(self):
+        src_code = (
+            "class AlternativeText:\n"
+            "    class Meta:\n"
+            '        namespace = "xsdata"\n'
+            "\n"
+            "    foo: Optional[Union[]] = field(\n"
+            "           init=False,\n"
+            '           metadata={"type": "Ignore"}\n'
+            "    )\n"
+            "    bar: str\n"
+            "    thug: str"
+        )
         file_path = Path(__file__)
 
         self.generator.config.output.max_line_length = 55
-        with self.assertRaises(CodegenError):
+        with self.assertRaises(CodegenError) as cm:
             self.generator.ruff_code(src_code, file_path)
+
+        expected = (
+            "\n"
+            "\n"
+            "   class AlternativeText:\n"
+            "       class Meta:\n"
+            '           namespace = "xsdata"\n'
+            "   \n"
+            "--->    foo: Optional[Union[]] = field(\n"
+            "              init=False,\n"
+            '              metadata={"type": "Ignore"}\n'
+            "       )"
+        )
+        self.assertEqual(expected, cm.exception.meta.get("source"))
+
+    def test_code_excerpt_with_no_line_number(self):
+        actual = self.generator.code_excerpt("foobar", "")
+        self.assertEqual("NA", actual)

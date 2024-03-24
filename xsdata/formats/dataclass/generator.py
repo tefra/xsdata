@@ -1,3 +1,4 @@
+import re
 import subprocess
 from pathlib import Path
 from textwrap import indent
@@ -255,5 +256,25 @@ class DataclassGenerator(AbstractGenerator):
 
             return src_code_encoded.decode()
         except subprocess.CalledProcessError as e:
-            error = indent(e.stderr.decode(), "  ")
-            raise CodegenError("Ruff failed", details=error)
+            details = e.stderr.decode().replace("error: ", "").strip()
+            source = self.code_excerpt(details, src_code_encoded.decode())
+            raise CodegenError("Ruff failed", details=details, source=source)
+
+    @classmethod
+    def code_excerpt(cls, details: str, src_code: str) -> str:
+        """Extract source code excerpt from the error details message."""
+        match = re.search(r"(\d+):(\d+)", details)
+        if match:
+            line_number = int(match.group(1)) - 1
+            lines = src_code.split("\n")
+            start = max(0, line_number - 4)
+            end = min(len(lines), line_number + 4)
+
+            excerpt = ["\n"]
+            for index in range(start, end):
+                prepend = "--->" if index == line_number else "   "
+                excerpt.append(f"{prepend}{lines[index]}")
+
+            return "\n".join(excerpt)
+
+        return "NA"

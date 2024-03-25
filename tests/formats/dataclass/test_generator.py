@@ -16,9 +16,12 @@ class DataclassGeneratorTests(FactoryTestCase):
         config = GeneratorConfig()
         self.generator = DataclassGenerator(config)
 
+    @mock.patch.object(DataclassGenerator, "validate_imports")
     @mock.patch.object(DataclassGenerator, "render_package")
     @mock.patch.object(DataclassGenerator, "render_module")
-    def test_render(self, mock_render_module, mock_render_package):
+    def test_render(
+        self, mock_render_module, mock_render_package, mock_validate_imports
+    ):
         classes = [
             ClassFactory.create(package="foo.bar", module="tests"),
             ClassFactory.create(package="bar.foo", module="tests"),
@@ -56,6 +59,7 @@ class DataclassGeneratorTests(FactoryTestCase):
         mock_render_module.assert_has_calls(
             [mock.call(mock.ANY, [x], mock.ANY) for x in classes]
         )
+        mock_validate_imports.assert_called_once()
 
     def test_render_package(self):
         classes = [

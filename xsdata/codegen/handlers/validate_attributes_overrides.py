@@ -127,7 +127,11 @@ class ValidateAttributesOverrides(RelativeHandlerInterface):
         if parent_attr.is_any_type and not child_attr.is_any_type:
             return
 
-        if child_attr.is_list and not parent_attr.is_list:
+        if (
+            child_attr.is_list
+            and not parent_attr.is_list
+            and not parent_attr.is_prohibited
+        ):
             # Hack much??? idk but Optional[str] can't override List[str]
             parent_attr.restrictions.max_occurs = sys.maxsize
             assert parent_attr.parent is not None

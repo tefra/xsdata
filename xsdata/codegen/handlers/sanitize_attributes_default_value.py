@@ -79,7 +79,10 @@ class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
             [tp.qname for tp in attr.types],
         )
 
-        self.reset_attribute_types(attr)
+        if self.container.config.output.retain_simple_types:
+            attr.default = None
+        else:
+            self.reset_attribute_types(attr)
 
     def is_valid_external_value(self, target: Class, attr: Attr) -> bool:
         """Validate user defined types.

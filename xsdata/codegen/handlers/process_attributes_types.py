@@ -195,7 +195,10 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
                 x.restrictions.format for x in source.attrs if x.restrictions.format
             )
             attr_type.reference = id(source)
-        elif not source.is_complex_type:
+        elif (
+            not source.is_complex_type
+            and not self.container.config.output.retain_simple_types
+        ):
             self.copy_attribute_properties(source, target, attr, attr_type)
         elif source.is_element and source.abstract:
             # Substitution groups with abstract elements are used like

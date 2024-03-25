@@ -3,6 +3,7 @@ from typing import List
 from xsdata.codegen.mixins import ContainerHandlerInterface
 from xsdata.codegen.models import Class
 from xsdata.logger import logger
+from xsdata.models.enums import Tag
 
 
 class FilterClasses(ContainerHandlerInterface):
@@ -36,7 +37,11 @@ class FilterClasses(ContainerHandlerInterface):
         """
         occurs = set()
         for obj in self.container:
-            if obj.is_complex_type:
+            if (
+                obj.is_complex_type
+                or self.container.config.output.retain_simple_types
+                and obj.tag == Tag.SIMPLE_TYPE
+            ):
                 occurs.add(obj.ref)
                 occurs.update(obj.references)
 

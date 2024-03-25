@@ -168,8 +168,7 @@ class FlattenClassExtensions(RelativeHandlerInterface):
         new_attr.fixed = True
         target.attrs = [new_attr]
 
-    @classmethod
-    def process_simple_extension(cls, source: Class, target: Class, ext: Extension):
+    def process_simple_extension(self, source: Class, target: Class, ext: Extension):
         """Process simple type extensions.
 
         Cases:
@@ -186,9 +185,11 @@ class FlattenClassExtensions(RelativeHandlerInterface):
         if source is target:
             target.extensions.remove(ext)
         elif source.is_enumeration and not target.is_enumeration:
-            cls.add_default_attribute(target, ext)
+            self.add_default_attribute(target, ext)
         elif source.is_enumeration == target.is_enumeration:
             ClassUtils.copy_attributes(source, target, ext)
+        elif self.container.config.output.retain_simple_types:
+            ext.type.reference = id(source)
         else:  # this is an enumeration
             target.extensions.remove(ext)
 

@@ -37,6 +37,7 @@ class GeneratorConfigTests(TestCase):
             "    <RelativeImports>false</RelativeImports>\n"
             '    <CompoundFields defaultName="choice" useSubstitutionGroups="false" forceDefaultName="false" maxNameParts="3">false</CompoundFields>\n'
             "    <WrapperFields>false</WrapperFields>\n"
+            "    <RetainSimpleTypes>true</RetainSimpleTypes>\n"
             "    <PostponedAnnotations>false</PostponedAnnotations>\n"
             "    <UnnestClasses>false</UnnestClasses>\n"
             "    <IgnorePatterns>false</IgnorePatterns>\n"
@@ -98,6 +99,7 @@ class GeneratorConfigTests(TestCase):
             "    <RelativeImports>false</RelativeImports>\n"
             '    <CompoundFields defaultName="choice" useSubstitutionGroups="false" forceDefaultName="false" maxNameParts="3">false</CompoundFields>\n'
             "    <WrapperFields>false</WrapperFields>\n"
+            "    <RetainSimpleTypes>true</RetainSimpleTypes>\n"
             "    <PostponedAnnotations>false</PostponedAnnotations>\n"
             "    <UnnestClasses>false</UnnestClasses>\n"
             "    <IgnorePatterns>false</IgnorePatterns>\n"

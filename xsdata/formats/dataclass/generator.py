@@ -1,5 +1,8 @@
+import importlib
+import pkgutil
 import re
 import subprocess
+import sys
 from pathlib import Path
 from typing import Iterator, List, Optional
 
@@ -10,6 +13,7 @@ from xsdata.codegen.models import Class, Import
 from xsdata.codegen.resolver import DependenciesResolver
 from xsdata.formats.dataclass.filters import Filters
 from xsdata.formats.mixins import AbstractGenerator, GeneratorResult
+from xsdata.logger import logger
 from xsdata.models.config import GeneratorConfig
 
 
@@ -81,6 +85,29 @@ class DataclassGenerator(AbstractGenerator):
                 title=cluster[0].target_module,
                 source=src_code,
             )
+
+        self.validate_imports()
+
+    def validate_imports(self):
+        """Recursively import all generated packages.
+
+        Raises:
+            ImportError: On circular imports
+        """
+
+        def import_package(package_name):
+            logger.debug(f"Importing: {package_name}")
+            module = importlib.import_module(package_name)
+            if hasattr(module, "__path__"):
+                for _, name, _ in pkgutil.walk_packages(
+                    module.__path__, module.__name__ + "."
+                ):
+                    logger.debug(f"Importing: {name}")
+                    importlib.import_module(name)
+
+        sys.path.insert(0, str(Path.cwd().absolute()))
+        package = self.config.output.package
+        import_package(self.package_name(package))
 
     def render_package(self, classes: List[Class], module: str, filename: Path) -> str:
         """Render the package for the given classes.

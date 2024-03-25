@@ -113,6 +113,17 @@ class ResourceTransformerTests(FactoryTestCase):
         with self.assertRaises(CodegenError):
             self.transformer.process([])
 
+    @mock.patch("xsdata.codegen.transformer.logger.warning")
+    @mock.patch.object(ResourceTransformer, "process_classes")
+    def test_process_with_module_not_found_error(
+        self, mock_process_classes, mock_warning
+    ):
+        mock_process_classes.side_effect = ModuleNotFoundError({})
+        self.transformer.process([])
+        mock_warning.assert_called_once_with(
+            "Module not found on imports validation, please report it."
+        )
+
     @mock.patch.object(ResourceTransformer, "convert_schema")
     @mock.patch.object(ResourceTransformer, "convert_definitions")
     @mock.patch.object(ResourceTransformer, "parse_definitions")

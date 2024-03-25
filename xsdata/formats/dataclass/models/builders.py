@@ -563,24 +563,6 @@ class XmlVarBuilder:
         return tuple(result)
 
     @classmethod
-    def default_namespace(cls, namespaces: Sequence[str]) -> Optional[str]:
-        """Return the first valid namespace uri or None.
-
-        Args:
-            namespaces: A list of namespace options which may include
-                valid uri(s) or a placeholder e.g. ##any, ##other,
-                ##targetNamespace, ##local
-
-        Returns:
-            A namespace uri or None if there isn't any.
-        """
-        for namespace in namespaces:
-            if namespace and not namespace.startswith("#"):
-                return namespace
-
-        return None
-
-    @classmethod
     def is_any_type(cls, types: Sequence[Type], xml_type: str) -> bool:
         """Return whether the given xml type supports generic values."""
         if xml_type in (XmlType.ELEMENT, XmlType.ELEMENTS):

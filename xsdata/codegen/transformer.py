@@ -138,10 +138,13 @@ class ResourceTransformer:
 
         try:
             self.process_classes()
-        except CircularDependencyError:
+        except ModuleNotFoundError:
+            logger.warning("Module not found on imports validation, please report it.")
+        except (CircularDependencyError, ImportError):
             raise CodegenError(
                 "Circular Dependencies Found",
-                help="Try a different structure style and enabling unnest classes.",
+                help="Try a different structure style and/or enable unnest classes. "
+                "Cleanup previously generated packages and modules.",
             )
 
         for name, times in stopwatches.items():

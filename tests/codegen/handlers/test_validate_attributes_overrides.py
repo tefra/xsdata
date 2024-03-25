@@ -170,11 +170,29 @@ class ValidateAttributesOverridesTests(FactoryTestCase):
         self.processor.validate_override(target, attr_a, attr_b)
         self.assertEqual(sys.maxsize, attr_b.restrictions.max_occurs)
 
+        # Parent is list, source is not
+        target.attrs = [attr_a]
+        attr_a.restrictions.min_occurs = 0
+        attr_a.restrictions.max_occurs = 1
+        attr_b.restrictions.min_occurs = 0
+        attr_b.restrictions.max_occurs = 2
+        self.processor.validate_override(target, attr_a, attr_b)
+        self.assertEqual(2, attr_b.restrictions.max_occurs)
+
+        # Source is list, parent is prohibited
+        target.attrs = [attr_a]
+        attr_a.restrictions.min_occurs = None
+        attr_a.restrictions.max_occurs = 10
+        attr_b.restrictions.min_occurs = 0
+        attr_b.restrictions.max_occurs = 0
+        self.processor.validate_override(target, attr_a, attr_b)
+        self.assertEqual(0, attr_b.restrictions.max_occurs)
+        self.assertIn(attr_a, target.attrs)
+
         # Parent is any type, source isn't, skip
         attr_a = AttrFactory.native(DataType.STRING)
         attr_b = AttrFactory.native(DataType.ANY_SIMPLE_TYPE)
         target = ClassFactory.create(attrs=[attr_a])
-
         self.processor.validate_override(target, attr_a.clone(), attr_b)
         self.assertEqual(attr_a, target.attrs[0])
 

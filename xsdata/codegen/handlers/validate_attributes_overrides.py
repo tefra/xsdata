@@ -127,27 +127,45 @@ class ValidateAttributesOverrides(RelativeHandlerInterface):
         if parent_attr.is_any_type and not child_attr.is_any_type:
             return
 
-        if child_attr.is_list and not parent_attr.is_list:
+        if (
+            child_attr.is_list
+            and not parent_attr.is_list
+            and not parent_attr.is_prohibited
+        ) or (
+            not child_attr.is_list
+            and not child_attr.is_prohibited
+            and parent_attr.is_list
+        ):
             # Hack much??? idk but Optional[str] can't override List[str]
-            parent_attr.restrictions.max_occurs = sys.maxsize
+            msg = "Converting {} field `{}::{}` to a list to match {} class `{}`"
             assert parent_attr.parent is not None
-            logger.warning(
-                "Converting parent field `%s::%s` to a list to match child class `%s`",
-                parent_attr.parent,
-                parent_attr.name,
-                target.name,
-            )
+
+            if child_attr.is_list:
+                parent_attr.restrictions.max_occurs = sys.maxsize
+                log_message = msg.format(
+                    "parent",
+                    parent_attr.parent,
+                    parent_attr.name,
+                    "child",
+                    target.qname,
+                )
+            else:
+                child_attr.restrictions.max_occurs = parent_attr.restrictions.max_occurs
+                log_message = msg.format(
+                    "child",
+                    target.name,
+                    child_attr.name,
+                    "parent",
+                    parent_attr.parent,
+                )
+            logger.warning(log_message)
 
         if (
             child_attr.default == parent_attr.default
             and _bool_eq(child_attr.fixed, parent_attr.fixed)
             and _bool_eq(child_attr.mixed, parent_attr.mixed)
-            and _bool_eq(
-                child_attr.restrictions.tokens, parent_attr.restrictions.tokens
-            )
-            and _bool_eq(
-                child_attr.restrictions.nillable, parent_attr.restrictions.nillable
-            )
+            and _bool_eq(child_attr.is_tokens, parent_attr.is_tokens)
+            and _bool_eq(child_attr.is_nillable, parent_attr.is_nillable)
             and _bool_eq(child_attr.is_prohibited, parent_attr.is_prohibited)
             and _bool_eq(child_attr.is_optional, parent_attr.is_optional)
         ):

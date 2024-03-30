@@ -9,16 +9,17 @@ on:
 jobs:
   tests:
     name: ${{ matrix.name }}
-    runs-on: ${{ matrix.os }}-latest
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         include:
-          - {name: Python 3.8, python: '3.8', os: ubuntu}
-          - {name: Python 3.9, python: '3.9', os: ubuntu}
-          - {name: Python 3.10, python: '3.10', os: ubuntu}
-          - {name: Python 3.11, python: '3.11', os: ubuntu}
-          - {name: Python 3.12, python: '3.12', os: ubuntu}
+          - {name: Python 3.8, python: '3.8'}
+          - {name: Python 3.9, python: '3.9'}
+          - {name: Python 3.10, python: '3.10'}
+          - {name: Python 3.11, python: '3.11'}
+          - {name: Python 3.12, python: '3.12'}
+          - {name: Python 3.13, python: '3.13-dev'}
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python }}
@@ -26,7 +27,7 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - name: Install libxml2
-        if: startsWith(matrix.python, 'pypy') || startsWith(matrix.python, '3.13')
+        if: startsWith(matrix.python, '3.13')
         run: |
           sudo apt-get install libxml2-dev libxslt-dev
       - name: Install dependencies

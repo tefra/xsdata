@@ -72,7 +72,8 @@ plugins:
 markdown_extensions:
   - admonition
   - pymdownx.details
-  - pymdownx.snippets
+  - pymdownx.snippets:
+      dedent_subsections: true
   - pymdownx.superfences:
       custom_fences:
         - name: "*"

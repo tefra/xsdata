@@ -7,9 +7,9 @@ The code generator works with:
 - DTD external definitions
 - Directly from XML and JSON Documents
 
-The resource [xsdata.codegen.transformer][xsdata.codegen.transformer] will detect and
-switch parsers based on the resource extension otherwise it will do some heuristic
-content searches. Before you start make sure the cli requirements are installed.
+The [xsdata.codegen.transformer][xsdata.codegen.transformer] will detect and switch
+parsers based on the resource extension otherwise it will do some heuristic content
+searches. Before you start make sure the cli requirements are installed.
 
 ```console
 $ pip install xsdata[cli]

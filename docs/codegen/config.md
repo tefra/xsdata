@@ -112,7 +112,7 @@ The [dataclass][dataclasses.dataclass] parameters.
     A TypeError is raised if a field without a default value follows a field with a default value.
     This is true whether this occurs in a single class, or as a result of class inheritance. If
     this option is not enabled, the generator will mark all required fields without default values
-    as optional with.
+    as optional with default value `None`.
 
 ### Structure
 

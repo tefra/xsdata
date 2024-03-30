@@ -118,7 +118,7 @@ class ClassUtils:
         """Copy the attrs of the source class to the target class.
 
         The attr represents a reference to the source class which is
-        derived from xs:group or xs:attributeGroup and wil be removed.
+        derived from xs:group or xs:attributeGroup and will be removed.
 
         Args:
             source: The source class instance

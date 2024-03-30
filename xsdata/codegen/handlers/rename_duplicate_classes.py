@@ -115,8 +115,6 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
 
         Args:
             target: The target class instance to rename
-            use_name: Whether simple or qualified names should be
-                used during renaming
         """
         namespace, name = namespaces.split_qname(target.qname)
         new_qname = self.next_qname(namespace, name)

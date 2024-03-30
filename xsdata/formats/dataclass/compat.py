@@ -136,7 +136,7 @@ class ClassTypes:
             The class type instance
 
         Raises:
-            KeyError: If the name is not registed.
+            KeyError: If the name is not registered.
         """
         return self.types[name]
 

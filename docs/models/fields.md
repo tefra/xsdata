@@ -256,7 +256,7 @@ Elements type represents repeatable choice elements. It's more commonly referred
 
 !!! Warning
 
-    A compound field can not contain ambigous types because it's impossible to infer the
+    A compound field can not contain ambiguous types because it's impossible to infer the
     element from the actual value.
 
     The xml contenxt will raise an error. The solution is to introduce intermediate

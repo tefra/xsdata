@@ -50,29 +50,30 @@ Check the [documentation](https://xsdata.readthedocs.io) for more ✨✨✨
 
 ## Features
 
-- Generate code from
+**Code Generator**
 
-  - XML Schemas 1.0 & 1.1
-  - WSDL 1.1 definitions with SOAP 1.1 bindings
-  - DTD external definitions
-  - Directly from XML and JSON Documents
-  - Extensive configuration to customize output
-  - Pluggable code writer for custom output formats
+- XML Schemas 1.0 & 1.1
+- WSDL 1.1 definitions with SOAP 1.1 bindings
+- DTD external definitions
+- Directly from XML and JSON Documents
+- Extensive configuration to customize output
+- Pluggable code writer for custom output formats
 
-- Default Output:
+**Default Output**
 
-  - Pure python dataclasses with metadata
-  - Type hints with support for forward references and unions
-  - Enumerations and inner classes
-  - Support namespace qualified elements and attributes
+- Pure python dataclasses with metadata
+- Type hints with support for forward references and unions
+- Enumerations and inner classes
+- Support namespace qualified elements and attributes
 
-- Data Binding:
-  - XML and JSON parser, serializer
-  - PyCode serializer
-  - Handlers and Writers based on lxml and native xml python
-  - Support wildcard elements and attributes
-  - Support xinclude statements and unknown properties
-  - Customize behaviour through config
+**Data Binding**
+
+- XML and JSON parser, serializer
+- PyCode serializer
+- Handlers and Writers based on lxml and native xml python
+- Support wildcard elements and attributes
+- Support xinclude statements and unknown properties
+- Customize behaviour through config
 
 ## Changelog: 24.3.1 (2024-03-10)
 

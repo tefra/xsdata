@@ -20,9 +20,7 @@ if present. If the resource lacks an extension, the loader will attempt to locat
 specific syntax markings associated with the resource type.
 
 If a resource cannot be accessed, a warning is issued, and the program continues its
-normal flow.
-
-In the case of circular imports, resources are loaded only once.
+normal flow. In the case of circular imports, resources are loaded only once.
 
 ## Parse transfer objects
 
@@ -72,7 +70,7 @@ graph LR
 <xs:element name="root" ref="RootType"/>
 ```
 
-- Remove duplicate overriden types:
+- Remove duplicate overridden types:
 
 ```xml
 <xs:override schemaLocation="over005a.xsd">

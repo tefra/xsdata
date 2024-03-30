@@ -7,6 +7,11 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: debug-statements
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.19.0
+    hooks:
+      - id: typos
+        exclude: ^tests/|.xsd$
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.3.4
     hooks:
@@ -27,8 +32,10 @@ repos:
           - types-toposort
         args: [ "--check-untyped-defs", "--ignore-missing-imports" ]
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.1.0
+    rev: v4.0.0-alpha.8
     hooks:
       - id: prettier
+        additional_dependencies:
+          - prettier@3.2.5
         types_or: [markdown]
         args: [--prose-wrap=always, --print-width=88]

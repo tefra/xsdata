@@ -37,14 +37,11 @@ $ xsdata tests/fixtures/primer/order.xsd --package tests.fixtures.primer
 ```
 
 ```python
->>> # Parse XML
->>> from pathlib import Path
 >>> from tests.fixtures.primer import PurchaseOrder
 >>> from xsdata.formats.dataclass.parsers import XmlParser
 >>>
->>> xml_string = Path("tests/fixtures/primer/sample.xml").read_text()
 >>> parser = XmlParser()
->>> order = parser.from_string(xml_string, PurchaseOrder)
+>>> order = parser.parse("tests/fixtures/primer/sample.xml", PurchaseOrder)
 >>> order.bill_to
 Usaddress(name='Robert Smith', street='8 Oak Avenue', city='Old Town', state='PA', zip=Decimal('95819'), country='US')
 ```
@@ -53,18 +50,22 @@ Check the [documentation](https://xsdata.readthedocs.io) for more ✨✨✨
 
 ## Features
 
-- Generate code from:
+- Generate code from
+
   - XML Schemas 1.0 & 1.1
   - WSDL 1.1 definitions with SOAP 1.1 bindings
   - DTD external definitions
   - Directly from XML and JSON Documents
   - Extensive configuration to customize output
   - Pluggable code writer for custom output formats
+
 - Default Output:
+
   - Pure python dataclasses with metadata
   - Type hints with support for forward references and unions
   - Enumerations and inner classes
   - Support namespace qualified elements and attributes
+
 - Data Binding:
   - XML and JSON parser, serializer
   - PyCode serializer

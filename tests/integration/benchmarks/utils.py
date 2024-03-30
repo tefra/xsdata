@@ -17,8 +17,8 @@ def make_books(how_many: int):
                 review=(
                     "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
                     "Integer at erat sagittis, accumsan mauris eu, egestas "
-                    "quam. Nam tristique felis justo, vel iaculis ipsum cursus "
-                    "at. Praesent varius enim ac nunc interdum placerat. "
+                    "quam. Name tristique felis justo, vel iaculis ipsum cursus "
+                    "at. Praesent various enim ac nunc interdum placerat. "
                     "Integer porttitor, nibh at viverra vehicula, leo dui "
                     "suscipit nisi, ornare laoreet eros neque nec mi. Proin."
                 ),

@@ -16,7 +16,7 @@ class ProcessMixedContentClass(HandlerInterface):
         All other elements will be moved as the wildcard attr choices.
 
         Args:
-            target: Tha target class instance
+            target: The target class instance
         """
         if not target.is_mixed:
             return

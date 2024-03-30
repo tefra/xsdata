@@ -771,7 +771,7 @@ class Filters:
 
         return result
 
-    def compound_field_types(self, attr: Attr, parents: List[str]):
+    def compound_field_types(self, attr: Attr, parents: List[str]) -> str:
         """Generate type hint for a compound field.
 
         Args:

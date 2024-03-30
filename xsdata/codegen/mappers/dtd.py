@@ -35,7 +35,7 @@ class DtdMapper:
 
     @classmethod
     def build_class(cls, element: DtdElement, location: str) -> Class:
-        """Build a clas for the given element.
+        """Build a class for the given element.
 
         Args:
             element: The dtd element to be mapped

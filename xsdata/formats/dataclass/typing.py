@@ -1,16 +1,21 @@
 import sys
-from typing import Any, Iterator, Tuple, Type, TypeVar, Union
+from typing import (
+    Any,
+    Callable,
+    NamedTuple,
+    Optional,
+    Tuple,
+    Type,
+    Union,
+)
 
 from typing_extensions import get_args, get_origin
-
-NONE_TYPE = type(None)
-
 
 try:
     from types import UnionType  # type: ignore
 except ImportError:
     UnionType = ()  # type: ignore
-
+from typing_extensions import ForwardRef
 
 if (3, 9) <= sys.version_info[:2] <= (3, 10):
     # Backport this fix for python 3.9 and 3.10
@@ -33,145 +38,185 @@ else:
     from typing import _eval_type  # type: ignore
 
 
-intern_typing = sys.intern("typing.")
+NONE_TYPE = type(None)
+UNION_TYPES = (Union, UnionType)
+ITERABLE_TYPES = (list, tuple)
 
 
-def is_from_typing(tp: Any) -> bool:
-    """Return whether the type is from the typing module."""
-    return str(tp).startswith(intern_typing)
-
-
-def evaluate(
-    tp: Any,
-    globalns: Any = None,
-    localns: Any = None,
-) -> Tuple[Type, ...]:
+def evaluate(tp: Any, globalns: Any, localns: Any = None) -> Any:
     """Analyze/Validate the typing annotation."""
-    return tuple(_evaluate(_eval_type(tp, globalns, localns)))
+    result = _eval_type(tp, globalns, localns)
+
+    # Ugly hack for the Type["str"]
+    # Let's switch to ForwardRef("str")
+    if get_origin(result) is type:
+        args = get_args(result)
+        if len(args) != 1:
+            raise TypeError
+
+        return args[0]
+
+    return result
 
 
-def _evaluate(tp: Any) -> Iterator[Type]:
-    if tp in (dict, list, tuple):
-        origin = tp
-    elif isinstance(tp, TypeVar):
-        origin = TypeVar
+class Result(NamedTuple):
+    types: Tuple[Type[Any], ...]
+    factory: Optional[Callable] = None
+    tokens_factory: Optional[Callable] = None
+
+
+def analyze_token_args(origin: Any, args: Tuple[Any, ...]) -> Tuple[Any]:
+    """Analyze token arguments.
+
+    Ensure it only has one argument, filter out ellipsis.
+
+    Args
+        origin: The annotation origin
+        args: The annotation arguments
+
+    Returns:
+        A tuple that contains only one arg
+
+    Raises:
+        TypeError: If the origin is not list or tuple,
+            and it has more than one argument
+
+    """
+    if origin in ITERABLE_TYPES:
+        args = filter_ellipsis(args)
+        if len(args) == 1:
+            return args
+
+    raise TypeError
+
+
+def filter_none_type(args: Tuple[Any, ...]) -> Tuple[Any, ...]:
+    return tuple(arg for arg in args if arg is not NONE_TYPE)
+
+
+def filter_ellipsis(args: Tuple[Any, ...]) -> Tuple[Any]:
+    return tuple(arg for arg in args if arg is not Ellipsis)
+
+
+def evaluate_text(annotation: Any, tokens: bool = False) -> Result:
+    """Run exactly the same validations with attribute."""
+    return evaluate_attribute(annotation, tokens)
+
+
+def evaluate_attribute(annotation: Any, tokens: bool = False) -> Result:
+    """Validate annotations for a xml attribute."""
+    origin = get_origin(annotation)
+    args = get_args(annotation)
+    tokens_factory = None
+
+    if tokens:
+        args = analyze_token_args(origin, args)
+        tokens_factory = origin
+        origin = get_origin(args[0])
+
+        if origin in UNION_TYPES:
+            args = get_args(args[0])
+        elif origin:
+            raise TypeError
+
+    if origin in UNION_TYPES:
+        types = filter_none_type(args)
+    elif origin is None:
+        types = args or (annotation,)
     else:
-        origin = get_origin(tp)
+        raise TypeError
 
-    if origin:
-        try:
-            yield from __evaluations__[origin](tp)
-        except KeyError:
-            raise TypeError()
-    elif is_from_typing(tp):
-        raise TypeError()
+    if any(get_origin(tp) for tp in types):
+        raise TypeError
+
+    return Result(types=types, tokens_factory=tokens_factory)
+
+
+def evaluate_attributes(annotation: Any, **_: Any) -> Result:
+    """Validate annotations for xml wildcard attributes."""
+    if annotation is dict:
+        args = ()
     else:
-        yield tp
+        origin = get_origin(annotation)
+        args = get_args(annotation)
+
+        if origin is not dict and annotation is not dict:
+            raise TypeError
+
+    if args and not all(arg is str for arg in args):
+        raise TypeError
+
+    return Result(types=(str,), factory=dict)
 
 
-def _evaluate_type(tp: Any) -> Iterator[Type]:
-    args = get_args(tp)
-    if not args or isinstance(args[0], TypeVar):
-        raise TypeError()
-    yield from _evaluate(args[0])
+def evaluate_element(annotation: Any, tokens: bool = False) -> Result:
+    """Validate annotations for a xml element."""
+    types = (annotation,)
+    origin = get_origin(annotation)
+    args = get_args(annotation)
+    tokens_factory = factory = None
 
+    if tokens:
+        args = analyze_token_args(origin, args)
 
-def _evaluate_mapping(tp: Any) -> Iterator[Type]:
-    yield dict
-    args = get_args(tp)
+        tokens_factory = origin
+        origin = get_origin(args[0])
+        types = args
+        args = get_args(args[0])
 
-    if not args:
-        yield str
-        yield str
+    if origin in ITERABLE_TYPES:
+        args = tuple(arg for arg in args if arg is not Ellipsis)
+        if len(args) != 1:
+            raise TypeError
 
-    for arg in args:
-        if isinstance(arg, TypeVar):
-            try:
-                next(_evaluate_typevar(arg))
-            except TypeError:
-                yield str
-            else:
-                raise TypeError()
-        elif is_from_typing(arg) or get_origin(arg) is not None:
-            raise TypeError()
+        if tokens_factory:
+            factory = tokens_factory
+            tokens_factory = origin
         else:
-            yield arg
+            factory = origin
+
+        types = args
+        origin = get_origin(args[0])
+        args = get_args(args[0])
+
+    if origin in UNION_TYPES:
+        types = filter_none_type(args)
+    elif origin:
+        raise TypeError
+
+    return Result(types=types, factory=factory, tokens_factory=tokens_factory)
 
 
-def _evaluate_list(tp: Any) -> Iterator[Type]:
-    yield list
+def evaluate_elements(annotation: Any, **_: Any) -> Result:
+    """Validate annotations for a xml compound field."""
+    (
+        types,
+        factory,
+        __,
+    ) = evaluate_element(annotation, tokens=False)
 
-    args = get_args(tp)
-    if not args:
-        yield str
+    for tp in types:
+        evaluate_element(tp, tokens=False)
 
-    for arg in args:
-        yield from _evaluate_array_arg(arg)
+    return Result(types=(object,), factory=factory)
 
 
-def _evaluate_array_arg(arg: Any) -> Iterator[Type]:
-    if isinstance(arg, TypeVar):
-        yield from _evaluate_typevar(arg)
+def evaluate_wildcard(annotation: Any, **_: Any) -> Result:
+    """Validate annotations for a xml wildcard."""
+    origin = get_origin(annotation)
+    factory = None
+
+    if origin in UNION_TYPES:
+        types = filter_none_type(get_args(annotation))
+    elif origin in ITERABLE_TYPES:
+        factory = origin
+        types = filter_ellipsis(get_args(annotation))
+    elif origin is None:
+        types = (annotation,)
     else:
-        origin = get_origin(arg)
+        raise TypeError
 
-        if origin is None and not is_from_typing(arg):
-            yield arg
-        elif origin in (Union, UnionType, list, tuple):
-            yield from __evaluations__[origin](arg)
-        else:
-            raise TypeError()
+    if len(types) != 1 or object not in types:
+        raise TypeError
 
-
-def _evaluate_tuple(tp: Any) -> Iterator[Type]:
-    yield tuple
-
-    args = get_args(tp)
-    if not args:
-        yield str
-
-    for arg in args:
-        if arg is Ellipsis:
-            continue
-
-        yield from _evaluate_array_arg(arg)
-
-
-def _evaluate_union(tp: Any) -> Iterator[Type]:
-    for arg in get_args(tp):
-        if arg is NONE_TYPE:
-            continue
-
-        if isinstance(arg, TypeVar):
-            yield from _evaluate_typevar(arg)
-        else:
-            origin = get_origin(arg)
-            if origin is list:
-                yield from _evaluate_list(arg)
-            elif origin is tuple:
-                yield from _evaluate_tuple(arg)
-            elif origin is None and not is_from_typing(arg):
-                yield arg
-            else:
-                raise TypeError()
-
-
-def _evaluate_typevar(tp: TypeVar):
-    if tp.__bound__:
-        yield from _evaluate(tp.__bound__)
-    elif tp.__constraints__:
-        for arg in tp.__constraints__:
-            yield from _evaluate(arg)
-    else:
-        raise TypeError()
-
-
-__evaluations__ = {
-    tuple: _evaluate_tuple,
-    list: _evaluate_list,
-    dict: _evaluate_mapping,
-    Union: _evaluate_union,
-    UnionType: _evaluate_union,
-    type: _evaluate_type,
-    TypeVar: _evaluate_typevar,
-}
+    return Result(types=types, factory=factory)

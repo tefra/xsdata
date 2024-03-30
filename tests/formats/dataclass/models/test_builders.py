@@ -1,9 +1,7 @@
-import functools
 import sys
-import uuid
 from dataclasses import dataclass, field, fields, make_dataclass
 from decimal import Decimal
-from typing import Dict, Iterator, List, Union, get_type_hints
+from typing import Iterator, List, get_type_hints
 from unittest import TestCase, mock
 from xml.etree.ElementTree import QName
 
@@ -448,74 +446,3 @@ class XmlVarBuilderTests(TestCase):
 
         actual = func(XmlType.WILDCARD, "##targetNamespace   foo", "p")
         self.assertEqual(("foo", "p"), tuple(sorted(actual)))
-
-    def test_analyze_types(self):
-        func = functools.partial(self.builder.analyze_types, BookForm, "foo")
-
-        actual = func(List[List[Union[str, int]]], None)
-        self.assertEqual((list, list, (int, str)), actual)
-
-        actual = func(Union[str, int], None)
-        self.assertEqual((None, None, (int, str)), actual)
-
-        actual = func(Dict[str, int], None)
-        self.assertEqual((dict, None, (int, str)), actual)
-
-        with self.assertRaises(XmlContextError) as cm:
-            func(List[List[List[int]]], None)
-
-        self.assertEqual(
-            "Error on BookForm::foo: Unsupported field typing `typing.List[typing.List[typing.List[int]]]`",
-            str(cm.exception),
-        )
-
-    def test_is_valid(self):
-        # Attributes need origin dict
-        self.assertFalse(
-            self.builder.is_valid(XmlType.ATTRIBUTES, None, None, (), False, True)
-        )
-
-        # Attributes don't support any origin
-        self.assertFalse(
-            self.builder.is_valid(XmlType.ATTRIBUTES, dict, list, (), False, True)
-        )
-
-        # Attributes don't support xs:NMTOKENS
-        self.assertFalse(
-            self.builder.is_valid(XmlType.ATTRIBUTES, dict, None, (), True, True)
-        )
-
-        self.assertTrue(
-            self.builder.is_valid(
-                XmlType.ATTRIBUTES, dict, None, (str, str), False, True
-            )
-        )
-
-        # xs:NMTOKENS need origin list
-        self.assertFalse(
-            self.builder.is_valid(XmlType.TEXT, dict, None, (), True, True)
-        )
-
-        # xs:NMTOKENS need origin list
-        self.assertFalse(self.builder.is_valid(XmlType.TEXT, set, None, (), True, True))
-
-        # Any type object is a superset, it's only supported alone
-        self.assertFalse(
-            self.builder.is_valid(
-                XmlType.ELEMENT, None, None, (object, int), False, True
-            )
-        )
-
-        # Type is not registered in converter.
-        self.assertFalse(
-            self.builder.is_valid(
-                XmlType.TEXT, None, None, (int, uuid.UUID), False, True
-            )
-        )
-
-        # init false vars are ignored!
-        self.assertTrue(
-            self.builder.is_valid(
-                XmlType.TEXT, None, None, (int, uuid.UUID), False, False
-            )
-        )

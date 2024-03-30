@@ -20,11 +20,28 @@ from xsdata.exceptions import XmlContextError
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.compat import ClassType
 from xsdata.formats.dataclass.models.elements import XmlMeta, XmlType, XmlVar
-from xsdata.formats.dataclass.typing import evaluate
+from xsdata.formats.dataclass.typing import (
+    evaluate,
+    evaluate_attribute,
+    evaluate_attributes,
+    evaluate_element,
+    evaluate_elements,
+    evaluate_text,
+    evaluate_wildcard,
+)
 from xsdata.models.enums import NamespaceType
 from xsdata.utils.collections import first
 from xsdata.utils.constants import EMPTY_SEQUENCE, return_input
 from xsdata.utils.namespaces import build_qname
+
+evaluations: Dict[str, Callable] = {
+    XmlType.TEXT: evaluate_text,
+    XmlType.ELEMENT: evaluate_element,
+    XmlType.ELEMENTS: evaluate_elements,
+    XmlType.WILDCARD: evaluate_wildcard,
+    XmlType.ATTRIBUTE: evaluate_attribute,
+    XmlType.ATTRIBUTES: evaluate_attributes,
+}
 
 
 class ClassMeta:
@@ -349,7 +366,7 @@ class XmlVarBuilder:
         parent_namespace: Optional[str],
         default_value: Any,
         globalns: Any,
-        factory: Optional[Callable] = None,
+        parent_factory: Optional[Callable] = None,
     ) -> Optional[XmlVar]:
         """Build the binding metadata for a class field.
 
@@ -362,7 +379,7 @@ class XmlVarBuilder:
             parent_namespace: The class namespace
             default_value: The field default value or factory
             globalns: Python's global namespace
-            factory: The value factory
+            parent_factory: The value factory
 
         Returns:
             The field binding metadata instance.
@@ -383,27 +400,23 @@ class XmlVarBuilder:
         sequence = metadata.get("sequence", None)
         wrapper = metadata.get("wrapper", None)
 
-        origin, sub_origin, types = self.analyze_types(model, name, type_hint, globalns)
+        annotation = evaluate(type_hint, globalns)
 
-        if not self.is_valid(xml_type, origin, sub_origin, types, tokens, init):
+        try:
+            analyze = evaluations[xml_type]
+            types, factory, tokens_factory = analyze(annotation, tokens=tokens)
+            types = tuple(converter.sort_types(types))
+            if not self.is_typing_supported(types):
+                raise TypeError
+
+        except TypeError:
             raise XmlContextError(
                 f"Error on {model.__qualname__}::{name}: "
                 f"Xml {xml_type} does not support typing `{type_hint}`"
             )
 
-        if xml_type == XmlType.ELEMENTS:
-            sub_origin = None
-            types = (object,)
-
+        factory = factory or parent_factory
         local_name = local_name or self.build_local_name(xml_type, name)
-
-        if tokens and sub_origin is None:
-            sub_origin = origin
-            origin = None
-
-        if origin is None:
-            origin = factory
-
         any_type = self.is_any_type(types, xml_type)
         clazz = first(tp for tp in types if self.class_type.is_model(tp))
         namespaces = self.resolve_namespaces(xml_type, namespace, parent_namespace)
@@ -413,7 +426,7 @@ class XmlVarBuilder:
         self.index += 1
         cur_index = self.index
         for choice in self.build_choices(
-            model, name, choices, origin, globalns, parent_namespace
+            model, name, choices, factory, globalns, parent_namespace
         ):
             if choice.is_element:
                 elements[choice.qname] = choice
@@ -434,8 +447,8 @@ class XmlVarBuilder:
             required=required,
             nillable=nillable,
             sequence=sequence,
-            factory=origin,
-            tokens_factory=sub_origin,
+            factory=factory,
+            tokens_factory=tokens_factory,
             default=default_value,
             types=types,
             elements=elements,
@@ -449,7 +462,7 @@ class XmlVarBuilder:
         model: Type,
         name: str,
         choices: List[Dict],
-        factory: Callable,
+        factory: Optional[Callable],
         globalns: Any,
         parent_namespace: Optional[str],
     ) -> Iterator[XmlVar]:
@@ -569,78 +582,6 @@ class XmlVarBuilder:
             return object in types
 
         return False
-
-    @classmethod
-    def analyze_types(
-        cls,
-        model: Type,
-        name: str,
-        type_hint: Any,
-        globalns: Any,
-    ) -> Tuple[Any, Any, Tuple[Type, ...]]:
-        """Analyze a type hint and return the origin, sub origin and the type args.
-
-        The only case we support a sub origin is for fields derived from
-        xs:NMTOKENS!
-
-        # Todo please rewrite this in a way that makes sense :(
-
-        Raises:
-            XmlContextError: if the typing is not supported for binding
-        """
-        try:
-            types = evaluate(type_hint, globalns)
-            origin = None
-            sub_origin = None
-
-            while types[0] in (tuple, list, dict):
-                if origin is None:
-                    origin = types[0]
-                elif sub_origin is None:
-                    sub_origin = types[0]
-                else:
-                    raise TypeError()
-
-                types = types[1:]
-
-            return origin, sub_origin, tuple(converter.sort_types(types))
-        except Exception:
-            raise XmlContextError(
-                f"Error on {model.__qualname__}::{name}: "
-                f"Unsupported field typing `{type_hint}`"
-            )
-
-    def is_valid(
-        self,
-        xml_type: str,
-        origin: Any,
-        sub_origin: Any,
-        types: Sequence[Type],
-        tokens: bool,
-        init: bool,
-    ) -> bool:
-        """Validate the given xml type against common unsupported cases."""
-        if not init:
-            # Ignore init==false vars
-            return True
-
-        if xml_type == XmlType.ATTRIBUTES:
-            # Attributes need origin dict, no sub origin and tokens
-            if origin is not dict or sub_origin or tokens:
-                return False
-        elif origin is dict or tokens and origin not in (list, tuple):
-            # Origin dict is only supported by Attributes
-            # xs:NMTOKENS need origin list
-            return False
-
-        if object in types and xml_type != XmlType.ELEMENTS:
-            # Any type, secondary types are not allowed except for 'Elements' XML type
-            return len(types) == 1
-
-        if xml_type == XmlType.ELEMENTS:
-            return True
-
-        return self.is_typing_supported(types)
 
     def is_typing_supported(self, types: Sequence[Type]) -> bool:
         """Validate all types are registered in the converter."""

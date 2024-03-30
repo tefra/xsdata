@@ -2,13 +2,14 @@ import warnings
 from dataclasses import dataclass, field
 from typing import Any, Dict, Iterable, List, Optional, Type, Union
 
+from typing_extensions import get_args, get_origin
+
 from xsdata.exceptions import ConverterWarning, ParserError
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlMeta, XmlVar
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
-from xsdata.formats.dataclass.typing import get_args, get_origin
 from xsdata.formats.types import T
 from xsdata.utils import collections
 from xsdata.utils.constants import EMPTY_MAP

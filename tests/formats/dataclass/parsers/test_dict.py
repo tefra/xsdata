@@ -1,5 +1,5 @@
 import json
-from dataclasses import asdict, make_dataclass
+from dataclasses import asdict, dataclass, field
 from decimal import Decimal
 from typing import List, Optional, Union
 from xml.etree.ElementTree import QName
@@ -389,7 +389,10 @@ class DictDecoderTests(FactoryTestCase):
         self.assertEqual("Unable to locate xsi:type `notexists`", str(cm.exception))
 
     def test_bind_text_with_unions(self):
-        Fixture = make_dataclass("Fixture", [("x", List[Union[int, float, str, bool]])])
+        @dataclass
+        class Fixture:
+            x: List[Union[int, float, str, bool]] = field(metadata={"tokens": True})
+
         values = ["foo", 12.2, "12.2", 12, "12", True, "false"]
 
         result = self.decoder.decode({"x": values}, Fixture)

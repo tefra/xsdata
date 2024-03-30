@@ -962,7 +962,7 @@ class Import(AnnotationBase):
 
     namespace: Optional[str] = attribute()
     schema_location: Optional[str] = attribute(name="schemaLocation")
-    location: Optional[str] = field(default=None, metadata={"type": "ignore"})
+    location: Optional[str] = field(default=None, metadata={"type": "Ignore"})
 
 
 @dataclass
@@ -970,7 +970,7 @@ class Include(AnnotationBase):
     """XSD Include model representation."""
 
     schema_location: Optional[str] = attribute(name="schemaLocation")
-    location: Optional[str] = field(default=None, metadata={"type": "ignore"})
+    location: Optional[str] = field(default=None, metadata={"type": "Ignore"})
 
 
 @dataclass
@@ -982,7 +982,7 @@ class Redefine(AnnotationBase):
     complex_types: Array[ComplexType] = array_element(name="complexType")
     groups: Array[Group] = array_element(name="group")
     attribute_groups: Array[AttributeGroup] = array_element(name="attributeGroup")
-    location: Optional[str] = field(default=None, metadata={"type": "ignore"})
+    location: Optional[str] = field(default=None, metadata={"type": "Ignore"})
 
 
 @dataclass
@@ -997,7 +997,7 @@ class Override(AnnotationBase):
     elements: Array[Element] = array_element(name="element")
     attributes: Array[Attribute] = array_element(name="attribute")
     notations: Array[Notation] = array_element(name="notation")
-    location: Optional[str] = field(default=None, metadata={"type": "ignore"})
+    location: Optional[str] = field(default=None, metadata={"type": "Ignore"})
 
 
 @dataclass
@@ -1040,7 +1040,7 @@ class Schema(AnnotationBase):
     elements: Array[Element] = array_element(name="element")
     attributes: Array[Attribute] = array_element(name="attribute")
     notations: Array[Notation] = array_element(name="notation")
-    location: Optional[str] = field(default=None, metadata={"type": "ignore"})
+    location: Optional[str] = field(default=None, metadata={"type": "Ignore"})
 
     def included(self) -> Iterator[UnionType[Import, Include, Redefine, Override]]:
         """Yields an iterator of included resources."""

@@ -81,6 +81,7 @@ class UpdateAttributesEffectiveChoiceTests(FactoryTestCase):
                 AttrFactory.element(
                     name="b", namespace="b", restrictions=restrictions.clone()
                 ),
+                AttrFactory.element(name="b", namespace="b"),  # no paths, impossible!
                 AttrFactory.element(name="c", namespace="b"),
                 AttrFactory.element(
                     name="d", namespace="b", restrictions=Restrictions(choice=1)

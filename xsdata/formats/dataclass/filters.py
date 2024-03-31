@@ -557,10 +557,11 @@ class Filters:
         length and the additional pad is more than the max line length,
         wrap the text into multiple lines, avoiding breaking long words
         """
-        if (data.startswith("Type[") or data.startswith("type[")) and data.endswith(
-            "]"
-        ):
-            return data if data[5] == '"' else data[5:-1]
+        if data.startswith("ForwardRef("):
+            return data
+
+        if data.startswith("Type["):
+            return data[5:-1]
 
         if data.startswith("Literal[") and data.endswith("]"):
             return data[8:-1]
@@ -822,8 +823,8 @@ class Filters:
             iterable_fmt = self._get_iterable_format()
             result = iterable_fmt.format(result)
 
-        if self.subscriptable_types:
-            return f"type[{result}]"
+        if result.startswith('"'):
+            return f"ForwardRef({result})"
 
         return f"Type[{result}]"
 
@@ -915,8 +916,8 @@ class Filters:
                 "List": [": List["],
                 "Optional": ["Optional["],
                 "Tuple": ["Tuple["],
-                "Type": ["Type["],
                 "Union": ["Union["],
+                "ForwardRef": [": ForwardRef("],
                 "Any": type_patterns("Any"),
             },
             "xml.etree.ElementTree": {"QName": type_patterns("QName")},

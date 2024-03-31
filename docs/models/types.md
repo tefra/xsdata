@@ -25,7 +25,6 @@ collections are also supported.
 | Case           | Example                                                                           |
 | -------------- | --------------------------------------------------------------------------------- |
 | List           | `value: List[str] = field(default_factory=list)`                                  |
-| Optional List  | `value: Optional[List[str]] = field(default=None)`                                |
 | List Union     | `value: List[Union[str, int]] = field(default_factory=list)`                      |
 | Tokens List    | `value: List[str] = field(default_factory=list, metadata={"tokens": True})`       |
 | List of Tokens | `value: List[List[str]] = field(default_factory=list, metadata={"tokens": True})` |
@@ -37,7 +36,6 @@ collections are also supported.
 | Case            | Example                                                                                        |
 | --------------- | ---------------------------------------------------------------------------------------------- |
 | Tuple           | `value: Tuple[str, ...] = field(default_factory=tuple)`                                        |
-| Optional Tuple  | `value: Optional[Tuple[str, ...]] = field(default=None)`                                       |
 | Tuple Union     | `value: Tuple[Union[str, int], ...] = field(default_factory=tuple)`                            |
 | Tokens Tuple    | `value: Tuple[str, ...] = field(default_factory=tuple, metadata={"tokens": True})`             |
 | Tuple of Tokens | `value: Tuple[Tuple[str, ...], ...] = field(default_factory=tuple, metadata={"tokens": True})` |

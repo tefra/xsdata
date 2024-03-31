@@ -770,40 +770,32 @@ class FiltersTests(FactoryTestCase):
         actual = self.filters.choice_type(choice, ["a", "b"])
         self.assertEqual("Type[Foobar]", actual)
 
-        self.filters.subscriptable_types = True
-        actual = self.filters.choice_type(choice, ["a", "b"])
-        self.assertEqual("type[Foobar]", actual)
-
     def test_choice_type_with_forward_reference(self):
         choice = AttrFactory.create(
             types=[AttrTypeFactory.create("foobar", forward=True)]
         )
         actual = self.filters.choice_type(choice, ["a", "b"])
-        self.assertEqual('Type["A.B.Foobar"]', actual)
+        self.assertEqual('ForwardRef("A.B.Foobar")', actual)
 
     def test_choice_type_with_circular_reference(self):
         choice = AttrFactory.create(
             types=[AttrTypeFactory.create("foobar", circular=True)]
         )
         actual = self.filters.choice_type(choice, ["a", "b"])
-        self.assertEqual('Type["Foobar"]', actual)
+        self.assertEqual('ForwardRef("Foobar")', actual)
 
         self.filters.postponed_annotations = True
         actual = self.filters.choice_type(choice, ["a", "b"])
-        self.assertEqual('Type["Foobar"]', actual)
+        self.assertEqual('ForwardRef("Foobar")', actual)
 
     def test_choice_type_with_multiple_types(self):
         choice = AttrFactory.create(types=[type_str, type_bool])
         actual = self.filters.choice_type(choice, ["a", "b"])
         self.assertEqual("Type[Union[str, bool]]", actual)
 
-        self.filters.subscriptable_types = True
-        actual = self.filters.choice_type(choice, ["a", "b"])
-        self.assertEqual("type[Union[str, bool]]", actual)
-
         self.filters.union_type = True
         actual = self.filters.choice_type(choice, ["a", "b"])
-        self.assertEqual("type[str | bool]", actual)
+        self.assertEqual("Type[str | bool]", actual)
 
     def test_choice_type_with_list_types_are_ignored(self):
         choice = AttrFactory.create(types=[type_str, type_bool])
@@ -824,7 +816,7 @@ class FiltersTests(FactoryTestCase):
         self.filters.union_type = True
         self.filters.subscriptable_types = True
         actual = self.filters.choice_type(choice, ["a", "b"])
-        self.assertEqual("type[tuple[str | bool, ...]]", actual)
+        self.assertEqual("Type[tuple[str | bool, ...]]", actual)
 
     def test_default_imports_with_decimal(self):
         expected = "from decimal import Decimal"
@@ -900,8 +892,8 @@ class FiltersTests(FactoryTestCase):
         expected = "from typing import Union"
         self.assertIn(expected, self.filters.default_imports(output))
 
-        output = " Type["
-        expected = "from typing import Type"
+        output = ": ForwardRef("
+        expected = "from typing import ForwardRef"
         self.assertIn(expected, self.filters.default_imports(output))
 
         output = ": Any = "
@@ -946,8 +938,7 @@ class FiltersTests(FactoryTestCase):
             "level_two": {"a": 1},
             "list": [
                 {"type": "Type[object]"},
-                {"type": 'type["something"]'},
-                {"type": "Type[object] mpla"},
+                {"type": 'ForwardRef("something")'},
             ],
             "default": "1",
             "default_factory": "list",
@@ -969,10 +960,7 @@ class FiltersTests(FactoryTestCase):
             '            "type": object,\n'
             "        },\n"
             "        {\n"
-            '            "type": type["something"],\n'
-            "        },\n"
-            "        {\n"
-            '            "type": "Type[object] mpla",\n'
+            '            "type": ForwardRef("something"),\n'
             "        },\n"
             "    ],\n"
             '    "default": 1,\n'

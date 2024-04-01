@@ -81,7 +81,6 @@ class UpdateAttributesEffectiveChoiceTests(FactoryTestCase):
                 AttrFactory.element(
                     name="b", namespace="b", restrictions=restrictions.clone()
                 ),
-                AttrFactory.element(name="b", namespace="b"),  # no paths, impossible!
                 AttrFactory.element(name="c", namespace="b"),
                 AttrFactory.element(
                     name="d", namespace="b", restrictions=Restrictions(choice=1)
@@ -124,3 +123,9 @@ class UpdateAttributesEffectiveChoiceTests(FactoryTestCase):
         self.processor.process(target)
 
         self.assertEqual(3, len(target.attrs))
+
+    def test_reset_effective_choice_for_coverage(self):
+        paths = [("g", 0, 1, 1), ("g", 1, 1, 1)]
+        self.processor.reset_effective_choice(paths, 3, 4)
+
+        self.assertEqual([("g", 0, 1, 1), ("g", 1, 1, 1)], paths)

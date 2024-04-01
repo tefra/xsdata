@@ -82,22 +82,37 @@ Check the [documentation](https://xsdata.readthedocs.io) for more ✨✨✨
 - Unnest class with circular reference
   ([#974](https://github.com/tefra/xsdata/pull/974))
 
-## Changelog: 24.3 (2024-03-10)
+## Changelog: 24.4 (2024-04-01)
 
 **Features**
 
-- Avoid flattening root elements ([#945](https://github.com/tefra/xsdata/pull/945))
-- Avoid generating ambiguous choices ([#946](https://github.com/tefra/xsdata/pull/946))
-- Added various type reference validations
-  ([#966](https://github.com/tefra/xsdata/pull/966),
-  [#967](https://github.com/tefra/xsdata/pull/967),
-  [#968](https://github.com/tefra/xsdata/pull/968))
-- Calculate circular references more accurately
-  ([#969](https://github.com/tefra/xsdata/pull/969))
-- Prettify codegen errors ([#970](https://github.com/tefra/xsdata/pull/970))
-- Use Ruff to sort imports ([#972](https://github.com/tefra/xsdata/pull/972))
+- Add xml and lxml tree serializers ([#975](https://github.com/tefra/xsdata/pull/975))
+- Capture namespace prefixes in user dicts
+  ([#978](https://github.com/tefra/xsdata/pull/978))
+- Add cli option to generate wrapper fields
+  ([#982](https://github.com/tefra/xsdata/pull/982))
+- Support wrapper fields in JSON data bindings
+  ([#982](https://github.com/tefra/xsdata/pull/982))
+- Use abstract suffixes to resolve class name conflicts
+  ([#985](https://github.com/tefra/xsdata/pull/985))
+- Add the version number in the cli cache key
+  ([#990](https://github.com/tefra/xsdata/pull/990))
+- Use unicodedata.name for attrs with only special characters
+  ([#993](https://github.com/tefra/xsdata/pull/993))
+- Add src code excerpts on ruff errors
+  ([#996](https://github.com/tefra/xsdata/pull/996))
+- Detect circular imports and raise appropriate error
+  ([#999](https://github.com/tefra/xsdata/pull/999))
+- Add support for Python 3.13 ([#1001](https://github.com/tefra/xsdata/pull/1001))
+- Add cli debug messages with performance stats
 
 **Fixes**
 
-- Move ruff format in the code generator
-  ([#964](https://github.com/tefra/xsdata/pull/964))
+- Use deepcopy to clone codegen models
+  ([#980](https://github.com/tefra/xsdata/pull/980))
+- Generate type hints for compound fields with token elements
+  ([#997](https://github.com/tefra/xsdata/pull/997))
+- Protect prohibited attrs from turning into lists
+  ([#998](https://github.com/tefra/xsdata/pull/998))
+- Convert child attr to list when parent is list
+  ([#998](https://github.com/tefra/xsdata/pull/998))

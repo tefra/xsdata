@@ -7,6 +7,8 @@ from xsdata.models.enums import DataType, QNames, Tag
 from xsdata.utils import collections
 from xsdata.utils.namespaces import split_qname
 
+_UNSET = object()
+
 
 class RawDocumentMapper:
     """Mixin class for raw json/xml documents."""
@@ -20,6 +22,7 @@ class RawDocumentMapper:
         parent_namespace: Optional[str] = None,
         tag: str = Tag.ELEMENT,
         sequence: int = 0,
+        value: Any = _UNSET,
     ):
         """Build an attr for the given class instance.
 
@@ -30,6 +33,7 @@ class RawDocumentMapper:
             parent_namespace: The parent namespace
             tag: The attr tag
             sequence: The attr sequence number
+            value: The attr sample value
         """
         namespace, name = split_qname(qname)
         namespace = cls.select_namespace(namespace, parent_namespace, tag)
@@ -43,6 +47,10 @@ class RawDocumentMapper:
 
         attr.restrictions.min_occurs = 1
         attr.restrictions.max_occurs = 1
+
+        if value is None:
+            attr.restrictions.min_occurs = 0
+
         cls.add_attribute(target, attr)
 
     @classmethod

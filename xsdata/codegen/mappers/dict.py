@@ -71,4 +71,4 @@ class DictMapper(RawDocumentMapper):
             else:
                 attr_type = cls.build_attr_type(name, value)
 
-            cls.build_attr(target, name, attr_type)
+            cls.build_attr(target, name, attr_type, value=value)

@@ -89,13 +89,13 @@ class DictMapperTests(FactoryTestCase):
                 AttrTypeFactory.native(DataType.ANY_SIMPLE_TYPE, tag=Tag.ELEMENT),
             ],
         )
-        restrictions = Restrictions(min_occurs=1, max_occurs=sys.maxsize)
+        restrictions = Restrictions(min_occurs=0, max_occurs=sys.maxsize)
         self.assertEqual(expected, target.attrs[0])
         self.assertEqual(restrictions, target.attrs[0].restrictions)
 
     def test_build_class_attribute_from_dict(self):
         target = ClassFactory.create()
-        data = {"sub1": 1, "sub2": "value"}
+        data = {"sub1": 1, "sub2": "value", "sub3": None}
         DictMapper.build_class_attribute(target, "a", data)
 
         expected = AttrFactory.create(
@@ -113,9 +113,14 @@ class DictMapperTests(FactoryTestCase):
             attrs=[
                 AttrFactory.native(DataType.SHORT, name="sub1"),
                 AttrFactory.native(DataType.STRING, name="sub2"),
+                AttrFactory.native(DataType.STRING, name="sub3"),
             ],
         )
 
         self.assertEqual(expected, target.attrs[0])
         self.assertEqual(expected_inner, target.inner[0])
         self.assertEqual(1, len(target.inner))
+
+        self.assertFalse(target.inner[0].attrs[0].restrictions.is_optional)
+        self.assertFalse(target.inner[0].attrs[1].restrictions.is_optional)
+        self.assertTrue(target.inner[0].attrs[2].restrictions.is_optional)

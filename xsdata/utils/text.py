@@ -57,6 +57,7 @@ stop_words = {
     "str",
     "try",
     "type",
+    "validate",
     "while",
     "with",
     "yield",

@@ -1,3 +1,4 @@
+from dataclasses import dataclass, fields
 from typing import Any, Dict, NamedTuple, Optional, Type, Union
 
 from xsdata.exceptions import ClientValueError
@@ -7,7 +8,8 @@ from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.formats.dataclass.transports import DefaultTransport, Transport
 
 
-class Config(NamedTuple):
+@dataclass(frozen=True)
+class Config:
     """Service configuration class.
 
     Attributes:
@@ -45,8 +47,8 @@ class Config(NamedTuple):
             A new config instance.
         """
         params = {
-            key: kwargs[key] if key in kwargs else getattr(obj, key, None)
-            for key in cls._fields
+            f.name: kwargs[f.name] if f.name in kwargs else getattr(obj, f.name, None)
+            for f in fields(cls)
         }
 
         return cls(**params)

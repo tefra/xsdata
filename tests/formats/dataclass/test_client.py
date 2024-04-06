@@ -1,3 +1,4 @@
+from dataclasses import asdict, replace
 from unittest import TestCase, mock
 
 from tests.fixtures.calculator import (
@@ -43,7 +44,7 @@ class ClientTests(TestCase):
     def test_from_service(self):
         client = Client.from_service(CalculatorSoapAdd, location="http://testurl.com")
 
-        actual = client.config._asdict()
+        actual = asdict(client.config)
         expected = {
             "style": "document",
             "input": CalculatorSoapAddInput,
@@ -138,7 +139,7 @@ class ClientTests(TestCase):
         self.assertEqual({"content-type": "text/xml", "foo": "bar"}, result)
         self.assertEqual(1, len(headers))
 
-        config = config._replace(soap_action="add")
+        config = replace(config, soap_action="add")
         client = Client(config=config)
         result = client.prepare_headers({})
         self.assertEqual({"SOAPAction": "add", "content-type": "text/xml"}, result)

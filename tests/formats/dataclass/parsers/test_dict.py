@@ -12,6 +12,7 @@ from tests.fixtures.models import (
     BaseType,
     ChoiceType,
     ExtendedType,
+    FixedType,
     OptionalChoiceType,
     TypeA,
     TypeB,
@@ -172,6 +173,13 @@ class DictDecoderTests(FactoryTestCase):
 
         with self.assertRaises(ParserError):
             self.decoder.bind_dataclass({"x": 1, "y": "a"}, TypeD)
+
+    def test_bind_dataclass_with_fixed_field(self):
+        obj = self.decoder.bind_dataclass({"value": "abc"}, FixedType)
+        self.assertEqual("abc", obj.value)
+
+        with self.assertRaises(ParserError):
+            self.decoder.bind_dataclass({"value": "abcd"}, FixedType)
 
     def test_bind_derived_dataclass(self):
         data = {

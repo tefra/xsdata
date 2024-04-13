@@ -83,7 +83,7 @@ class ElementNodeTests(FactoryTestCase):
         self.node.meta = self.context.build(FixedType)
 
         objects = []
-        self.assertTrue(self.node.bind("foo", "not the fixed value", None, objects))
+        self.assertTrue(self.node.bind("foo", "abc", None, objects))
         self.assertEqual(("foo", FixedType()), objects[-1])
 
     def test_bind_with_derived_element(self):
@@ -182,7 +182,7 @@ class ElementNodeTests(FactoryTestCase):
         self.node.meta = self.context.build(AttrsType)
         self.node.attrs = {
             "index": "0",
-            "fixed": "will be ignored",
+            "fixed": "ignored",
             "{what}ever": "qname",
             "extended": "attr",
         }
@@ -198,7 +198,7 @@ class ElementNodeTests(FactoryTestCase):
         self.node.config.fail_on_unknown_attributes = True
         self.node.attrs = {
             "index": "0",
-            "fixed": "will be ignored",
+            "fixed": "ignored",
             "{what}ever": "qname",
             "extended": "attr",
         }

@@ -1,10 +1,12 @@
 from unittest import mock
 
+from tests.fixtures.models import TypeA
+from xsdata.exceptions import ParserError
 from xsdata.formats.converter import ConverterFactory
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.models.enums import Namespace, QNames
-from xsdata.utils.testing import FactoryTestCase
+from xsdata.utils.testing import FactoryTestCase, XmlMetaFactory, XmlVarFactory
 
 
 class ParserUtilsTests(FactoryTestCase):
@@ -94,3 +96,21 @@ class ParserUtilsTests(FactoryTestCase):
         ns_map["http"] = "happens"
         value = ParserUtils.parse_any_attribute("http://www.com", ns_map)
         self.assertEqual("http://www.com", value)
+
+    def test_validate_fixed_value(self):
+        meta = XmlMetaFactory.create(clazz=TypeA, qname="foo")
+        var = XmlVarFactory.create("fixed", default="a")
+        with self.assertRaises(ParserError) as cm:
+            ParserUtils.validate_fixed_value(meta, var, "b")
+
+        self.assertEqual("Fixed value mismatch foo:fixed, `a != b`", str(cm.exception))
+
+        var = XmlVarFactory.create("fixed", default=lambda: "a")
+        with self.assertRaises(ParserError):
+            ParserUtils.validate_fixed_value(meta, var, "b")
+
+        var = XmlVarFactory.create("fixed", default=lambda: " a ")
+        ParserUtils.validate_fixed_value(meta, var, "  a  ")
+
+        var = XmlVarFactory.create("fixed", default=lambda: float("nan"))
+        ParserUtils.validate_fixed_value(meta, var, float("nan"))

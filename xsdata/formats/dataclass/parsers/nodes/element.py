@@ -1,3 +1,4 @@
+import math
 from typing import Any, Dict, List, Optional, Set, Type
 
 from xsdata.exceptions import ParserError
@@ -191,15 +192,19 @@ class ElementNode(XmlNode):
             var: The xml var instance
             value: The attribute value
         """
+        value = ParserUtils.parse_value(
+            value=value,
+            types=var.types,
+            default=var.default,
+            ns_map=self.ns_map,
+            tokens_factory=var.tokens_factory,
+            format=var.format,
+        )
+
         if var.init:
-            params[var.name] = ParserUtils.parse_value(
-                value=value,
-                types=var.types,
-                default=var.default,
-                ns_map=self.ns_map,
-                tokens_factory=var.tokens_factory,
-                format=var.format,
-            )
+            params[var.name] = value
+        else:
+            ParserUtils.validate_fixed_value(self.meta, var, value)
 
     def bind_any_attr(self, params: Dict, var: XmlVar, qname: str, value: Any):
         """Parse an element attribute to a wildcard field.
@@ -364,18 +369,23 @@ class ElementNode(XmlNode):
         if not var or (text is None and not self.xsi_nil):
             return False
 
+        if self.xsi_nil and not text:
+            value = None
+        else:
+            value = ParserUtils.parse_value(
+                value=text,
+                types=var.types,
+                default=var.default,
+                ns_map=self.ns_map,
+                tokens_factory=var.tokens_factory,
+                format=var.format,
+            )
+
         if var.init:
-            if self.xsi_nil and not text:
-                params[var.name] = None
-            else:
-                params[var.name] = ParserUtils.parse_value(
-                    value=text,
-                    types=var.types,
-                    default=var.default,
-                    ns_map=self.ns_map,
-                    tokens_factory=var.tokens_factory,
-                    format=var.format,
-                )
+            params[var.name] = value
+        else:
+            ParserUtils.validate_fixed_value(self.meta, var, value)
+
         return True
 
     def bind_wild_text(

@@ -497,7 +497,7 @@ class GeneratorConfig:
         name = "Config"
         namespace = "http://pypi.org/project/xsdata"
 
-    version: str = attribute(init=False, default=__version__)
+    version: str = attribute(default=__version__)
     output: GeneratorOutput = element(default_factory=GeneratorOutput)
     conventions: GeneratorConventions = element(default_factory=GeneratorConventions)
     substitutions: GeneratorSubstitutions = element(
@@ -542,7 +542,9 @@ class GeneratorConfig:
                 fail_on_converter_warnings=True,
             ),
         )
-        return parser.from_path(path, cls)
+        cfg = parser.from_path(path, cls)
+        cfg.version = __version__
+        return cfg
 
     @classmethod
     def write(cls, output: TextIO, obj: "GeneratorConfig"):

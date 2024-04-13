@@ -1,7 +1,10 @@
+import math
 from collections import UserList
 from typing import Any, Callable, Dict, Iterable, Optional, Sequence, Type
 
+from xsdata.exceptions import ParserError
 from xsdata.formats.converter import QNameConverter, converter
+from xsdata.formats.dataclass.models.elements import XmlMeta, XmlVar
 from xsdata.models.enums import QNames
 from xsdata.utils import collections, constants, text
 from xsdata.utils.namespaces import build_qname
@@ -162,3 +165,31 @@ class ParserUtils:
             value = build_qname(ns_map[prefix], suffix)
 
         return value
+
+    @classmethod
+    def validate_fixed_value(cls, meta: XmlMeta, var: XmlVar, value: Any):
+        """Validate if the parsed value matches the fixed value.
+
+        Special cases
+            - float nans are never equal in python
+            - strings with whitespaces, need trimming
+
+        """
+
+        default_value = var.default() if callable(var.default) else var.default
+        if (
+            isinstance(default_value, float)
+            and isinstance(value, float)
+            and math.isnan(default_value)
+            and math.isnan(value)
+        ) or (
+            isinstance(default_value, str)
+            and isinstance(value, str)
+            and default_value.strip() == value.strip()
+        ):
+            return
+
+        if default_value != value:
+            raise ParserError(
+                f"Fixed value mismatch {meta.qname}:{var.qname}, `{default_value} != {value}`"
+            )

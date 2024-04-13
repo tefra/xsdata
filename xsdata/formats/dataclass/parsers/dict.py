@@ -132,14 +132,20 @@ class DictDecoder:
         for key, value in data.items():
             var = self.find_var(xml_vars, key, value)
 
-            if var is None and self.config.fail_on_unknown_properties:
-                raise ParserError(f"Unknown property {clazz.__qualname__}.{key}")
+            if var is None:
+                if self.config.fail_on_unknown_properties:
+                    raise ParserError(f"Unknown property {clazz.__qualname__}.{key}")
+                else:
+                    continue
 
-            if var and var.init:
-                if var.wrapper:
-                    value = value[var.local_name]
+            if var.wrapper:
+                value = value[var.local_name]
 
-                params[var.name] = self.bind_value(meta, var, value)
+            value = self.bind_value(meta, var, value)
+            if var.init:
+                params[var.name] = value
+            else:
+                ParserUtils.validate_fixed_value(meta, var, value)
 
         try:
             return self.config.class_factory(clazz, params)
@@ -150,7 +156,7 @@ class DictDecoder:
         """Bind the input data to the given class type.
 
         Examples:
-            >>> {
+            {
                 "qname": "foo",
                 "type": "my:type",
                 "value": {"prop": "value"}

@@ -53,6 +53,18 @@ class ConverterFactoryTests(TestCase):
 
         self.assertTrue(converter.test("0", [float]))
         self.assertFalse(converter.test("0", [float], strict=True))
+
+        self.assertTrue(converter.test("INF", [float], strict=True))
+        self.assertTrue(converter.test("inf", [float], strict=True))
+        self.assertTrue(converter.test("+INF", [float], strict=True))
+        self.assertTrue(converter.test("+inf", [float], strict=True))
+        self.assertTrue(converter.test("-INF", [float], strict=True))
+        self.assertTrue(converter.test("-inf", [float], strict=True))
+        self.assertTrue(converter.test("NAN", [float], strict=True))
+        self.assertTrue(converter.test("NaN", [float], strict=True))
+        self.assertTrue(converter.test("nan", [float], strict=True))
+        self.assertTrue(converter.test("-NAN", [float], strict=True))
+
         self.assertTrue(converter.test(".0", [float]))
         self.assertFalse(converter.test(".0", [float], strict=True))
         self.assertTrue(converter.test("1.0", [float]))

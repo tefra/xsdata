@@ -160,6 +160,11 @@ class ConverterFactory:
             return False
 
         if strict and isinstance(decoded, (float, int, Decimal, XmlPeriod)):
+            if isinstance(decoded, float) and (
+                math.isinf(decoded) or math.isnan(decoded)
+            ):
+                return True
+
             encoded = self.serialize(decoded, **kwargs)
             return value.strip() == encoded
 

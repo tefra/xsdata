@@ -60,3 +60,37 @@ class ValidateReferencesTests(FactoryTestCase):
 
         with self.assertRaises(CodegenError):
             self.handler.run()
+
+    def test_validate_parent_references_with_root_class_with_parent(self):
+        target = ClassFactory.create()
+        target.parent = ClassFactory.create()
+        self.container.add(target)
+
+        with self.assertRaises(CodegenError):
+            self.handler.run()
+
+    def test_validate_parent_references_with_wrong_parent(self):
+        parent = ClassFactory.create()
+        child = ClassFactory.create()
+        wrong = ClassFactory.create()
+
+        parent.inner.append(child)
+        child.parent = wrong
+
+        self.container.extend([parent, wrong])
+
+        with self.assertRaises(CodegenError):
+            self.handler.run()
+
+    def test_validate_parent_references_with_wrong_parent_ref(self):
+        parent = ClassFactory.create()
+        child = ClassFactory.create()
+        wrong = parent.clone()
+
+        parent.inner.append(child)
+        child.parent = wrong
+
+        self.container.extend([parent])
+
+        with self.assertRaises(CodegenError):
+            self.handler.run()

@@ -60,6 +60,7 @@ class UnnestInnerClasses(RelativeHandlerInterface):
             The new class instance
         """
         clone = inner.clone()
+        clone.parent = None
         clone.local_type = True
         clone.qname = build_qname(inner.target_namespace, f"{name}_{inner.name}")
 

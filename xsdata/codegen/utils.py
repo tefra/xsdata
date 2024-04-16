@@ -206,6 +206,7 @@ class ClassUtils:
             clone.module = target.module
             clone.status = Status.RAW
             attr_type.reference = clone.ref
+            clone.parent = target
             target.inner.append(clone)
 
     @classmethod
@@ -259,6 +260,7 @@ class ClassUtils:
             An iterator over all the found classes.
         """
         target.location = location
+        target.parent = None
 
         while target.inner:
             yield from cls.flatten(target.inner.pop(), location)

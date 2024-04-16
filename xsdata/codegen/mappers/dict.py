@@ -66,6 +66,7 @@ class DictMapper(RawDocumentMapper):
         else:
             if isinstance(value, dict):
                 inner = cls.build_class(value, name)
+                inner.parent = target
                 attr_type = AttrType(qname=inner.qname, forward=True)
                 target.inner.append(inner)
             else:

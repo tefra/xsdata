@@ -106,6 +106,7 @@ class ElementMapper(RawDocumentMapper):
 
                 if child.attributes or child.children:
                     inner = cls.build_class(child, namespace)
+                    inner.parent = target
                     attr_type = AttrType(qname=inner.qname, forward=True)
                     target.inner.append(inner)
                 else:

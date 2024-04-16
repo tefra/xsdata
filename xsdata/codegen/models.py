@@ -512,6 +512,7 @@ class Class(CodegenModel):
         attrs: The list of all the attr instances
         inner: The list of all the inner class instances
         ns_map: The namespace prefix-URI map
+        parent: The parent outer class
     """
 
     qname: str
@@ -535,6 +536,7 @@ class Class(CodegenModel):
     attrs: List[Attr] = field(default_factory=list)
     inner: List["Class"] = field(default_factory=list)
     ns_map: Dict = field(default_factory=dict)
+    parent: Optional["Class"] = field(default=None, compare=False)
 
     @property
     def name(self) -> str:

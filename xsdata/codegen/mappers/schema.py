@@ -360,6 +360,7 @@ class SchemaMapper:
         location = target.location
         namespace = target.target_namespace
         for inner in cls.build_inner_classes(obj, location, namespace):
+            inner.parent = target
             target.inner.append(inner)
             types.append(AttrType(qname=inner.qname, forward=True))
 

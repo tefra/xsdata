@@ -196,7 +196,7 @@ class ClassUtils:
         if not attr_type.forward:
             return
 
-        inner = ClassUtils.find_inner(source, attr_type.qname)
+        inner = ClassUtils.find_nested(source, attr_type.qname)
         if inner is target:
             attr_type.circular = True
             attr_type.reference = target.ref
@@ -209,26 +209,6 @@ class ClassUtils:
             attr_type.reference = clone.ref
             clone.parent = target
             target.inner.append(clone)
-
-    @classmethod
-    def find_inner(cls, source: Class, qname: str) -> Class:
-        """Find an inner class in the source class by its qualified name.
-
-        Args:
-            source: The parent class instance
-            qname: The inner class qualified name
-
-        Returns:
-            The inner class instance
-
-        Raises:
-            CodeGenerationError: If no inner class matched.
-        """
-        for inner in source.inner:
-            if inner.qname == qname:
-                return inner
-
-        raise CodegenError("Missing inner class", parent=source, qname=qname)
 
     @classmethod
     def find_attr(cls, source: Class, name: str) -> Optional[Attr]:

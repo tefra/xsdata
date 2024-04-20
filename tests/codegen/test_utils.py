@@ -214,20 +214,6 @@ class ClassUtilsTests(FactoryTestCase):
         with self.assertRaises(CodegenError):
             ClassUtils.copy_inner_class(source, target, attr_type)
 
-    def test_find_inner(self):
-        obj = ClassFactory.create(qname="{a}parent")
-        first = ClassFactory.create(qname="{a}a")
-        second = ClassFactory.create(qname="{c}c")
-        third = ClassFactory.enumeration(2, qname="{d}d")
-        obj.inner.extend((first, second, third))
-
-        with self.assertRaises(CodegenError):
-            self.assertIsNone(ClassUtils.find_inner(obj, "nope"))
-
-        self.assertEqual(first, ClassUtils.find_inner(obj, "{a}a"))
-        self.assertEqual(second, ClassUtils.find_inner(obj, "{c}c"))
-        self.assertEqual(third, ClassUtils.find_inner(obj, "{d}d"))
-
     def test_flatten(self):
         target = ClassFactory.create(
             qname="{xsdata}root", attrs=AttrFactory.list(3), inner=ClassFactory.list(2)

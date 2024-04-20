@@ -1,5 +1,6 @@
 import sys
-from typing import Iterator, List, Optional, Set
+from collections import deque
+from typing import Deque, Iterator, List, Optional, Set
 
 from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.models import (
@@ -495,3 +496,44 @@ class ClassUtils:
             types.append(AttrType(qname=str(DataType.STRING), native=True))
 
         return types
+
+    @classmethod
+    def find_nested(cls, target: Class, qname: str) -> Class:
+        """Find a nested class by qname.
+
+        Breath-first search implementation, that goes
+        from the current level to bottom before looking
+        for outer classes.
+
+        Args:
+            target: The class instance to begin the search
+            qname: The qualified name of the nested class to find
+
+        Raises:
+            CodegenException: If the nested class cannot be found.
+
+        Returns:
+            The nested class instance.
+        """
+        queue: Deque[Class] = deque()
+        visited: Set[int] = set()
+
+        if target.inner:
+            queue.extend(target.inner)
+        elif target.parent:
+            queue.append(target.parent)
+
+        while len(queue) > 0:
+            item = queue.popleft()
+            visited.add(item.ref)
+            if item.qname == qname:
+                return item
+
+            for inner in item.inner:
+                if inner.ref not in visited:
+                    queue.append(inner)
+
+            if len(queue) == 0 and item.parent:
+                queue.append(item.parent)
+
+        raise CodegenError("Missing inner class", parent=target, qname=qname)

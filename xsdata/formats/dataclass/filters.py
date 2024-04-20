@@ -19,6 +19,7 @@ from docformatter import configuration, format
 from jinja2 import Environment
 
 from xsdata.codegen.models import Attr, AttrType, Class
+from xsdata.codegen.utils import ClassUtils
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.models.config import (
@@ -243,14 +244,14 @@ class Filters:
 
     def field_definition(
         self,
+        obj: Class,
         attr: Attr,
-        ns_map: Dict,
         parent_namespace: Optional[str],
-        parents: List[str],
     ) -> str:
         """Return the field definition with any extra metadata."""
+        ns_map = obj.ns_map
         default_value = self.field_default_value(attr, ns_map)
-        metadata = self.field_metadata(attr, parent_namespace, parents)
+        metadata = self.field_metadata(obj, attr, parent_namespace)
 
         kwargs: Dict[str, Any] = {}
         if attr.fixed or attr.is_prohibited:
@@ -421,9 +422,9 @@ class Filters:
 
     def field_metadata(
         self,
+        obj: Class,
         attr: Attr,
         parent_namespace: Optional[str],
-        parents: List[str],
     ) -> Dict:
         """Return a metadata dictionary for the given attribute."""
         if attr.is_prohibited:
@@ -432,7 +433,7 @@ class Filters:
         name = namespace = None
 
         if not attr.is_nameless and attr.local_name != self.field_name(
-            attr.name, parents[-1]
+            attr.name, obj.name
         ):
             name = attr.local_name
 
@@ -447,7 +448,7 @@ class Filters:
             "type": attr.xml_type,
             "namespace": namespace,
             "mixed": attr.mixed,
-            "choices": self.field_choices(attr, parent_namespace, parents),
+            "choices": self.field_choices(obj, attr, parent_namespace),
             **restrictions,
         }
 
@@ -458,9 +459,9 @@ class Filters:
 
     def field_choices(
         self,
+        obj: Class,
         attr: Attr,
         parent_namespace: Optional[str],
-        parents: List[str],
     ) -> Optional[Tuple]:
         """Return a tuple of field metadata if the attr has choices."""
         if not attr.choices:
@@ -477,7 +478,7 @@ class Filters:
             metadata = {
                 "name": choice.local_name,
                 "wildcard": choice.is_wildcard,
-                "type": self.choice_type(choice, parents),
+                "type": self.choice_type(obj, choice),
                 "namespace": namespace,
             }
 
@@ -742,15 +743,15 @@ class Filters:
 
         return f"lambda: {self.format_metadata(tokens, indent=8)}"
 
-    def field_type(self, attr: Attr, parents: List[str]) -> str:
+    def field_type(self, obj: Class, attr: Attr) -> str:
         """Generate type hints for the given attr."""
         if attr.is_prohibited:
             return "Any"
 
         if attr.tag == Tag.CHOICE:
-            return self.compound_field_types(attr, parents)
+            return self.compound_field_types(obj, attr)
 
-        result = self._field_type_names(attr, parents, choice=False)
+        result = self._field_type_names(obj, attr, choice=False)
 
         iterable_fmt = self._get_iterable_format()
         if attr.is_tokens:
@@ -772,12 +773,12 @@ class Filters:
 
         return result
 
-    def compound_field_types(self, attr: Attr, parents: List[str]) -> str:
+    def compound_field_types(self, obj: Class, attr: Attr) -> str:
         """Generate type hint for a compound field.
 
         Args:
+            obj: The parent class instance
             attr: The compound attr instance
-            parents: A list of the parent class names
 
         Returns:
             The string representation of the type hint.
@@ -785,7 +786,7 @@ class Filters:
         results = []
         iterable_fmt = self._get_iterable_format()
         for choice in attr.choices:
-            names = self._field_type_names(choice, parents, choice=False)
+            names = self._field_type_names(obj, choice, choice=False)
             if choice.is_tokens:
                 names = iterable_fmt.format(names)
             results.append(names)
@@ -800,7 +801,7 @@ class Filters:
 
         return result
 
-    def choice_type(self, choice: Attr, parents: List[str]) -> str:
+    def choice_type(self, obj: Class, choice: Attr) -> str:
         """Generate type hints for the given choice.
 
         Choices support a subset of features from normal attributes.
@@ -811,13 +812,13 @@ class Filters:
         is also ignored.
 
         Args:
+            obj: The parent class instance
             choice: The choice instance
-            parents: A list of the parent class names
 
         Returns:
             The string representation of the type hint.
         """
-        result = self._field_type_names(choice, parents, choice=True)
+        result = self._field_type_names(obj, choice, choice=True)
 
         if choice.is_tokens:
             iterable_fmt = self._get_iterable_format()
@@ -830,13 +831,11 @@ class Filters:
 
     def _field_type_names(
         self,
+        obj: Class,
         attr: Attr,
-        parents: List[str],
         choice: bool = False,
     ) -> str:
-        type_names = [
-            self._field_type_name(x, parents, choice=choice) for x in attr.types
-        ]
+        type_names = [self._field_type_name(obj, x, choice=choice) for x in attr.types]
         return self._join_type_names(type_names)
 
     def _join_type_names(self, type_names: List[str]) -> str:
@@ -850,15 +849,12 @@ class Filters:
         return f'Union[{", ".join(type_names)}]'
 
     def _field_type_name(
-        self, attr_type: AttrType, parents: List[str], choice: bool = False
+        self, obj: Class, attr_type: AttrType, choice: bool = False
     ) -> str:
         name = self.type_name(attr_type)
-
-        if attr_type.forward and attr_type.circular:
-            outer_str = ".".join(map(self.class_name, parents))
-            name = f'"{outer_str}"'
-        elif attr_type.forward:
-            outer_str = ".".join(map(self.class_name, parents))
+        if attr_type.forward:
+            inner = ClassUtils.find_nested(obj, attr_type.qname)
+            outer_str = ".".join(map(self.class_name, inner.parent_names()))
             name = f'"{outer_str}.{name}"'
         elif attr_type.circular:
             name = f'"{name}"'

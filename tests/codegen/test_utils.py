@@ -400,3 +400,28 @@ class ClassUtilsTests(FactoryTestCase):
         types = [xs_any]
         actual = ClassUtils.filter_types(types)
         self.assertEqual(1, len(actual))
+
+    def test_find_nested(self):
+        a = ClassFactory.create(qname="a")
+        b = ClassFactory.create(qname="b")
+        c = ClassFactory.create(qname="c")
+
+        a.inner.append(b)
+        b.inner.append(c)
+        c.parent = b
+        b.parent = a
+
+        self.assertEqual(a, ClassUtils.find_nested(a, "a"))
+        self.assertEqual(b, ClassUtils.find_nested(a, "b"))
+        self.assertEqual(b, ClassUtils.find_nested(c, "b"))
+        self.assertEqual(a, ClassUtils.find_nested(c, "a"))
+
+        a2 = ClassFactory.create(qname="a")
+        c.inner.append(a2)
+        a2.parent = c
+
+        # Breadth-first search
+        self.assertEqual(a2, ClassUtils.find_nested(c, "a"))
+
+        with self.assertRaises(CodegenError):
+            ClassUtils.find_nested(a, "nope")

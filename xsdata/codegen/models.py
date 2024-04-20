@@ -714,6 +714,16 @@ class Class(CodegenModel):
 
         return any(inner.has_forward_ref() for inner in self.inner)
 
+    def parent_names(self) -> List[str]:
+        """Return the outer class names."""
+        result = []
+        target = self.parent
+        while target is not None:
+            result.append(target.name)
+            target = target.parent
+
+        return list(reversed(result))
+
 
 @dataclass
 class Import:

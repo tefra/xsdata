@@ -25,6 +25,10 @@ class ContainerInterface(abc.ABC):
         """Yield an iterator for the class map values."""
 
     @abc.abstractmethod
+    def process(self):
+        """Run the processor and filter steps."""
+
+    @abc.abstractmethod
     def find(self, qname: str, condition: Callable = return_true) -> Optional[Class]:
         """Find class that matches the given qualified name and condition callable.
 

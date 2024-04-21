@@ -115,7 +115,9 @@ class ClassUtils:
             index += 1
 
     @classmethod
-    def copy_group_attributes(cls, source: Class, target: Class, attr: Attr):
+    def copy_group_attributes(
+        cls, source: Class, target: Class, attr: Attr, skip_inner_classes: bool = False
+    ):
         """Copy the attrs of the source class to the target class.
 
         The attr represents a reference to the source class which is
@@ -125,6 +127,8 @@ class ClassUtils:
             source: The source class instance
             target: The target class instance
             attr: The group attr instance
+            skip_inner_classes: Whether the attr is circular reference, which
+                means we can skip copying the inner classes.
         """
         index = target.attrs.index(attr)
         target.attrs.pop(index)
@@ -134,7 +138,8 @@ class ClassUtils:
             target.attrs.insert(index, clone)
             index += 1
 
-            cls.copy_inner_classes(source, target, clone)
+            if not skip_inner_classes:
+                cls.copy_inner_classes(source, target, clone)
 
     @classmethod
     def copy_extensions(cls, source: Class, target: Class, extension: Extension):

@@ -1,6 +1,6 @@
 from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.mixins import RelativeHandlerInterface
-from xsdata.codegen.models import Attr, Class
+from xsdata.codegen.models import Attr, Class, Status
 from xsdata.codegen.utils import ClassUtils
 
 
@@ -51,4 +51,5 @@ class FlattenAttributeGroups(RelativeHandlerInterface):
         if source is target:
             ClassUtils.remove_attribute(target, attr)
         else:
-            ClassUtils.copy_group_attributes(source, target, attr)
+            is_circular_ref = source.status == Status.UNGROUPING
+            ClassUtils.copy_group_attributes(source, target, attr, is_circular_ref)

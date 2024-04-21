@@ -10,6 +10,7 @@ from toposort import toposort_flatten
 from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.mixins import ContainerHandlerInterface
 from xsdata.codegen.models import Class, get_location, get_target_namespace
+from xsdata.logger import logger
 from xsdata.models.config import ObjectType, StructureStyle
 from xsdata.models.enums import COMMON_SCHEMA_DIR
 from xsdata.utils import collections
@@ -57,6 +58,7 @@ class DesignateClassPackages(ContainerHandlerInterface):
         package = self.container.config.output.package
         class_map = collections.group_by(self.container, key=get_location)
         groups = self.group_common_paths(class_map.keys())
+        modules_map = defaultdict(list)
 
         for keys in groups:
             if len(keys) == 1:
@@ -67,9 +69,20 @@ class DesignateClassPackages(ContainerHandlerInterface):
             for key in keys:
                 items = class_map[key]
                 suffix = ".".join(Path(key).parent.relative_to(common_path).parts)
-
                 package_name = f"{package}.{suffix}" if suffix else package
-                self.assign(items, package_name, module_name(key))
+                mod_name = module_name(key)
+                modules_map[(package_name, mod_name)].append(key)
+
+                self.assign(items, package_name, mod_name)
+
+        for locations in modules_map.values():
+            if len(locations) > 1:
+                logger.warning(
+                    "Classes from different locations are designated to same module.\n"
+                    "You can resolve this if you switch to another `--structure-style`."
+                    "\n%s",
+                    "\n".join(locations),
+                )
 
     def group_by_namespace(self):
         """Group classes by their target namespace.

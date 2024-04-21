@@ -327,5 +327,5 @@ class DtdMapper:
                     types=[attr_type.clone()],
                 )
             )
-
+        inner.parent = target
         target.inner.append(inner)

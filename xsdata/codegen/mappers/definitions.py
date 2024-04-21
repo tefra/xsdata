@@ -376,6 +376,7 @@ class DefinitionsMapper:
             )
             attr = cls.build_attr(name, inner.qname, forward=True, namespace=namespace)
 
+            inner.parent = target
             target.inner.append(inner)
             target.attrs.append(attr)
 

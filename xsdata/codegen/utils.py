@@ -1,5 +1,6 @@
 import sys
-from typing import Iterator, List, Optional, Set
+from collections import deque
+from typing import Deque, Iterator, List, Optional, Set
 
 from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.models import (
@@ -114,7 +115,9 @@ class ClassUtils:
             index += 1
 
     @classmethod
-    def copy_group_attributes(cls, source: Class, target: Class, attr: Attr):
+    def copy_group_attributes(
+        cls, source: Class, target: Class, attr: Attr, skip_inner_classes: bool = False
+    ):
         """Copy the attrs of the source class to the target class.
 
         The attr represents a reference to the source class which is
@@ -124,6 +127,8 @@ class ClassUtils:
             source: The source class instance
             target: The target class instance
             attr: The group attr instance
+            skip_inner_classes: Whether the attr is circular reference, which
+                means we can skip copying the inner classes.
         """
         index = target.attrs.index(attr)
         target.attrs.pop(index)
@@ -133,7 +138,8 @@ class ClassUtils:
             target.attrs.insert(index, clone)
             index += 1
 
-            cls.copy_inner_classes(source, target, clone)
+            if not skip_inner_classes:
+                cls.copy_inner_classes(source, target, clone)
 
     @classmethod
     def copy_extensions(cls, source: Class, target: Class, extension: Extension):
@@ -195,7 +201,7 @@ class ClassUtils:
         if not attr_type.forward:
             return
 
-        inner = ClassUtils.find_inner(source, attr_type.qname)
+        inner = ClassUtils.find_nested(source, attr_type.qname)
         if inner is target:
             attr_type.circular = True
             attr_type.reference = target.ref
@@ -206,27 +212,8 @@ class ClassUtils:
             clone.module = target.module
             clone.status = Status.RAW
             attr_type.reference = clone.ref
+            clone.parent = target
             target.inner.append(clone)
-
-    @classmethod
-    def find_inner(cls, source: Class, qname: str) -> Class:
-        """Find an inner class in the source class by its qualified name.
-
-        Args:
-            source: The parent class instance
-            qname: The inner class qualified name
-
-        Returns:
-            The inner class instance
-
-        Raises:
-            CodeGenerationError: If no inner class matched.
-        """
-        for inner in source.inner:
-            if inner.qname == qname:
-                return inner
-
-        raise CodegenError("Missing inner class", parent=source, qname=qname)
 
     @classmethod
     def find_attr(cls, source: Class, name: str) -> Optional[Attr]:
@@ -259,6 +246,7 @@ class ClassUtils:
             An iterator over all the found classes.
         """
         target.location = location
+        target.parent = None
 
         while target.inner:
             yield from cls.flatten(target.inner.pop(), location)
@@ -493,3 +481,44 @@ class ClassUtils:
             types.append(AttrType(qname=str(DataType.STRING), native=True))
 
         return types
+
+    @classmethod
+    def find_nested(cls, target: Class, qname: str) -> Class:
+        """Find a nested class by qname.
+
+        Breath-first search implementation, that goes
+        from the current level to bottom before looking
+        for outer classes.
+
+        Args:
+            target: The class instance to begin the search
+            qname: The qualified name of the nested class to find
+
+        Raises:
+            CodegenException: If the nested class cannot be found.
+
+        Returns:
+            The nested class instance.
+        """
+        queue: Deque[Class] = deque()
+        visited: Set[int] = set()
+
+        if target.inner:
+            queue.extend(target.inner)
+        elif target.parent:
+            queue.append(target.parent)
+
+        while len(queue) > 0:
+            item = queue.popleft()
+            visited.add(item.ref)
+            if item.qname == qname:
+                return item
+
+            for inner in item.inner:
+                if inner.ref not in visited:
+                    queue.append(inner)
+
+            if len(queue) == 0 and item.parent:
+                queue.append(item.parent)
+
+        raise CodegenError("Missing inner class", parent=target, qname=qname)

@@ -1,10 +1,7 @@
-from unittest import mock
-
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.handlers import FlattenAttributeGroups
-from xsdata.codegen.models import Attr, Status
-from xsdata.codegen.utils import ClassUtils
+from xsdata.codegen.models import Status
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import Tag
 from xsdata.utils.testing import AttrFactory, ClassFactory, FactoryTestCase
@@ -17,65 +14,38 @@ class FlattenAttributeGroupsTests(FactoryTestCase):
         container = ClassContainer(config=GeneratorConfig())
         self.processor = FlattenAttributeGroups(container=container)
 
-    @mock.patch.object(Attr, "is_group", new_callable=mock.PropertyMock)
-    @mock.patch.object(FlattenAttributeGroups, "process_attribute")
-    def test_process(self, mock_process_attribute, mock_is_group):
-        mock_is_group.side_effect = [
-            True,
-            False,
-            True,
-            True,
-            False,
-            False,
+    def test_process(self):
+        group = ClassFactory.create(qname="group", tag=Tag.GROUP)
+        group.attrs = [
+            AttrFactory.reference(name="one", qname="inner_one", forward=True),
+            AttrFactory.reference(name="two", qname="inner_two", forward=True),
         ]
-        target = ClassFactory.elements(2)
-
-        self.processor.process(target)
-        self.assertEqual(6, mock_is_group.call_count)
-
-        mock_process_attribute.assert_has_calls(
-            [
-                mock.call(target, target.attrs[0]),
-                mock.call(target, target.attrs[0]),
-                mock.call(target, target.attrs[1]),
+        inner_one = ClassFactory.create(
+            qname="inner_one",
+            attrs=[
+                AttrFactory.reference(qname="group", tag=Tag.GROUP),
+            ],
+        )
+        inner_two = inner_one.clone(qname="inner_two")
+        inner_one.parent = group
+        inner_two.parent = group
+        group.inner.extend([inner_one, inner_two])
+        target = ClassFactory.create(
+            attrs=[
+                AttrFactory.reference(qname="group", tag=Tag.GROUP),
             ]
         )
+        self.processor.container.extend([group, target])
+        self.processor.container.process()
 
-    @mock.patch.object(ClassUtils, "copy_group_attributes")
-    def test_process_attribute_with_group(self, mock_copy_group_attributes):
-        complex_bar = ClassFactory.create(qname="bar", tag=Tag.COMPLEX_TYPE)
-        group_bar = ClassFactory.create(qname="bar", tag=Tag.ATTRIBUTE_GROUP)
-        group_attr = AttrFactory.attribute_group(name="bar")
-        target = ClassFactory.create()
-        target.attrs.append(group_attr)
+        self.assertEqual(["one", "two"], [x.name for x in target.attrs])
+        self.assertEqual(["inner_one", "inner_two"], [x.name for x in target.inner])
 
-        self.processor.container.add(complex_bar)
-        self.processor.container.add(group_bar)
-        self.processor.container.add(target)
+        for inner in target.inner:
+            self.assertEqual(["one", "two"], [x.name for x in inner.attrs])
+            self.assertEqual(0, len(inner.inner))
 
-        self.processor.process_attribute(target, group_attr)
-        mock_copy_group_attributes.assert_called_once_with(
-            group_bar, target, group_attr
-        )
-
-    @mock.patch.object(ClassUtils, "copy_group_attributes")
-    def test_process_attribute_with_attribute_group(self, mock_copy_group_attributes):
-        complex_bar = ClassFactory.create(qname="bar", tag=Tag.COMPLEX_TYPE)
-        group_bar = ClassFactory.create(qname="bar", tag=Tag.ATTRIBUTE_GROUP)
-        group_attr = AttrFactory.attribute_group(name="bar")
-        target = ClassFactory.create()
-        target.attrs.append(group_attr)
-
-        self.processor.container.add(complex_bar)
-        self.processor.container.add(group_bar)
-        self.processor.container.add(target)
-
-        self.processor.process_attribute(target, group_attr)
-        mock_copy_group_attributes.assert_called_once_with(
-            group_bar, target, group_attr
-        )
-
-    def test_process_attribute_with_circular_reference(self):
+    def test_process_attribute_with_self_reference(self):
         group_attr = AttrFactory.attribute_group(name="bar")
         target = ClassFactory.create(qname="bar", tag=Tag.ATTRIBUTE_GROUP)
         target.attrs.append(group_attr)

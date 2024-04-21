@@ -171,6 +171,7 @@ class DisambiguateChoices(RelativeHandlerInterface):
         if not inner:
             self.container.add(ref_class)
         else:
+            ref_class.parent = target
             target.inner.append(ref_class)
 
     def is_simple_type(self, choice: Attr) -> bool:

@@ -114,6 +114,9 @@ class ClassContainerTests(FactoryTestCase):
         target = ClassFactory.create(
             inner=[ClassFactory.elements(2), ClassFactory.elements(1)]
         )
+        for inner in target.inner:
+            inner.parent = target
+
         self.container.add(target)
 
         self.container.process()

@@ -3,7 +3,6 @@
     {%- include "docstrings." + docstring_name + ".jinja2" -%}
 {% endset -%}
 {% set parent_namespace = obj.namespace if obj.namespace is not none else parent_namespace|default(None) -%}
-{% set parents = parents|default([obj.name]) -%}
 {% set class_name =  obj.name|class_name -%}
 {% set class_annotations =  obj | class_annotations(class_name) -%}
 {% set global_type = level == 0 and not obj.local_type -%}
@@ -42,15 +41,14 @@ class {{ class_name }}{{"({})".format(base_classes) if base_classes }}:
 {{ post_meta_output|indent(4, first=True) }}
 {%- endif -%}
 {%- for attr in obj.attrs %}
-    {%- set field_typing = attr|field_type(parents) %}
-    {%- set field_definition = attr|field_definition(obj.ns_map, parent_namespace, parents) %}
+    {%- set field_typing = obj|field_type(attr) %}
+    {%- set field_definition = obj|field_definition(attr, parent_namespace) %}
     {{ attr.name|field_name(obj.name) }}: {{ field_typing }} = {{ field_definition }}
 {%- endfor -%}
 {%- for inner in obj.inner %}
     {%- set tpl = "enum.jinja2" if inner.is_enumeration else "class.jinja2" -%}
-    {%- set inner_parents = parents + [inner.name] -%}
     {%- filter indent(4) -%}
-        {%- with obj=inner, parents=inner_parents, level=(level + 1) -%}
+        {%- with obj=inner, level=(level + 1) -%}
             {% include tpl %}
         {%- endwith -%}
     {%- endfilter -%}

@@ -1,4 +1,4 @@
-from typing import Set
+from typing import Optional, Set
 
 from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.mixins import ContainerHandlerInterface
@@ -21,6 +21,7 @@ class ValidateReferences(ContainerHandlerInterface):
         self.validate_unique_qualified_names()
         self.validate_unique_instances()
         self.validate_resolved_references()
+        self.validate_parent_references()
 
     def validate_unique_qualified_names(self):
         """Validate all root classes have unique qualified names."""
@@ -71,3 +72,37 @@ class ValidateReferences(ContainerHandlerInterface):
                     raise CodegenError(
                         "Misrepresented reference", cls=item.qname, type=tp.qname
                     )
+
+    def validate_parent_references(self):
+        """Validate inner to outer classes is accurate."""
+
+        def _validate(target: Class, parent: Optional[Class] = None):
+            actual_qname = actual_ref = expected_qname = expected_ref = None
+            if target.parent:
+                actual_qname = target.parent.qname
+                actual_ref = target.parent.ref
+
+            if parent:
+                expected_qname = parent.qname
+                expected_ref = parent.ref
+
+            if actual_qname != expected_qname:
+                raise CodegenError(
+                    "Invalid parent class reference",
+                    cls=target.qname,
+                    expected=expected_qname,
+                    actual=actual_qname,
+                )
+
+            if actual_ref != expected_ref:
+                raise CodegenError(
+                    "Invalid parent class reference",
+                    cls=target.qname,
+                    ref=actual_qname,
+                )
+
+            for inner in target.inner:
+                _validate(inner, target)
+
+        for item in self.container:
+            _validate(item)

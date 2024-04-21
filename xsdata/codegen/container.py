@@ -148,7 +148,7 @@ class ClassContainer(ContainerInterface):
         Raises:
             CodeGenerationError: If the inner class is not found.
         """
-        inner = ClassUtils.find_inner(source, qname)
+        inner = ClassUtils.find_nested(source, qname)
         if inner.status < self.step:
             self.process_class(inner, self.step)
 

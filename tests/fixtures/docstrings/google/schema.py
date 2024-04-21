@@ -24,7 +24,7 @@ class DoubleQuotesSummary:
         namespace = "urn:docs"
 
 
-class RootEnum(Enum):
+class RootEnum(str, Enum):
     """
     Attributes:
         A: Lorem ipsum dolor
@@ -36,7 +36,7 @@ class RootEnum(Enum):
     B = "B"
 
 
-class RootB(Enum):
+class RootB(str, Enum):
     """
     Attributes:
         YES: This is an inner enum member documentation. Lorem ipsum
@@ -48,7 +48,7 @@ class RootB(Enum):
     NO = "No"
 
 
-class RootD(Enum):
+class RootD(str, Enum):
     TRUE = "true"
     FALSE = "false"
 

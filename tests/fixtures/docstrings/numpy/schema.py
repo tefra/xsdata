@@ -24,7 +24,7 @@ class DoubleQuotesSummary:
         namespace = "urn:docs"
 
 
-class RootEnum(Enum):
+class RootEnum(str, Enum):
     """
     Properties
     ----------
@@ -39,7 +39,7 @@ class RootEnum(Enum):
     B = "B"
 
 
-class RootB(Enum):
+class RootB(str, Enum):
     """
     Properties
     ----------
@@ -54,7 +54,7 @@ class RootB(Enum):
     NO = "No"
 
 
-class RootD(Enum):
+class RootD(str, Enum):
     TRUE = "true"
     FALSE = "false"
 

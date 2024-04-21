@@ -1,10 +1,10 @@
-{% set level = level | default(0) -%}
+{% set level = level | default(0) %}
 {% set help | format_docstring(level + 1) %}
-    {%- include "docstrings." + docstring_name + ".jinja2" -%}
+    {%- include "docstrings." + docstring_name + ".jinja2" %}
 {% endset -%}
 {% set class_name = obj.name | class_name %}
 
-class {{ class_name }}(Enum):
+class {{ class_name }}({{ obj | enum_bases }}):
 {%- if help %}
 {{ help | indent(4, first=True) }}
 {%- endif -%}

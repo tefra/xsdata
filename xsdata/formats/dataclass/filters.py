@@ -1,7 +1,7 @@
 import re
 import sys
 import textwrap
-from collections import defaultdict
+from collections import defaultdict, UserString
 from typing import (
     Any,
     Callable,
@@ -136,6 +136,7 @@ class Filters:
                 "class_bases": self.class_bases,
                 "class_annotations": self.class_annotations,
                 "class_params": self.class_params,
+                "enum_bases": self.enum_bases,
                 "format_string": self.format_string,
                 "format_docstring": self.format_docstring,
                 "constant_name": self.constant_name,
@@ -234,6 +235,31 @@ class Filters:
                     annotations.append(f"@{ext.func_name}")
 
         return collections.unique_sequence(annotations)
+
+    @classmethod
+    def enum_bases(cls, obj: Class) -> str:
+        native_types = set()
+        tokens = set()
+        for attr in obj.attrs:
+            native_types.update(attr.native_types)
+            tokens.add(attr.is_tokens)
+
+        result = []
+        if len(native_types) == 1 and len(tokens) == 1:
+            base = next(iter(native_types))
+            if issubclass(base, UserString):
+                base = str
+
+            name = base.__name__
+
+            is_tokens = next(iter(tokens))
+            if is_tokens:
+                result.append(f"Tuple[{name}, ...]")
+            else:
+                result.append(name)
+
+        result.append("Enum")
+        return ", ".join(result)
 
     def apply_substitutions(self, name: str, obj_type: ObjectType) -> str:
         """Apply name substitutions by obj type."""
@@ -906,7 +932,7 @@ class Filters:
         return {
             "dataclasses": {"dataclass": ["@dataclass"], "field": [" = field("]},
             "decimal": {"Decimal": type_patterns("Decimal")},
-            "enum": {"Enum": ["(Enum)"]},
+            "enum": {"Enum": ["Enum)"]},
             "typing": {
                 "Dict": [": Dict"],
                 "List": [": List["],

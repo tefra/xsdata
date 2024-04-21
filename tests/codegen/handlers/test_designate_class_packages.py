@@ -23,6 +23,7 @@ class DesignateClassPackagesTests(FactoryTestCase):
         prpa = "file://HL7V3/NE2008/multicacheschemas/PRPA_MT201307UV02.xsd"
         coct = "file://HL7V3/NE2008/multicacheschemas/COCT_MT080000UV.xsd"
         foo_bar = "http://xsdata/foo/bar/schema.xsd"
+        foo_wsdl = "http://xsdata/foo/bar/schema.wsdl"
         foo_common = "http://xsdata/foo/common.xsd"
         xsi = Namespace.XSI.location
         xlink = Namespace.XLINK.location
@@ -31,6 +32,7 @@ class DesignateClassPackagesTests(FactoryTestCase):
         multi_one = ClassFactory.list(2, location=prpa)
         multi_two = ClassFactory.list(1, location=coct)
         http_one = ClassFactory.list(1, location=foo_bar)
+        wsdl_one = ClassFactory.list(1, location=foo_wsdl)
         http_two = ClassFactory.list(1, location=foo_common)
         local_one = ClassFactory.list(1, location=xsi)
         local_two = ClassFactory.list(1, location=xlink)
@@ -39,23 +41,25 @@ class DesignateClassPackagesTests(FactoryTestCase):
         self.container.extend(multi_one)
         self.container.extend(multi_two)
         self.container.extend(http_one)
+        self.container.extend(wsdl_one)
         self.container.extend(http_two)
         self.container.extend(local_one)
         self.container.extend(local_two)
 
-        self.config.output.package = "foo.bar"
+        self.config.output.package = "foo"
 
         self.handler.run()
 
-        self.assertEqual("foo.bar.coreschemas", core[0].package)
-        self.assertEqual("foo.bar.coreschemas", core[0].inner[0].package)
-        self.assertEqual("foo.bar.multicacheschemas", multi_one[0].package)
-        self.assertEqual("foo.bar.multicacheschemas", multi_one[1].package)
-        self.assertEqual("foo.bar.multicacheschemas", multi_two[0].package)
-        self.assertEqual("foo.bar.bar", http_one[0].package)
-        self.assertEqual("foo.bar", http_two[0].package)
-        self.assertEqual("foo.bar", local_one[0].package)
-        self.assertEqual("foo.bar", local_two[0].package)
+        self.assertEqual("foo.coreschemas", core[0].package)
+        self.assertEqual("foo.coreschemas", core[0].inner[0].package)
+        self.assertEqual("foo.multicacheschemas", multi_one[0].package)
+        self.assertEqual("foo.multicacheschemas", multi_one[1].package)
+        self.assertEqual("foo.multicacheschemas", multi_two[0].package)
+        self.assertEqual("foo.bar", http_one[0].package)
+        self.assertEqual("foo", http_two[0].package)
+        self.assertEqual("foo.bar", wsdl_one[0].package)
+        self.assertEqual("foo", local_one[0].package)
+        self.assertEqual("foo", local_two[0].package)
 
     def test_group_by_namespace(self):
         classes = [

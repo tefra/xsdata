@@ -257,6 +257,8 @@ class Filters:
                 result.append(f"Tuple[{name}, ...]")
             else:
                 result.append(name)
+        else:
+            raise Exception("foo")
 
         result.append("Enum")
         return ", ".join(result)

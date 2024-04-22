@@ -94,14 +94,14 @@ class PycodeSerializer:
             An iterator of the representation strings.
         """
         types.add(type(obj))
-        if collections.is_array(obj):
+        if isinstance(obj, Enum):
+            yield f"{obj.__class__.__name__}.{obj.name}"
+        elif collections.is_array(obj):
             yield from self.repr_array(obj, level, types)
         elif isinstance(obj, dict):
             yield from self.repr_mapping(obj, level, types)
         elif self.context.class_type.is_model(obj):
             yield from self.repr_model(obj, level, types)
-        elif isinstance(obj, Enum):
-            yield str(obj)
         else:
             yield literal_value(obj)
 

@@ -212,6 +212,9 @@ class ConverterFactory:
         except KeyError:
             pass
 
+        if isinstance(data_type, EnumMeta):
+            return self.registry[Enum]
+
         # We tested the first, ignore the object
         for mro in data_type.__mro__[1:-1]:
             if mro in self.registry:

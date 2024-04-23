@@ -35,7 +35,7 @@ The local name of the XML/JSON field.
 
 ```
 
-**Type:** `srt`
+**Type:** `str`
 
 **Default:** `The field name`
 

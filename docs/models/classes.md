@@ -47,7 +47,7 @@ The local name of the XML/JSON element.
 
 ```
 
-**Type:** `srt`
+**Type:** `str`
 
 **Default:** `The class name`
 
@@ -66,7 +66,7 @@ The namespace name of the XML element
 
 ```
 
-**Type:** `srt | None`
+**Type:** `str | None`
 
 **Default:** `None`
 
@@ -102,7 +102,7 @@ doesn't have any meaningful content.
 The namespace name, the XML element was defined under. Used during auto-type discovery
 when the element form is `unqualified`.
 
-**Type:** `srt | None`
+**Type:** `str | None`
 
 **Default:** `None`
 

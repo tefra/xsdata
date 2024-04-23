@@ -1,8 +1,9 @@
 import abc
 from dataclasses import dataclass
-from typing import Any, Dict, Protocol
+from typing import Any, Dict, Optional, Protocol
 
 from xsdata.exceptions import XmlHandlerError
+from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.serializers.mixins import EventGenerator, XmlWriterEvent
 from xsdata.formats.types import T
 from xsdata.models.enums import EventType
@@ -50,10 +51,28 @@ class TreeSerializer(EventGenerator):
             elif event == XmlWriterEvent.ATTR:
                 key, value = element
                 pending_attrs[key] = value
-
             elif event == EventType.END:
                 builder.end(*element)
             elif event == XmlWriterEvent.DATA:
-                builder.data(*element)
+                data = self.encode_data(element[0])
+                builder.data(data)
             else:
                 raise XmlHandlerError(f"Unhandled event: `{event}`.")
+
+    @classmethod
+    def encode_data(cls, data: Any) -> str:
+        """Encode data for xml rendering.
+
+        Args:
+            data: The content to encode/serialize
+
+        Returns:
+            The xml encoded data
+        """
+        if data is None or isinstance(data, list) and not data:
+            return ""
+
+        if isinstance(data, str):
+            return data
+
+        return converter.serialize(data)

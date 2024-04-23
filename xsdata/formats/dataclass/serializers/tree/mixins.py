@@ -50,7 +50,7 @@ class TreeSerializer(EventGenerator):
                 pending_attrs = {}
             elif event == XmlWriterEvent.ATTR:
                 key, value = element
-                pending_attrs[key] = value
+                pending_attrs[key] = self.encode_data(value)
             elif event == EventType.END:
                 builder.end(*element)
             elif event == XmlWriterEvent.DATA:

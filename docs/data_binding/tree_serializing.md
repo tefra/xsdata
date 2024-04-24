@@ -36,7 +36,7 @@ python [XmlTreeSerializer][xsdata.formats.dataclass.serializers.XmlTreeSerialize
 >>> actual = etree.tostring(result)
 >>> print(actual.decode())
 <ns0:books xmlns:ns0="urn:books">
-  <book>
+  <book id="bk001" lang="en">
     <author>Hightower, Kim</author>
     <title>The First Book</title>
     <genre>Fiction</genre>
@@ -44,7 +44,7 @@ python [XmlTreeSerializer][xsdata.formats.dataclass.serializers.XmlTreeSerialize
     <pub_date>2000-10-01</pub_date>
     <review>An amazing story of nothing.</review>
   </book>
-  <book>
+  <book id="bk002" lang="en">
     <author>Nagata, Suanne</author>
     <title>Becoming Somebody</title>
     <genre>Biography</genre>

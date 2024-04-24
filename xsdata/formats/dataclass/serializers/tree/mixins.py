@@ -1,12 +1,11 @@
 import abc
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Protocol
+from typing import Any, Dict, Protocol
 
 from xsdata.exceptions import XmlHandlerError
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.serializers.mixins import EventGenerator, XmlWriterEvent
 from xsdata.formats.types import T
-from xsdata.models.enums import EventType
 
 
 class TreeBuilder(Protocol):
@@ -39,8 +38,9 @@ class TreeSerializer(EventGenerator):
         """
         pending_tag = None
         pending_attrs: Dict[str, Any] = {}
+        flush_events = (XmlWriterEvent.START, XmlWriterEvent.END, XmlWriterEvent.DATA)
         for event, *element in self.generate(obj):
-            if pending_tag is not None:
+            if pending_tag is not None and event in flush_events:
                 builder.start(pending_tag, pending_attrs)
                 pending_tag = None
                 pending_attrs = {}
@@ -51,7 +51,7 @@ class TreeSerializer(EventGenerator):
             elif event == XmlWriterEvent.ATTR:
                 key, value = element
                 pending_attrs[key] = self.encode_data(value)
-            elif event == EventType.END:
+            elif event == XmlWriterEvent.END:
                 builder.end(*element)
             elif event == XmlWriterEvent.DATA:
                 data = self.encode_data(element[0])

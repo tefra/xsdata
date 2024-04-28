@@ -21,7 +21,7 @@ class TreeSerializerTests(TestCase):
         self.assertEqual("Unhandled event: `foobar`.", str(cm.exception))
 
     def test_encode_data(self):
-        self.assertEqual("", TreeSerializer.encode_data(None))
-        self.assertEqual("", TreeSerializer.encode_data([]))
+        self.assertEqual(None, TreeSerializer.encode_data(None))
+        self.assertEqual(None, TreeSerializer.encode_data([]))
         self.assertEqual("", TreeSerializer.encode_data(""))
         self.assertEqual("1 2 3", TreeSerializer.encode_data([1, 2, 3]))

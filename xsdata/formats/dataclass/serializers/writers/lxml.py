@@ -9,7 +9,7 @@ from xsdata.formats.dataclass.serializers.mixins import XmlWriter
 class LxmlEventWriter(XmlWriter):
     """Xml event writer based on `lxml.sax.ElementTreeContentHandler`.
 
-    The writer converts the events to an lxml tree which is
+    The writer converts the events to a lxml tree which is
     then converted to string.
 
     Args:

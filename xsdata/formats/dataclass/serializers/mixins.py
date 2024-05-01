@@ -49,16 +49,14 @@ EndEvent: TypeAlias = Tuple[Literal["end"], str]
 EventIterator = Iterator[Union[StartEvent, AttrEvent, DataEvent, EndEvent]]
 
 
-class XmlWriter(abc.ABC):
+class EventHandler(abc.ABC):
     """A consistency wrapper for sax content handlers.
 
     Args:
         config: The serializer config instance
-        output: The output stream to write the result
         ns_map: A user defined namespace prefix-URI map
 
     Attributes:
-        handler: The content handler instance
         in_tail: Specifies whether the text content has been written
         tail: The current element tail content
         attrs: The current element attributes
@@ -69,10 +67,8 @@ class XmlWriter(abc.ABC):
 
     __slots__ = (
         "config",
-        "output",
         "ns_map",
         # Instance attributes
-        "handler",
         "in_tail",
         "tail",
         "attrs",
@@ -81,14 +77,8 @@ class XmlWriter(abc.ABC):
         "pending_prefixes",
     )
 
-    def __init__(
-        self,
-        config: SerializerConfig,
-        output: TextIO,
-        ns_map: Dict,
-    ):
+    def __init__(self, config: SerializerConfig, ns_map: Dict):
         self.config = config
-        self.output = output
         self.ns_map = ns_map
 
         self.in_tail = False
@@ -97,15 +87,6 @@ class XmlWriter(abc.ABC):
         self.ns_context: List[Dict] = []
         self.pending_tag: Optional[Tuple] = None
         self.pending_prefixes: List[List] = []
-        self.handler = self.build_handler()
-
-    @abc.abstractmethod
-    def build_handler(self) -> ContentHandler:
-        """Build the content handler instance.
-
-        Returns:
-            A content handler instance.
-        """
 
     def write(self, events: EventIterator):
         """Feed the sax content handler with events.
@@ -147,17 +128,7 @@ class XmlWriter(abc.ABC):
             else:
                 raise XmlWriterError(f"Unhandled event: `{name}`")
 
-        self.handler.endDocument()
-
-    def start_document(self):
-        """Start document notification receiver.
-
-        Write the xml version and encoding, if the
-        configuration is enabled.
-        """
-        if self.config.xml_declaration:
-            self.output.write(f'<?xml version="{self.config.xml_version}"')
-            self.output.write(f' encoding="{self.config.encoding}"?>\n')
+        self.end_document()
 
     def start_tag(self, qname: str):
         """Start tag notification receiver.
@@ -230,7 +201,7 @@ class XmlWriter(abc.ABC):
 
         if value:
             if not self.in_tail:
-                self.handler.characters(value)
+                self.set_characters(value)
             else:
                 self.tail = value
 
@@ -247,10 +218,10 @@ class XmlWriter(abc.ABC):
             qname: The qualified name of the element
         """
         self.flush_start(True)
-        self.handler.endElementNS(split_qname(qname), "")
+        self.end_element(split_qname(qname), "")
 
         if self.tail:
-            self.handler.characters(self.tail)
+            self.set_characters(self.tail)
 
         self.tail = None
         self.in_tail = False
@@ -259,7 +230,7 @@ class XmlWriter(abc.ABC):
             self.ns_map = self.ns_context[-1]
 
         for prefix in self.pending_prefixes.pop():
-            self.handler.endPrefixMapping(prefix)
+            self.end_prefix_mapping(prefix)
 
     def flush_start(self, is_nil: bool = True):
         """Flush start notification receiver.
@@ -285,7 +256,7 @@ class XmlWriter(abc.ABC):
         self.reset_default_namespace()
         self.start_namespaces()
 
-        self.handler.startElementNS(self.pending_tag, "", self.attrs)  # type: ignore
+        self.start_element(self.pending_tag, "", self.attrs)
         self.attrs = {}
         self.in_tail = False
         self.pending_tag = None
@@ -307,7 +278,7 @@ class XmlWriter(abc.ABC):
         for prefix, uri in self.ns_map.items():
             if parent_ns_map.get(prefix) != uri:
                 prefixes.append(prefix)
-                self.handler.startPrefixMapping(prefix, uri)
+                self.start_prefix_mapping(prefix, uri)
 
     def reset_default_namespace(self):
         """Reset the default namespace if the pending element is not qualified."""
@@ -346,6 +317,131 @@ class XmlWriter(abc.ABC):
             return None
 
         return converter.serialize(data, ns_map=self.ns_map)
+
+    @abc.abstractmethod
+    def start_document(self):
+        """Start document notification receiver."""
+
+    @abc.abstractmethod
+    def end_document(self):
+        """End document notification receiver."""
+
+    @abc.abstractmethod
+    def start_element(self, name: tuple[str, str], qname: str, attrs: Dict):
+        """Start element notification receiver.
+
+        Args:
+            name: The qname as tuple
+            qname: The qualified name
+            attrs: The attributes mapping
+        """
+
+    @abc.abstractmethod
+    def end_element(self, name: tuple[str, str], qname: str):
+        """End element notification receiver.
+
+        Args:
+            name: The qname as tuple
+            qname: The qualified name
+        """
+
+    @abc.abstractmethod
+    def set_characters(self, data: str):
+        """Characters notification receiver.
+
+        Args:
+            data: The characters data to write
+        """
+
+    @abc.abstractmethod
+    def start_prefix_mapping(self, prefix: Optional[str], uri: str):
+        """Start namespace prefix notification receiver.
+
+        Args:
+            prefix: The namespace prefix
+            uri: The namespace URI
+        """
+
+    @abc.abstractmethod
+    def end_prefix_mapping(self, prefix: str):
+        """End namespace prefix notification receiver.
+
+        Args:
+            prefix: The namespace prefix
+        """
+
+
+class XmlWriter(EventHandler):
+    def __init__(self, config: SerializerConfig, output: TextIO, ns_map: Dict):
+        super().__init__(config, ns_map)
+        self.output = output
+        self.handler = self.build_handler()
+
+    @abc.abstractmethod
+    def build_handler(self) -> ContentHandler:
+        """Build the content handler instance.
+
+        Returns:
+            A content handler instance.
+        """
+
+    def start_document(self):
+        """Start document notification receiver.
+
+        Write the xml version and encoding, if the
+        configuration is enabled.
+        """
+        if self.config.xml_declaration:
+            self.output.write(f'<?xml version="{self.config.xml_version}"')
+            self.output.write(f' encoding="{self.config.encoding}"?>\n')
+
+    def end_document(self):
+        """End document entrypoint."""
+        self.handler.endDocument()
+
+    def end_element(self, name: tuple[str, str], qname: str):
+        """End element notification receiver.
+
+        Args:
+            name: The qname as tuple
+            qname: The qualified name
+        """
+        self.handler.endElementNS(name, qname)
+
+    def set_characters(self, data: str):
+        """Characters notification receiver.
+
+        Args:
+            data: The characters data to write
+        """
+        self.handler.characters(data)
+
+    def end_prefix_mapping(self, prefix: str):
+        """End namespace prefix notification receiver.
+
+        Args:
+            prefix: The namespace prefix
+        """
+        self.handler.endPrefixMapping(prefix)
+
+    def start_element(self, name: tuple[str, str], qname: str, attrs: Dict):
+        """Start element notification receiver.
+
+        Args:
+            name: The qname as tuple
+            qname: The qualified name
+            attrs: The attributes mapping
+        """
+        self.handler.startElementNS(name, qname, attrs)  # type: ignore
+
+    def start_prefix_mapping(self, prefix: Optional[str], uri: str):
+        """Start namespace prefix notification receiver.
+
+        Args:
+            prefix: The namespace prefix
+            uri: The namespace URI
+        """
+        self.handler.startPrefixMapping(prefix, uri)
 
 
 @dataclass

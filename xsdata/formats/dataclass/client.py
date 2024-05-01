@@ -1,5 +1,5 @@
 from dataclasses import dataclass, fields
-from typing import Any, Dict, NamedTuple, Optional, Type, Union
+from typing import Any, Dict, Optional, Type, Union
 
 from xsdata.exceptions import ClientValueError
 from xsdata.formats.dataclass.context import XmlContext

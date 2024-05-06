@@ -12,7 +12,7 @@ from xsdata.formats.dataclass.serializers.mixins import (
     EventGenerator,
     XmlWriter,
 )
-from xsdata.formats.dataclass.serializers.writers import default_writer
+from xsdata.formats.dataclass.serializers.writers import DEFAULT_XML_WRITER
 from xsdata.utils import namespaces
 
 
@@ -26,7 +26,7 @@ class XmlSerializer(EventGenerator):
         writer: The xml writer class
     """
 
-    writer: Type[XmlWriter] = field(default=default_writer())
+    writer: Type[XmlWriter] = field(default=DEFAULT_XML_WRITER)
 
     def render(self, obj: Any, ns_map: Optional[Dict] = None) -> str:
         """Serialize the input model instance to xml string.

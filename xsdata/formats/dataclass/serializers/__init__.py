@@ -10,3 +10,10 @@ __all__ = [
     "XmlSerializer",
     "PycodeSerializer",
 ]
+
+try:
+    from xsdata.formats.dataclass.serializers.tree import TreeSerializer
+
+    __all__.append("TreeSerializer")
+except ImportError:  # pragma: no cover
+    pass

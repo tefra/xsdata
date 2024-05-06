@@ -1,4 +1,5 @@
 import abc
+from abc import ABC
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import (
@@ -50,7 +51,7 @@ EventIterator = Iterator[Union[StartEvent, AttrEvent, DataEvent, EndEvent]]
 
 
 class EventHandler(abc.ABC):
-    """A consistency wrapper for sax content handlers.
+    """A consistency wrapper for sax events.
 
     Args:
         config: The serializer config instance
@@ -218,7 +219,7 @@ class EventHandler(abc.ABC):
             qname: The qualified name of the element
         """
         self.flush_start(True)
-        self.end_element(split_qname(qname), "")
+        self.end_element(split_qname(qname), qname)
 
         if self.tail:
             self.set_characters(self.tail)
@@ -327,7 +328,7 @@ class EventHandler(abc.ABC):
         """End document notification receiver."""
 
     @abc.abstractmethod
-    def start_element(self, name: tuple[str, str], qname: str, attrs: Dict):
+    def start_element(self, name: Tuple[str, str], qname: str, attrs: Dict):
         """Start element notification receiver.
 
         Args:
@@ -337,7 +338,7 @@ class EventHandler(abc.ABC):
         """
 
     @abc.abstractmethod
-    def end_element(self, name: tuple[str, str], qname: str):
+    def end_element(self, name: Tuple[str, str], qname: str):
         """End element notification receiver.
 
         Args:
@@ -371,10 +372,25 @@ class EventHandler(abc.ABC):
         """
 
 
-class XmlWriter(EventHandler):
-    def __init__(self, config: SerializerConfig, output: TextIO, ns_map: Dict):
+class EventContentHandler(EventHandler):
+    """A consistency wrapper for sax content handlers.
+
+    Args:
+        config: The serializer config instance
+        ns_map: A user defined namespace prefix-URI map
+
+    Attributes:
+        handler: The content handler instance
+        in_tail: Specifies whether the text content has been written
+        tail: The current element tail content
+        attrs: The current element attributes
+        ns_context: The namespace context queue
+        pending_tag: The pending element namespace, name tuple
+        pending_prefixes: The pending element namespace prefixes
+    """
+
+    def __init__(self, config: SerializerConfig, ns_map: Dict):
         super().__init__(config, ns_map)
-        self.output = output
         self.handler = self.build_handler()
 
     @abc.abstractmethod
@@ -391,15 +407,13 @@ class XmlWriter(EventHandler):
         Write the xml version and encoding, if the
         configuration is enabled.
         """
-        if self.config.xml_declaration:
-            self.output.write(f'<?xml version="{self.config.xml_version}"')
-            self.output.write(f' encoding="{self.config.encoding}"?>\n')
+        self.handler.startDocument()
 
     def end_document(self):
         """End document entrypoint."""
         self.handler.endDocument()
 
-    def end_element(self, name: tuple[str, str], qname: str):
+    def end_element(self, name: Tuple[str, str], qname: str):
         """End element notification receiver.
 
         Args:
@@ -424,7 +438,7 @@ class XmlWriter(EventHandler):
         """
         self.handler.endPrefixMapping(prefix)
 
-    def start_element(self, name: tuple[str, str], qname: str, attrs: Dict):
+    def start_element(self, name: Tuple[str, str], qname: str, attrs: Dict):
         """Start element notification receiver.
 
         Args:
@@ -442,6 +456,39 @@ class XmlWriter(EventHandler):
             uri: The namespace URI
         """
         self.handler.startPrefixMapping(prefix, uri)
+
+
+class XmlWriter(EventContentHandler, ABC):
+    """A consistency wrapper for sax content writers.
+
+    Args:
+        config: The serializer config instance
+        output: The writer output stream
+        ns_map: A user defined namespace prefix-URI map
+
+    Attributes:
+        handler: The content handler instance
+        in_tail: Specifies whether the text content has been written
+        tail: The current element tail content
+        attrs: The current element attributes
+        ns_context: The namespace context queue
+        pending_tag: The pending element namespace, name tuple
+        pending_prefixes: The pending element namespace prefixes
+    """
+
+    def __init__(self, config: SerializerConfig, output: TextIO, ns_map: Dict):
+        self.output = output
+        super().__init__(config, ns_map)
+
+    def start_document(self):
+        """Start document notification receiver.
+
+        Write the xml version and encoding, if the
+        configuration is enabled.
+        """
+        if self.config.xml_declaration:
+            self.output.write(f'<?xml version="{self.config.xml_version}"')
+            self.output.write(f' encoding="{self.config.encoding}"?>\n')
 
 
 @dataclass

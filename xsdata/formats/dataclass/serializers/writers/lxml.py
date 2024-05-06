@@ -3,7 +3,7 @@ from typing import Iterator
 from lxml import etree
 from lxml.sax import ElementTreeContentHandler
 
-from xsdata.formats.dataclass.serializers.mixins import XmlWriter
+from xsdata.formats.dataclass.serializers.mixins import EventContentHandler, XmlWriter
 
 
 class LxmlEventWriter(XmlWriter):
@@ -65,3 +65,34 @@ class LxmlEventWriter(XmlWriter):
 
         if self.config.indent:
             self.output.write("\n")
+
+
+class LxmlTreeBuilder(EventContentHandler):
+    def build_handler(self) -> ElementTreeContentHandler:
+        """Build the content handler instance.
+
+        Returns:
+            An element tree content handler instance.
+        """
+        return ElementTreeContentHandler()
+
+    def build(self, events: Iterator) -> etree.ElementTree:
+        """Feed the sax content handler with events.
+
+        Args:
+            events: An iterator of sax events
+
+        Raises:
+            XmlWriterError: On unknown events.
+
+        Returns:
+            The element tree instance.
+        """
+        self.write(events)
+
+        assert isinstance(self.handler, ElementTreeContentHandler)
+
+        if self.config.indent:
+            etree.indent(self.handler.etree, self.config.indent)
+
+        return self.handler.etree

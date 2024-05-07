@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Any, Dict, Optional
 
+from lxml.etree import ElementTree
+
 from xsdata.formats.dataclass.serializers.mixins import EventGenerator
 from xsdata.formats.dataclass.serializers.writers.lxml import LxmlTreeBuilder
 from xsdata.utils import namespaces
@@ -8,7 +10,23 @@ from xsdata.utils import namespaces
 
 @dataclass
 class TreeSerializer(EventGenerator):
-    def render(self, obj: Any, ns_map: Optional[Dict] = None):
+    """Lxml tree serializer for data classes.
+
+    Args:
+        config: The serializer config instance
+        context: The models context instance
+    """
+
+    def render(self, obj: Any, ns_map: Optional[Dict] = None) -> ElementTree:
+        """Serialize the input model instance to a lxml etree instance.
+
+        Args:
+            obj: The input model instance to serialize
+            ns_map: A user defined namespace prefix-URI map
+
+        Returns:
+            The element tree instance.
+        """
         builder = LxmlTreeBuilder(
             config=self.config,
             ns_map=namespaces.clean_prefixes(ns_map) if ns_map else {},

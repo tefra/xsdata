@@ -5,9 +5,8 @@ import lxml
 
 from tests import fixtures_dir
 from tests.fixtures.books.fixtures import books
-from xsdata.formats.dataclass.serializers import XmlSerializer
+from xsdata.formats.dataclass.serializers import TreeSerializer, XmlSerializer
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
-from xsdata.formats.dataclass.serializers.tree import TreeSerializer
 from xsdata.formats.dataclass.serializers.writers import (
     LxmlEventWriter,
 )

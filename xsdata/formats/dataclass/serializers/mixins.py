@@ -5,6 +5,7 @@ from typing import (
     Any,
     Dict,
     Final,
+    Generator,
     Iterable,
     Iterator,
     List,

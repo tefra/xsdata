@@ -1,3 +1,23 @@
+## 24.5 (2024-05-07)
+
+**Features**
+
+- Rewrite TreeSerializer, drop support for native python ElementTree
+  ([#1032](https://github.com/tefra/xsdata/pull/1032))
+- Validate fields fixed values ([#1013](https://github.com/tefra/xsdata/pull/1013))
+- Detect optional fields in dict mapper
+- Refactor typing annotations analyze process
+- Generate ForwardRef() instead of Type[]
+
+**Fixes**
+
+- Allow soap client config subclassing
+  ([#1010](https://github.com/tefra/xsdata/pull/1010))
+- Avoid recursive error on nested group references
+  ([#1016](https://github.com/tefra/xsdata/pull/1016))
+- Add warning for same module designation
+  ([#1018](https://github.com/tefra/xsdata/pull/1018))
+
 ## 24.4 (2024-04-01)
 
 **Features**

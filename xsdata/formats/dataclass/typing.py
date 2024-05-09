@@ -6,6 +6,7 @@ from typing import (
     Optional,
     Tuple,
     Type,
+    TypeVar,
     Union,
 )
 
@@ -151,6 +152,11 @@ def evaluate_attributes(annotation: Any, **_: Any) -> Result:
 
 def evaluate_element(annotation: Any, tokens: bool = False) -> Result:
     """Validate annotations for a xml element."""
+
+    # Only the derived element value field is allowed a typevar
+    if isinstance(annotation, TypeVar) and annotation.__bound__ is object:
+        annotation = object
+
     types = (annotation,)
     origin = get_origin(annotation)
     args = get_args(annotation)

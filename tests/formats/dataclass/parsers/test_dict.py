@@ -102,7 +102,7 @@ class DictDecoderTests(FactoryTestCase):
             self.decoder.decode(json_str, TypeA)
 
         self.assertEqual(
-            "Failed to convert value `foo` to one of (<class 'int'>,)",
+            "Failed to convert value for `TypeA.x`\n  `foo` is not a valid `int`",
             str(cm.exception),
         )
 

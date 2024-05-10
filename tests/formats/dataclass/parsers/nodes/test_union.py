@@ -2,6 +2,7 @@ from dataclasses import make_dataclass
 from typing import Union
 from unittest import TestCase
 
+from tests.fixtures.artists import Artist
 from tests.fixtures.models import UnionType
 from xsdata.exceptions import ParserError
 from xsdata.formats.dataclass.context import XmlContext
@@ -9,7 +10,7 @@ from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.nodes import UnionNode
 from xsdata.models.mixins import attribute
-from xsdata.utils.testing import XmlVarFactory
+from xsdata.utils.testing import XmlMetaFactory, XmlVarFactory
 
 
 class UnionNodeTests(TestCase):
@@ -22,10 +23,12 @@ class UnionNodeTests(TestCase):
     def test_child(self):
         attrs = {"id": "1"}
         ns_map = {"ns0": "xsdata"}
+        meta = XmlMetaFactory.create(clazz=Artist)
         var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo")
         node = UnionNode(
-            position=0,
+            meta=meta,
             var=var,
+            position=0,
             config=self.config,
             context=self.context,
             attrs={},
@@ -38,10 +41,12 @@ class UnionNodeTests(TestCase):
         self.assertIsNot(attrs, node.events[0][2])
 
     def test_bind_appends_end_event_when_level_not_zero(self):
+        meta = XmlMetaFactory.create(clazz=Artist)
         var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo")
         node = UnionNode(
-            position=0,
+            meta=meta,
             var=var,
+            position=0,
             config=self.config,
             context=self.context,
             attrs={},
@@ -67,8 +72,9 @@ class UnionNodeTests(TestCase):
         attrs = {"a": "1", "b": 2}
         ns_map = {}
         node = UnionNode(
-            position=0,
+            meta=meta,
             var=var,
+            position=0,
             config=self.config,
             context=self.context,
             attrs=attrs,
@@ -102,8 +108,9 @@ class UnionNodeTests(TestCase):
         var = next(meta.find_children("element"))
 
         node = UnionNode(
-            position=0,
+            meta=meta,
             var=var,
+            position=0,
             config=self.config,
             context=self.context,
             attrs={},

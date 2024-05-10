@@ -325,13 +325,11 @@ class DictDecoder:
         value = converter.serialize(value)
 
         # Convert value according to the field types
-        return ParserUtils.parse_value(
+        return ParserUtils.parse_var(
+            meta=meta,
+            var=var,
             value=value,
-            types=var.types,
-            default=var.default,
             ns_map=EMPTY_MAP,
-            tokens_factory=var.tokens_factory,
-            format=var.format,
         )
 
     def bind_complex_type(self, meta: XmlMeta, var: XmlVar, data: Dict) -> Any:

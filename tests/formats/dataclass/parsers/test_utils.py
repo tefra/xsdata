@@ -1,3 +1,4 @@
+import warnings
 from unittest import mock
 
 from tests.fixtures.models import TypeA
@@ -114,3 +115,18 @@ class ParserUtilsTests(FactoryTestCase):
 
         var = XmlVarFactory.create("fixed", default=lambda: float("nan"))
         ParserUtils.validate_fixed_value(meta, var, float("nan"))
+
+    def test_parse_var_with_warnings(self):
+        meta = XmlMetaFactory.create(clazz=TypeA, qname="foo")
+        var = XmlVarFactory.create("fixed", default="a")
+
+        with warnings.catch_warnings(record=True) as w:
+            result = ParserUtils.parse_var(meta, var, "a", types=[int, float])
+
+        expected = (
+            "Failed to convert value for `TypeA.fixed`\n"
+            "  `a` is not a valid `int | float`"
+        )
+        self.assertEqual("a", result)
+
+        self.assertEqual(expected, str(w[-1].message))

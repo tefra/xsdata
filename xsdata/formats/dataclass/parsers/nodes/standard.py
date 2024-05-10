@@ -1,6 +1,7 @@
 from typing import Dict, List, Optional, Type
 
 from xsdata.exceptions import XmlContextError
+from xsdata.formats.dataclass.models.elements import XmlMeta, XmlVar
 from xsdata.formats.dataclass.parsers.mixins import XmlNode
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.models.enums import DataType
@@ -16,15 +17,19 @@ class StandardNode(XmlNode):
         derived_factory: The derived element factory
     """
 
-    __slots__ = "datatype", "ns_map", "nillable", "derived_factory"
+    __slots__ = "meta", "var", "datatype", "ns_map", "nillable", "derived_factory"
 
     def __init__(
         self,
+        meta: XmlMeta,
+        var: XmlVar,
         datatype: DataType,
         ns_map: Dict,
         nillable: bool,
         derived_factory: Optional[Type],
     ):
+        self.meta = meta
+        self.var = var
         self.datatype = datatype
         self.ns_map = ns_map
         self.nillable = nillable
@@ -52,7 +57,9 @@ class StandardNode(XmlNode):
             Always true, it's not possible to fail during parsing
             for this node.
         """
-        obj = ParserUtils.parse_value(
+        obj = ParserUtils.parse_var(
+            meta=self.meta,
+            var=self.var,
             value=text,
             types=[self.datatype.type],
             ns_map=self.ns_map,

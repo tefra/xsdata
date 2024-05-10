@@ -47,7 +47,7 @@ class NodeParserTests(TestCase):
             parser.from_string(xml, TypeA)
 
         self.assertEqual(
-            "Failed to convert value `foo` to one of (<class 'int'>,)",
+            "Failed to convert value for `TypeA.x`\n  `foo` is not a valid `int`",
             str(cm.exception),
         )
 

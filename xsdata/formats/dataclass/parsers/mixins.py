@@ -174,6 +174,8 @@ class XmlNode(abc.ABC):
     and a list of all the intermediate objects.
     """
 
+    __slots__ = ()
+
     @abc.abstractmethod
     def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> "XmlNode":
         """Initialize the next child node to be queued, when an element starts.

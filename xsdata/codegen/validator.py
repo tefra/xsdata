@@ -53,7 +53,7 @@ class ClassValidator:
             """Check if given type declaration is not native and is missing."""
             return not ext.type.native and ext.type.qname not in self.container.data
 
-        for target in list(classes):
+        for target in classes.copy():
             if any(is_invalid(extension) for extension in target.extensions):
                 classes.remove(target)
 
@@ -77,7 +77,7 @@ class ClassValidator:
             if len(items) == 1:
                 continue
 
-            index = cls.select_winner(list(items))
+            index = cls.select_winner(items.copy())
 
             if index == -1:
                 logger.warning(

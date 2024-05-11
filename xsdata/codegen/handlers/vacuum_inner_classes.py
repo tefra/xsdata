@@ -31,7 +31,7 @@ class VacuumInnerClasses(HandlerInterface):
             target: The target class instance
         """
         target.inner = collections.unique_sequence(target.inner, key="qname")
-        for inner in list(target.inner):
+        for inner in target.inner.copy():
             if not inner.attrs and len(inner.extensions) < 2:
                 self.remove_inner(target, inner)
             elif inner.qname == target.qname:

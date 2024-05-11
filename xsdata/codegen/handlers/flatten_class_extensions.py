@@ -19,7 +19,7 @@ class FlattenClassExtensions(RelativeHandlerInterface):
         Args:
             target: The target class instance
         """
-        for extension in list(target.extensions):
+        for extension in target.extensions.copy():
             self.process_extension(target, extension)
 
     def process_extension(self, target: Class, extension: Extension):

@@ -1,5 +1,4 @@
 import abc
-from abc import ABCMeta
 from typing import Callable, Dict, Iterator, List, Optional
 
 from xsdata.codegen.models import Attr, Class
@@ -129,7 +128,7 @@ class HandlerInterface(abc.ABC):
         """
 
 
-class RelativeHandlerInterface(HandlerInterface, metaclass=ABCMeta):
+class RelativeHandlerInterface(HandlerInterface, abc.ABC):
     """An interface for codegen handlers with class container access.
 
     Args:

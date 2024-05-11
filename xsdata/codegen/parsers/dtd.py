@@ -120,7 +120,7 @@ class DtdParser:
         """
         ns_map = {ns.prefix: ns.uri for ns in Namespace.common()}
 
-        for attribute in list(attributes):
+        for attribute in attributes.copy():
             if not attribute.default_value:
                 continue
 

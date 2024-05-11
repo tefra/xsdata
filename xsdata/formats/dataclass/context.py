@@ -1,5 +1,6 @@
 import sys
 from collections import defaultdict
+from contextlib import suppress
 from typing import Any, Callable, Dict, Iterator, List, Optional, Set, Type
 
 from xsdata.exceptions import XmlContextError
@@ -192,7 +193,7 @@ class XmlContext:
         ]
 
         choices.sort(key=lambda x: (x[1], x[0].__name__))
-        return choices[0][0] if len(choices) > 0 else None
+        return choices[0][0] if choices else None
 
     def find_subclass(self, clazz: Type, qname: str) -> Optional[Type]:
         """Find a subclass for the given clazz and xsi:type qname.
@@ -301,9 +302,7 @@ class XmlContext:
     @classmethod
     def get_subclasses(cls, clazz: Type) -> Iterator[Type]:
         """Return an iterator of the given class subclasses."""
-        try:
+        with suppress(TypeError):
             for subclass in clazz.__subclasses__():
                 yield from cls.get_subclasses(subclass)
                 yield subclass
-        except TypeError:
-            pass

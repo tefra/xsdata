@@ -74,7 +74,7 @@ class ValidateAttributesOverrides(RelativeHandlerInterface):
             target: The target class instance
             base_attrs_map: A mapping of qualified names to lists of parent attrs
         """
-        for attr in list(target.attrs):
+        for attr in target.attrs.copy():
             base_attrs = base_attrs_map.get(attr.slug)
 
             if base_attrs:

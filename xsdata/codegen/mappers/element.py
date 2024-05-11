@@ -165,10 +165,9 @@ class ElementMapper(RawDocumentMapper):
             if isinstance(child, AnyElement) and child.qname:
                 counters[child.qname].append(index)
 
-        groups = []
+        groups: List[List[int]] = []
         if len(counters) > 1:
-            for x in counters.values():
-                if len(x) > 1:
-                    groups.append(list(range(x[0], x[-1] + 1)))
-
+            groups.extend(
+                list(range(x[0], x[-1] + 1)) for x in counters.values() if len(x) > 1
+            )
         return groups

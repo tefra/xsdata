@@ -1,4 +1,5 @@
 import math
+from itertools import starmap
 from typing import Any, Dict, List, Optional, Set, Type
 
 from xsdata.exceptions import ParserError
@@ -329,9 +330,7 @@ class ElementNode(XmlNode):
             objects: The list of intermediate parsed objects
         """
         pos = self.position
-        params[var.name] = [
-            self.prepare_generic_value(qname, value) for qname, value in objects[pos:]
-        ]
+        params[var.name] = list(starmap(self.prepare_generic_value, objects[pos:]))
         del objects[pos:]
 
     def prepare_generic_value(self, qname: Optional[str], value: Any) -> Any:
@@ -410,7 +409,7 @@ class ElementNode(XmlNode):
         """
         text = ParserUtils.normalize_content(text)
         tail = ParserUtils.normalize_content(tail)
-        if text is None and tail is None:
+        if text is tail is None:
             return False
 
         if var.list_element:

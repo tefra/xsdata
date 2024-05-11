@@ -380,8 +380,7 @@ class XmlVar(MetaMixin):
         for check in self.namespaces:
             if (
                 (not check and uri is None)
-                or check == uri
-                or check == NamespaceType.ANY_NS
+                or check in (uri, NamespaceType.ANY_NS)
                 or (check and check[0] == "!" and check[1:] != uri)
             ):
                 return True

@@ -1,7 +1,7 @@
 from typing import Dict, List, Optional
 
 from xsdata.exceptions import XmlContextError
-from xsdata.formats.dataclass.models.elements import XmlVar
+from xsdata.formats.dataclass.models.elements import XmlMeta, XmlVar
 from xsdata.formats.dataclass.parsers.mixins import XmlNode
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 
@@ -10,17 +10,17 @@ class PrimitiveNode(XmlNode):
     """XmlNode for text elements with simple type values.
 
     Args:
+        meta: The parent xml meta instance
         var: The xml var instance
         ns_map: The element namespace prefix-URI map
-        mixed: Specifies if this node supports mixed content
     """
 
-    __slots__ = "var", "ns_map"
+    __slots__ = "meta", "var", "ns_map"
 
-    def __init__(self, var: XmlVar, ns_map: Dict, mixed: bool):
+    def __init__(self, meta: XmlMeta, var: XmlVar, ns_map: Dict):
+        self.meta = meta
         self.var = var
         self.ns_map = ns_map
-        self.mixed = mixed
 
     def bind(
         self,
@@ -44,13 +44,8 @@ class PrimitiveNode(XmlNode):
         Returns:
             Whether the binding process was successful or not.
         """
-        obj = ParserUtils.parse_value(
-            value=text,
-            types=self.var.types,
-            default=self.var.default,
-            ns_map=self.ns_map,
-            tokens_factory=self.var.tokens_factory,
-            format=self.var.format,
+        obj = ParserUtils.parse_var(
+            meta=self.meta, var=self.var, value=text, ns_map=self.ns_map
         )
 
         if obj is None and not self.var.nillable:
@@ -58,7 +53,7 @@ class PrimitiveNode(XmlNode):
 
         objects.append((qname, obj))
 
-        if self.mixed:
+        if self.meta.mixed_content:
             tail = ParserUtils.normalize_content(tail)
             if tail:
                 objects.append((None, tail))

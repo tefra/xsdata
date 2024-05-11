@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Tuple, Type
 
 from xsdata.exceptions import ConverterWarning, ParserError
 from xsdata.formats.dataclass.context import XmlContext
-from xsdata.formats.dataclass.models.elements import XmlVar
+from xsdata.formats.dataclass.models.elements import XmlMeta, XmlVar
 from xsdata.formats.dataclass.parsers.bases import NodeParser
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.mixins import EventsHandler, XmlNode
@@ -31,6 +31,7 @@ class UnionNode(XmlNode):
     """
 
     __slots__ = (
+        "meta",
         "var",
         "attrs",
         "ns_map",
@@ -43,6 +44,7 @@ class UnionNode(XmlNode):
 
     def __init__(
         self,
+        meta: XmlMeta,
         var: XmlVar,
         attrs: Dict,
         ns_map: Dict,
@@ -50,6 +52,7 @@ class UnionNode(XmlNode):
         config: ParserConfig,
         context: XmlContext,
     ):
+        self.meta = meta
         self.var = var
         self.attrs = attrs
         self.ns_map = ns_map
@@ -169,8 +172,12 @@ class UnionNode(XmlNode):
         try:
             with warnings.catch_warnings():
                 warnings.filterwarnings("error", category=ConverterWarning)
-                return ParserUtils.parse_value(
-                    value=value, types=types, ns_map=self.ns_map
+                return ParserUtils.parse_var(
+                    meta=self.meta,
+                    var=self.var,
+                    value=value,
+                    types=types,
+                    ns_map=self.ns_map,
                 )
         except Exception:
             return None

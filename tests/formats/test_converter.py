@@ -1,5 +1,4 @@
 import sys
-import warnings
 from datetime import date, datetime, time
 from decimal import Decimal
 from enum import Enum
@@ -18,12 +17,10 @@ from xsdata.models.enums import UseType
 
 class ConverterFactoryTests(TestCase):
     def test_deserialize(self):
-        with warnings.catch_warnings(record=True) as w:
-            self.assertEqual("a", converter.deserialize("a", [int]))
+        with self.assertRaises(ConverterError) as cm:
+            converter.deserialize("a", [int])
 
-        self.assertEqual(
-            "Failed to convert value `a` to one of [<class 'int'>]", str(w[-1].message)
-        )
+        self.assertEqual("`a` is not a valid `int`", str(cm.exception))
 
         self.assertFalse(converter.deserialize("false", [int, bool]))
         self.assertEqual(1, converter.deserialize("1", [int, bool]))
@@ -73,13 +70,12 @@ class ConverterFactoryTests(TestCase):
         class A:
             pass
 
-        class B(A):
-            pass
+        with self.assertRaises(ConverterError) as cm:
+            converter.serialize(A())
 
-        with warnings.catch_warnings(record=True) as w:
-            converter.serialize(B())
-
-        self.assertEqual(f"No converter registered for `{B}`", str(w[-1].message))
+        self.assertEqual(
+            f"No converter registered for `{A.__qualname__}`", str(cm.exception)
+        )
 
     def test_register_converter(self):
         class MinusOneInt(int):

@@ -80,7 +80,7 @@ class PycodeSerializer:
 
                 imports.add(f"from {module} import {name}\n")
 
-        return "".join(sorted(set(imports)))
+        return "".join(sorted(imports))
 
     def repr_object(self, obj: Any, level: int, types: Set[Type]) -> Iterator[str]:
         """Write the given object as repr code.

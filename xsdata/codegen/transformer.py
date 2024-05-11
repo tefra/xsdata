@@ -313,7 +313,7 @@ class ResourceTransformer:
     def generate_classes(self, schema: Schema) -> List[Class]:
         """Convert the given schema instance to a list of classes."""
         uri = schema.location
-        logger.info("Compiling schema %s", uri if uri else "...")
+        logger.info("Compiling schema %s", uri or "...")
         classes = SchemaMapper.map(schema)
 
         class_num, inner_num = self.count_classes(classes)

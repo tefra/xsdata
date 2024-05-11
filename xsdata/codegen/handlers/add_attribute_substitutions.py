@@ -38,7 +38,7 @@ class AddAttributeSubstitutions(RelativeHandlerInterface):
         if self.substitutions is None:
             self.create_substitutions()
 
-        for attr in list(target.attrs):
+        for attr in target.attrs.copy():
             if not (attr.is_enumeration or attr.is_wildcard):
                 self.process_attribute(target, attr)
 

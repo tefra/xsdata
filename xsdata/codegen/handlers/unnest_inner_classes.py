@@ -22,7 +22,7 @@ class UnnestInnerClasses(RelativeHandlerInterface):
         Args:
             target: The target class instance to inspect
         """
-        for inner in list(target.inner):
+        for inner in target.inner.copy():
             if inner.is_enumeration or self.container.config.output.unnest_classes:
                 self.promote(target, inner)
 

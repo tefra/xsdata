@@ -203,9 +203,7 @@ class Filters:
 
     def class_bases(self, obj: Class, class_name: str) -> List[str]:
         """Return a list of base class names."""
-        bases = []
-        for obj_ext in obj.extensions:
-            bases.append(self.type_name(obj_ext.type))
+        bases = [self.type_name(x.type) for x in obj.extensions]
 
         derived = len(obj.extensions) > 0
         for ext in self.extensions[ExtensionType.CLASS]:
@@ -238,7 +236,7 @@ class Filters:
     def apply_substitutions(self, name: str, obj_type: ObjectType) -> str:
         """Apply name substitutions by obj type."""
         for search, replace in self.substitutions[obj_type].items():
-            name = re.sub(rf"{search}", rf"{replace}", name)
+            name = re.sub(search, replace, name)
 
         return name
 
@@ -573,7 +571,7 @@ class Filters:
         if key == "pattern":
             # escape double quotes because double quotes surround the regex string
             # in the rendered output
-            value = re.sub(self.UNESCAPED_DBL_QUOTE_REGEX, r'\1\\"', data)
+            value = self.UNESCAPED_DBL_QUOTE_REGEX.sub(r'\1\\"', data)
             return f'r"{value}"'
 
         if data == "":

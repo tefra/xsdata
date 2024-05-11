@@ -3,6 +3,7 @@ import base64
 import binascii
 import math
 import re
+from contextlib import suppress
 from datetime import date, datetime, time
 from decimal import Decimal, InvalidOperation
 from enum import Enum, EnumMeta
@@ -99,11 +100,9 @@ class ConverterFactory:
             The converted value
         """
         for data_type in types:
-            try:
+            with suppress(ConverterError):
                 instance = self.type_converter(data_type)
                 return instance.deserialize(value, data_type=data_type, **kwargs)
-            except ConverterError:
-                pass
 
         type_names = " | ".join(tp.__name__ for tp in types)
         raise ConverterError(f"`{value}` is not a valid `{type_names}`")
@@ -205,11 +204,9 @@ class ConverterFactory:
         Returns:
             A converter instance
         """
-        try:
+        with suppress(KeyError):
             # Quick in and out, without checking the whole mro.
             return self.registry[data_type]
-        except KeyError:
-            pass
 
         # We tested the first, ignore the object
         for mro in data_type.__mro__[1:-1]:
@@ -677,7 +674,7 @@ class EnumConverter(Converter):
             Whether the value or values matches the enumeration member value.
         """
         if isinstance(value, str) and isinstance(real, str):
-            return value == real or " ".join(values) == real
+            return real in (value, " ".join(values))
 
         if isinstance(real, (tuple, list)) and not hasattr(real, "_fields"):
             if len(real) == length and cls._match_list(values, real, **kwargs):
@@ -708,7 +705,7 @@ class EnumConverter(Converter):
         return cmp == real
 
 
-class DateTimeBase(Converter, metaclass=abc.ABCMeta):
+class DateTimeBase(Converter, abc.ABC):
     """An abstract datetime converter."""
 
     @classmethod

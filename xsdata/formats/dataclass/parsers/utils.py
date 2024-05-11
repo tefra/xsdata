@@ -115,7 +115,7 @@ class ParserUtils:
                 format=format or var.format,
             )
         except ConverterError as ex:
-            message = f"  {str(ex)}"
+            message = f"  {ex}"
             warnings.warn(
                 f"Failed to convert value for `{meta.clazz.__qualname__}.{var.name}`\n{message}",
                 ConverterWarning,

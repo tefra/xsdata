@@ -143,9 +143,4 @@ class UpdateAttributesEffectiveChoice(HandlerInterface):
             if not attr.is_attribute:
                 counters[attr.key].append(index)
 
-        groups = []
-        for x in counters.values():
-            if len(x) > 1:
-                groups.append(list(range(x[0], x[-1] + 1)))
-
-        return groups
+        return [list(range(x[0], x[-1] + 1)) for x in counters.values() if len(x) > 1]

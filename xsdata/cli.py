@@ -143,6 +143,9 @@ def generate(**kwargs: Any):
     handler.emit_warnings()
 
 
+_SUPPORTED_EXTENSIONS = ("wsdl", "xsd", "dtd", "xml", "json")
+
+
 def resolve_source(source: str, recursive: bool) -> Iterator[str]:
     """Yields all supported resource URIs."""
     if source.find("://") > -1 and not source.startswith("file://"):
@@ -151,9 +154,9 @@ def resolve_source(source: str, recursive: bool) -> Iterator[str]:
         path = Path(source).resolve()
         match = "**/*" if recursive else "*"
         if path.is_dir():
-            for ext in ["wsdl", "xsd", "dtd", "xml", "json"]:
+            for ext in _SUPPORTED_EXTENSIONS:
                 yield from (x.as_uri() for x in path.glob(f"{match}.{ext}"))
-        else:  # is file
+        else:  # is a file
             yield path.as_uri()
 
 

@@ -32,7 +32,7 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
         Args:
             target: The target class instance
         """
-        for attr in list(target.attrs):
+        for attr in target.attrs.copy():
             self.process_types(target, attr)
             self.cascade_properties(target, attr)
 
@@ -46,7 +46,7 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
         if self.container.config.output.ignore_patterns:
             attr.restrictions.pattern = None
 
-        for attr_type in list(attr.types):
+        for attr_type in attr.types.copy():
             self.process_type(target, attr, attr_type)
 
         attr.types = ClassUtils.filter_types(attr.types)

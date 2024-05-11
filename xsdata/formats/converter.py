@@ -2,6 +2,7 @@ import abc
 import base64
 import binascii
 import math
+import re
 from datetime import date, datetime, time
 from decimal import Decimal, InvalidOperation
 from enum import Enum, EnumMeta
@@ -424,6 +425,7 @@ class BytesConverter(Converter):
 
         try:
             fmt = kwargs.get("format")
+            value = re.sub(r"\s+", "", value)
 
             if fmt == "base16":
                 return binascii.unhexlify(value)

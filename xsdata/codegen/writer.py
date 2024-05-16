@@ -47,19 +47,6 @@ class CodeWriter:
                 result.path.parent.mkdir(parents=True, exist_ok=True)
                 result.path.write_text(src_code, encoding="utf-8")
 
-    def print(self, classes: List[Class]):
-        """Print the generated code for the given classes.
-
-        Args:
-            classes: A list of class instances
-        """
-        self.generator.normalize_packages(classes)
-        header = self.generator.render_header()
-        for result in self.generator.render(classes):
-            if result.source.strip():
-                src_code = header + result.source
-                print(src_code, end="")
-
     @classmethod
     def from_config(cls, config: GeneratorConfig) -> "CodeWriter":
         """Instance the code writer from the generator configuration instance.

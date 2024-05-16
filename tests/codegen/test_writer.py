@@ -42,32 +42,6 @@ class CodeWriterTests(FactoryTestCase):
             self.assertFalse(Path(f"{tmpdir}/c.py").exists())
             mock_normalize_packages.assert_called_once_with(classes)
 
-    @mock.patch.object(NoneGenerator, "render_header")
-    @mock.patch.object(NoneGenerator, "render")
-    @mock.patch.object(NoneGenerator, "normalize_packages")
-    @mock.patch("builtins.print")
-    def test_print(
-        self,
-        mock_print,
-        mock_normalize_packages,
-        mock_render,
-        mock_render_header,
-    ):
-        classes = ClassFactory.list(2)
-        mock_render.return_value = [
-            GeneratorResult(Path("foo/a.py"), "file", "aAa"),
-            GeneratorResult(Path("bar/b.py"), "file", "bBb"),
-            GeneratorResult(Path("c.py"), "file", ""),
-        ]
-        mock_render_header.return_value = "# H\n"
-
-        self.writer.print(classes)
-
-        mock_normalize_packages.assert_called_once_with(classes)
-        mock_print.assert_has_calls(
-            [mock.call("# H\naAa", end=""), mock.call("# H\nbBb", end="")]
-        )
-
     def test_from_config(self):
         CodeWriter.unregister_generator("dataclasses")
         config = GeneratorConfig()

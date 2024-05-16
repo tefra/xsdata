@@ -42,7 +42,6 @@ class CliTests(TestCase):
         config = mock_init.call_args[1]["config"]
 
         self.assertIsNone(result.exception)
-        self.assertFalse(mock_init.call_args[1]["print"])
         self.assertEqual("foo", config.output.package)
         self.assertEqual("dataclasses", config.output.format.value)
         self.assertFalse(config.output.relative_imports)
@@ -78,23 +77,12 @@ class CliTests(TestCase):
         config = mock_init.call_args[1]["config"]
 
         self.assertIsNone(result.exception)
-        self.assertFalse(mock_init.call_args[1]["print"])
         self.assertEqual("foo.bar", config.output.package)
         self.assertEqual("dataclasses", config.output.format.value)
         self.assertFalse(config.output.format.eq)
         self.assertEqual(StructureStyle.NAMESPACES, config.output.structure_style)
         self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
         file_path.unlink()
-
-    @mock.patch.object(ResourceTransformer, "process")
-    @mock.patch.object(ResourceTransformer, "__init__", return_value=None)
-    def test_generate_with_print_mode(self, mock_init, mock_process):
-        source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
-        result = self.runner.invoke(cli, [str(source), "--package", "foo", "--print"])
-
-        self.assertIsNone(result.exception)
-        self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
-        self.assertTrue(mock_init.call_args[1]["print"])
 
     @mock.patch.object(ResourceTransformer, "process")
     @mock.patch.object(ResourceTransformer, "__init__", return_value=None)
@@ -150,12 +138,6 @@ class CliTests(TestCase):
             ]
         )
         output_path.unlink()
-
-    def test_init_config_with_print_mode(self):
-        result = self.runner.invoke(cli, ["init-config", "--print"])
-
-        self.assertIsNone(result.exception)
-        self.assertIn('<Config xmlns="http://pypi.org/project/xsdata"', result.output)
 
     @mock.patch.object(Downloader, "wget")
     @mock.patch.object(Downloader, "__init__", return_value=None)

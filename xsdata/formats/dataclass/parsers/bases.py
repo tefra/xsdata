@@ -54,15 +54,11 @@ class NodeParser(PushParser):
         """
         handler = self.handler(clazz=clazz, parser=self)
 
-        with warnings.catch_warnings():
-            if self.config.fail_on_converter_warnings:
-                warnings.filterwarnings("error", category=ConverterWarning)
-
-            try:
-                ns_map = self.ns_map if ns_map is None else ns_map
-                result = handler.parse(source, ns_map)
-            except (ConverterWarning, SyntaxError) as e:
-                raise ParserError(e)
+        try:
+            ns_map = self.ns_map if ns_map is None else ns_map
+            result = handler.parse(source, ns_map)
+        except SyntaxError as e:
+            raise ParserError(e)
 
         if result is not None:
             return result

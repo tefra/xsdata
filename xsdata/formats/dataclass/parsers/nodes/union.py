@@ -1,15 +1,15 @@
 import copy
-import warnings
-from typing import Any, Dict, List, Optional, Tuple, Type
+from contextlib import suppress
+from dataclasses import replace
+from typing import Any, Dict, List, Optional, Tuple
 
-from xsdata.exceptions import ConverterWarning, ParserError
+from xsdata.exceptions import ParserError
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlMeta, XmlVar
 from xsdata.formats.dataclass.parsers.bases import NodeParser
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.mixins import EventsHandler, XmlNode
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
-from xsdata.formats.types import T
 from xsdata.utils.namespaces import target_uri
 
 
@@ -118,12 +118,26 @@ class UnionNode(XmlNode):
         obj = None
         max_score = -1.0
         parent_namespace = target_uri(qname)
+        config = replace(self.config, fail_on_converter_warnings=True)
+
         for clazz in self.var.types:
-            if self.context.class_type.is_model(clazz):
-                self.context.build(clazz, parent_ns=parent_namespace)
-                candidate = self.parse_class(clazz)
-            else:
-                candidate = self.parse_value(text, [clazz])
+            candidate = None
+            with suppress(Exception):
+                if self.context.class_type.is_model(clazz):
+                    self.context.build(clazz, parent_ns=parent_namespace)
+                    parser = NodeParser(
+                        config=config, context=self.context, handler=EventsHandler
+                    )
+                    candidate = parser.parse(self.events, clazz)
+                else:
+                    candidate = ParserUtils.parse_var(
+                        meta=self.meta,
+                        var=self.var,
+                        config=config,
+                        value=text,
+                        types=[clazz],
+                        ns_map=self.ns_map,
+                    )
 
             score = self.context.class_type.score_object(candidate)
             if score > max_score:
@@ -136,48 +150,3 @@ class UnionNode(XmlNode):
             return True
 
         raise ParserError(f"Failed to parse union node: {self.var.qname}")
-
-    def parse_class(self, clazz: Type[T]) -> Optional[T]:
-        """Replay the recorded events and attempt to build the target class.
-
-        Args:
-            clazz: The target class
-
-        Returns:
-             The target class instance or None if the recorded
-             xml events didn't fit the class.
-        """
-        try:
-            with warnings.catch_warnings():
-                warnings.filterwarnings("error", category=ConverterWarning)
-
-                parser = NodeParser(
-                    config=self.config, context=self.context, handler=EventsHandler
-                )
-                return parser.parse(self.events, clazz)
-        except Exception:
-            return None
-
-    def parse_value(self, value: Any, types: List[Type]) -> Any:
-        """Parse simple values.
-
-        Args:
-            value: The xml value
-            types: The list of the candidate simple types
-
-        Returns:
-            The parsed value or None if value didn't match
-            with any of the given types.
-        """
-        try:
-            with warnings.catch_warnings():
-                warnings.filterwarnings("error", category=ConverterWarning)
-                return ParserUtils.parse_var(
-                    meta=self.meta,
-                    var=self.var,
-                    value=value,
-                    types=types,
-                    ns_map=self.ns_map,
-                )
-        except Exception:
-            return None

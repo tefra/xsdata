@@ -2,6 +2,7 @@ from typing import Dict, List, Optional
 
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.models.elements import XmlMeta, XmlVar
+from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.mixins import XmlNode
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 
@@ -13,14 +14,16 @@ class PrimitiveNode(XmlNode):
         meta: The parent xml meta instance
         var: The xml var instance
         ns_map: The element namespace prefix-URI map
+        config: The parser config instance
     """
 
-    __slots__ = "meta", "var", "ns_map"
+    __slots__ = "meta", "var", "ns_map", "config"
 
-    def __init__(self, meta: XmlMeta, var: XmlVar, ns_map: Dict):
+    def __init__(self, meta: XmlMeta, var: XmlVar, ns_map: Dict, config: ParserConfig):
         self.meta = meta
         self.var = var
         self.ns_map = ns_map
+        self.config = config
 
     def bind(
         self,
@@ -45,7 +48,11 @@ class PrimitiveNode(XmlNode):
             Whether the binding process was successful or not.
         """
         obj = ParserUtils.parse_var(
-            meta=self.meta, var=self.var, value=text, ns_map=self.ns_map
+            meta=self.meta,
+            var=self.var,
+            config=self.config,
+            value=text,
+            ns_map=self.ns_map,
         )
 
         if obj is None and not self.var.nillable:

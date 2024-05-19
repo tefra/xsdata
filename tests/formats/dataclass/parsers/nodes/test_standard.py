@@ -3,6 +3,7 @@ from unittest import TestCase
 from tests.fixtures.artists import Artist
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.models.generics import DerivedElement
+from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.nodes import StandardNode
 from xsdata.models.enums import DataType
 from xsdata.utils.testing import XmlMetaFactory, XmlVarFactory
@@ -13,10 +14,13 @@ class StandardNodeTests(TestCase):
         super().setUp()
         self.meta = XmlMetaFactory.create(clazz=Artist)
         self.var = XmlVarFactory.create()
+        self.config = ParserConfig()
 
     def test_bind_simple(self):
         datatype = DataType.INT
-        node = StandardNode(self.meta, self.var, datatype, {}, False, False)
+        node = StandardNode(
+            self.meta, self.var, datatype, {}, self.config, False, False
+        )
         objects = []
 
         self.assertTrue(node.bind("a", "13", None, objects))
@@ -24,7 +28,9 @@ class StandardNodeTests(TestCase):
 
     def test_bind_derived(self):
         datatype = DataType.INT
-        node = StandardNode(self.meta, self.var, datatype, {}, False, DerivedElement)
+        node = StandardNode(
+            self.meta, self.var, datatype, {}, self.config, False, DerivedElement
+        )
         objects = []
 
         self.assertTrue(node.bind("a", "13", None, objects))
@@ -32,7 +38,9 @@ class StandardNodeTests(TestCase):
 
     def test_bind_wrapper_type(self):
         datatype = DataType.HEX_BINARY
-        node = StandardNode(self.meta, self.var, datatype, {}, False, DerivedElement)
+        node = StandardNode(
+            self.meta, self.var, datatype, {}, self.config, False, DerivedElement
+        )
         objects = []
 
         self.assertTrue(node.bind("a", "13", None, objects))
@@ -40,7 +48,7 @@ class StandardNodeTests(TestCase):
 
     def test_bind_nillable(self):
         datatype = DataType.STRING
-        node = StandardNode(self.meta, self.var, datatype, {}, True, None)
+        node = StandardNode(self.meta, self.var, datatype, {}, self.config, True, None)
         objects = []
 
         self.assertTrue(node.bind("a", None, None, objects))
@@ -52,7 +60,9 @@ class StandardNodeTests(TestCase):
 
     def test_child(self):
         datatype = DataType.STRING
-        node = StandardNode(self.meta, self.var, datatype, {}, False, False)
+        node = StandardNode(
+            self.meta, self.var, datatype, {}, self.config, False, False
+        )
 
         with self.assertRaises(XmlContextError):
             node.child("foo", {}, {}, 0)

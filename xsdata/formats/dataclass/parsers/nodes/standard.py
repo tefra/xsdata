@@ -2,6 +2,7 @@ from typing import Dict, List, Optional, Type
 
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.models.elements import XmlMeta, XmlVar
+from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.mixins import XmlNode
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.models.enums import DataType
@@ -11,13 +12,24 @@ class StandardNode(XmlNode):
     """XmlNode for elements with a standard xsi:type.
 
     Args:
+        meta: The parent xml meta instance
+        var: The xml var instance
         datatype: The element standard xsi data type
         ns_map: The element namespace prefix-URI map
+        config: The parser config instance
         nillable: Specifies whether nil content is allowed
         derived_factory: The derived element factory
     """
 
-    __slots__ = "meta", "var", "datatype", "ns_map", "nillable", "derived_factory"
+    __slots__ = (
+        "meta",
+        "var",
+        "datatype",
+        "ns_map",
+        "config",
+        "nillable",
+        "derived_factory",
+    )
 
     def __init__(
         self,
@@ -25,6 +37,7 @@ class StandardNode(XmlNode):
         var: XmlVar,
         datatype: DataType,
         ns_map: Dict,
+        config: ParserConfig,
         nillable: bool,
         derived_factory: Optional[Type],
     ):
@@ -32,6 +45,7 @@ class StandardNode(XmlNode):
         self.var = var
         self.datatype = datatype
         self.ns_map = ns_map
+        self.config = config
         self.nillable = nillable
         self.derived_factory = derived_factory
 
@@ -60,6 +74,7 @@ class StandardNode(XmlNode):
         obj = ParserUtils.parse_var(
             meta=self.meta,
             var=self.var,
+            config=self.config,
             value=text,
             types=[self.datatype.type],
             ns_map=self.ns_map,

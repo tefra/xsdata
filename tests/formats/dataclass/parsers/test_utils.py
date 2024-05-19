@@ -5,6 +5,7 @@ from tests.fixtures.models import TypeA
 from xsdata.exceptions import ParserError
 from xsdata.formats.converter import ConverterFactory
 from xsdata.formats.dataclass.context import XmlContext
+from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.models.enums import Namespace, QNames
 from xsdata.utils.testing import FactoryTestCase, XmlMetaFactory, XmlVarFactory
@@ -116,17 +117,23 @@ class ParserUtilsTests(FactoryTestCase):
         var = XmlVarFactory.create("fixed", default=lambda: float("nan"))
         ParserUtils.validate_fixed_value(meta, var, float("nan"))
 
-    def test_parse_var_with_warnings(self):
+    def test_parse_var_with_error(self):
         meta = XmlMetaFactory.create(clazz=TypeA, qname="foo")
         var = XmlVarFactory.create("fixed", default="a")
+        config = ParserConfig()
 
         with warnings.catch_warnings(record=True) as w:
-            result = ParserUtils.parse_var(meta, var, "a", types=[int, float])
+            result = ParserUtils.parse_var(meta, var, config, "a", types=[int, float])
 
         expected = (
             "Failed to convert value for `TypeA.fixed`\n"
             "  `a` is not a valid `int | float`"
         )
         self.assertEqual("a", result)
-
         self.assertEqual(expected, str(w[-1].message))
+
+        config.fail_on_converter_warnings = True
+        with self.assertRaises(ParserError) as cm:
+            ParserUtils.parse_var(meta, var, config, "a", types=[int, float])
+
+        self.assertEqual(expected, str(cm.exception))

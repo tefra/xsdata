@@ -1,11 +1,12 @@
 import math
 import warnings
 from collections import UserList
-from typing import Any, Callable, Dict, Iterable, Optional, Sequence, Type, Union
+from typing import Any, Callable, Dict, Iterable, Optional, Sequence, Type
 
 from xsdata.exceptions import ConverterError, ConverterWarning, ParserError
 from xsdata.formats.converter import QNameConverter, converter
 from xsdata.formats.dataclass.models.elements import XmlMeta, XmlVar
+from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.models.enums import QNames
 from xsdata.utils import collections, constants, text
 from xsdata.utils.namespaces import build_qname
@@ -83,6 +84,7 @@ class ParserUtils:
         cls,
         meta: XmlMeta,
         var: XmlVar,
+        config: ParserConfig,
         value: Any,
         ns_map: Optional[Dict] = None,
         default: Any = None,
@@ -95,6 +97,7 @@ class ParserUtils:
         Args:
             meta: The xml meta instance
             var: The xml var instance
+            config: The parser config instance
             value: A primitive value or a list of primitive values
             ns_map: The element namespace prefix-URI map
             default: Override the var default value
@@ -115,11 +118,11 @@ class ParserUtils:
                 format=format or var.format,
             )
         except ConverterError as ex:
-            message = f"  {ex}"
-            warnings.warn(
-                f"Failed to convert value for `{meta.clazz.__qualname__}.{var.name}`\n{message}",
-                ConverterWarning,
-            )
+            message = f"Failed to convert value for `{meta.clazz.__qualname__}.{var.name}`\n  {ex}"
+            if config.fail_on_converter_warnings:
+                raise ParserError(message)
+
+            warnings.warn(message, ConverterWarning)
 
         return value
 

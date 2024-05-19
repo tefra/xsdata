@@ -196,6 +196,7 @@ class ElementNode(XmlNode):
         value = ParserUtils.parse_var(
             meta=self.meta,
             var=var,
+            config=self.config,
             value=value,
             ns_map=self.ns_map,
         )
@@ -372,6 +373,7 @@ class ElementNode(XmlNode):
             value = ParserUtils.parse_var(
                 meta=self.meta,
                 var=var,
+                config=self.config,
                 value=text,
                 ns_map=self.ns_map,
             )
@@ -518,7 +520,7 @@ class ElementNode(XmlNode):
             )
 
         if not var.any_type and not var.is_wildcard:
-            return nodes.PrimitiveNode(self.meta, var, ns_map)
+            return nodes.PrimitiveNode(self.meta, var, ns_map, self.config)
 
         datatype = DataType.from_qname(xsi_type) if xsi_type else None
         derived = var.is_wildcard
@@ -528,6 +530,7 @@ class ElementNode(XmlNode):
                 var,
                 datatype,
                 ns_map,
+                self.config,
                 var.nillable,
                 derived_factory if derived else None,
             )

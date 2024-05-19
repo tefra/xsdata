@@ -61,12 +61,13 @@ class DataclassGenerator(AbstractGenerator):
         """
         packages = {obj.qname: obj.target_module for obj in classes}
         resolver = DependenciesResolver(registry=packages)
-
+        file_names = []
         # Generate packages
         for path, cluster in self.group_by_package(classes).items():
             module = ".".join(path.relative_to(Path.cwd()).parts)
             package_path = path.joinpath("__init__.py")
-            src_code = self.render_package(cluster, module, package_path)
+            src_code = self.render_package(cluster, module)
+            file_names.append(str(package_path))
 
             yield GeneratorResult(
                 path=package_path,
@@ -78,7 +79,8 @@ class DataclassGenerator(AbstractGenerator):
         # Generate modules
         for path, cluster in self.group_by_module(classes).items():
             module_path = path.with_suffix(".py")
-            src_code = self.render_module(resolver, cluster, module_path)
+            src_code = self.render_module(resolver, cluster)
+            file_names.append(str(module_path))
 
             yield GeneratorResult(
                 path=module_path,
@@ -86,6 +88,7 @@ class DataclassGenerator(AbstractGenerator):
                 source=src_code,
             )
 
+        self.ruff_code(file_names)
         self.validate_imports()
 
     def validate_imports(self):
@@ -109,13 +112,12 @@ class DataclassGenerator(AbstractGenerator):
         package = self.config.output.package
         import_package(self.package_name(package))
 
-    def render_package(self, classes: List[Class], module: str, filename: Path) -> str:
+    def render_package(self, classes: List[Class], module: str) -> str:
         """Render the package for the given classes.
 
         Args:
             classes: A list of class instances
             module: The target dot notation path
-            filename: The package path
 
         Returns:
             The rendered package output.
@@ -126,24 +128,21 @@ class DataclassGenerator(AbstractGenerator):
         ]
         DependenciesResolver.resolve_conflicts(imports, set())
 
-        output = self.env.get_template(self.package_template).render(
+        return self.env.get_template(self.package_template).render(
             imports=imports,
             module=module,
         )
-        return self.ruff_code(output, filename)
 
     def render_module(
         self,
         resolver: DependenciesResolver,
         classes: List[Class],
-        filename: Path,
     ) -> str:
         """Render the module for the given classes.
 
         Args:
             resolver: The dependencies resolver
             classes: A list of class instances
-            filename: The module path
 
         Returns:
             The rendered module output.
@@ -159,15 +158,13 @@ class DataclassGenerator(AbstractGenerator):
         output = self.render_classes(classes, module_namespace)
         module = classes[0].target_module
 
-        result = self.env.get_template(self.module_template).render(
+        return self.env.get_template(self.module_template).render(
             output=output,
             classes=classes,
             module=module,
             imports=imports,
             namespace=module_namespace,
         )
-
-        return self.ruff_code(result, filename)
 
     def render_classes(
         self,
@@ -236,30 +233,23 @@ class DataclassGenerator(AbstractGenerator):
         """Initialize the filters instance by the generator configuration."""
         return Filters(config)
 
-    def ruff_code(self, src_code: str, file_path: Path) -> str:
-        """Run ruff format on the src code.
+    def ruff_code(self, file_names: List[str]):
+        """Run ruff lint and format on a list of file names.
 
         Args:
-            src_code: The output source code
-            file_path: The file path the source code will be written to
-
-        Returns:
-            The formatted output source code
+            file_names: A list of files to format and check
         """
         commands = [
             [
                 "ruff",
                 "format",
-                "--stdin-filename",
-                str(file_path),
                 "--line-length",
                 str(self.config.output.max_line_length),
+                *file_names,
             ],
             [
                 "ruff",
                 "checks",
-                "--stdin-filename",
-                str(file_path),
                 "--line-length",
                 str(self.config.output.max_line_length),
                 "--config",
@@ -267,40 +257,16 @@ class DataclassGenerator(AbstractGenerator):
                 "--fix",
                 "--unsafe-fixes",
                 "--exit-zero",
+                *file_names,
             ],
         ]
         try:
-            src_code_encoded = src_code.encode()
             for command in commands:
-                result = subprocess.run(
+                subprocess.run(
                     command,
-                    input=src_code_encoded,
                     capture_output=True,
                     check=True,
                 )
-                src_code_encoded = result.stdout
-
-            return src_code_encoded.decode()
         except subprocess.CalledProcessError as e:
             details = e.stderr.decode().replace("error: ", "").strip()
-            source = self.code_excerpt(details, src_code_encoded.decode())
-            raise CodegenError("Ruff failed", details=details, source=source)
-
-    @classmethod
-    def code_excerpt(cls, details: str, src_code: str) -> str:
-        """Extract source code excerpt from the error details message."""
-        match = re.search(r"(\d+):(\d+)", details)
-        if match:
-            line_number = int(match.group(1)) - 1
-            lines = src_code.split("\n")
-            start = max(0, line_number - 4)
-            end = min(len(lines), line_number + 4)
-
-            excerpt = ["\n"]
-            for index in range(start, end):
-                prepend = "--->" if index == line_number else "   "
-                excerpt.append(f"{prepend}{lines[index]}")
-
-            return "\n".join(excerpt)
-
-        return "NA"
+            raise CodegenError(f"Ruff failed\n{details}")

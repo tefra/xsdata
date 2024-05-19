@@ -100,7 +100,6 @@ class ResourceTransformer:
     Supports xsd, wsdl, dtd, xml and json documents.
 
     Args:
-        print: Print to stdout the generated output
         config: Generator configuration
 
     Attributes:
@@ -109,10 +108,9 @@ class ResourceTransformer:
         preloaded: A uri/content map used as cache
     """
 
-    __slots__ = ("print", "config", "classes", "processed", "preloaded")
+    __slots__ = ("config", "classes", "processed", "preloaded")
 
-    def __init__(self, print: bool, config: GeneratorConfig):
-        self.print = print
+    def __init__(self, config: GeneratorConfig):
         self.config = config
         self.classes: List[Class] = []
         self.processed: List[str] = []
@@ -287,10 +285,7 @@ class ResourceTransformer:
 
             writer = CodeWriter.from_config(self.config)
             with stopwatch(CodeWriter.__name__):
-                if self.print:
-                    writer.print(classes)
-                else:
-                    writer.write(classes)
+                writer.write(classes)
 
     def convert_schema(self, schema: Schema):
         """Convert a schema instance to codegen classes.

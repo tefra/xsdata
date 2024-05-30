@@ -1,4 +1,5 @@
 import sys
+from collections.abc import Iterable
 from typing import (
     Any,
     Callable,
@@ -163,6 +164,9 @@ def evaluate_element(annotation: Any, tokens: bool = False) -> Result:
         origin = get_origin(args[0])
         types = args
         args = get_args(args[0])
+
+    if origin == Iterable:
+        origin = list
 
     if origin in ITERABLE_TYPES:
         args = tuple(arg for arg in args if arg is not Ellipsis)

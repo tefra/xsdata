@@ -41,7 +41,7 @@ else:
 
 NONE_TYPE = type(None)
 UNION_TYPES = (Union, UnionType)
-ITERABLE_TYPES = (list, tuple)
+ITERABLE_TYPES = (list, tuple, Iterable)
 
 
 def evaluate(tp: Any, globalns: Any, localns: Any = None) -> Any:

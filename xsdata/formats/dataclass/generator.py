@@ -61,13 +61,13 @@ class DataclassGenerator(AbstractGenerator):
         """
         packages = {obj.qname: obj.target_module for obj in classes}
         resolver = DependenciesResolver(registry=packages)
-        file_names = []
+        package_dirs = set()
         # Generate packages
         for path, cluster in self.group_by_package(classes).items():
             module = ".".join(path.relative_to(Path.cwd()).parts)
             package_path = path.joinpath("__init__.py")
             src_code = self.render_package(cluster, module)
-            file_names.append(str(package_path))
+            package_dirs.add(str(path))
 
             yield GeneratorResult(
                 path=package_path,
@@ -80,7 +80,6 @@ class DataclassGenerator(AbstractGenerator):
         for path, cluster in self.group_by_module(classes).items():
             module_path = path.with_suffix(".py")
             src_code = self.render_module(resolver, cluster)
-            file_names.append(str(module_path))
 
             yield GeneratorResult(
                 path=module_path,
@@ -88,7 +87,7 @@ class DataclassGenerator(AbstractGenerator):
                 source=src_code,
             )
 
-        self.ruff_code(file_names)
+        self.ruff_code(list(package_dirs))
         self.validate_imports()
 
     def validate_imports(self):
@@ -233,11 +232,11 @@ class DataclassGenerator(AbstractGenerator):
         """Initialize the filters instance by the generator configuration."""
         return Filters(config)
 
-    def ruff_code(self, file_names: List[str]):
+    def ruff_code(self, file_paths: List[str]):
         """Run ruff lint and format on a list of file names.
 
         Args:
-            file_names: A list of files to format and check
+            file_paths: A list of files/directories to format and check
         """
         commands = [
             [
@@ -245,7 +244,7 @@ class DataclassGenerator(AbstractGenerator):
                 "format",
                 "--line-length",
                 str(self.config.output.max_line_length),
-                *file_names,
+                *file_paths,
             ],
             [
                 "ruff",
@@ -257,7 +256,7 @@ class DataclassGenerator(AbstractGenerator):
                 "--fix",
                 "--unsafe-fixes",
                 "--exit-zero",
-                *file_names,
+                *file_paths,
             ],
         ]
         try:

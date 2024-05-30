@@ -165,9 +165,6 @@ def evaluate_element(annotation: Any, tokens: bool = False) -> Result:
         types = args
         args = get_args(args[0])
 
-    if origin == Iterable:
-        origin = list
-
     if origin in ITERABLE_TYPES:
         args = tuple(arg for arg in args if arg is not Ellipsis)
         if len(args) != 1:

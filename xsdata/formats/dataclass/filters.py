@@ -896,7 +896,7 @@ class Filters:
         return "\n".join(collections.unique_sequence(imports))
 
     def _get_iterable_format(self):
-        fmt = "Tuple[{}, ...]" if self.format.frozen else "List[{}]"
+        fmt = "Iterable[{}]"
         return fmt.lower() if self.subscriptable_types else fmt
 
     @classmethod
@@ -909,9 +909,8 @@ class Filters:
             "enum": {"Enum": ["(Enum)"]},
             "typing": {
                 "Dict": [": Dict"],
-                "List": [": List["],
+                "Iterable": [": Iterable["],
                 "Optional": ["Optional["],
-                "Tuple": ["Tuple["],
                 "Union": ["Union["],
                 "ForwardRef": [": ForwardRef("],
                 "Any": type_patterns("Any"),

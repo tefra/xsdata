@@ -125,10 +125,12 @@ class ClassContainerTests(FactoryTestCase):
         self.assertEqual(Status.FINALIZED, target.inner[1].status)
 
     def test_process_classes(self):
-        target = ClassFactory.create(
-            attrs=[AttrFactory.reference("enumeration", forward=True)],
-            inner=[ClassFactory.enumeration(2, qname="enumeration")],
-        )
+        target = ClassFactory.create()
+        inner = ClassFactory.enumeration(2, qname="enumeration")
+
+        target.inner.append(inner)
+        inner.parent = target
+        target.attrs.append(AttrFactory.reference("enumeration", forward=True))
 
         self.container.add(target)
         self.container.process_classes(Steps.FLATTEN)

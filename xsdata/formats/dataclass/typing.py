@@ -90,6 +90,29 @@ def analyze_token_args(origin: Any, args: Tuple[Any, ...]) -> Tuple[Any]:
     raise TypeError
 
 
+def analyze_optional_origin(
+    origin: Any, args: Tuple[Any, ...], types: Tuple[Any, ...]
+) -> Tuple[Any, ...]:
+    """Analyze optional type annotations.
+
+    Remove the NoneType, adjust and return the origin, args and types.
+
+    Args
+        origin: The annotation origin
+        args: The annotation arguments
+        types: The annotation types
+
+    Returns:
+        The old or new origin args and types.
+    """
+    if origin in UNION_TYPES:
+        new_args = filter_none_type(args)
+        if len(new_args) == 1:
+            return get_origin(new_args[0]), get_args(new_args[0]), new_args
+
+    return origin, args, types
+
+
 def filter_none_type(args: Tuple[Any, ...]) -> Tuple[Any, ...]:
     return tuple(arg for arg in args if arg is not NONE_TYPE)
 
@@ -105,11 +128,14 @@ def evaluate_text(annotation: Any, tokens: bool = False) -> Result:
 
 def evaluate_attribute(annotation: Any, tokens: bool = False) -> Result:
     """Validate annotations for a xml attribute."""
+    types = (annotation,)
     origin = get_origin(annotation)
     args = get_args(annotation)
     tokens_factory = None
 
     if tokens:
+        origin, args, types = analyze_optional_origin(origin, args, types)
+
         args = analyze_token_args(origin, args)
         tokens_factory = origin
         origin = get_origin(args[0])
@@ -160,6 +186,8 @@ def evaluate_element(annotation: Any, tokens: bool = False) -> Result:
     origin = get_origin(annotation)
     args = get_args(annotation)
     tokens_factory = factory = None
+
+    origin, args, types = analyze_optional_origin(origin, args, types)
 
     if tokens:
         args = analyze_token_args(origin, args)

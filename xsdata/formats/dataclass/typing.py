@@ -174,7 +174,10 @@ def evaluate_element(annotation: Any, tokens: bool = False) -> Result:
             factory = tokens_factory
             tokens_factory = origin
         else:
-            factory = origin
+            if origin == Iterable:
+                factor = list
+            else:
+                factory = origin
 
         types = args
         origin = get_origin(args[0])

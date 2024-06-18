@@ -85,6 +85,13 @@ The output package for the generated code, e.g. `code.models`
 
 **CLI Option:** `-p, --package TEXT`
 
+!!! Warning
+
+    Formatting and linting is executed on any directory that contains a Python file
+    created during generation, including other Python files in the same directory prior
+    to generation. As such it is recommended that the directories represented by this
+    option do not include any previously created files.
+
 ### Format
 
 The output format for the generated code, e.g. `code.models`

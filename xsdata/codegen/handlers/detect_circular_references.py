@@ -63,16 +63,18 @@ class DetectCircularReferences(RelativeHandlerInterface):
         """
         path = set()
         stack = [start]
-        while len(stack) != 0:
+        while stack:
             if stop in path:
                 return True
 
             ref = stack.pop()
             path.add(ref)
 
-            for tp in self.reference_types[ref]:
-                if not tp.circular and tp.reference not in path:
-                    stack.append(tp.reference)
+            stack.extend(
+                tp.reference
+                for tp in self.reference_types[ref]
+                if not tp.circular and tp.reference not in path
+            )
 
         return stop in path
 

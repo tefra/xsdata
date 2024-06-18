@@ -1,4 +1,5 @@
 import random
+import tempfile
 from pathlib import Path
 from unittest import mock
 
@@ -16,11 +17,16 @@ class DataclassGeneratorTests(FactoryTestCase):
         config = GeneratorConfig()
         self.generator = DataclassGenerator(config)
 
+    @mock.patch.object(DataclassGenerator, "ruff_code")
     @mock.patch.object(DataclassGenerator, "validate_imports")
     @mock.patch.object(DataclassGenerator, "render_package")
     @mock.patch.object(DataclassGenerator, "render_module")
     def test_render(
-        self, mock_render_module, mock_render_package, mock_validate_imports
+        self,
+        mock_render_module,
+        mock_render_package,
+        mock_validate_imports,
+        mock_ruff_code,
     ):
         classes = [
             ClassFactory.create(package="foo.bar", module="tests"),
@@ -49,16 +55,12 @@ class DataclassGeneratorTests(FactoryTestCase):
         self.assertEqual(expected, actual)
         mock_render_package.assert_has_calls(
             [
-                mock.call([classes[0]], "foo.bar", cwd.joinpath("foo/bar/__init__.py")),
-                mock.call([classes[1]], "bar.foo", cwd.joinpath("bar/foo/__init__.py")),
-                mock.call(
-                    [classes[2]], "thug.life", cwd.joinpath("thug/life/__init__.py")
-                ),
+                mock.call([classes[0]], "foo.bar"),
+                mock.call([classes[1]], "bar.foo"),
+                mock.call([classes[2]], "thug.life"),
             ]
         )
-        mock_render_module.assert_has_calls(
-            [mock.call(mock.ANY, [x], mock.ANY) for x in classes]
-        )
+        mock_render_module.assert_has_calls([mock.call(mock.ANY, [x]) for x in classes])
         mock_validate_imports.assert_called_once()
 
     def test_render_package(self):
@@ -71,13 +73,11 @@ class DataclassGeneratorTests(FactoryTestCase):
 
         random.shuffle(classes)
 
-        actual = self.generator.render_package(classes, "foo.tests", Path.cwd())
+        actual = self.generator.render_package(classes, "foo.tests")
         expected = (
             "from foo.bar import A as BarA\n"
             "from foo.tests import (\n"
             "    A as TestsA,\n"
-            ")\n"
-            "from foo.tests import (\n"
             "    B,\n"
             "    C,\n"
             ")\n"
@@ -87,7 +87,7 @@ class DataclassGeneratorTests(FactoryTestCase):
             '    "TestsA",\n'
             '    "B",\n'
             '    "C",\n'
-            "]\n"
+            "]"
         )
         self.assertEqual(expected, actual)
 
@@ -102,7 +102,7 @@ class DataclassGeneratorTests(FactoryTestCase):
 
         resolver = DependenciesResolver({})
 
-        actual = self.generator.render_module(resolver, classes, Path.cwd())
+        actual = self.generator.render_module(resolver, classes)
         expected = (
             "from dataclasses import dataclass, field\n"
             "from enum import Enum\n"
@@ -118,18 +118,14 @@ class DataclassGeneratorTests(FactoryTestCase):
             "    :cvar ATTR_B: I am a member\n"
             "    :cvar ATTR_C:\n"
             '    """\n'
-            "\n"
             "    ATTR_B = None\n"
             "    ATTR_C = None\n"
-            "\n"
-            "\n"
             "@dataclass\n"
             "class ClassC:\n"
             '    """\n'
             "    :ivar attr_d: I am a field\n"
             "    :ivar attr_e:\n"
             '    """\n'
-            "\n"
             "    class Meta:\n"
             '        name = "class_C"\n'
             "\n"
@@ -138,20 +134,18 @@ class DataclassGeneratorTests(FactoryTestCase):
             "        metadata={\n"
             '            "name": "attr_D",\n'
             '            "type": "Element",\n'
-            "        },\n"
+            "        }\n"
             "    )\n"
             "    attr_e: Optional[str] = field(\n"
             "        default=None,\n"
             "        metadata={\n"
             '            "name": "attr_E",\n'
             '            "type": "Element",\n'
-            "        },\n"
+            "        }\n"
             "    )\n"
-            "\n"
-            "\n"
             "class ClassD:\n"
             '    attr_f = "None"\n'
-            '    attr_g = "None"\n'
+            '    attr_g = "None"'
         )
 
         self.assertEqual(expected, actual)
@@ -163,7 +157,7 @@ class DataclassGeneratorTests(FactoryTestCase):
         ]
         resolver = DependenciesResolver({})
 
-        actual = self.generator.render_module(resolver, classes, Path.cwd())
+        actual = self.generator.render_module(resolver, classes)
         expected = (
             "from dataclasses import dataclass, field\n"
             "from typing import Optional\n"
@@ -180,10 +174,8 @@ class DataclassGeneratorTests(FactoryTestCase):
             "        metadata={\n"
             '            "name": "attr_C",\n'
             '            "type": "Element",\n'
-            "        },\n"
+            "        }\n"
             "    )\n"
-            "\n"
-            "\n"
             "@dataclass\n"
             "class Bar:\n"
             "    class Meta:\n"
@@ -195,8 +187,8 @@ class DataclassGeneratorTests(FactoryTestCase):
             "        metadata={\n"
             '            "name": "attr_B",\n'
             '            "type": "Element",\n'
-            "        },\n"
-            "    )\n"
+            "        }\n"
+            "    )"
         )
 
         self.assertEqual(expected, actual)
@@ -229,26 +221,10 @@ class DataclassGeneratorTests(FactoryTestCase):
             "    bar: str\n"
             "    thug: str"
         )
-        file_path = Path(__file__)
 
-        self.generator.config.output.max_line_length = 55
-        with self.assertRaises(CodegenError) as cm:
-            self.generator.ruff_code(src_code, file_path)
+        with tempfile.NamedTemporaryFile(delete=True, suffix=".py") as temp_file:
+            temp_file.write(src_code.encode())
+            temp_file.seek(0)
 
-        expected = (
-            "\n"
-            "\n"
-            "   class AlternativeText:\n"
-            "       class Meta:\n"
-            '           namespace = "xsdata"\n'
-            "   \n"
-            "--->    foo: Optional[Union[]] = field(\n"
-            "              init=False,\n"
-            '              metadata={"type": "Ignore"}\n'
-            "       )"
-        )
-        self.assertEqual(expected, cm.exception.meta.get("source"))
-
-    def test_code_excerpt_with_no_line_number(self):
-        actual = self.generator.code_excerpt("foobar", "")
-        self.assertEqual("NA", actual)
+            with self.assertRaises(CodegenError):
+                self.generator.ruff_code([temp_file.name])

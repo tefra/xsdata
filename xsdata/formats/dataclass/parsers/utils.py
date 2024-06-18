@@ -1,13 +1,21 @@
 import math
+import warnings
 from collections import UserList
 from typing import Any, Callable, Dict, Iterable, Optional, Sequence, Type
 
-from xsdata.exceptions import ParserError
+from xsdata.exceptions import ConverterError, ConverterWarning, ParserError
 from xsdata.formats.converter import QNameConverter, converter
 from xsdata.formats.dataclass.models.elements import XmlMeta, XmlVar
+from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.models.enums import QNames
 from xsdata.utils import collections, constants, text
 from xsdata.utils.namespaces import build_qname
+
+
+class _MissingType: ...
+
+
+MISSING = _MissingType()
 
 
 class PendingCollection(UserList):
@@ -70,6 +78,53 @@ class ParserUtils:
         """
         xsi_nil = attrs.get(QNames.XSI_NIL)
         return xsi_nil == constants.XML_TRUE if xsi_nil else None
+
+    @classmethod
+    def parse_var(
+        cls,
+        meta: XmlMeta,
+        var: XmlVar,
+        config: ParserConfig,
+        value: Any,
+        ns_map: Optional[Dict] = None,
+        default: Any = None,
+        types: Optional[Sequence[Type]] = None,
+        tokens_factory: Optional[Callable] = None,
+        format: Optional[str] = None,
+    ) -> Any:
+        """Convert a value to a python primitive type.
+
+        Args:
+            meta: The xml meta instance
+            var: The xml var instance
+            config: The parser config instance
+            value: A primitive value or a list of primitive values
+            ns_map: The element namespace prefix-URI map
+            default: Override the var default value
+            types: Override the var types
+            tokens_factory: Override the var tokens factory
+            format: Override the var format
+
+        Returns:
+            The converted value or values.
+        """
+        try:
+            value = cls.parse_value(
+                value=value,
+                types=types or var.types,
+                default=default or var.default,
+                ns_map=ns_map,
+                tokens_factory=tokens_factory or var.tokens_factory,
+                format=format or var.format,
+            )
+        except ConverterError as ex:
+            message = f"Failed to convert value for `{meta.clazz.__qualname__}.{var.name}`\n  {ex}"
+            if config.fail_on_converter_warnings:
+                raise ParserError(message)
+
+            warnings.warn(message, ConverterWarning)
+
+        return value
 
     @classmethod
     def parse_value(

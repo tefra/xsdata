@@ -1,10 +1,9 @@
 import sys
-import warnings
+import unittest
 from datetime import date, datetime, time
 from decimal import Decimal
 from enum import Enum
 from typing import Any
-from unittest import TestCase
 from xml.etree.ElementTree import QName
 
 import pytest
@@ -16,14 +15,12 @@ from xsdata.models.datatype import XmlDuration, XmlPeriod
 from xsdata.models.enums import UseType
 
 
-class ConverterFactoryTests(TestCase):
+class ConverterFactoryTests(unittest.TestCase):
     def test_deserialize(self):
-        with warnings.catch_warnings(record=True) as w:
-            self.assertEqual("a", converter.deserialize("a", [int]))
+        with self.assertRaises(ConverterError) as cm:
+            converter.deserialize("a", [int])
 
-        self.assertEqual(
-            "Failed to convert value `a` to one of [<class 'int'>]", str(w[-1].message)
-        )
+        self.assertEqual("`a` is not a valid `int`", str(cm.exception))
 
         self.assertFalse(converter.deserialize("false", [int, bool]))
         self.assertEqual(1, converter.deserialize("1", [int, bool]))
@@ -73,13 +70,12 @@ class ConverterFactoryTests(TestCase):
         class A:
             pass
 
-        class B(A):
-            pass
+        with self.assertRaises(ConverterError) as cm:
+            converter.serialize(A())
 
-        with warnings.catch_warnings(record=True) as w:
-            converter.serialize(B())
-
-        self.assertEqual(f"No converter registered for `{B}`", str(w[-1].message))
+        self.assertEqual(
+            f"No converter registered for `{A.__qualname__}`", str(cm.exception)
+        )
 
     def test_register_converter(self):
         class MinusOneInt(int):
@@ -110,7 +106,7 @@ class ConverterFactoryTests(TestCase):
         converter.unregister_converter(MinusOneInt)
 
 
-class StrConverterTests(TestCase):
+class StrConverterTests(unittest.TestCase):
     def setUp(self):
         self.converter = converter.type_converter(str)
 
@@ -123,7 +119,7 @@ class StrConverterTests(TestCase):
         self.assertEqual("1", self.converter.serialize(1))
 
 
-class StringConverterTests(TestCase):
+class StringConverterTests(unittest.TestCase):
     def setUp(self):
         self.converter = converter.type_converter(str)
 
@@ -138,7 +134,7 @@ class StringConverterTests(TestCase):
         self.assertEqual("1", self.converter.serialize(1))
 
 
-class BoolConverterTests(TestCase):
+class BoolConverterTests(unittest.TestCase):
     def setUp(self):
         self.converter = converter.type_converter(bool)
 
@@ -159,7 +155,7 @@ class BoolConverterTests(TestCase):
         self.assertEqual("false", self.converter.serialize(False))
 
 
-class IntConverterTests(TestCase):
+class IntConverterTests(unittest.TestCase):
     def setUp(self):
         self.converter = converter.type_converter(int)
 
@@ -175,7 +171,7 @@ class IntConverterTests(TestCase):
         self.assertEqual("2", self.converter.serialize(2))
 
 
-class FloatConverterTests(TestCase):
+class FloatConverterTests(unittest.TestCase):
     def setUp(self):
         self.converter = converter.type_converter(float)
 
@@ -195,14 +191,14 @@ class FloatConverterTests(TestCase):
         self.assertEqual("8.77683E-08", self.converter.serialize(float("8.77683E-8")))
 
 
-class BytesConverterTests(TestCase):
+class BytesConverterTests(unittest.TestCase):
     def setUp(self):
         self.converter = converter.type_converter(bytes)
 
     def test_serialize_with_base16_format(self):
         inputs = [
-            ("312d322d33", "312D322D33"),
-            ("312D322D33", "312D322D33"),
+            ("312d\n322d33", "312D322D33"),
+            ("312D \t322D33", "312D322D33"),
         ]
 
         for actual, expected in inputs:
@@ -249,7 +245,7 @@ class BytesConverterTests(TestCase):
             self.converter.deserialize("foo", format="foo")
 
 
-class DecimalConverterTests(TestCase):
+class DecimalConverterTests(unittest.TestCase):
     def setUp(self):
         self.converter = converter.type_converter(Decimal)
 
@@ -269,7 +265,7 @@ class DecimalConverterTests(TestCase):
         )
 
 
-class DateTimeConverterTests(TestCase):
+class DateTimeConverterTests(unittest.TestCase):
     def setUp(self):
         self.converter = converter.type_converter(datetime)
 
@@ -302,7 +298,7 @@ class DateTimeConverterTests(TestCase):
             self.converter.deserialize("21 June 2018 15:40", format="")
 
 
-class DateConverterTests(TestCase):
+class DateConverterTests(unittest.TestCase):
     def setUp(self):
         self.converter = converter.type_converter(date)
 
@@ -315,7 +311,7 @@ class DateConverterTests(TestCase):
         self.assertEqual(original, self.converter.serialize(obj, format=fmt))
 
 
-class TimeConverterTests(TestCase):
+class TimeConverterTests(unittest.TestCase):
     def setUp(self):
         self.converter = converter.type_converter(time)
 
@@ -328,7 +324,7 @@ class TimeConverterTests(TestCase):
         self.assertEqual(original, self.converter.serialize(obj, format=fmt))
 
 
-class QNameConverterTests(TestCase):
+class QNameConverterTests(unittest.TestCase):
     def setUp(self):
         self.converter = converter.type_converter(QName)
 
@@ -369,7 +365,7 @@ class EnumA(Enum):
     J = (Telephone(1, 2, 3), Telephone(4, 5, 6))
 
 
-class EnumConverterTests(TestCase):
+class EnumConverterTests(unittest.TestCase):
     def setUp(self):
         self.converter = converter.type_converter(Enum)
 
@@ -403,7 +399,7 @@ class EnumConverterTests(TestCase):
         self.assertEqual("2.1", self.converter.serialize(EnumA.C))
 
 
-class ProxyConverterTests(TestCase):
+class ProxyConverterTests(unittest.TestCase):
     def setUp(self):
         self.converter = ProxyConverter(lambda x: int(x))
 
@@ -417,7 +413,7 @@ class ProxyConverterTests(TestCase):
         self.assertEqual("1", self.converter.serialize(1))
 
 
-class XmlDurationConverterTests(TestCase):
+class XmlDurationConverterTests(unittest.TestCase):
     def setUp(self):
         self.converter = converter.type_converter(XmlDuration)
 
@@ -433,7 +429,7 @@ class XmlDurationConverterTests(TestCase):
         self.assertNotIsInstance(actual, XmlDuration)
 
 
-class XmlPeriodConverterTests(TestCase):
+class XmlPeriodConverterTests(unittest.TestCase):
     def setUp(self):
         self.converter = converter.type_converter(XmlPeriod)
 

@@ -1,10 +1,10 @@
-import warnings
-from dataclasses import dataclass, field
+from contextlib import suppress
+from dataclasses import dataclass, field, replace
 from typing import Any, Dict, Iterable, List, Optional, Type, Union
 
 from typing_extensions import get_args, get_origin
 
-from xsdata.exceptions import ConverterWarning, ParserError
+from xsdata.exceptions import ParserError
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlMeta, XmlVar
@@ -41,18 +41,10 @@ class DictDecoder:
             An instance of the specified class representing the decoded content.
         """
         tp = self.verify_type(clazz, data)
+        if not isinstance(data, list):
+            return self.bind_dataclass(data, tp)
 
-        with warnings.catch_warnings():
-            if self.config.fail_on_converter_warnings:
-                warnings.filterwarnings("error", category=ConverterWarning)
-
-            try:
-                if not isinstance(data, list):
-                    return self.bind_dataclass(data, tp)
-
-                return [self.bind_dataclass(obj, tp) for obj in data]  # type: ignore
-            except ConverterWarning as e:
-                raise ParserError(e)
+        return [self.bind_dataclass(obj, tp) for obj in data]  # type: ignore
 
     def verify_type(self, clazz: Optional[Type[T]], data: Union[Dict, List]) -> Type[T]:
         """Verify the given data matches the given clazz.
@@ -206,12 +198,18 @@ class DictDecoder:
         obj = None
         keys = set(data.keys())
         max_score = -1.0
+        config = replace(self.config, fail_on_converter_warnings=True)
+        decoder = DictDecoder(config=config, context=self.context)
+
         for clazz in classes:
             if not self.context.class_type.is_model(clazz):
                 continue
 
             if self.context.local_names_match(keys, clazz):
-                candidate = self.bind_optional_dataclass(data, clazz)
+                candidate = None
+                with suppress(Exception):
+                    candidate = decoder.bind_dataclass(data, clazz)
+
                 score = self.context.class_type.score_object(candidate)
                 if score > max_score:
                     max_score = score
@@ -224,28 +222,6 @@ class DictDecoder:
             f"Failed to bind object with properties({list(data.keys())}) "
             f"to any of the {[cls.__qualname__ for cls in classes]}"
         )
-
-    def bind_optional_dataclass(self, data: Dict, clazz: Type[T]) -> Optional[T]:
-        """Bind the input data to the given class type.
-
-        This is a strict process, if there is any warning the process
-        returns None. This method is used to test if te data fit into
-        the class type.
-
-        Args:
-            data: The derived element dictionary
-            clazz: The target class type to bind the input data
-
-        Returns:
-            An instance of the class type representing the parsed content
-            or None if there is any warning or error.
-        """
-        try:
-            with warnings.catch_warnings():
-                warnings.filterwarnings("error", category=ConverterWarning)
-                return self.bind_dataclass(data, clazz)
-        except Exception:
-            return None
 
     def bind_value(
         self,
@@ -325,13 +301,12 @@ class DictDecoder:
         value = converter.serialize(value)
 
         # Convert value according to the field types
-        return ParserUtils.parse_value(
+        return ParserUtils.parse_var(
+            meta=meta,
+            var=var,
+            config=self.config,
             value=value,
-            types=var.types,
-            default=var.default,
             ns_map=EMPTY_MAP,
-            tokens_factory=var.tokens_factory,
-            format=var.format,
         )
 
     def bind_complex_type(self, meta: XmlMeta, var: XmlVar, data: Dict) -> Any:

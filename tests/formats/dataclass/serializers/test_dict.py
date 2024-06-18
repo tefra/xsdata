@@ -3,6 +3,7 @@ from unittest.case import TestCase
 from tests.fixtures.books import BookForm, Books
 from tests.fixtures.datatypes import Telephone
 from tests.fixtures.wrapper import Wrapper
+from xsdata.formats.dataclass.models.generics import AnyElement, DerivedElement
 from xsdata.formats.dataclass.serializers import DictEncoder, DictFactory
 from xsdata.models.datatype import XmlDate
 from xsdata.models.xsd import Attribute
@@ -107,3 +108,23 @@ class DictEncoderTests(TestCase):
         expected = expected[:-1]
         actual = [name for name, value in self.encoder.next_value(book)]
         self.assertEqual(expected, actual)
+
+    def test_generics(self):
+        self.obj = AnyElement(
+            children=[
+                AnyElement(qname="foo", text="bar"),
+                DerivedElement(qname="bar", value="1"),
+                DerivedElement(qname="bar", value=2),
+            ]
+        )
+        result = self.encoder.encode(self.obj)
+        expected = {
+            "attributes": {},
+            "children": [
+                {"attributes": {}, "children": [], "qname": "foo", "text": "bar"},
+                {"qname": "bar", "value": "1"},
+                {"qname": "bar", "value": 2},
+            ],
+        }
+
+        self.assertEqual(expected, result)

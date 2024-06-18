@@ -1,41 +1,26 @@
 # Element Tree Serializer
 
-The element tree serializers will render an object into an element tree, that you can
-use to run XPATH evaluations or XSLT transformations.
+The tree serializer will render an object into an element tree, that you can use to run
+XPATH evaluations or XSLT transformations.
 
-There are two implementations based on lxml
-[LxmlTreeSerializer][xsdata.formats.dataclass.serializers.LxmlTreeSerializer] and native
-python [XmlTreeSerializer][xsdata.formats.dataclass.serializers.XmlTreeSerializer].
+The [TreeSerializer][xsdata.formats.dataclass.serializers.TreeSerializer] depends on
+lxml. There is no native python ElementTree implementation because of limitations with
+namespaces.
 
-## xml.etree.ElementTree.Element
-
-```python
->>> from xml.etree import ElementTree
->>> from tests.fixtures.books.fixtures import books
->>> from xsdata.formats.dataclass.serializers import XmlTreeSerializer
-...
->>> serializer = XmlTreeSerializer()
->>> result = serializer.render(books)
-...
->>> result.find(".//title").text
-'The First Book'
-
-```
-
-## lxml.etree.Element
+## Example
 
 ```python
 >>> from lxml import etree
 >>> from tests.fixtures.books.fixtures import books
->>> from xsdata.formats.dataclass.serializers import LxmlTreeSerializer
+>>> from xsdata.formats.dataclass.serializers import TreeSerializer
 ...
->>> serializer = LxmlTreeSerializer()
->>> result = serializer.render(books)
+>>> serializer = TreeSerializer()
+>>> serializer.config.indent = "  "
+>>> result = serializer.render(books, ns_map={'bk': "urn:books"})
 ...
->>> etree.indent(result)
 >>> actual = etree.tostring(result)
 >>> print(actual.decode())
-<ns0:books xmlns:ns0="urn:books">
+<bk:books xmlns:bk="urn:books">
   <book id="bk001" lang="en">
     <author>Hightower, Kim</author>
     <title>The First Book</title>
@@ -52,6 +37,6 @@ python [XmlTreeSerializer][xsdata.formats.dataclass.serializers.XmlTreeSerialize
     <pub_date>2001-01-10</pub_date>
     <review>A masterpiece of the fine art of gossiping.</review>
   </book>
-</ns0:books>
+</bk:books>
 
 ```

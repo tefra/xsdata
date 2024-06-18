@@ -1,7 +1,9 @@
-from typing import Optional
+from collections import defaultdict
+from typing import Iterator, List, Tuple
 
 from xsdata.codegen.mixins import RelativeHandlerInterface
-from xsdata.codegen.models import Attr, Class
+from xsdata.codegen.models import AttrType, Class
+from xsdata.codegen.utils import ClassUtils
 from xsdata.utils.namespaces import build_qname
 
 
@@ -11,97 +13,91 @@ class UnnestInnerClasses(RelativeHandlerInterface):
     __slots__ = ()
 
     def process(self, target: Class):
-        """Process entrypoint for classes.
-
-        Process the target class inner classes recursively.
-
-        All enumerations are promoted by default, otherwise
-        only if the configuration is disabled the classes
-        are ignored.
+        """Promote all inner classes recursively.
 
         Args:
-            target: The target class instance to inspect
+            target: The target class instance to process
         """
-        for inner in list(target.inner):
-            if inner.is_enumeration or self.container.config.output.unnest_classes:
-                self.promote(target, inner)
+        inner_classes = {}
+        inner_references = defaultdict(list)
+        promote_all = self.container.config.output.unnest_classes
+        for attr_type, source in self.find_forward_refs(target):
+            inner = ClassUtils.find_nested(source, attr_type.qname)
 
-    def promote(self, target: Class, inner: Class):
-        """Promote the inner class to root classes.
+            if not (promote_all or inner.is_enumeration):
+                continue
 
-        Steps:
-            - Replace forward references to the inner class
-            - Remove inner class from target class
-            - Copy the class to the global class container.
+            inner_classes[inner.ref] = inner
+            inner_references[inner.ref].append(attr_type)
+
+        for ref, inner in inner_classes.items():
+            references = inner_references[ref]
+
+            self.update_inner_class(inner)
+            self.update_types(references, inner.qname)
+            self.container.add(inner)
+
+        self.remove_orphan_inner_classes(target, promote_all)
+
+    @classmethod
+    def remove_orphan_inner_classes(cls, target: Class, promote_all: bool):
+        """Remove inner classes with no attr references.
+
+        Args:
+            target: The target class instance to process
+            promote_all: Whether to remove all inner classes or just the enumerations
+        """
+        for inner in target.inner.copy():
+            if promote_all or inner.is_enumeration:
+                target.inner.remove(inner)
+
+    @classmethod
+    def find_forward_refs(cls, target: Class) -> Iterator[Tuple[AttrType, Class]]:
+        """Find all forward references for all inner classes.
+
+        Args:
+            target: The target class instance to process
+
+        Yields:
+            A tuple of attr type and the parent class instance.
+        """
+        for attr in target.attrs:
+            for tp in attr.types:
+                if tp.forward and not tp.native:
+                    yield tp, target
+
+        for inner in target.inner:
+            yield from cls.find_forward_refs(inner)
+
+    @classmethod
+    def update_inner_class(cls, target: Class):
+        """Prepare the nested class to be added as root.
 
         Args:
             target: The target class
-            inner: An inner class
         """
-        target.inner.remove(inner)
-        attr = self.find_forward_attr(target, inner.qname)
-        if attr:
-            clone = self.clone_class(inner, target.name)
-            self.update_types(attr, inner.qname, clone)
-            self.container.add(clone)
+        assert target.parent is not None
+        name_parts = [target.parent.name, target.name]
+        new_qname = build_qname(target.target_namespace, "_".join(name_parts))
+
+        target.qname = new_qname
+
+        assert target.parent is not None
+
+        target.parent.inner.remove(target)
+        target.parent = None
+        target.local_type = True
 
     @classmethod
-    def clone_class(cls, inner: Class, name: str) -> Class:
-        """Clone and prepare inner class for promotion.
+    def update_types(cls, types: List[AttrType], qname: str):
+        """Search and replace forward references.
 
-        Clone the inner class, mark it as promoted and pref
-        the qualified name with the parent class name.
-
-        Args:
-            inner: The inner class to clone and prepare
-            name: The parent class name to use a prefix
-
-        Returns:
-            The new class instance
-        """
-        clone = inner.clone()
-        clone.parent = None
-        clone.local_type = True
-        clone.qname = build_qname(inner.target_namespace, f"{name}_{inner.name}")
-
-        for attr in clone.attrs:
-            for tp in attr.types:
-                if tp.circular and tp.qname == inner.qname:
-                    tp.qname = clone.qname
-                    tp.reference = clone.ref
-
-        return clone
-
-    @classmethod
-    def update_types(cls, attr: Attr, search: str, source: Class):
-        """Update the references from an inner to a global class.
+        Return the number changes.
 
         Args:
-            attr: The target attr to inspect and update
-            search: The current inner class qname
-            source: The new global class qname
+            types: The types to search and replace
+            qname: The updated qname
         """
-        for attr_type in attr.types:
-            if attr_type.qname == search and attr_type.forward:
-                attr_type.qname = source.qname
-                attr_type.reference = source.ref
-                attr_type.forward = False
-
-    @classmethod
-    def find_forward_attr(cls, target: Class, qname: str) -> Optional[Attr]:
-        """Find the first attr that references the given inner class qname.
-
-        Args:
-            target: The target class instance
-            qname: An inner class qualified name
-
-        Returns:
-            Attr: The first attr that references the given qname
-            None: If no such attr exists, it can happen!
-        """
-        for attr in target.attrs:
-            for attr_type in attr.types:
-                if attr_type.forward and attr_type.qname == qname:
-                    return attr
-
-        return None
+        for tp in types:
+            tp.qname = qname
+            tp.forward = False

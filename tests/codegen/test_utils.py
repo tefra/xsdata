@@ -110,7 +110,7 @@ class ClassUtilsTests(FactoryTestCase):
         source = ClassFactory.elements(2)
         source.inner.append(ClassFactory.create())
         target = ClassFactory.elements(3)
-        attrs = list(target.attrs)
+        attrs = target.attrs.copy()
         attrs[1].name = "bar"
         attr = target.attrs[1]
 

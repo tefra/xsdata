@@ -62,7 +62,7 @@ class ClassUtils:
         Args:
             target: The target class instance to inspect.
         """
-        for inner in list(target.inner):
+        for inner in target.inner.copy():
             if cls.is_orphan_inner(target, inner):
                 target.inner.remove(inner)
 

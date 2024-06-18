@@ -1,4 +1,5 @@
 import math
+from itertools import starmap
 from typing import Any, Dict, List, Optional, Set, Type
 
 from xsdata.exceptions import ParserError
@@ -192,13 +193,12 @@ class ElementNode(XmlNode):
             var: The xml var instance
             value: The attribute value
         """
-        value = ParserUtils.parse_value(
+        value = ParserUtils.parse_var(
+            meta=self.meta,
+            var=var,
+            config=self.config,
             value=value,
-            types=var.types,
-            default=var.default,
             ns_map=self.ns_map,
-            tokens_factory=var.tokens_factory,
-            format=var.format,
         )
 
         if var.init:
@@ -331,9 +331,7 @@ class ElementNode(XmlNode):
             objects: The list of intermediate parsed objects
         """
         pos = self.position
-        params[var.name] = [
-            self.prepare_generic_value(qname, value) for qname, value in objects[pos:]
-        ]
+        params[var.name] = list(starmap(self.prepare_generic_value, objects[pos:]))
         del objects[pos:]
 
     def prepare_generic_value(self, qname: Optional[str], value: Any) -> Any:
@@ -372,13 +370,12 @@ class ElementNode(XmlNode):
         if self.xsi_nil and not text:
             value = None
         else:
-            value = ParserUtils.parse_value(
+            value = ParserUtils.parse_var(
+                meta=self.meta,
+                var=var,
+                config=self.config,
                 value=text,
-                types=var.types,
-                default=var.default,
                 ns_map=self.ns_map,
-                tokens_factory=var.tokens_factory,
-                format=var.format,
             )
 
         if var.init:
@@ -414,7 +411,7 @@ class ElementNode(XmlNode):
         """
         text = ParserUtils.normalize_content(text)
         tail = ParserUtils.normalize_content(tail)
-        if text is None and tail is None:
+        if text is tail is None:
             return False
 
         if var.list_element:
@@ -496,6 +493,7 @@ class ElementNode(XmlNode):
         """
         if var.is_clazz_union:
             return nodes.UnionNode(
+                meta=self.meta,
                 var=var,
                 attrs=attrs,
                 ns_map=ns_map,
@@ -522,14 +520,17 @@ class ElementNode(XmlNode):
             )
 
         if not var.any_type and not var.is_wildcard:
-            return nodes.PrimitiveNode(var, ns_map, self.meta.mixed_content)
+            return nodes.PrimitiveNode(self.meta, var, ns_map, self.config)
 
         datatype = DataType.from_qname(xsi_type) if xsi_type else None
         derived = var.is_wildcard
         if datatype:
             return nodes.StandardNode(
+                self.meta,
+                var,
                 datatype,
                 ns_map,
+                self.config,
                 var.nillable,
                 derived_factory if derived else None,
             )

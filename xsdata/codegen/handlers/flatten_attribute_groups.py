@@ -19,7 +19,7 @@ class FlattenAttributeGroups(RelativeHandlerInterface):
             target: The target class instance to inspect and process
         """
         repeat = False
-        for attr in list(target.attrs):
+        for attr in target.attrs.copy():
             if attr.is_group:
                 repeat = True
                 self.process_attribute(target, attr)

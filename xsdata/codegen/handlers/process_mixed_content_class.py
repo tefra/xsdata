@@ -23,7 +23,7 @@ class ProcessMixedContentClass(HandlerInterface):
 
         attrs = []
         choices = []
-        for attr in list(target.attrs):
+        for attr in target.attrs.copy():
             if attr.is_attribute:
                 attrs.append(attr)
             elif not attr.is_any_type:

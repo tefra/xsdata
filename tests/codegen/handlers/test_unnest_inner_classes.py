@@ -15,124 +15,94 @@ class UnnestInnerClassesTests(FactoryTestCase):
         self.container = ClassContainer(config=GeneratorConfig())
         self.processor = UnnestInnerClasses(container=self.container)
 
-    def test_process(self):
-        self.container.config.output.unnest_classes = False
-
-        enumeration = ClassFactory.enumeration(2)
-        local_type = ClassFactory.elements(2)
-        target = ClassFactory.create()
-
-        target.inner.append(enumeration)
-        target.inner.append(local_type)
-        self.container.add(target)
-
-        self.processor.process(target)
-
-        self.assertEqual(1, len(target.inner))
-        self.assertTrue(local_type in target.inner)
-
+    def test_process_with_config_enabled(self):
         self.container.config.output.unnest_classes = True
-        self.processor.process(target)
-        self.assertEqual(0, len(target.inner))
+        a = ClassFactory.create()
+        b = ClassFactory.create()
+        c = ClassFactory.create()
 
-    def test_promote_with_orphan_inner(self):
-        inner = ClassFactory.elements(2)
-        target = ClassFactory.create()
-        target.inner.append(inner)
-        self.container.add(target)
+        a.attrs.append(AttrFactory.reference(b.qname, forward=True))
+        b.attrs.append(AttrFactory.reference(c.qname, forward=True))
+        c.attrs.append(AttrFactory.reference(b.qname, forward=True))
 
-        self.processor.promote(target, inner)
+        a.inner.append(b)
+        b.inner.append(c)
+        b.parent = a
+        c.parent = b
 
-        self.assertEqual(0, len(target.inner))
-        self.assertEqual(1, len(self.container.data))
+        self.container.add(a)
+        self.processor.process(a)
+        self.assertEqual(3, len(list(self.container)))
 
-    def test_promote_updates_forward_attr_types(self):
-        inner = ClassFactory.elements(2)
-        attr = AttrFactory.reference(inner.qname, forward=True)
-        target = ClassFactory.create()
-        target.attrs.append(attr)
-        target.inner.append(inner)
-        self.container.add(target)
+        self.assertEqual(b.qname, a.attrs[0].types[0].qname)
+        self.assertEqual(c.qname, b.attrs[0].types[0].qname)
+        self.assertEqual(b.qname, c.attrs[0].types[0].qname)
 
-        self.processor.promote(target, inner)
+    def test_process_with_config_disabled_promotes_only_enumerations(self):
+        self.container.config.output.unnest_classes = False
+        a = ClassFactory.create()
+        b = ClassFactory.create()
+        c = ClassFactory.enumeration(2)
 
-        self.assertEqual(0, len(target.inner))
-        self.assertEqual(2, len(self.container.data))
-        self.assertFalse(attr.types[0].forward)
-        self.assertEqual("{xsdata}class_C_class_B", attr.types[0].qname)
+        a.attrs.append(AttrFactory.reference(b.qname, forward=True))
+        b.attrs.append(AttrFactory.reference(c.qname, forward=True))
 
-    def test_clone_class(self):
-        target = ClassFactory.create(qname="{a}b")
-        actual = self.processor.clone_class(target, "parent")
+        a.inner.append(b)
+        b.inner.append(c)
+        b.parent = a
+        c.parent = b
 
-        self.assertIsNot(target, actual)
-        self.assertTrue(actual.local_type)
-        self.assertEqual("{a}parent_b", actual.qname)
+        self.container.add(a)
+        self.processor.process(a)
 
-    def test_clone_class_with_circular_reference(self):
-        target = ClassFactory.create(qname="{a}b")
-        target.attrs.append(
-            AttrFactory.create(
-                name="self",
-                types=[AttrTypeFactory.create(qname=target.qname, circular=True)],
-            )
-        )
+        self.assertEqual(2, len(list(self.container)))
+        self.assertEqual(c.qname, b.attrs[0].types[0].qname)
+        self.assertEqual(1, len(a.inner))
+        self.assertEqual(0, len(b.inner))
 
-        actual = self.processor.clone_class(target, "parent")
+    def test_process_with_orphan_nested_class(self):
+        self.container.config.output.unnest_classes = True
+        a = ClassFactory.create()
+        b = ClassFactory.create()
+        c = ClassFactory.create()
 
-        self.assertIsNot(target, actual)
-        self.assertTrue(actual.local_type)
-        self.assertEqual("{a}parent_b", actual.qname)
+        a.inner.append(b)
+        b.inner.append(c)
+        b.parent = a
+        c.parent = b
 
-        self.assertTrue(actual.attrs[0].types[0].circular)
-        self.assertEqual(actual.ref, actual.attrs[0].types[0].reference)
-        self.assertEqual(actual.qname, actual.attrs[0].types[0].qname)
+        self.container.add(a)
+        self.processor.process(a)
+        self.assertEqual(1, len(list(self.container)))
+        self.assertEqual(0, len(a.inner))
+        self.assertEqual(1, len(b.inner))
+
+    def test_update_inner_class(self):
+        a = ClassFactory.create(qname="a")
+        b = ClassFactory.create(qname="b")
+        c = ClassFactory.create(qname="c")
+        a.inner.append(b)
+        b.inner.append(c)
+        b.parent = a
+        c.parent = b
+
+        self.processor.update_inner_class(c)
+
+        self.assertEqual("b_c", c.qname)
+        self.assertTrue(c.local_type)
+        self.assertIsNone(c.parent)
+        self.assertEqual(0, len(b.inner))
 
     def test_update_types(self):
-        attr = AttrFactory.create(
-            types=[
-                AttrTypeFactory.create(qname="a", forward=True),
-                AttrTypeFactory.create(qname="a", forward=False),
-                AttrTypeFactory.create(qname="b", forward=False),
-            ]
-        )
-        source = ClassFactory.create()
+        types = [
+            AttrTypeFactory.create(qname="a", forward=True),
+            AttrTypeFactory.create(qname="a", forward=True),
+        ]
 
-        self.processor.update_types(attr, "a", source)
+        self.processor.update_types(types, "b")
 
-        self.assertEqual(source.qname, attr.types[0].qname)
-        self.assertFalse(attr.types[0].forward)
-        self.assertEqual(source.ref, attr.types[0].reference)
+        self.assertEqual("b", types[0].qname)
+        self.assertFalse(types[0].forward)
 
-        self.assertEqual("a", attr.types[1].qname)
-        self.assertFalse(attr.types[1].forward)
-        self.assertEqual("b", attr.types[2].qname)
-        self.assertFalse(attr.types[2].forward)
-
-    def test_find_forward_attr(self):
-        target = ClassFactory.create(
-            attrs=[
-                AttrFactory.create(
-                    types=[
-                        AttrTypeFactory.create("a", forward=False),
-                        AttrTypeFactory.create("b", forward=False),
-                    ]
-                ),
-                AttrFactory.create(
-                    types=[
-                        AttrTypeFactory.create("a", forward=True),
-                        AttrTypeFactory.create("b", forward=True),
-                    ]
-                ),
-                AttrFactory.create(),
-            ]
-        )
-
-        actual = self.processor.find_forward_attr(target, "a")
-        self.assertEqual(target.attrs[1], actual)
-
-        actual = self.processor.find_forward_attr(target, "b")
-        self.assertEqual(target.attrs[1], actual)
-
-        actual = self.processor.find_forward_attr(target, "c")
-        self.assertIsNone(actual)
+        self.assertEqual("b", types[1].qname)
+        self.assertFalse(types[1].forward)

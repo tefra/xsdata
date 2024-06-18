@@ -1,4 +1,4 @@
-from typing import Dict, List, Set, Tuple, Union
+from typing import Dict, List, Optional, Set, Tuple, Union
 
 from tests.formats.dataclass.cases import PY39
 
@@ -7,10 +7,13 @@ tokens = [
     (Dict[str, int], False),
     (Tuple[str, str], False),
     (List[str], ((str,), None, list)),
+    (Optional[List[str]], ((str,), None, list)),
     (Tuple[str, ...], ((str,), None, tuple)),
     (List[List[str]], ((str,), list, list)),
+    (Optional[List[List[Union[str, int]]]], ((str, int), list, list)),
     (List[Tuple[str, ...]], ((str,), list, tuple)),
     (Tuple[List[str], ...], ((str,), tuple, list)),
+    (Optional[Tuple[List[str], ...]], ((str,), tuple, list)),
 ]
 
 not_tokens = [
@@ -23,6 +26,7 @@ not_tokens = [
     (str, ((str,), None, None)),
     (List[str], ((str,), list, None)),
     (List[Union[str, int]], ((str, int), list, None)),
+    (Optional[List[Union[str, int]]], ((str, int), list, None)),
     (Tuple[str, ...], ((str,), tuple, None)),
 ]
 

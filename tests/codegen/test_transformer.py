@@ -30,7 +30,7 @@ from xsdata.utils.testing import ClassFactory, DtdFactory, FactoryTestCase
 class ResourceTransformerTests(FactoryTestCase):
     def setUp(self):
         config = GeneratorConfig()
-        self.transformer = ResourceTransformer(print=True, config=config)
+        self.transformer = ResourceTransformer(config=config)
         super().setUp()
 
     @mock.patch.object(ResourceTransformer, "process_classes")
@@ -252,34 +252,9 @@ class ResourceTransformerTests(FactoryTestCase):
         )
 
     @mock.patch("xsdata.codegen.transformer.logger.info")
-    @mock.patch.object(CodeWriter, "print")
-    @mock.patch.object(ResourceTransformer, "analyze_classes")
-    def test_process_classes_with_print_true(
-        self,
-        mock_analyze_classes,
-        mock_writer_print,
-        mock_logger_into,
-    ):
-        schema_classes = ClassFactory.list(3)
-        analyzer_classes = ClassFactory.list(2)
-        mock_analyze_classes.return_value = analyzer_classes
-
-        self.transformer.classes = schema_classes
-        self.transformer.process_classes()
-
-        mock_analyze_classes.assert_called_once_with(schema_classes)
-        mock_writer_print.assert_called_once_with(analyzer_classes)
-        mock_logger_into.assert_has_calls(
-            [
-                mock.call("Analyzer input: %d main and %d inner classes", 3, 0),
-                mock.call("Analyzer output: %d main and %d inner classes", 2, 0),
-            ]
-        )
-
-    @mock.patch("xsdata.codegen.transformer.logger.info")
     @mock.patch.object(CodeWriter, "write")
     @mock.patch.object(ResourceTransformer, "analyze_classes")
-    def test_process_classes_with_print_false(
+    def test_process_classes(
         self,
         mock_analyze_classes,
         mock_writer_write,
@@ -289,7 +264,6 @@ class ResourceTransformerTests(FactoryTestCase):
         analyzer_classes = ClassFactory.list(2)
         mock_analyze_classes.return_value = analyzer_classes
 
-        self.transformer.print = False
         self.transformer.classes = schema_classes
         self.transformer.process_classes()
 

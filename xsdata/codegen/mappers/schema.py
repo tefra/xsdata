@@ -364,7 +364,7 @@ class SchemaMapper:
             target.inner.append(inner)
             types.append(AttrType(qname=inner.qname, forward=True))
 
-        if len(types) == 0:
+        if not types:
             types.append(cls.build_attr_type(target, name=obj.default_type))
 
         return collections.unique_sequence(types)

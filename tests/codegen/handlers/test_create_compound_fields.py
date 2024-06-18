@@ -118,7 +118,7 @@ class CreateCompoundFieldsTests(FactoryTestCase):
         )
         expected_res = Restrictions(min_occurs=0, max_occurs=20)
 
-        self.processor.group_fields(target, list(target.attrs))
+        self.processor.group_fields(target, target.attrs.copy())
         self.assertEqual(1, len(target.attrs))
         self.assertEqual(expected, target.attrs[0])
         self.assertEqual(expected_res, target.attrs[0].restrictions)
@@ -134,7 +134,7 @@ class CreateCompoundFieldsTests(FactoryTestCase):
 
         expected_res = Restrictions(min_occurs=4, max_occurs=6)
 
-        self.processor.group_fields(target, list(target.attrs))
+        self.processor.group_fields(target, target.attrs.copy())
         self.assertEqual(1, len(target.attrs))
         self.assertEqual(expected_res, target.attrs[0].restrictions)
 

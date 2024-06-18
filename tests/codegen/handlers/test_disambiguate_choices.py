@@ -144,7 +144,6 @@ class DisambiguateChoicesTest(FactoryTestCase):
 
     def test_find_ambiguous_choices_ignore_wildcards(self):
         """Wildcards are merged."""
-
         attr = AttrFactory.create()
         attr.choices.append(AttrFactory.any())
         attr.choices.append(AttrFactory.any())

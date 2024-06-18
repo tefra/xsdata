@@ -65,7 +65,6 @@ def cli(ctx: click.Context, **kwargs: Any):
 
 @cli.command("init-config")
 @click.argument("output", type=click.Path(), default=".xsdata.xml")
-@click.option("-pp", "--print", is_flag=True, default=False, help="Print output")
 def init_config(**kwargs: Any):
     """Create or update a configuration file."""
     file_path = Path(kwargs["output"])
@@ -76,11 +75,8 @@ def init_config(**kwargs: Any):
         logger.info("Initializing configuration file %s", kwargs["output"])
         config = GeneratorConfig.create()
 
-    if kwargs["print"]:
-        config.write(sys.stdout, config)
-    else:
-        with file_path.open("w") as fp:
-            config.write(fp, config)
+    with file_path.open("w") as fp:
+        config.write(fp, config)
 
     handler.emit_warnings()
 
@@ -112,7 +108,6 @@ def download(source: str, output: str):
     help="Search files recursively in the source directory",
 )
 @click.option("-c", "--config", default=".xsdata.xml", help="Project configuration")
-@click.option("-pp", "--print", is_flag=True, default=False, help="Print output")
 @click.option("--cache", is_flag=True, default=False, help="Cache sources loading")
 @click.option("--debug", is_flag=True, default=False, help="Show debug messages")
 @model_options(GeneratorOutput)
@@ -127,7 +122,6 @@ def generate(**kwargs: Any):
         logger.setLevel(logging.DEBUG)
 
     source = kwargs.pop("source")
-    stdout = kwargs.pop("print")
     cache = kwargs.pop("cache")
     recursive = kwargs.pop("recursive")
     config_file = Path(kwargs.pop("config")).resolve()
@@ -136,11 +130,14 @@ def generate(**kwargs: Any):
     config = GeneratorConfig.read(config_file)
     config.output.update(**params)
 
-    transformer = ResourceTransformer(config=config, print=stdout)
+    transformer = ResourceTransformer(config=config)
     uris = sorted(resolve_source(source, recursive=recursive))
     transformer.process(uris, cache=cache)
 
     handler.emit_warnings()
+
+
+_SUPPORTED_EXTENSIONS = ("wsdl", "xsd", "dtd", "xml", "json")
 
 
 def resolve_source(source: str, recursive: bool) -> Iterator[str]:
@@ -151,9 +148,9 @@ def resolve_source(source: str, recursive: bool) -> Iterator[str]:
         path = Path(source).resolve()
         match = "**/*" if recursive else "*"
         if path.is_dir():
-            for ext in ["wsdl", "xsd", "dtd", "xml", "json"]:
+            for ext in _SUPPORTED_EXTENSIONS:
                 yield from (x.as_uri() for x in path.glob(f"{match}.{ext}"))
-        else:  # is file
+        else:  # is a file
             yield path.as_uri()
 
 

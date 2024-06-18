@@ -2,7 +2,8 @@ import abc
 import base64
 import binascii
 import math
-import warnings
+import re
+from contextlib import suppress
 from datetime import date, datetime, time
 from decimal import Decimal, InvalidOperation
 from enum import Enum, EnumMeta
@@ -20,7 +21,7 @@ from typing import (
 )
 from xml.etree.ElementTree import QName
 
-from xsdata.exceptions import ConverterError, ConverterWarning
+from xsdata.exceptions import ConverterError
 from xsdata.models.datatype import (
     XmlBase64Binary,
     XmlDate,
@@ -87,28 +88,24 @@ class ConverterFactory:
     def deserialize(self, value: Any, types: Sequence[Type], **kwargs: Any) -> Any:
         """Attempt to convert any value to one of the given types.
 
-        If all attempts fail return the value input value and emit a
-        warning.
-
         Args:
             value: The input value
             types: The target candidate types
             **kwargs: Additional keyword arguments needed per converter
 
+        Raises:
+            ConverterError: if the value can't be converted to any of the given types.
+
         Returns:
-            The converted value or the input value.
+            The converted value
         """
         for data_type in types:
-            try:
+            with suppress(ConverterError):
                 instance = self.type_converter(data_type)
                 return instance.deserialize(value, data_type=data_type, **kwargs)
-            except ConverterError:
-                pass
 
-        warnings.warn(
-            f"Failed to convert value `{value}` to one of {types}", ConverterWarning
-        )
-        return value
+        type_names = " | ".join(tp.__name__ for tp in types)
+        raise ConverterError(f"`{value}` is not a valid `{type_names}`")
 
     def serialize(self, value: Any, **kwargs: Any) -> Any:
         """Convert the given value to string.
@@ -153,10 +150,9 @@ class ConverterFactory:
         if not isinstance(value, str):
             return False
 
-        with warnings.catch_warnings(record=True) as w:
+        try:
             decoded = self.deserialize(value, types, **kwargs)
-
-        if w and w[-1].category is ConverterWarning:
+        except ConverterError:
             return False
 
         if strict and isinstance(decoded, (float, int, Decimal, XmlPeriod)):
@@ -197,28 +193,27 @@ class ConverterFactory:
         """Find a suitable converter for given data type.
 
         Iterate over all but last mro items and check for registered
-        converters, fall back to str and issue a warning if there are
-        no matches.
+        converters.
 
         Args:
             data_type: The data type
 
+        Raises:
+            ConverterError: if the data type is not registered.
+
         Returns:
             A converter instance
         """
-        try:
+        with suppress(KeyError):
             # Quick in and out, without checking the whole mro.
             return self.registry[data_type]
-        except KeyError:
-            pass
 
         # We tested the first, ignore the object
         for mro in data_type.__mro__[1:-1]:
             if mro in self.registry:
                 return self.registry[mro]
 
-        warnings.warn(f"No converter registered for `{data_type}`", ConverterWarning)
-        return self.registry[str]
+        raise ConverterError(f"No converter registered for `{data_type.__qualname__}`")
 
     def value_converter(self, value: Any) -> Converter:
         """Get a suitable converter for the given value."""
@@ -427,6 +422,7 @@ class BytesConverter(Converter):
 
         try:
             fmt = kwargs.get("format")
+            value = re.sub(r"\s+", "", value)
 
             if fmt == "base16":
                 return binascii.unhexlify(value)
@@ -678,7 +674,7 @@ class EnumConverter(Converter):
             Whether the value or values matches the enumeration member value.
         """
         if isinstance(value, str) and isinstance(real, str):
-            return value == real or " ".join(values) == real
+            return real in (value, " ".join(values))
 
         if isinstance(real, (tuple, list)) and not hasattr(real, "_fields"):
             if len(real) == length and cls._match_list(values, real, **kwargs):
@@ -698,9 +694,10 @@ class EnumConverter(Converter):
 
     @classmethod
     def _match_atomic(cls, raw: Any, real: Any, **kwargs: Any) -> bool:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
+        try:
             cmp = converter.deserialize(raw, [type(real)], **kwargs)
+        except ConverterError:
+            cmp = raw
 
         if isinstance(real, float):
             return cmp == real or repr(cmp) == repr(real)
@@ -708,7 +705,7 @@ class EnumConverter(Converter):
         return cmp == real
 
 
-class DateTimeBase(Converter, metaclass=abc.ABCMeta):
+class DateTimeBase(Converter, abc.ABC):
     """An abstract datetime converter."""
 
     @classmethod

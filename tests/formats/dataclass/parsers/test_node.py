@@ -47,7 +47,7 @@ class NodeParserTests(TestCase):
             parser.from_string(xml, TypeA)
 
         self.assertEqual(
-            "Failed to convert value `foo` to one of (<class 'int'>,)",
+            "Failed to convert value for `TypeA.x`\n  `foo` is not a valid `int`",
             str(cm.exception),
         )
 
@@ -182,7 +182,7 @@ class NodeParserTests(TestCase):
         objects = [("q", "result")]
         queue = []
         var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo")
-        queue.append(PrimitiveNode(var, {}, False))
+        queue.append(PrimitiveNode(var, {}, False, parser.config))
 
         self.assertTrue(parser.end(queue, objects, "author", "foobar", None))
         self.assertEqual(0, len(queue))

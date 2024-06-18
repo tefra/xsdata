@@ -3,6 +3,7 @@ import copy
 import importlib
 import random
 import unittest
+from contextlib import suppress
 from dataclasses import is_dataclass
 from typing import Any, Callable, Dict, List, Optional, Sequence, Type, TypeVar
 
@@ -54,11 +55,9 @@ def load_class(output: str, clazz_name: str) -> Any:
     packages = [line[start:] for line in output.splitlines() if line.startswith(search)]
 
     for package in reversed(packages):
-        try:
+        with suppress(ModuleNotFoundError, AttributeError):
             module = importlib.import_module(package)
             return getattr(module, clazz_name)
-        except (ModuleNotFoundError, AttributeError):
-            pass
 
     raise ModuleNotFoundError(f"Class `{clazz_name}` not found.")
 

@@ -84,7 +84,7 @@ class Downloader:
             self.base_path = Path(uri).parent
             logger.info("Setting base path to %s", self.base_path)
         else:
-            common_path = os.path.commonpath((str(self.base_path) or "", uri))
+            common_path = os.path.commonpath((self.base_path, uri))
 
             if common_path:
                 common_path_path = Path(common_path)
@@ -98,7 +98,7 @@ class Downloader:
         for match in matches:
             if isinstance(self.downloaded.get(match), Path):
                 location = os.path.relpath(self.downloaded[match], path)
-                replace = str(location).replace("\\", "/")
+                replace = location.replace("\\", "/")
                 content = content.replace(f'ocation="{match}"', f'ocation="{replace}"')
 
         return content

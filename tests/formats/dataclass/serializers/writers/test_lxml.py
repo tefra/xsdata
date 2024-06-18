@@ -1,11 +1,15 @@
 from dataclasses import make_dataclass
 from unittest import TestCase
 
+import lxml
+
 from tests import fixtures_dir
 from tests.fixtures.books.fixtures import books
-from xsdata.formats.dataclass.serializers import XmlSerializer
+from xsdata.formats.dataclass.serializers import TreeSerializer, XmlSerializer
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
-from xsdata.formats.dataclass.serializers.writers import LxmlEventWriter
+from xsdata.formats.dataclass.serializers.writers import (
+    LxmlEventWriter,
+)
 
 
 class LxmlEventWriterTests(TestCase):
@@ -58,3 +62,30 @@ class LxmlEventWriterTests(TestCase):
         _, actual = actual.split("\n", 1)
         _, expected = expected.split("\n", 1)
         self.assertEqual(expected.replace("  ", "").replace("\n", ""), actual)
+
+
+class LxmlTreeBuilderTests(TestCase):
+    def setUp(self):
+        super().setUp()
+        self.serializer = TreeSerializer()
+        self.serializer.config.indent = "  "
+
+    def test_render(self):
+        tree = self.serializer.render(books)
+
+        actual = lxml.etree.tostring(tree).decode()
+
+        expected = fixtures_dir.joinpath("books/books_auto_ns.xml").read_text()
+        expected = "\n".join(expected.splitlines()[1:])
+        self.assertEqual(expected, actual)
+
+    def test_render_with_no_indent(self):
+        self.serializer.config.indent = ""
+        tree = self.serializer.render(books)
+
+        lxml.etree.indent(tree, "  ")
+        actual = lxml.etree.tostring(tree).decode()
+
+        expected = fixtures_dir.joinpath("books/books_auto_ns.xml").read_text()
+        expected = "\n".join(expected.splitlines()[1:])
+        self.assertEqual(expected, actual)

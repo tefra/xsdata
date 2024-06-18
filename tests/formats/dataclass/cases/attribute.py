@@ -1,4 +1,4 @@
-from typing import Dict, List, Literal, Set, Tuple, Union
+from typing import Dict, List, Literal, Optional, Set, Tuple, Union
 
 from tests.formats.dataclass.cases import PY39, PY310
 from xsdata.models.enums import Mode
@@ -14,6 +14,7 @@ tokens = [
     (Tuple[int, ...], ((int,), None, tuple)),
     (List[int], ((int,), None, list)),
     (List[Union[str, int]], ((str, int), None, list)),
+    (Optional[List[Union[str, int]]], ((str, int), None, list)),
 ]
 
 not_tokens = [

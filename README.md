@@ -74,22 +74,25 @@ Check the [documentation](https://xsdata.readthedocs.io) for more ✨✨✨
 - Support xinclude statements and unknown properties
 - Customize behaviour through config
 
-## Changelog: 24.5 (2024-05-07)
+## Changelog: 24.6 (2024-06-24)
 
 **Features**
 
-- Rewrite TreeSerializer, drop support for native python ElementTree
-  ([#1032](https://github.com/tefra/xsdata/pull/1032))
-- Validate fields fixed values ([#1013](https://github.com/tefra/xsdata/pull/1013))
-- Detect optional fields in dict mapper
-- Refactor typing annotations analyze process
-- Generate ForwardRef() instead of Type[]
+- Add class and field info in parsing warnings
+  ([#1036](https://github.com/tefra/xsdata/pull/1036))
+- Remove whitespace from bytes encoded xml strings
+  ([#1037](https://github.com/tefra/xsdata/pull/1037))
+- Improve codegen performance ([#1043](https://github.com/tefra/xsdata/pull/1043))
 
 **Fixes**
 
-- Allow soap client config subclassing
-  ([#1010](https://github.com/tefra/xsdata/pull/1010))
-- Avoid recursive error on nested group references
-  ([#1016](https://github.com/tefra/xsdata/pull/1016))
-- Add warning for same module designation
-  ([#1018](https://github.com/tefra/xsdata/pull/1018))
+- JSON serializer fails on derived elements
+  ([#1053](https://github.com/tefra/xsdata/pull/1053))
+- Update typing-extensions minimum version
+  ([#1039](https://github.com/tefra/xsdata/pull/1039))
+- Avoid using not-threadsafe warnings.catch_warning
+  ([#1042](https://github.com/tefra/xsdata/pull/1042))
+- Unnest classes doesn't update inner classes recursively
+  ([#1047](https://github.com/tefra/xsdata/pull/1047))
+- Restore support for optional lists
+  ([#1053](https://github.com/tefra/xsdata/pull/1053))

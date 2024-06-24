@@ -1,3 +1,26 @@
+## 24.6 (2024-06-24)
+
+**Features**
+
+- Add class and field info in parsing warnings
+  ([#1036](https://github.com/tefra/xsdata/pull/1036))
+- Remove whitespace from bytes encoded xml strings
+  ([#1037](https://github.com/tefra/xsdata/pull/1037))
+- Improve codegen performance ([#1043](https://github.com/tefra/xsdata/pull/1043))
+
+**Fixes**
+
+- JSON serializer fails on derived elements
+  ([#1053](https://github.com/tefra/xsdata/pull/1053))
+- Update typing-extensions minimum version
+  ([#1039](https://github.com/tefra/xsdata/pull/1039))
+- Avoid using not-threadsafe warnings.catch_warning
+  ([#1042](https://github.com/tefra/xsdata/pull/1042))
+- Unnest classes doesn't update inner classes recursively
+  ([#1047](https://github.com/tefra/xsdata/pull/1047))
+- Restore support for optional lists
+  ([#1053](https://github.com/tefra/xsdata/pull/1053))
+
 ## 24.5 (2024-05-07)
 
 **Features**

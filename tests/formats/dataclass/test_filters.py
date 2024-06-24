@@ -302,7 +302,7 @@ class FiltersTests(FactoryTestCase):
             "field(\n"
             "        default=None,\n"
             "        metadata={\n"
-            '            "pattern": r"([^\\ \\? > < \\* / \\" \\": |]{1,256})",\n'
+            '            "pattern": r\'([^\\ \\? > < \\* / " ": |]{1,256})\',\n'
             "        }\n"
             "    )"
         )
@@ -953,7 +953,7 @@ class FiltersTests(FactoryTestCase):
             '    "text": "foo",\n'
             '    "text_two": "fo\'o",\n'
             '    "text_three": "fo\\"o",\n'
-            '    "pattern": r"foo",\n'
+            "    \"pattern\": r'foo',\n"
             '    "custom": Telephone(country_code=30, area_code=123, number=4567),\n'
             '    "level_two": {\n'
             '        "a": 1,\n'

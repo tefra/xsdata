@@ -21,7 +21,7 @@ from xsdata.formats.dataclass.typing import (
 
 def test_evaluate_with_typevar():
     result = evaluate(Type["str"], None)
-    assert str == result
+    assert result is str
 
     with pytest.raises(TypeError):
         evaluate(Type, None)

@@ -180,10 +180,7 @@ class DisambiguateChoices(RelativeHandlerInterface):
             return True
 
         source = self.container.find(choice.types[0].qname)
-        if source and source.is_enumeration:
-            return True
-
-        return False
+        return bool(source and source.is_enumeration)
 
     def create_ref_class(self, source: Class, choice: Attr, inner: bool) -> Class:
         """Create an intermediate class  for the given choice.

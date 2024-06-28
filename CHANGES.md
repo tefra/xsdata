@@ -1,3 +1,10 @@
+## 24.6.1 (2024-06-28)
+
+**Fixes**
+
+- Ruff check command typo breaks generator with v0.5.0
+  ([#1061](https://github.com/tefra/xsdata/pull/1061))
+
 ## 24.6 (2024-06-24)
 
 **Features**

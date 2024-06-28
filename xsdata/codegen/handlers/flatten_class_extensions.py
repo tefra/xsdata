@@ -280,14 +280,14 @@ class FlattenClassExtensions(RelativeHandlerInterface):
             source: The source class instance
             target: The target class instance
         """
-        if not source.extensions and (
-            not source.is_complex_type
-            or target.has_suffix_attr
-            or (source.has_suffix_attr and target.attrs)
-        ):
-            return True
-
-        return False
+        return bool(
+            not source.extensions
+            and (
+                not source.is_complex_type
+                or target.has_suffix_attr
+                or (source.has_suffix_attr and target.attrs)
+            )
+        )
 
     @classmethod
     def have_unordered_sequences(

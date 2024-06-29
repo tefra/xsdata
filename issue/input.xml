@@ -1,0 +1,417 @@
+<LogRecord schema="1.0.2.0">
+    <Summary>[0002 | 0660 | 9 | 1 mu1] UXMId: 0, Carrier:NUL, CEId: 0, RNTI: 1 (C_RNTI), HARQ ID: 6, CRC: PASS, EVM: 1.75 %, Max Pwr: -14.65 dBm (-24.30 dBFs) - Ant: 0 </Summary>
+    <Frame>216716</Frame>
+    <Field name="RT_API_Version">
+        <Value>30210</Value>
+    </Field>
+    <Field name="FPGA_API_Version">
+        <Value>85524480</Value>
+    </Field>
+    <Field name="UXMId">
+        <Value>0</Value>
+    </Field>
+    <Field name="CellSetId">
+        <Value>0</Value>
+    </Field>
+    <Field name="UL Carrier">
+        <Value>NUL</Value>
+    </Field>
+    <Field name="CellEntityId">
+        <Value>0</Value>
+    </Field>
+    <Field name="UEId">
+        <Value>0</Value>
+    </Field>
+    <Field name="Global TTI">
+        <Value>216716</Value>
+    </Field>
+    <Field name="Global TTI to decode">
+        <Value>0002 | 0660 | 9 | 1 mu1</Value>
+    </Field>
+    <Field name="TTI">
+        <Field name="HFN">
+            <Value>2</Value>
+        </Field>
+        <Field name="FN">
+            <Value>660</Value>
+        </Field>
+        <Field name="sfn">
+            <Value>9</Value>
+        </Field>
+        <Field name="slot">
+            <Value>1</Value>
+        </Field>
+    </Field>
+    <Field name="Numerology">
+        <Value>1 ( 30 KHz )</Value>
+    </Field>
+    <Field name="RntiType">
+        <Value>3</Value>
+    </Field>
+    <Field name="Rnti">
+        <Value>1 (C_RNTI)</Value>
+    </Field>
+    <Field name="Sampling freq">
+        <Value>122880000</Value>
+    </Field>
+    <Field name="Measurement State">
+        <Value/>
+    </Field>
+    <Field name="HARQ Process">
+        <Value>6</Value>
+    </Field>
+    <Field name="Symbols Freq Hop #1">
+        <Value>
+            <i>14</i>
+            <i>11</i>
+            <i>3</i>
+            <i>0</i>
+            <i>13</i>
+        </Value>
+    </Field>
+    <Field name="Symbols Freq Hop #2">
+        <Value>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+        </Value>
+    </Field>
+    <Field name="Mean EVM">
+        <Value>1.75 %</Value>
+    </Field>
+    <Field name="Mean EVM Per Layer">
+        <Value>
+            <i>175</i>
+        </Value>
+    </Field>
+    <Field name="EVM Per Symbol">
+        <Value>
+            <i>1</i>
+            <i>1330287</i>
+            <i>1277767</i>
+            <i>1328698</i>
+            <i>1358641</i>
+            <i>1194190</i>
+            <i>1171658</i>
+            <i>1200243</i>
+            <i>1208648</i>
+            <i>1439885</i>
+            <i>1422179</i>
+            <i>1570015</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>117572352</i>
+            <i>4109762571</i>
+            <i>4110352383</i>
+            <i>4110155775</i>
+            <i>65535</i>
+            <i>4110024704</i>
+            <i>65535</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>4111075155</i>
+            <i>4111138815</i>
+            <i>4111073279</i>
+            <i>65535</i>
+            <i>4294836224</i>
+            <i>4294901759</i>
+            <i>4294901759</i>
+            <i>65535</i>
+            <i>65536</i>
+            <i>2583694592</i>
+            <i>654312400</i>
+            <i>973079503</i>
+            <i>4211082185</i>
+            <i>3288335311</i>
+            <i>2332033999</i>
+            <i>3925869519</i>
+            <i>637535182</i>
+            <i>1174406089</i>
+            <i>3019899853</i>
+            <i>4110418896</i>
+            <i>3388998606</i>
+            <i>771752901</i>
+            <i>1761608654</i>
+            <i>2248147917</i>
+            <i>1107300500</i>
+            <i>4143976672</i>
+            <i>922750172</i>
+            <i>1862275031</i>
+            <i>2264928360</i>
+            <i>1342181520</i>
+            <i>1895829266</i>
+            <i>3137342692</i>
+            <i>855641939</i>
+            <i>3305115456</i>
+            <i>1224740861</i>
+            <i>3674213597</i>
+            <i>1459621609</i>
+            <i>989859920</i>
+            <i>4194304252</i>
+            <i>83886355</i>
+            <i>2583691949</i>
+            <i>4160750277</i>
+            <i>83886144</i>
+            <i>738197654</i>
+            <i>3992977531</i>
+            <i>1342177495</i>
+            <i>201327175</i>
+            <i>2902458572</i>
+            <i>822083691</i>
+            <i>771752239</i>
+            <i>33554958</i>
+            <i>2315255868</i>
+            <i>182</i>
+            <i>1</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+            <i>0</i>
+        </Value>
+    </Field>
+    <Field name="EVM">
+        <Field name="Layer 0">
+            <Value>1.75 %</Value>
+            <Field name="EVM per symbol [0..13]">
+                <Value>[1.76 | 1.72 | X | 1.76 | 1.78 | 1.67 | 1.65 | X | 1.67 | 1.68 | 1.83 | X | 1.82 | 1.91]</Value>
+            </Field>
+        </Field>
+    </Field>
+    <Field name="NumPUSCH_OFDM_DMRS_Symbols">
+        <Value>3</Value>
+    </Field>
+    <Field name="DMRS_OFDM_SymbolIndex">
+        <Value>
+            <i>2</i>
+            <i>7</i>
+            <i>11</i>
+        </Value>
+    </Field>
+    <Field name="DMRS STO">
+        <Field name="OFDM symbol 2">
+            <Value>-7.06 Ts (-229.98 nsec) - signal advanced</Value>
+        </Field>
+        <Field name="OFDM symbol 7">
+            <Value>-7.04 Ts (-229.33 nsec) - signal advanced</Value>
+        </Field>
+        <Field name="OFDM symbol 11">
+            <Value>-7.05 Ts (-229.57 nsec) - signal advanced</Value>
+        </Field>
+    </Field>
+    <Field name="Num Layers">
+        <Value>1</Value>
+    </Field>
+    <Field name="DMRS STO Per Layer">
+        <Field name="Layer 0">
+            <Value>-7.05 Ts (-229.65 nsec) - signal advanced</Value>
+        </Field>
+    </Field>
+    <Field name="DMRS Power">
+        <Field name="OFDM symbol 2">
+            <Value>-28.06 dBFS</Value>
+        </Field>
+        <Field name="OFDM symbol 7">
+            <Value>-28.06 dBFS</Value>
+        </Field>
+        <Field name="OFDM symbol 11">
+            <Value>-28.07 dBFS</Value>
+        </Field>
+    </Field>
+    <Field name="DMRS Correlation">
+        <Field name="OFDM symbol 2">
+            <Value>-0.02 dB</Value>
+        </Field>
+        <Field name="OFDM symbol 7">
+            <Value>-0.02 dB</Value>
+        </Field>
+        <Field name="OFDM symbol 11">
+            <Value>-0.02 dB</Value>
+        </Field>
+    </Field>
+    <Field name="Num_Antennas">
+        <Value>1</Value>
+    </Field>
+    <Field name="Power parameters">
+        <Field name="Mean power">
+            <Field name="Antenna 0">
+                <Value>-14.65 dBm (-24.30 dBFs)</Value>
+            </Field>
+        </Field>
+        <Field name="PAPR (dB)">
+            <Field name="Antenna 0 (symbols 0..13)">
+                <Value>[ 6.38 | 6.46 | 5.31 | 6.19 | 6.34 | 6.38 | 5.97 | 5.32 | 6.05 | 6.02 | 6.23 | 5.33 | 5.93 | 6.32]</Value>
+            </Field>
+        </Field>
+    </Field>
+    <Field name="DC Leakage Measurement">
+        <Field name="Antenna 0">
+            <Value>-35.22dBc</Value>
+        </Field>
+    </Field>
+    <Field name="Power summary">
+        <Value>-14.65 dBm (-24.30 dBFs) - Ant: 0</Value>
+    </Field>
+    <Field name="CRC Feedback">
+        <Value>PASS</Value>
+    </Field>
+    <Field name="Applied CFO">
+        <Value>4.20 Hz</Value>
+    </Field>
+    <Field name="Delta CFO">
+        <Field name="Antenna 0_1">
+            <Value>361.93 Hz</Value>
+        </Field>
+    </Field>
+    <Field name="UL Timing Offset">
+        <Value>0 Ts</Value>
+    </Field>
+</LogRecord>

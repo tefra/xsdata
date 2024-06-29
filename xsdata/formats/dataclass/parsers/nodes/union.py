@@ -40,6 +40,7 @@ class UnionNode(XmlNode):
         "context",
         "level",
         "events",
+        "candidates",
     )
 
     def __init__(
@@ -60,7 +61,34 @@ class UnionNode(XmlNode):
         self.config = config
         self.context = context
         self.level = 0
+        self.candidates = list(self.filter_candidates())
         self.events: List[Tuple[str, str, Any, Any]] = []
+
+    def filter_candidates(self):
+        parent_ns = target_uri(self.var.qname)
+        for clazz in self.var.types:
+            is_model = self.context.class_type.is_model(clazz)
+            if self.attrs and not is_model:
+                continue
+
+            meta = self.context.build(clazz, parent_ns=parent_ns)
+            if self.filter_candidate_by_fixed_attribute(meta):
+                yield clazz
+
+    def filter_candidate_by_fixed_attribute(self, meta: XmlMeta) -> bool:
+        for qname, value in self.attrs.items():
+            attr = meta.find_attribute(qname)
+            if attr is not None and not attr.init:
+                with suppress(ParserError):
+                    ParserUtils.validate_fixed_value(meta, attr, value)
+                    return True
+
+                return False
+
+        return True
+
+
+
 
     def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
         """Record the event for the child element.
@@ -120,7 +148,7 @@ class UnionNode(XmlNode):
         parent_namespace = target_uri(qname)
         config = replace(self.config, fail_on_converter_warnings=True)
 
-        for clazz in self.var.types:
+        for clazz in self.candidates:
             candidate = None
             with suppress(Exception):
                 if self.context.class_type.is_model(clazz):

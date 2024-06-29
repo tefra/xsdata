@@ -187,7 +187,7 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
         source = self.find_dependency(attr_type, attr.tag)
         if not source:
             logger.warning("Reset absent type: %s", attr_type.name)
-            self.reset_attribute_type(attr_type, True)
+            self.reset_attribute_type(attr_type)
         elif source.is_enumeration:
             attr.restrictions.min_length = None
             attr.restrictions.max_length = None
@@ -230,6 +230,11 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
         Raises:
             AnalyzerValueError: if the source class has more than one attributes
         """
+        if not source.attrs:
+            logger.warning("Reset absent simple type: %s", attr_type.name)
+            cls.reset_attribute_type(attr_type)
+            return
+
         source_attr = source.attrs[0]
         index = attr.types.index(attr_type)
         attr.types.pop(index)
@@ -257,17 +262,16 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
         attr.default = attr.default or source_attr.default
 
     @classmethod
-    def reset_attribute_type(cls, attr_type: AttrType, use_str: bool = True):
-        """Reset the attribute type to string or any simple type.
+    def reset_attribute_type(cls, attr_type: AttrType):
+        """Reset the attribute type to string.
 
         The method will also unset the circular/forward flags, as native
         types only depend on python builtin types.
 
         Args:
             attr_type: The attr type instance to reset
-            use_str: Whether to use xs:string or xs:anySimpleType
         """
-        attr_type.qname = str(DataType.STRING if use_str else DataType.ANY_SIMPLE_TYPE)
+        attr_type.qname = str(DataType.STRING)
         attr_type.native = True
         attr_type.circular = False
         attr_type.forward = False

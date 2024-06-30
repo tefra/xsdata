@@ -7,7 +7,7 @@ from xsdata.formats.converter import ConverterFactory
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
-from xsdata.models.enums import Namespace, QNames
+from xsdata.models.enums import Namespace, ProcessType, QNames
 from xsdata.utils.testing import FactoryTestCase, XmlMetaFactory, XmlVarFactory
 
 
@@ -116,6 +116,9 @@ class ParserUtilsTests(FactoryTestCase):
 
         var = XmlVarFactory.create("fixed", default=lambda: float("nan"))
         ParserUtils.validate_fixed_value(meta, var, float("nan"))
+
+        var = XmlVarFactory.create("fixed", default=lambda: ProcessType.LAX)
+        ParserUtils.validate_fixed_value(meta, var, "lax")
 
     def test_parse_var_with_error(self):
         meta = XmlMetaFactory.create(clazz=TypeA, qname="foo")

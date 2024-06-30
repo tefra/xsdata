@@ -228,7 +228,7 @@ class ParserUtils:
         Special cases
             - float nans are never equal in python
             - strings with whitespaces, need trimming
-
+            - comparing raw str values
         """
 
         default_value = var.default() if callable(var.default) else var.default
@@ -243,6 +243,9 @@ class ParserUtils:
             and default_value.strip() == value.strip()
         ):
             return
+
+        if isinstance(value, str) and not isinstance(default_value, str):
+            default_value = converter.serialize(default_value, format=var.format)
 
         if default_value != value:
             raise ParserError(

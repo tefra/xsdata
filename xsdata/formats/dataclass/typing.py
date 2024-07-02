@@ -1,4 +1,5 @@
 import sys
+from collections.abc import Iterable
 from typing import (
     Any,
     Callable,
@@ -40,7 +41,7 @@ else:
 
 NONE_TYPE = type(None)
 UNION_TYPES = (Union, UnionType)
-ITERABLE_TYPES = (list, tuple)
+ITERABLE_TYPES = (list, tuple, Iterable)
 
 
 def evaluate(tp: Any, globalns: Any, localns: Any = None) -> Any:
@@ -206,7 +207,10 @@ def evaluate_element(annotation: Any, tokens: bool = False) -> Result:
             factory = tokens_factory
             tokens_factory = origin
         else:
-            factory = origin
+            if origin == Iterable:
+                factor = list
+            else:
+                factory = origin
 
         types = args
         origin = get_origin(args[0])

@@ -40,7 +40,6 @@ class Filters:
 
     DEFAULT_KEY = "default"
     FACTORY_KEY = "default_factory"
-    UNESCAPED_DBL_QUOTE_REGEX = re.compile(r"([^\\])\"")
 
     __slots__ = (
         "substitutions",
@@ -569,10 +568,7 @@ class Filters:
             return data
 
         if key == "pattern":
-            # escape double quotes because double quotes surround the regex string
-            # in the rendered output
-            value = self.UNESCAPED_DBL_QUOTE_REGEX.sub(r'\1\\"', data)
-            return f'r"{value}"'
+            return f"r{repr(data)}".replace("\\\\", "\\")
 
         if data == "":
             return '""'

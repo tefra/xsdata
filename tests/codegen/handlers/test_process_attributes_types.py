@@ -145,7 +145,7 @@ class ProcessAttributeTypesTests(FactoryTestCase):
         attr_type = attr.types[0]
 
         self.processor.process_dependency_type(target, attr, attr_type)
-        mock_reset_attribute_type.assert_called_once_with(attr_type, True)
+        mock_reset_attribute_type.assert_called_once_with(attr_type)
 
     @mock.patch.object(ProcessAttributeTypes, "copy_attribute_properties")
     @mock.patch.object(ProcessAttributeTypes, "find_dependency")
@@ -298,6 +298,18 @@ class ProcessAttributeTypesTests(FactoryTestCase):
                 mock.call(source, target, source.attrs[0].types[1]),
             ]
         )
+
+    @mock.patch.object(ProcessAttributeTypes, "reset_attribute_type")
+    def test_copy_attribute_properties_from_empty_source(
+        self, mock_reset_attribute_type
+    ):
+        source = ClassFactory.create()
+        target = ClassFactory.elements(1)
+        attr = target.attrs[0]
+
+        self.processor.copy_attribute_properties(source, target, attr, attr.types[0])
+
+        mock_reset_attribute_type.assert_called_once_with(attr.types[0])
 
     def test_copy_attribute_properties_from_nillable_source(self):
         source = ClassFactory.elements(1, nillable=True)

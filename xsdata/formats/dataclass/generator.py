@@ -248,7 +248,7 @@ class DataclassGenerator(AbstractGenerator):
             ],
             [
                 "ruff",
-                "checks",
+                "check",
                 "--line-length",
                 str(self.config.output.max_line_length),
                 "--config",

@@ -693,6 +693,10 @@ class EventGeneratorTests(TestCase):
         expected = [
             ("start", "a"),
             ("attr", "a0", "foo"),
+            ("start", "{xsdata}x6"),
+            ("attr", QNames.XSI_NIL, "true"),
+            ("data", None),
+            ("end", "{xsdata}x6"),
             ("end", "a"),
         ]
 
@@ -814,6 +818,7 @@ class EventGeneratorTests(TestCase):
         x2 = next(meta.find_children("x2"))
         x3 = next(meta.find_children("x3"))
         x4 = next(meta.find_children("x4"))
+        x6 = next(meta.find_children("x6"))
 
         actual = self.generator.next_value(obj, meta)
         expected = [
@@ -825,6 +830,7 @@ class EventGeneratorTests(TestCase):
             (x1, 4),
             (x3, 9),
             (x4, 10),
+            (x6, None),
         ]
 
         self.assertIsInstance(actual, Generator)

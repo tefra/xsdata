@@ -172,6 +172,8 @@ class SequentialType:
     x4: Optional[int] = field(
         default=None, metadata={"type": "Element", "sequence": 2}
     )
+    x5: Optional[str] = field(default=None, metadata={"type": "Element", "nillable": True})
+    x6: Optional[str] = field(default=None, metadata={"type": "Element", "nillable": True, "required": True})
 
 
 @dataclass

@@ -1,3 +1,17 @@
+## 24.7 (2024-07-28)
+
+**Features**
+
+- Improve XML parsing performance on union elements with fixed attributes
+  ([#1066](https://github.com/tefra/xsdata/pull/1066))
+- Skip optional and nillable elements on XML Serializer
+  ([#1066](https://github.com/tefra/xsdata/pull/1066))
+
+**Fixes**
+
+- Reset attr types derived from missing simple types
+  ([#1062](https://github.com/tefra/xsdata/pull/1062))
+
 ## 24.6.1 (2024-06-28)
 
 **Fixes**

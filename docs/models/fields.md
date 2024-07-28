@@ -63,12 +63,12 @@ The namespace name of the XML element or attribute.
 ### `nillable`
 
 Specify if the field has to be present in the serialized result even when it doesn't
-have any meaningful content.
+have any meaningful content. If the field is not required the serializer will ignore it.
 
 ```python
 >>> @dataclass
 ... class Root:
-...     first: Optional[str] = field(metadata={"nillable": True}, default=None)
+...     first: Optional[str] = field(metadata={"nillable": True, "required": True}, default=None)
 ...     second: Optional[str] = field(default=None)
 ...
 >>> print(serializer.render(Root()))

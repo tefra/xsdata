@@ -933,7 +933,7 @@ class EventGenerator:
 
             if var.sequence is None:
                 value = getattr(obj, var.name)
-                if value is not None or var.nillable:
+                if value is not None or (var.nillable and var.required):
                     yield var, value
                 index += 1
                 continue
@@ -955,11 +955,11 @@ class EventGenerator:
                         if j < len(values):
                             rolling = True
                             value = values[j]
-                            if value is not None or var.nillable:
+                            if value is not None or (var.nillable and var.required):
                                 yield var, value
                     elif j == 0:
                         rolling = True
-                        if values is not None or var.nillable:
+                        if values is not None or (var.nillable and var.required):
                             yield var, values
 
                 j += 1

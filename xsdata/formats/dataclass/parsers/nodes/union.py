@@ -74,7 +74,7 @@ class UnionNode(XmlNode):
 
         return list(filter(fixed_attribute, candidates))
 
-    def filter_fixed_attrs(self, candidate: Type, parent_ns: str) -> bool:
+    def filter_fixed_attrs(self, candidate: Type, parent_ns: Optional[str]) -> bool:
         """Return whether the node attrs are incompatible with fixed attrs.
 
         Args:

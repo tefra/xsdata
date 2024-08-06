@@ -1,6 +1,7 @@
 import itertools
 import operator
 import sys
+from collections.abc import Iterable
 from typing import (
     Any,
     Callable,
@@ -190,7 +191,7 @@ class XmlVar(MetaMixin):
         self.required = required
         self.nillable = nillable
         self.sequence = sequence
-        self.list_element = factory in (list, tuple)
+        self.list_element = factory in (list, tuple, Iterable)
         self.default = default
         self.namespaces = namespaces
         self.elements = elements

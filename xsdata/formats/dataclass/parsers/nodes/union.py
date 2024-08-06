@@ -1,7 +1,8 @@
 import copy
+import functools
 from contextlib import suppress
 from dataclasses import replace
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Type
 
 from xsdata.exceptions import ParserError
 from xsdata.formats.dataclass.context import XmlContext
@@ -40,6 +41,7 @@ class UnionNode(XmlNode):
         "context",
         "level",
         "events",
+        "candidates",
     )
 
     def __init__(
@@ -60,7 +62,40 @@ class UnionNode(XmlNode):
         self.config = config
         self.context = context
         self.level = 0
+        self.candidates = self.filter_candidates()
         self.events: List[Tuple[str, str, Any, Any]] = []
+
+    def filter_candidates(self) -> List[Type]:
+        """Filter union candidates by fixed attributes."""
+        candidates = list(self.var.types)
+        fixed_attribute = functools.partial(
+            self.filter_fixed_attrs, parent_ns=target_uri(self.var.qname)
+        )
+
+        return list(filter(fixed_attribute, candidates))
+
+    def filter_fixed_attrs(self, candidate: Type, parent_ns: Optional[str]) -> bool:
+        """Return whether the node attrs are incompatible with fixed attrs.
+
+        Args:
+            candidate: The candidate type
+            parent_ns: The parent namespace
+        """
+        if not self.context.class_type.is_model(candidate):
+            return not self.attrs
+
+        meta = self.context.build(candidate, parent_ns=parent_ns)
+        for qname, value in self.attrs.items():
+            var = meta.find_attribute(qname)
+            if not var or var.init:
+                continue
+
+            try:
+                ParserUtils.validate_fixed_value(meta, var, value)
+            except ParserError:
+                return False
+
+        return True
 
     def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
         """Record the event for the child element.
@@ -120,29 +155,31 @@ class UnionNode(XmlNode):
         parent_namespace = target_uri(qname)
         config = replace(self.config, fail_on_converter_warnings=True)
 
-        for clazz in self.var.types:
-            candidate = None
+        for candidate in self.candidates:
+            result = None
             with suppress(Exception):
-                if self.context.class_type.is_model(clazz):
-                    self.context.build(clazz, parent_ns=parent_namespace)
+                if self.context.class_type.is_model(candidate):
+                    self.context.build(candidate, parent_ns=parent_namespace)
                     parser = NodeParser(
-                        config=config, context=self.context, handler=EventsHandler
+                        config=config,
+                        context=self.context,
+                        handler=EventsHandler,
                     )
-                    candidate = parser.parse(self.events, clazz)
+                    result = parser.parse(self.events, candidate)
                 else:
-                    candidate = ParserUtils.parse_var(
+                    result = ParserUtils.parse_var(
                         meta=self.meta,
                         var=self.var,
                         config=config,
                         value=text,
-                        types=[clazz],
+                        types=[candidate],
                         ns_map=self.ns_map,
                     )
 
-            score = self.context.class_type.score_object(candidate)
+            score = self.context.class_type.score_object(result)
             if score > max_score:
                 max_score = score
-                obj = candidate
+                obj = result
 
         if obj:
             objects.append((self.var.qname, obj))

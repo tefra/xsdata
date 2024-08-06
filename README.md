@@ -74,32 +74,16 @@ Check the [documentation](https://xsdata.readthedocs.io) for more ✨✨✨
 - Support xinclude statements and unknown properties
 - Customize behaviour through config
 
-## Changelog: 24.6.1 (2024-06-28)
-
-**Fixes**
-
-- Ruff check command typo breaks generator with v0.5.0
-  ([#1061](https://github.com/tefra/xsdata/pull/1061))
-
-## Changelog: 24.6 (2024-06-24)
+## Changelog: 24.7 (2024-07-28)
 
 **Features**
 
-- Add class and field info in parsing warnings
-  ([#1036](https://github.com/tefra/xsdata/pull/1036))
-- Remove whitespace from bytes encoded xml strings
-  ([#1037](https://github.com/tefra/xsdata/pull/1037))
-- Improve codegen performance ([#1043](https://github.com/tefra/xsdata/pull/1043))
+- Improve XML parsing performance on union elements with fixed attributes
+  ([#1066](https://github.com/tefra/xsdata/pull/1066))
+- Skip optional and nillable elements on XML Serializer
+  ([#1066](https://github.com/tefra/xsdata/pull/1066))
 
 **Fixes**
 
-- JSON serializer fails on derived elements
-  ([#1053](https://github.com/tefra/xsdata/pull/1053))
-- Update typing-extensions minimum version
-  ([#1039](https://github.com/tefra/xsdata/pull/1039))
-- Avoid using not-threadsafe warnings.catch_warning
-  ([#1042](https://github.com/tefra/xsdata/pull/1042))
-- Unnest classes doesn't update inner classes recursively
-  ([#1047](https://github.com/tefra/xsdata/pull/1047))
-- Restore support for optional lists
-  ([#1053](https://github.com/tefra/xsdata/pull/1053))
+- Reset attr types derived from missing simple types
+  ([#1062](https://github.com/tefra/xsdata/pull/1062))

@@ -1,4 +1,4 @@
-from dataclasses import make_dataclass
+from dataclasses import field, make_dataclass
 from typing import Union
 from unittest import TestCase
 
@@ -60,6 +60,41 @@ class UnionNodeTests(TestCase):
         self.assertEqual(0, node.level)
         self.assertEqual([("end", "bar", "text", "tail")], node.events)
 
+    def test_filter_fixed_attrs(self):
+        a = make_dataclass(
+            "A",
+            [("x", int, field(init=False, default=1, metadata={"type": "Attribute"}))],
+        )
+        b = make_dataclass(
+            "A",
+            [("x", int, field(init=False, default=2, metadata={"type": "Attribute"}))],
+        )
+
+        root = make_dataclass("Root", [("value", Union[a, b, int])])
+        meta = self.context.build(root)
+        var = next(meta.find_children("value"))
+        node = UnionNode(
+            meta=meta,
+            var=var,
+            position=0,
+            config=self.config,
+            context=self.context,
+            attrs={"x": 2},
+            ns_map={},
+        )
+        self.assertEqual([b], node.candidates)
+
+        node = UnionNode(
+            meta=meta,
+            var=var,
+            position=0,
+            config=self.config,
+            context=self.context,
+            attrs={},
+            ns_map={},
+        )
+        self.assertEqual([a, b, int], node.candidates)
+
     def test_bind_returns_best_matching_object(self):
         item = make_dataclass(
             "Item", [("value", str), ("a", int, attribute()), ("b", int, attribute())]
@@ -95,8 +130,15 @@ class UnionNodeTests(TestCase):
         self.assertIsNot(node.attrs, node.events[0][2])
         self.assertIs(node.ns_map, node.events[0][3])
 
-        node.events.clear()
-        node.attrs.clear()
+        node = UnionNode(
+            meta=meta,
+            var=var,
+            position=0,
+            config=self.config,
+            context=self.context,
+            attrs={},
+            ns_map=ns_map,
+        )
         self.assertTrue(node.bind("item", "1", None, objects))
         self.assertEqual(1, objects[-1][1])
 

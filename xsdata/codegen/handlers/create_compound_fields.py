@@ -43,8 +43,15 @@ class CreateCompoundFields(RelativeHandlerInterface):
         """
         groups = group_by(target.attrs, get_restriction_choice)
         for choice, attrs in groups.items():
+            is_list = False
+            if self.config.list_only:
+                try:
+                    is_list = next(True for attr in attrs if attr.is_list)
+                except StopIteration:
+                    pass
+
             if choice and len(attrs) > 1:
-                if self.config.enabled:
+                if self.config.enabled and (not self.config.list_only or is_list):
                     self.group_fields(target, attrs)
                 else:
                     self.calculate_choice_min_occurs(attrs)

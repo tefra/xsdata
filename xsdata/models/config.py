@@ -192,6 +192,7 @@ class CompoundFields:
 
     Args:
         enabled: Use compound fields for repeatable elements
+        list_only: Only use compound fields for lists
         default_name: Default compound field name
         use_substitution_groups: Use substitution groups if they
             exist, instead of element names.
@@ -204,6 +205,7 @@ class CompoundFields:
     """
 
     enabled: bool = text_node(default=False, cli="compound-fields")
+    list_only: bool = attribute(default=False, cli=False)
     default_name: str = attribute(default="choice", cli=False)
     use_substitution_groups: bool = attribute(default=False, cli=False)
     force_default_name: bool = attribute(default=False, cli=False)

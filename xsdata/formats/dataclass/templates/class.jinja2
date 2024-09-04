@@ -43,7 +43,26 @@ class {{ class_name }}{{"({})".format(base_classes) if base_classes }}:
 {%- for attr in obj.attrs %}
     {%- set field_typing = obj|field_type(attr) %}
     {%- set field_definition = obj|field_definition(attr, parent_namespace) %}
-    {{ attr.name|field_name(obj.name) }}: {{ field_typing }} = {{ field_definition }}
+    {%- set field_name = attr.name|field_name(obj.name) %}
+    {{ field_name }}: {{ field_typing }} = {{ field_definition }}
+{%- for attr2 in attr.choices %}
+    {%- set field_type_names = obj|field_type_names(attr2) %}
+    {# TODO: how to get the string without quotes? #}
+    {%- set field_type_names_fmt = obj|field_type_names_join(attr2)|replace("\"", "") %}
+    {%- set field_name2 = attr2.name|field_name(obj.name) %}
+    {% if 'Any' not in field_typing %}
+    @property
+    def {{ field_name2 }}(self) -> {{ field_type_names_fmt }}:
+        {%- for field_type_name in field_type_names %}
+        {# TODO: how to get the string without quotes? #}
+        if isinstance(self.{{ field_name }}, {{ field_type_name|replace("\"", "") }}):
+            return self.{{ field_name }}
+        {% endfor %}
+    @{{ field_name2 }}.setter
+    def {{ field_name2 }}(self, value: {{ field_type_names_fmt|safe }}) -> None:
+        self.{{ field_name }} = value
+    {% endif %}
+{% endfor %}
 {%- endfor -%}
 {%- for inner in obj.inner %}
     {%- set tpl = "enum.jinja2" if inner.is_enumeration else "class.jinja2" -%}

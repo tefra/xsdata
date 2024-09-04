@@ -128,6 +128,8 @@ class Filters:
             {
                 "field_name": self.field_name,
                 "field_type": self.field_type,
+                "field_type_names": self.field_type_names,
+                "field_type_names_join": self.field_type_names_join,
                 "field_default": self.field_default_value,
                 "field_metadata": self.field_metadata,
                 "field_definition": self.field_definition,
@@ -822,6 +824,23 @@ class Filters:
             return f"ForwardRef({result})"
 
         return f"Type[{result}]"
+
+    def field_type_names(
+        self,
+        obj: Class,
+        attr: Attr,
+        choice: bool = False,
+    ) -> List[str]:
+        return [self._field_type_name(obj, x, choice=choice) for x in attr.types]
+
+    def field_type_names_join(
+        self,
+        obj: Class,
+        attr: Attr,
+        choice: bool = False,
+    ) -> str:
+        type_names = [self._field_type_name(obj, x, choice=choice) for x in attr.types]
+        return self._join_type_names(type_names)
 
     def _field_type_names(
         self,

@@ -819,7 +819,7 @@ class EventGenerator:
         Yields:
             An iterator of sax events.
         """
-        if collections.is_array(value) or instance(value, Generator):
+        if collections.is_array(value) or isinstance(value, Generator):
             for val in value:
                 yield from self.convert_choice(val, var, namespace)
         else:

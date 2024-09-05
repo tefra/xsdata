@@ -630,7 +630,7 @@ class EventGenerator:
         elif var.is_elements:
             yield from self.convert_elements(value, var, namespace)
         elif var.list_element and (
-                collections.is_array(value) or isinstance(value, Generator)
+            collections.is_array(value) or isinstance(value, Generator)
         ):
             yield from self.convert_list(value, var, namespace)
         else:

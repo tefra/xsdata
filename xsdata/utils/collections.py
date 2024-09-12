@@ -5,6 +5,7 @@ from typing import (
     Dict,
     Iterable,
     Iterator,
+    Generator,
     List,
     Optional,
     Sequence,
@@ -20,7 +21,7 @@ def is_array(value: Any) -> bool:
     if isinstance(value, tuple):
         return not hasattr(value, "_fields")
 
-    return isinstance(value, (list, set, frozenset))
+    return isinstance(value, (list, set, frozenset, Generator))
 
 
 def unique_sequence(items: Iterable[T], key: Optional[str] = None) -> List[T]:

@@ -6,7 +6,6 @@ from typing import (
     Any,
     Dict,
     Final,
-    Generator,
     Iterable,
     Iterator,
     List,
@@ -629,9 +628,7 @@ class EventGenerator:
             yield from self.convert_tokens(value, var, namespace)
         elif var.is_elements:
             yield from self.convert_elements(value, var, namespace)
-        elif var.list_element and (
-            collections.is_array(value) or isinstance(value, Generator)
-        ):
+        elif var.list_element and collections.is_array(value):
             yield from self.convert_list(value, var, namespace)
         else:
             yield from self.convert_any_type(value, var, namespace)
@@ -819,7 +816,7 @@ class EventGenerator:
         Yields:
             An iterator of sax events.
         """
-        if collections.is_array(value) or isinstance(value, Generator):
+        if collections.is_array(value):
             for val in value:
                 yield from self.convert_choice(val, var, namespace)
         else:

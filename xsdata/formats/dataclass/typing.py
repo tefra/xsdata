@@ -33,7 +33,12 @@ if (3, 9) <= sys.version_info[:2] <= (3, 10):
             tp = tp.__origin__[args]  # type: ignore
 
         return __eval_type(tp, globalns, localns)
+elif sys.version_info[:2] >= (3, 13):
+    # python 3.13+ requires type_params argument
+    from typing import _eval_type as __eval_type  # type: ignore
 
+    def _eval_type(tp: Any, globalns: Any, localns: Any) -> Any:
+        return __eval_type(tp, globalns, localns, type_params=())
 else:
     from typing import _eval_type  # type: ignore
 

@@ -27,11 +27,15 @@ class CollectionsTests(TestCase):
     def test_is_array(self):
         fixture = namedtuple("fixture", ["a", "b"])
 
+        def foo():
+            yield 1
+
         self.assertFalse(collections.is_array(1))
         self.assertFalse(collections.is_array(fixture(1, 2)))
         self.assertTrue(collections.is_array([]))
         self.assertTrue(collections.is_array(()))
         self.assertTrue(collections.is_array(frozenset()))
+        self.assertTrue(collections.is_array(foo()))
 
     def test_connected_components(self):
         lists = [[1, 2, 3], [4], [3, 4], [6]]

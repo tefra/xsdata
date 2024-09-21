@@ -19,7 +19,7 @@ from xsdata.codegen.mappers import (
     DictMapper,
     DtdMapper,
     ElementMapper,
-    SchemaMapper,
+    SchemaMapper, JsonSchemaMapper,
 )
 from xsdata.codegen.models import Class
 from xsdata.codegen.parsers import DtdParser
@@ -42,6 +42,7 @@ TYPE_DEFINITION = 2
 TYPE_DTD = 3
 TYPE_XML = 4
 TYPE_JSON = 5
+TYPE_JSON_SCHEMA = 6
 
 
 class SupportedType(NamedTuple):
@@ -84,6 +85,12 @@ supported_types = [
         name="xml",
         match_uri=lambda x: x.endswith("xml"),
         match_content=lambda x: x.endswith(">"),
+    ),
+    SupportedType(
+        id=TYPE_JSON_SCHEMA,
+        name="json_schema",
+        match_uri=lambda x: x.endswith("schema.json"),
+        match_content=lambda x: "$schema" in x,
     ),
     SupportedType(
         id=TYPE_JSON,
@@ -167,6 +174,7 @@ class ResourceTransformer:
         self.process_dtds(sources[TYPE_DTD])
         self.process_xml_documents(sources[TYPE_XML])
         self.process_json_documents(sources[TYPE_JSON])
+        self.process_json_schemas(sources[TYPE_JSON_SCHEMA])
 
     def process_definitions(self, uris: List[str]):
         """Process a list of wsdl resources.
@@ -194,6 +202,15 @@ class ResourceTransformer:
         """
         for uri in uris:
             self.process_schema(uri)
+
+    def process_json_schemas(self, uris: List[str]):
+        """Process a list of json schema resources.
+
+        Args:
+            uris: A list of json schema URI strings to process
+        """
+        for uri in uris:
+            self.process_json_schema(uri)
 
     def process_dtds(self, uris: List[str]):
         """Process a list of dtd resources.
@@ -224,6 +241,29 @@ class ResourceTransformer:
         schema = self.parse_schema(uri, namespace)
         if schema:
             self.convert_schema(schema)
+
+    def process_json_schema(self, uri: str, namespace: Optional[str] = None):
+
+        input_stream = self.load_resource(uri)
+        if input_stream:
+            logger.info("Parsing JSON Schema %s", uri)
+            data = json.load(io.BytesIO(input_stream))
+            self.classes.extend(JsonSchemaMapper.map(data, uri))
+
+            def resolve_refs(schema):
+                for key, value in schema.items():
+                    if key == "$ref" and not value.startswith("#"):
+                        self.process_json_schema(value)
+
+                    if isinstance(value, dict):
+                        resolve_refs(value)
+
+            resolve_refs(data)
+
+
+
+
+
 
     def process_xml_documents(self, uris: List[str]):
         """Process a list of xml resources.

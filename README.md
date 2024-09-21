@@ -74,16 +74,14 @@ Check the [documentation](https://xsdata.readthedocs.io) for more ✨✨✨
 - Support xinclude statements and unknown properties
 - Customize behaviour through config
 
-## Changelog: 24.7 (2024-07-28)
-
-**Features**
-
-- Improve XML parsing performance on union elements with fixed attributes
-  ([#1066](https://github.com/tefra/xsdata/pull/1066))
-- Skip optional and nillable elements on XML Serializer
-  ([#1066](https://github.com/tefra/xsdata/pull/1066))
+## Changelog: 24.9 (2024-09-21)
 
 **Fixes**
 
-- Reset attr types derived from missing simple types
-  ([#1062](https://github.com/tefra/xsdata/pull/1062))
+- Fix typing annotations deprecation warning in Python 3.13
+  ([#1077](https://github.com/tefra/xsdata/pull/1077))
+
+**Features**
+
+- Allow generators as array elements
+  ([#1074](https://github.com/tefra/xsdata/pull/1074))

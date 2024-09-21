@@ -1,3 +1,15 @@
+## 24.9 (2024-09-21)
+
+**Fixes**
+
+- Fix typing annotations deprecation warning in Python 3.13
+  ([#1077](https://github.com/tefra/xsdata/pull/1077))
+
+**Features**
+
+- Allow generators as array elements
+  ([#1074](https://github.com/tefra/xsdata/pull/1074))
+
 ## 24.7 (2024-07-28)
 
 **Features**

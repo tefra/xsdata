@@ -1,5 +1,5 @@
 import sys
-from collections.abc import Iterable, Iterator, Mapping
+from collections.abc import Iterable, Mapping
 from typing import (
     Any,
     Callable,

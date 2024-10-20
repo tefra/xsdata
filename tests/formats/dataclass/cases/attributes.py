@@ -1,8 +1,6 @@
 from collections.abc import Mapping
 from typing import Dict, List, Set, Tuple
 
-from tests.formats.dataclass.cases import PY39
-
 cases = [
     (int, False),
     (Set, False),
@@ -12,11 +10,5 @@ cases = [
     (Dict, ((str,), dict, None)),
     (Dict[str, str], ((str,), dict, None)),
     (Mapping[str, str], ((str,), dict, None)),
+    (dict[str, str], ((str,), dict, None)),
 ]
-
-if PY39:
-    cases.extend(
-        [
-            (dict[str, str], ((str,), dict, None)),
-        ]
-    )

@@ -34,7 +34,7 @@ $ xsdata --help
 
 ## Requirements
 
-!!! Note "xsData relies on these awesome libraries and supports `python >= 3.8`"
+!!! Note "xsData relies on these awesome libraries and supports `python >= 3.9`"
 
     - [lxml](https://lxml.de/) - XML advanced features
     - [requests](https://requests.readthedocs.io/) - Webservice Default Transport

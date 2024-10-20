@@ -136,23 +136,6 @@ class GeneratorConfigTests(TestCase):
 
         self.assertEqual("Enabling eq because order is true", str(w[-1].message))
 
-    def test_subscriptable_types_requires_390(self):
-        if sys.version_info < (3, 9):
-            with warnings.catch_warnings(record=True) as w:
-                self.assertFalse(
-                    GeneratorOutput(subscriptable_types=True).subscriptable_types
-                )
-
-            self.assertEqual(
-                "Generics PEP 585 requires python >= 3.9, reverting...",
-                str(w[-1].message),
-            )
-
-        else:
-            self.assertTrue(
-                GeneratorOutput(subscriptable_types=True).subscriptable_types
-            )
-
     def test_use_union_type_requires_310_and_postponed_annotations(self):
         if sys.version_info < (3, 10):
             with warnings.catch_warnings(record=True) as w:

@@ -257,13 +257,6 @@ class GeneratorOutput:
 
     def validate(self):
         """Reset configuration conflicts."""
-        if self.subscriptable_types and sys.version_info < (3, 9):
-            self.subscriptable_types = False
-            warnings.warn(
-                "Generics PEP 585 requires python >= 3.9, reverting...",
-                CodegenWarning,
-            )
-
         if self.union_type and sys.version_info < (3, 10):
             self.union_type = False
             warnings.warn(

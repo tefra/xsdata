@@ -1,8 +1,6 @@
 from collections.abc import Iterable
 from typing import Dict, List, Optional, Set, Tuple, Union
 
-from tests.formats.dataclass.cases import PY39
-
 tokens = [
     (Set, False),
     (Dict[str, int], False),
@@ -16,6 +14,11 @@ tokens = [
     (Iterable[Iterable[str, ...]], ((str,), list, list)),
     (Tuple[List[str], ...], ((str,), tuple, list)),
     (Optional[Tuple[List[str], ...]], ((str,), tuple, list)),
+    (list[str], ((str,), None, list)),
+    (tuple[str, ...], ((str,), None, tuple)),
+    (list[list[str]], ((str,), list, list)),
+    (list[tuple[str, ...]], ((str,), list, tuple)),
+    (tuple[list[str], ...], ((str,), tuple, list)),
 ]
 
 not_tokens = [
@@ -30,22 +33,6 @@ not_tokens = [
     (List[Union[str, int]], ((str, int), list, None)),
     (Optional[List[Union[str, int]]], ((str, int), list, None)),
     (Tuple[str, ...], ((str,), tuple, None)),
+    (list[str], ((str,), list, None)),
+    (tuple[str, ...], ((str,), tuple, None)),
 ]
-
-if PY39:
-    tokens.extend(
-        [
-            (list[str], ((str,), None, list)),
-            (tuple[str, ...], ((str,), None, tuple)),
-            (list[list[str]], ((str,), list, list)),
-            (list[tuple[str, ...]], ((str,), list, tuple)),
-            (tuple[list[str], ...], ((str,), tuple, list)),
-        ]
-    )
-
-    not_tokens.extend(
-        [
-            (list[str], ((str,), list, None)),
-            (tuple[str, ...], ((str,), tuple, None)),
-        ]
-    )

@@ -643,6 +643,9 @@ class FiltersTests(FactoryTestCase):
         self.filters.format.frozen = False
         self.assertEqual('list["A.B.C"]', self.filters.field_type(self.obj, attr))
 
+        self.filters.generic_collections = True
+        self.assertEqual('Iterable["A.B.C"]', self.filters.field_type(self.obj, attr))
+
     def test_field_type_with_token_attr(self):
         attr = AttrFactory.create(
             types=AttrTypeFactory.list(1, qname="foo_bar"),
@@ -709,6 +712,9 @@ class FiltersTests(FactoryTestCase):
 
         self.filters.subscriptable_types = True
         self.assertEqual("dict[str, str]", self.filters.field_type(self.obj, attr))
+
+        self.filters.generic_collections = True
+        self.assertEqual("Mapping[str, str]", self.filters.field_type(self.obj, attr))
 
     def test_field_type_with_native_type(self):
         attr = AttrFactory.create(
@@ -901,6 +907,14 @@ class FiltersTests(FactoryTestCase):
 
         output = ": Any = "
         expected = "from typing import Any"
+        self.assertIn(expected, self.filters.default_imports(output))
+
+        output = ": Iterable[str] = "
+        expected = "from collections.abc import Iterable"
+        self.assertIn(expected, self.filters.default_imports(output))
+
+        output = ": Mapping[str, str] = "
+        expected = "from collections.abc import Mapping"
         self.assertIn(expected, self.filters.default_imports(output))
 
     def test_default_imports_combo(self):

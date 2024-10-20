@@ -29,7 +29,7 @@ class GeneratorConfigTests(TestCase):
         expected = (
             '<?xml version="1.0" encoding="UTF-8"?>\n'
             f'<Config xmlns="http://pypi.org/project/xsdata" version="{__version__}">\n'
-            '  <Output maxLineLength="79" subscriptableTypes="false" unionType="false">\n'
+            '  <Output maxLineLength="79" subscriptableTypes="false" genericCollections="false" unionType="false">\n'
             "    <Package>generated</Package>\n"
             '    <Format repr="true" eq="true" order="false" unsafeHash="false" frozen="false" slots="false" kwOnly="false">dataclasses</Format>\n'
             "    <Structure>filenames</Structure>\n"
@@ -89,7 +89,7 @@ class GeneratorConfigTests(TestCase):
         expected = (
             '<?xml version="1.0" encoding="UTF-8"?>\n'
             f'<Config xmlns="http://pypi.org/project/xsdata" version="{__version__}">\n'
-            '  <Output maxLineLength="79" subscriptableTypes="false" unionType="false">\n'
+            '  <Output maxLineLength="79" subscriptableTypes="false" genericCollections="false" unionType="false">\n'
             "    <Package>foo.bar</Package>\n"
             '    <Format repr="true" eq="true" order="false" unsafeHash="false"'
             ' frozen="false" slots="false" kwOnly="false">dataclasses</Format>\n'
@@ -171,6 +171,18 @@ class GeneratorConfigTests(TestCase):
                     "Enabling postponed annotations, because `union_type==True`",
                     str(w[-1].message),
                 )
+
+    def test_generic_collections_requires_frozen_false(self):
+        with warnings.catch_warnings(record=True) as w:
+            output = GeneratorOutput(
+                generic_collections=True, format=OutputFormat(frozen=True)
+            )
+            self.assertFalse(output.generic_collections)
+
+            self.assertEqual(
+                "Generic Collections, requires frozen=False, reverting...",
+                str(w[-1].message),
+            )
 
     def test_format_slots_requires_310(self):
         if sys.version_info < (3, 10):

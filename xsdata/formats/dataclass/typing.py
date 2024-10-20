@@ -1,4 +1,5 @@
 import sys
+from collections.abc import Iterable, Iterator, Mapping
 from typing import (
     Any,
     Callable,
@@ -45,7 +46,7 @@ else:
 
 NONE_TYPE = type(None)
 UNION_TYPES = (Union, UnionType)
-ITERABLE_TYPES = (list, tuple)
+ITERABLE_TYPES = (list, tuple, Iterable)
 
 
 def evaluate(tp: Any, globalns: Any, localns: Any = None) -> Any:
@@ -143,6 +144,9 @@ def evaluate_attribute(annotation: Any, tokens: bool = False) -> Result:
 
         args = analyze_token_args(origin, args)
         tokens_factory = origin
+        if tokens_factory is Iterable:
+            tokens_factory = list
+
         origin = get_origin(args[0])
 
         if origin in UNION_TYPES:
@@ -171,7 +175,7 @@ def evaluate_attributes(annotation: Any, **_: Any) -> Result:
         origin = get_origin(annotation)
         args = get_args(annotation)
 
-        if origin is not dict and annotation is not dict:
+        if origin is not dict and origin is not Mapping:
             raise TypeError
 
     if args and not all(arg is str for arg in args):
@@ -222,6 +226,12 @@ def evaluate_element(annotation: Any, tokens: bool = False) -> Result:
     elif origin:
         raise TypeError
 
+    if factory is Iterable:
+        factory = list
+
+    if tokens_factory is Iterable:
+        tokens_factory = list
+
     return Result(types=types, factory=factory, tokens_factory=tokens_factory)
 
 
@@ -247,7 +257,7 @@ def evaluate_wildcard(annotation: Any, **_: Any) -> Result:
     if origin in UNION_TYPES:
         types = filter_none_type(get_args(annotation))
     elif origin in ITERABLE_TYPES:
-        factory = origin
+        factory = list if origin is Iterable else origin
         types = filter_ellipsis(get_args(annotation))
     elif origin is None:
         types = (annotation,)

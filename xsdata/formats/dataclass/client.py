@@ -51,7 +51,7 @@ class Config:
             for f in fields(cls)
         }
 
-        return cls(**params)
+        return cls(**params)  # type: ignore
 
 
 class TransportTypes:

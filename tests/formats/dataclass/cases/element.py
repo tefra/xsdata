@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from typing import Dict, List, Optional, Set, Tuple, Union
 
 from tests.formats.dataclass.cases import PY39
@@ -12,6 +13,7 @@ tokens = [
     (List[List[str]], ((str,), list, list)),
     (Optional[List[List[Union[str, int]]]], ((str, int), list, list)),
     (List[Tuple[str, ...]], ((str,), list, tuple)),
+    (Iterable[Iterable[str, ...]], ((str,), list, list)),
     (Tuple[List[str], ...], ((str,), tuple, list)),
     (Optional[Tuple[List[str], ...]], ((str,), tuple, list)),
 ]

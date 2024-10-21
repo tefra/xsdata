@@ -2,24 +2,24 @@ exclude: tests/fixtures
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: debug-statements
   - repo: https://github.com/crate-ci/typos
-    rev: v1.24.6
+    rev: v1.26.0
     hooks:
       - id: typos
         exclude: ^tests/|.xsd|xsdata/models/datatype.py$
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.6
+    rev: v0.7.0
     hooks:
       - id: ruff
         args: [ --fix, --show-fixes]
       - id: ruff-format
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.11.2
+    rev: v1.12.1
     hooks:
       - id: mypy
         files: ^(xsdata/)

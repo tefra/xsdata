@@ -17,7 +17,6 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -29,7 +28,7 @@ classifiers = [
     "Topic :: Text Processing :: Markup :: XML",
 ]
 keywords = ["xsd", "wsdl", "schema", "dtd", "binding", "xml", "json", "dataclasses", "generator", "cli"]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 dependencies = [
     "typing-extensions>=4.7.0",
 ]

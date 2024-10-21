@@ -225,6 +225,7 @@ class GeneratorOutput:
         max_line_length: Adjust the maximum line length
         subscriptable_types: Use PEP-585 generics for standard
             collections, python>=3.9 Only
+        generic_collections: Use generic collections (Iterable, Mapping)
         union_type: Use PEP-604 union type, python>=3.10 Only
         postponed_annotations: Use 563 postponed evaluation of  annotations
         unnest_classes: Move inner classes to upper level
@@ -243,6 +244,7 @@ class GeneratorOutput:
     wrapper_fields: bool = element(default=False)
     max_line_length: int = attribute(default=79)
     subscriptable_types: bool = attribute(default=False)
+    generic_collections: bool = attribute(default=False)
     union_type: bool = attribute(default=False)
     postponed_annotations: bool = element(default=False)
     unnest_classes: bool = element(default=False)
@@ -255,13 +257,6 @@ class GeneratorOutput:
 
     def validate(self):
         """Reset configuration conflicts."""
-        if self.subscriptable_types and sys.version_info < (3, 9):
-            self.subscriptable_types = False
-            warnings.warn(
-                "Generics PEP 585 requires python >= 3.9, reverting...",
-                CodegenWarning,
-            )
-
         if self.union_type and sys.version_info < (3, 10):
             self.union_type = False
             warnings.warn(
@@ -273,6 +268,13 @@ class GeneratorOutput:
             self.postponed_annotations = True
             warnings.warn(
                 "Enabling postponed annotations, because `union_type==True`",
+                CodegenWarning,
+            )
+
+        if self.generic_collections and self.format.frozen:
+            self.generic_collections = False
+            warnings.warn(
+                "Generic Collections, requires frozen=False, reverting...",
                 CodegenWarning,
             )
 

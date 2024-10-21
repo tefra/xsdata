@@ -58,6 +58,7 @@ class Filters:
         "max_line_length",
         "union_type",
         "subscriptable_types",
+        "generic_collections",
         "relative_imports",
         "postponed_annotations",
         "format",
@@ -106,6 +107,7 @@ class Filters:
         self.max_line_length: int = config.output.max_line_length
         self.union_type: bool = config.output.union_type
         self.subscriptable_types: bool = config.output.subscriptable_types
+        self.generic_collections: bool = config.output.generic_collections
         self.relative_imports: bool = config.output.relative_imports
         self.postponed_annotations: bool = config.output.postponed_annotations
         self.format = config.output.format
@@ -758,6 +760,9 @@ class Filters:
             return result
 
         if attr.is_dict:
+            if self.generic_collections:
+                return "Mapping[str, str]"
+
             return "dict[str, str]" if self.subscriptable_types else "Dict[str, str]"
 
         if attr.is_nillable or (
@@ -889,7 +894,10 @@ class Filters:
 
         return "\n".join(collections.unique_sequence(imports))
 
-    def _get_iterable_format(self):
+    def _get_iterable_format(self) -> str:
+        if self.generic_collections:
+            return "Iterable[{}]"
+
         fmt = "Tuple[{}, ...]" if self.format.frozen else "List[{}]"
         return fmt.lower() if self.subscriptable_types else fmt
 
@@ -902,13 +910,17 @@ class Filters:
             "decimal": {"Decimal": type_patterns("Decimal")},
             "enum": {"Enum": ["(Enum)"]},
             "typing": {
-                "Dict": [": Dict"],
+                "Dict": [": Dict["],
                 "List": [": List["],
                 "Optional": ["Optional["],
                 "Tuple": ["Tuple["],
                 "Union": ["Union["],
                 "ForwardRef": [": ForwardRef("],
                 "Any": type_patterns("Any"),
+            },
+            "collections.abc": {
+                "Iterable": [": Iterable["],
+                "Mapping": [": Mapping["],
             },
             "xml.etree.ElementTree": {"QName": type_patterns("QName")},
             "xsdata.models.datatype": {

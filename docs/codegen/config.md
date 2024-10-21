@@ -60,7 +60,14 @@ type # typing.Type
 
 **CLI Option:** `--subscriptable-types / --no-subscriptable-types`
 
-**Requirements:** `python>=3.9`
+### `genericCollections`
+
+Use `collections.abc.Iterable` and `collections.abc.Mapping` instead of `List|Tuple` and
+`Dict`
+
+**Default Value:** `False`
+
+**CLI Option:** `--generic-collections / --no-generic-collections`
 
 ### `unionType`
 

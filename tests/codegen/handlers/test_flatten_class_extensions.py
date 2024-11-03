@@ -474,3 +474,13 @@ class FlattenClassExtensionsTests(FactoryTestCase):
         self.assertEqual(0, len(item.extensions))
         self.assertEqual(expected, item.attrs[0])
         self.assertEqual(expected.restrictions, item.attrs[0].restrictions)
+
+    def test_get_or_create_attribute_ignore_existing_attribute(self):
+        target = ClassFactory.create()
+        attr = AttrFactory.create(tag=Tag.ATTRIBUTE, name="value")
+
+        result = FlattenClassExtensions.get_or_create_attribute(
+            target, "value", Tag.EXTENSION
+        )
+
+        self.assertIsNot(attr.tag, result)

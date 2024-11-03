@@ -380,7 +380,7 @@ class FlattenClassExtensions(RelativeHandlerInterface):
             tag: The attr tag name
         """
         attr = ClassUtils.find_attr(target, name)
-        if attr is None:
+        if attr is None or attr.tag == Tag.ATTRIBUTE:
             attr = Attr(name=name, tag=tag)
             attr.restrictions.min_occurs = 1
             attr.restrictions.max_occurs = 1

@@ -74,14 +74,18 @@ Check the [documentation](https://xsdata.readthedocs.io) for more ✨✨✨
 - Support xinclude statements and unknown properties
 - Customize behaviour through config
 
-## Changelog: 24.9 (2024-09-21)
+## Changelog: 24.11 (2024-11-03)
 
 **Fixes**
 
-- Fix typing annotations deprecation warning in Python 3.13
-  ([#1077](https://github.com/tefra/xsdata/pull/1077))
+- Avoid conflict with attributes named value when flattening extensions
+  ([#1085](https://github.com/tefra/xsdata/pull/1085))
 
 **Features**
 
-- Allow generators as array elements
-  ([#1074](https://github.com/tefra/xsdata/pull/1074))
+- Add cli config to use generic collections
+  ([#1082](https://github.com/tefra/xsdata/pull/1082))
+
+**Deprecations**
+
+- Drop support for python 3.8

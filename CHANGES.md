@@ -1,3 +1,19 @@
+## 24.11 (2024-11-03)
+
+**Fixes**
+
+- Avoid conflict with attributes named value when flattening extensions
+  ([#1085](https://github.com/tefra/xsdata/pull/1085))
+
+**Features**
+
+- Add cli config to use generic collections
+  ([#1082](https://github.com/tefra/xsdata/pull/1082))
+
+**Deprecations**
+
+- Drop support for python 3.8
+
 ## 24.9 (2024-09-21)
 
 **Fixes**

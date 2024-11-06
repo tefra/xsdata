@@ -96,14 +96,13 @@ class NodeParser(PushParser):
         except IndexError:
             xsi_type = ParserUtils.xsi_type(attrs, ns_map)
 
-            # Match element qname directly
-            if clazz is None:
-                clazz = self.context.find_type(qname)
-
-            # Root is xs:anyType try xsi:type
-            if clazz is None and xsi_type:
-                clazz = self.context.find_type(xsi_type)
-
+            clazz = self.find_root_clazz(
+                clazz=clazz,
+                qname=qname,
+                attrs=attrs,
+                ns_map=ns_map,
+                xsi_type=xsi_type,
+            )
             # Exit if we still have no binding model
             if clazz is None:
                 raise ParserError(f"No class found matching root: {qname}")
@@ -152,6 +151,34 @@ class NodeParser(PushParser):
         """
         item = queue.pop()
         return item.bind(qname, text, tail, objects)
+
+    def find_root_clazz(
+        self,
+        clazz: Optional[Type],
+        qname: str,
+        attrs: Dict,
+        ns_map: Dict,
+        xsi_type: Optional[str],
+    ) -> Optional[Type]:
+        """
+        Obtain the root clazz, maybe from the provided clazz.
+
+        :param clazz: Root class type, if it's missing look for any
+            suitable models from the current context.
+        :param qname: Qualified name
+        :param attrs: Attribute key-value map
+        :param ns_map: Namespace prefix-URI map
+        :param xsi_type: The xsi:type of the object
+        """
+        # Match element qname directly
+        if clazz is None:
+            clazz = self.context.find_type(qname)
+
+        # Root is xs:anyType try xsi:type
+        if clazz is None and xsi_type:
+            clazz = self.context.find_type(xsi_type)
+
+        return clazz
 
 
 @dataclass

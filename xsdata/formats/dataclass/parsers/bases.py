@@ -163,12 +163,14 @@ class NodeParser(PushParser):
         """
         Obtain the root clazz, maybe from the provided clazz.
 
-        :param clazz: Root class type, if it's missing look for any
-            suitable models from the current context.
-        :param qname: Qualified name
-        :param attrs: Attribute key-value map
-        :param ns_map: Namespace prefix-URI map
-        :param xsi_type: The xsi:type of the object
+        Args:
+            clazz: The root class type, auto locate if omitted
+            qname: Qualified name
+            attrs: Attribute key-value map
+            ns_map: Namespace prefix-URI map
+            xsi_type: The xsi:type of the object
+        Returns:
+            The root class.
         """
         # Match element qname directly
         if clazz is None:

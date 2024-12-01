@@ -504,6 +504,9 @@ class DefinitionsMapperTests(FactoryTestCase):
         self.assertEqual(expected_fault_attr, body.attrs[0])
         self.assertEqual(expected_fault_attrs, body.inner[0].attrs)
 
+        for attr in body.attrs:
+            self.assertTrue(attr.is_optional)
+
     def test_build_envelope_fault_with_detail_messages(self):
         body = ClassFactory.create(qname="Body")
         target = ClassFactory.create()

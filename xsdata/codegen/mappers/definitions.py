@@ -259,6 +259,9 @@ class DefinitionsMapper:
             ),
         )
 
+        for attr in body.attrs:
+            attr.restrictions.min_occurs = 0
+
     @classmethod
     def build_envelope_class(
         cls,

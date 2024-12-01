@@ -59,6 +59,7 @@ class GeneratorConfigTests(TestCase):
             '    <Substitution type="package" search="http://schemas.xmlsoap.org/wsdl/soap/" replace="soap"/>\n'
             '    <Substitution type="package" search="http://schemas.xmlsoap.org/wsdl/soap12/" replace="soap12"/>\n'
             '    <Substitution type="package" search="http://schemas.xmlsoap.org/soap/envelope/" replace="soapenv"/>\n'
+            '    <Substitution type="package" search="http://schemas.xmlsoap.org/soap/encoding/" replace="soapenc"/>\n'
             '    <Substitution type="class" search="(.*)Class$" replace="\\1Type"/>\n'
             "  </Substitutions>\n"
             "  <Extensions/>\n"

@@ -30,6 +30,7 @@ class Namespace(Enum):
     SOAP11 = ("http://schemas.xmlsoap.org/wsdl/soap/", "soap")
     SOAP12 = ("http://schemas.xmlsoap.org/wsdl/soap12/", "soap12")
     SOAP_ENV = ("http://schemas.xmlsoap.org/soap/envelope/", "soapenv")
+    SOAP_ENC = ("http://schemas.xmlsoap.org/soap/encoding/", "soapenc")
 
     def __init__(self, uri: str, prefix: str):
         self.uri = uri

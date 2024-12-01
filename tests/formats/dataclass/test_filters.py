@@ -281,6 +281,7 @@ class FiltersTests(FactoryTestCase):
         expected = (
             "field(\n"
             "        init=False,\n"
+            "        default=None,\n"
             "        metadata={\n"
             '            "type": "Ignore",\n'
             "        }\n"

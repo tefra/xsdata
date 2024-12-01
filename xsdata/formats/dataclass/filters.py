@@ -256,6 +256,9 @@ class Filters:
         if attr.fixed or attr.is_prohibited:
             kwargs["init"] = False
 
+            if attr.is_prohibited:
+                kwargs[self.DEFAULT_KEY] = None
+
         if default_value is not False and not attr.is_prohibited:
             key = self.FACTORY_KEY if attr.is_factory else self.DEFAULT_KEY
             kwargs[key] = default_value

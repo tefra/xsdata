@@ -1,8 +1,9 @@
 import os
 import re
 from collections import defaultdict
+from collections.abc import Iterable, Iterator
 from pathlib import Path
-from typing import Iterable, Iterator, List, Optional, Set
+from typing import Optional
 from urllib.parse import urlparse
 
 from toposort import toposort_flatten
@@ -132,7 +133,7 @@ class DesignateClassPackages(ContainerHandlerInterface):
             module = classes[0].name
             self.assign(classes, ".".join(parts), module)
 
-    def sort_classes(self, qnames: Set[str]) -> List[Class]:
+    def sort_classes(self, qnames: set[str]) -> list[Class]:
         """Sort classes by their dependencies graph.
 
         Args:
@@ -148,7 +149,7 @@ class DesignateClassPackages(ContainerHandlerInterface):
         }
         return [self.container.first(qname) for qname in toposort_flatten(edges)]
 
-    def strongly_connected_classes(self) -> Iterator[Set[str]]:
+    def strongly_connected_classes(self) -> Iterator[set[str]]:
         """Compute strongly connected classes of a directed graph.
 
         Returns:
@@ -170,7 +171,7 @@ class DesignateClassPackages(ContainerHandlerInterface):
             cls.assign(obj.inner, package, module)
 
     @classmethod
-    def group_common_paths(cls, paths: Iterable[str]) -> List[List[str]]:
+    def group_common_paths(cls, paths: Iterable[str]) -> list[list[str]]:
         """Group a list of file paths by their common paths.
 
         Args:
@@ -198,7 +199,7 @@ class DesignateClassPackages(ContainerHandlerInterface):
 
         return list(groups.values())
 
-    def combine_ns_package(self, namespace: Optional[str]) -> List[str]:
+    def combine_ns_package(self, namespace: Optional[str]) -> list[str]:
         """Combine the output package with a namespace.
 
         You can add aliases to namespace uri with the

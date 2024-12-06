@@ -8,8 +8,6 @@ from typing import Type
 from typing import Union
 from xml.etree.ElementTree import QName
 
-from xsdata.utils.constants import return_true
-
 __NAMESPACE__ = "xsdata"
 
 

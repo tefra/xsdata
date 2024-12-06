@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Dict, List, Optional
+from typing import Optional
 
 from xsdata.codegen.mixins import ContainerInterface, RelativeHandlerInterface
 from xsdata.codegen.models import Attr, AttrType, Class
@@ -22,7 +22,7 @@ class AddAttributeSubstitutions(RelativeHandlerInterface):
 
     def __init__(self, container: ContainerInterface):
         super().__init__(container)
-        self.substitutions: Optional[Dict[str, List[Attr]]] = None
+        self.substitutions: Optional[dict[str, list[Attr]]] = None
 
     def process(self, target: Class):
         """Process the given class attrs for substitution groups.

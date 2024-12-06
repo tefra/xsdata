@@ -2,7 +2,7 @@ import abc
 import io
 import pathlib
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple, Type
+from typing import Any, Optional
 
 from xsdata.exceptions import XmlHandlerError
 from xsdata.formats.dataclass.parsers.config import ParserConfig
@@ -22,13 +22,13 @@ class PushParser:
     """
 
     config: ParserConfig = field(default_factory=ParserConfig)
-    ns_map: Dict[Optional[str], str] = field(init=False, default_factory=dict)
+    ns_map: dict[Optional[str], str] = field(init=False, default_factory=dict)
 
     def from_path(
         self,
         path: pathlib.Path,
-        clazz: Optional[Type[T]] = None,
-        ns_map: Optional[Dict[Optional[str], str]] = None,
+        clazz: Optional[type[T]] = None,
+        ns_map: Optional[dict[Optional[str], str]] = None,
     ) -> T:
         """Parse the input file into the target class type.
 
@@ -48,8 +48,8 @@ class PushParser:
     def from_string(
         self,
         source: str,
-        clazz: Optional[Type[T]] = None,
-        ns_map: Optional[Dict[Optional[str], str]] = None,
+        clazz: Optional[type[T]] = None,
+        ns_map: Optional[dict[Optional[str], str]] = None,
     ) -> T:
         """Parse the input source string into the target class type.
 
@@ -69,8 +69,8 @@ class PushParser:
     def from_bytes(
         self,
         source: bytes,
-        clazz: Optional[Type[T]] = None,
-        ns_map: Optional[Dict[Optional[str], str]] = None,
+        clazz: Optional[type[T]] = None,
+        ns_map: Optional[dict[Optional[str], str]] = None,
     ) -> T:
         """Parse the input source bytes object into the target class type.
 
@@ -91,8 +91,8 @@ class PushParser:
     def parse(
         self,
         source: Any,
-        clazz: Optional[Type[T]] = None,
-        ns_map: Optional[Dict[Optional[str], str]] = None,
+        clazz: Optional[type[T]] = None,
+        ns_map: Optional[dict[Optional[str], str]] = None,
     ) -> T:
         """Parse the input file or stream into the target class type.
 
@@ -111,12 +111,12 @@ class PushParser:
     @abc.abstractmethod
     def start(
         self,
-        clazz: Optional[Type],
-        queue: List[Any],
-        objects: List[Any],
+        clazz: Optional[type],
+        queue: list[Any],
+        objects: list[Any],
         qname: str,
-        attrs: Dict[str, str],
-        ns_map: Dict[Optional[str], str],
+        attrs: dict[str, str],
+        ns_map: dict[Optional[str], str],
     ):
         """Build and queue the XmlNode for the starting element.
 
@@ -132,8 +132,8 @@ class PushParser:
     @abc.abstractmethod
     def end(
         self,
-        queue: List,
-        objects: List,
+        queue: list,
+        objects: list,
         qname: str,
         text: Optional[str],
         tail: Optional[str],
@@ -152,7 +152,7 @@ class PushParser:
         """
 
     def register_namespace(
-        self, ns_map: Dict[Optional[str], str], prefix: Optional[str], uri: str
+        self, ns_map: dict[Optional[str], str], prefix: Optional[str], uri: str
     ):
         """Register the uri prefix in the namespace prefix-URI map.
 
@@ -177,7 +177,7 @@ class XmlNode(abc.ABC):
     __slots__ = ()
 
     @abc.abstractmethod
-    def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> "XmlNode":
+    def child(self, qname: str, attrs: dict, ns_map: dict, position: int) -> "XmlNode":
         """Initialize the next child node to be queued, when an element starts.
 
         This entry point is responsible to create the next node type
@@ -200,7 +200,7 @@ class XmlNode(abc.ABC):
         qname: str,
         text: Optional[str],
         tail: Optional[str],
-        objects: List[Any],
+        objects: list[Any],
     ) -> bool:
         """Bind the parsed data into an object for the ending element.
 
@@ -233,13 +233,13 @@ class XmlHandler:
 
     __slots__ = ("parser", "clazz", "queue", "objects")
 
-    def __init__(self, parser: PushParser, clazz: Optional[Type]):
+    def __init__(self, parser: PushParser, clazz: Optional[type]):
         self.parser = parser
         self.clazz = clazz
-        self.queue: List = []
-        self.objects: List = []
+        self.queue: list = []
+        self.objects: list = []
 
-    def parse(self, source: Any, ns_map: Dict[Optional[str], str]) -> Any:
+    def parse(self, source: Any, ns_map: dict[Optional[str], str]) -> Any:
         """Parse the source XML document.
 
         Args:
@@ -255,7 +255,7 @@ class XmlHandler:
 class EventsHandler(XmlHandler):
     """Sax content handler for pre-recorded events."""
 
-    def parse(self, source: List[Tuple], ns_map: Dict[Optional[str], str]) -> Any:
+    def parse(self, source: list[tuple], ns_map: dict[Optional[str], str]) -> Any:
         """Forward the pre-recorded events to the main parser.
 
         Args:

@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import Optional
 
 __NAMESPACE__ = "xsdata"
 
@@ -25,7 +25,7 @@ class Bravos:
         name = "bravos"
         namespace = "xsdata"
 
-    bravo: List[int] = field(
+    bravo: list[int] = field(
         default_factory=list,
         metadata={
             "type": "Element",
@@ -60,7 +60,7 @@ class Charlies:
         name = "charlies"
         namespace = "xsdata"
 
-    charlie: List[Charlie] = field(
+    charlie: list[Charlie] = field(
         default_factory=list,
         metadata={
             "type": "Element",
@@ -83,7 +83,7 @@ class Wrapper:
             "required": True,
         },
     )
-    bravo: List[int] = field(
+    bravo: list[int] = field(
         default_factory=list,
         metadata={
             "wrapper": "bravos",
@@ -91,7 +91,7 @@ class Wrapper:
             "min_occurs": 1,
         },
     )
-    charlie: List[Charlie] = field(
+    charlie: list[Charlie] = field(
         default_factory=list,
         metadata={
             "wrapper": "charlies",

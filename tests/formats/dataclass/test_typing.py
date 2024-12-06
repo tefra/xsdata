@@ -1,5 +1,3 @@
-from typing import Type
-
 import pytest
 
 from tests.formats.dataclass.cases import (
@@ -20,11 +18,11 @@ from xsdata.formats.dataclass.typing import (
 
 
 def test_evaluate_with_typevar():
-    result = evaluate(Type["str"], None)
+    result = evaluate(type["str"], None)
     assert result is str
 
     with pytest.raises(TypeError):
-        evaluate(Type, None)
+        evaluate(type["str", "int"], None)
 
 
 @pytest.mark.parametrize("case,expected", attribute.tokens)

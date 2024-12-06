@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import List, Optional
+from typing import Optional
 
 from xsdata.codegen.mappers.mixins import RawDocumentMapper
 from xsdata.codegen.models import AttrType, Class
@@ -17,7 +17,7 @@ class ElementMapper(RawDocumentMapper):
     """
 
     @classmethod
-    def map(cls, element: AnyElement, location: str) -> List[Class]:
+    def map(cls, element: AnyElement, location: str) -> list[Class]:
         """Map schema children elements to classes.
 
         Args:
@@ -138,7 +138,7 @@ class ElementMapper(RawDocumentMapper):
                 target.mixed = True
 
     @classmethod
-    def sequential_groups(cls, element: AnyElement) -> List[List[int]]:
+    def sequential_groups(cls, element: AnyElement) -> list[list[int]]:
         """Identify sequential groups of repeating attributes.
 
         Args:
@@ -151,7 +151,7 @@ class ElementMapper(RawDocumentMapper):
         return list(collections.connected_components(groups))
 
     @classmethod
-    def group_repeating_attrs(cls, element: AnyElement) -> List[List[int]]:
+    def group_repeating_attrs(cls, element: AnyElement) -> list[list[int]]:
         """Group repeating children in the given generic element.
 
         Args:
@@ -165,7 +165,7 @@ class ElementMapper(RawDocumentMapper):
             if isinstance(child, AnyElement) and child.qname:
                 counters[child.qname].append(index)
 
-        groups: List[List[int]] = []
+        groups: list[list[int]] = []
         if len(counters) > 1:
             groups.extend(
                 list(range(x[0], x[-1] + 1)) for x in counters.values() if len(x) > 1

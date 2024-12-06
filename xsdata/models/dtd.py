@@ -1,6 +1,6 @@
 import enum
 from dataclasses import dataclass
-from typing import Dict, List, Optional
+from typing import Optional
 
 from xsdata.models.enums import DataType
 from xsdata.utils.namespaces import build_qname
@@ -76,7 +76,7 @@ class DtdAttribute:
     type: DtdAttributeType
     default: DtdAttributeDefault
     default_value: Optional[str]
-    values: List[str]
+    values: list[str]
 
     @property
     def data_type(self) -> DataType:
@@ -120,8 +120,8 @@ class DtdElement:
     type: DtdElementType
     prefix: Optional[str]
     content: Optional[DtdContent]
-    attributes: List[DtdAttribute]
-    ns_map: Dict
+    attributes: list[DtdAttribute]
+    ns_map: dict
 
     @property
     def qname(self) -> str:
@@ -140,4 +140,4 @@ class Dtd:
     """
 
     location: str
-    elements: List[DtdElement]
+    elements: list[DtdElement]

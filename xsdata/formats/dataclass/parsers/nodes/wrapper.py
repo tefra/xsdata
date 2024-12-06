@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Optional
 
 from xsdata.formats.dataclass.parsers.mixins import XmlNode
 from xsdata.formats.dataclass.parsers.nodes.element import ElementNode
@@ -26,7 +26,7 @@ class WrapperNode(XmlNode):
         self.ns_map = parent.ns_map
 
     def bind(
-        self, qname: str, text: Optional[str], tail: Optional[str], objects: List
+        self, qname: str, text: Optional[str], tail: Optional[str], objects: list
     ) -> bool:
         """This node will never appear in the xml, so it never binds any data.
 
@@ -41,7 +41,7 @@ class WrapperNode(XmlNode):
         """
         return False
 
-    def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
+    def child(self, qname: str, attrs: dict, ns_map: dict, position: int) -> XmlNode:
         """Proxy the next child node to the parent node.
 
         Args:

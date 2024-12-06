@@ -1,6 +1,5 @@
-import math
 from itertools import starmap
-from typing import Any, Dict, List, Optional, Set, Type
+from typing import Any, Optional
 
 from xsdata.exceptions import ParserError
 from xsdata.formats.converter import converter
@@ -54,13 +53,13 @@ class ElementNode(XmlNode):
     def __init__(
         self,
         meta: XmlMeta,
-        attrs: Dict,
-        ns_map: Dict,
+        attrs: dict,
+        ns_map: dict,
         config: ParserConfig,
         context: XmlContext,
         position: int,
         mixed: bool = False,
-        derived_factory: Optional[Type] = None,
+        derived_factory: Optional[type] = None,
         xsi_type: Optional[str] = None,
         xsi_nil: Optional[bool] = None,
     ):
@@ -74,7 +73,7 @@ class ElementNode(XmlNode):
         self.derived_factory = derived_factory
         self.xsi_type = xsi_type
         self.xsi_nil = xsi_nil
-        self.assigned: Set[int] = set()
+        self.assigned: set[int] = set()
         self.tail_processed: bool = False
 
     def bind(
@@ -82,7 +81,7 @@ class ElementNode(XmlNode):
         qname: str,
         text: Optional[str],
         tail: Optional[str],
-        objects: List[Any],
+        objects: list[Any],
     ) -> bool:
         """Bind the parsed data into an object for the ending element.
 
@@ -101,7 +100,7 @@ class ElementNode(XmlNode):
         """
         obj: Any = None
         if not self.xsi_nil or self.meta.nillable:
-            params: Dict = {}
+            params: dict = {}
             self.bind_attrs(params)
             self.bind_content(params, text, tail, objects)
             obj = self.config.class_factory(self.meta.clazz, params)
@@ -120,10 +119,10 @@ class ElementNode(XmlNode):
 
     def bind_content(
         self,
-        params: Dict,
+        params: dict,
         text: Optional[str],
         tail: Optional[str],
-        objects: List[Any],
+        objects: list[Any],
     ):
         """Parse the text and tail content.
 
@@ -149,7 +148,7 @@ class ElementNode(XmlNode):
             if isinstance(params[key], PendingCollection):
                 params[key] = params[key].evaluate()
 
-    def bind_attrs(self, params: Dict[str, Any]):
+    def bind_attrs(self, params: dict[str, Any]):
         """Parse the element attributes.
 
         Scenarios:
@@ -183,7 +182,7 @@ class ElementNode(XmlNode):
                             f"Unknown attribute {self.meta.qname}:{qname}"
                         )
 
-    def bind_attr(self, params: Dict, var: XmlVar, value: Any):
+    def bind_attr(self, params: dict, var: XmlVar, value: Any):
         """Parse an element attribute.
 
         Ignores fields with init==false!
@@ -206,7 +205,7 @@ class ElementNode(XmlNode):
         else:
             ParserUtils.validate_fixed_value(self.meta, var, value)
 
-    def bind_any_attr(self, params: Dict, var: XmlVar, qname: str, value: Any):
+    def bind_any_attr(self, params: dict, var: XmlVar, qname: str, value: Any):
         """Parse an element attribute to a wildcard field.
 
         Args:
@@ -220,7 +219,7 @@ class ElementNode(XmlNode):
 
         params[var.name][qname] = ParserUtils.parse_any_attribute(value, self.ns_map)
 
-    def bind_objects(self, params: Dict, objects: List):
+    def bind_objects(self, params: dict, objects: list):
         """Bind children objects.
 
         Emit a warning if an object doesn't fit in any
@@ -237,7 +236,7 @@ class ElementNode(XmlNode):
 
         del objects[position:]
 
-    def bind_object(self, params: Dict, qname: str, value: Any) -> bool:
+    def bind_object(self, params: dict, qname: str, value: Any) -> bool:
         """Bind a child object.
 
         Args:
@@ -259,7 +258,7 @@ class ElementNode(XmlNode):
         return False
 
     @classmethod
-    def bind_var(cls, params: Dict, var: XmlVar, value: Any) -> bool:
+    def bind_var(cls, params: dict, var: XmlVar, value: Any) -> bool:
         """Bind a child object to an element field.
 
         Args:
@@ -285,7 +284,7 @@ class ElementNode(XmlNode):
 
         return True
 
-    def bind_wild_var(self, params: Dict, var: XmlVar, qname: str, value: Any) -> bool:
+    def bind_wild_var(self, params: dict, var: XmlVar, qname: str, value: Any) -> bool:
         """Bind a child object to a wildcard field.
 
         The wildcard might support one or more values. If it
@@ -322,7 +321,7 @@ class ElementNode(XmlNode):
 
         return True
 
-    def bind_mixed_objects(self, params: Dict, var: XmlVar, objects: List):
+    def bind_mixed_objects(self, params: dict, var: XmlVar, objects: list):
         """Bind children objects to a mixed content wildcard field.
 
         Args:
@@ -351,7 +350,7 @@ class ElementNode(XmlNode):
 
         return value
 
-    def bind_text(self, params: Dict, text: Optional[str]) -> bool:
+    def bind_text(self, params: dict, text: Optional[str]) -> bool:
         """Bind the element text content.
 
         Args:
@@ -387,7 +386,7 @@ class ElementNode(XmlNode):
 
     def bind_wild_text(
         self,
-        params: Dict,
+        params: dict,
         var: XmlVar,
         text: Optional[str],
         tail: Optional[str],
@@ -438,7 +437,7 @@ class ElementNode(XmlNode):
 
         return True
 
-    def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
+    def child(self, qname: str, attrs: dict, ns_map: dict, position: int) -> XmlNode:
         """Initialize the next child node to be queued, when an element starts.
 
         This entry point is responsible to create the next node type
@@ -474,8 +473,8 @@ class ElementNode(XmlNode):
         self,
         qname: str,
         var: XmlVar,
-        attrs: Dict,
-        ns_map: Dict,
+        attrs: dict,
+        ns_map: dict,
         position: int,
     ) -> Optional[XmlNode]:
         """Build the next child node based on the xml var instance.
@@ -585,13 +584,13 @@ class ElementNode(XmlNode):
 
     def build_element_node(
         self,
-        clazz: Type,
+        clazz: type,
         derived: bool,
         nillable: bool,
-        attrs: Dict,
-        ns_map: Dict,
+        attrs: dict,
+        ns_map: dict,
         position: int,
-        derived_factory: Type,
+        derived_factory: type,
         xsi_type: Optional[str] = None,
         xsi_nil: Optional[bool] = None,
     ) -> Optional["ElementNode"]:

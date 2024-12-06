@@ -1,11 +1,10 @@
 from datetime import date, datetime, time, timedelta, timezone
-from typing import Dict
 from unittest import TestCase
 
 from xsdata.models.datatype import XmlDate, XmlDateTime, XmlDuration, XmlPeriod, XmlTime
 
 
-def filter_none(mapping: Dict) -> Dict:
+def filter_none(mapping: dict) -> dict:
     return {k: v for k, v in mapping.items() if v is not None}
 
 

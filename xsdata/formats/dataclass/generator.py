@@ -1,10 +1,10 @@
 import importlib
 import pkgutil
-import re
 import subprocess
 import sys
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Iterator, List, Optional
+from typing import Optional
 
 from jinja2 import Environment, FileSystemLoader
 
@@ -46,11 +46,11 @@ class DataclassGenerator(AbstractGenerator):
         self.ruff_config = Path(__file__).parent / "ruff.toml"
 
     @classmethod
-    def get_template_paths(cls) -> List[str]:
+    def get_template_paths(cls) -> list[str]:
         """Return a list of template paths to feed the jinja2 loader."""
         return [str(Path(__file__).parent.joinpath("templates"))]
 
-    def render(self, classes: List[Class]) -> Iterator[GeneratorResult]:
+    def render(self, classes: list[Class]) -> Iterator[GeneratorResult]:
         """Render the given classes to python packages and modules.
 
         Args:
@@ -111,7 +111,7 @@ class DataclassGenerator(AbstractGenerator):
         package = self.config.output.package
         import_package(self.package_name(package))
 
-    def render_package(self, classes: List[Class], module: str) -> str:
+    def render_package(self, classes: list[Class], module: str) -> str:
         """Render the package for the given classes.
 
         Args:
@@ -135,7 +135,7 @@ class DataclassGenerator(AbstractGenerator):
     def render_module(
         self,
         resolver: DependenciesResolver,
-        classes: List[Class],
+        classes: list[Class],
     ) -> str:
         """Render the module for the given classes.
 
@@ -167,7 +167,7 @@ class DataclassGenerator(AbstractGenerator):
 
     def render_classes(
         self,
-        classes: List[Class],
+        classes: list[Class],
         module_namespace: Optional[str],
     ) -> str:
         """Render the classes source code in a module.
@@ -232,7 +232,7 @@ class DataclassGenerator(AbstractGenerator):
         """Initialize the filters instance by the generator configuration."""
         return Filters(config)
 
-    def ruff_code(self, file_paths: List[str]):
+    def ruff_code(self, file_paths: list[str]):
         """Run ruff lint and format on a list of file names.
 
         Args:

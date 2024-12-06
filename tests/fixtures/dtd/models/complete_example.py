@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import List, Optional
+from typing import Optional
 
 
 @dataclass
@@ -60,7 +60,7 @@ class Title:
 
 @dataclass
 class Tags:
-    tag: List[Tag] = field(
+    tag: list[Tag] = field(
         default_factory=list,
         metadata={
             "name": "Tag",
@@ -100,14 +100,14 @@ class Post:
             "required": True,
         },
     )
-    origin: List[Origin] = field(
+    origin: list[Origin] = field(
         default_factory=list,
         metadata={
             "name": "Origin",
             "type": "Element",
         },
     )
-    source: List[Source] = field(
+    source: list[Source] = field(
         default_factory=list,
         metadata={
             "name": "Source",
@@ -142,7 +142,7 @@ class Post:
 
 @dataclass
 class Blog:
-    post: List[Post] = field(
+    post: list[Post] = field(
         default_factory=list,
         metadata={
             "name": "Post",

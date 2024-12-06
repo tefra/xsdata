@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.models import Attr, Class, Extension, get_tag
@@ -42,7 +42,7 @@ class ClassValidator:
             if len(classes) > 1:
                 self.merge_global_types(classes)
 
-    def remove_invalid_classes(self, classes: List[Class]):
+    def remove_invalid_classes(self, classes: list[Class]):
         """Remove classes with undefined extensions.
 
         Args:
@@ -58,7 +58,7 @@ class ClassValidator:
                 classes.remove(target)
 
     @classmethod
-    def handle_duplicate_types(cls, classes: List[Class]):
+    def handle_duplicate_types(cls, classes: list[Class]):
         """Find and handle duplicate classes.
 
         If a class is defined more than once, keep either
@@ -115,7 +115,7 @@ class ClassValidator:
             ClassUtils.copy_group_attributes(source, target, circular_group)
 
     @classmethod
-    def select_winner(cls, candidates: List[Class]) -> int:
+    def select_winner(cls, candidates: list[Class]) -> int:
         """From a list of classes select which class index will remain.
 
         Classes that were extracted from in xs:override/xs:redefined
@@ -170,7 +170,7 @@ class ClassValidator:
         return ClassUtils.find_attr(target, target.name)
 
     @classmethod
-    def merge_global_types(cls, classes: List[Class]):
+    def merge_global_types(cls, classes: list[Class]):
         """Merge parent-child global types.
 
         Conditions

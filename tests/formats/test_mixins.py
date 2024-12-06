@@ -1,5 +1,5 @@
 import datetime
-from typing import Iterator, List
+from collections.abc import Iterator
 from unittest import mock
 
 from xsdata import __version__
@@ -11,7 +11,7 @@ from xsdata.utils.testing import ClassFactory, FactoryTestCase
 
 
 class NoneGenerator(AbstractGenerator):
-    def render(self, classes: List[Class]) -> Iterator[GeneratorResult]:
+    def render(self, classes: list[Class]) -> Iterator[GeneratorResult]:
         """Do nothing."""
 
 

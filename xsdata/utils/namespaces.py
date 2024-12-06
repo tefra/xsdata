@@ -1,6 +1,6 @@
 import functools
 import re
-from typing import Dict, Optional, Tuple
+from typing import Optional
 
 from xsdata.models.enums import Namespace
 from xsdata.utils import text
@@ -14,7 +14,7 @@ URI_REGEX = re.compile(
 )
 
 
-def load_prefix(uri: str, ns_map: Dict) -> Optional[str]:
+def load_prefix(uri: str, ns_map: dict) -> Optional[str]:
     """Get or create a prefix for the uri in the prefix-URI map."""
     for prefix, ns in ns_map.items():
         if ns == uri:
@@ -23,7 +23,7 @@ def load_prefix(uri: str, ns_map: Dict) -> Optional[str]:
     return generate_prefix(uri, ns_map)
 
 
-def generate_prefix(uri: str, ns_map: Dict) -> str:
+def generate_prefix(uri: str, ns_map: dict) -> str:
     """Generate a prefix for the given uri and append it in the prefix-URI map."""
     namespace = Namespace.get_enum(uri)
     if namespace:
@@ -37,17 +37,17 @@ def generate_prefix(uri: str, ns_map: Dict) -> str:
     return prefix
 
 
-def prefix_exists(uri: str, ns_map: Dict) -> bool:
+def prefix_exists(uri: str, ns_map: dict) -> bool:
     """Check if the uri exists in the prefix-URI namespace mapping."""
     return uri in ns_map.values()
 
 
-def is_default(uri: str, ns_map: Dict) -> bool:
+def is_default(uri: str, ns_map: dict) -> bool:
     """Check if the uri exists and it has no prefix."""
     return any(uri == ns and not prefix for prefix, ns in ns_map.items())
 
 
-def clean_prefixes(ns_map: Dict) -> Dict:
+def clean_prefixes(ns_map: dict) -> dict:
     """Remove default namespace if it's also assigned to a prefix."""
     result = {}
     for prefix, ns in ns_map.items():
@@ -91,7 +91,7 @@ def build_qname(tag_or_uri: Optional[str], tag: Optional[str] = None) -> str:
 
 
 @functools.lru_cache(maxsize=50)
-def split_qname(qname: str) -> Tuple:
+def split_qname(qname: str) -> tuple:
     """Split namespace qualified strings."""
     if qname[0] == "{":
         left, right = text.split(qname[1:], "}")

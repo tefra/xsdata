@@ -1,4 +1,3 @@
-from typing import Dict
 from unittest import TestCase
 
 from xsdata.models.enums import Namespace
@@ -19,7 +18,7 @@ from xsdata.utils.namespaces import (
 
 class NamespacesTests(TestCase):
     def test_load_prefix(self):
-        ns_map: Dict = {}
+        ns_map: dict = {}
         self.assertEqual("ns0", load_prefix("a", ns_map))
         self.assertEqual("ns0", load_prefix("a", ns_map))
         self.assertEqual("ns0", load_prefix("a", ns_map))
@@ -34,7 +33,7 @@ class NamespacesTests(TestCase):
         self.assertEqual(expected, ns_map)
 
     def test_generate_prefix(self):
-        ns_map: Dict = {}
+        ns_map: dict = {}
         self.assertEqual("ns0", generate_prefix("a", ns_map))
         self.assertEqual("xs", generate_prefix(Namespace.XS.uri, ns_map))
         self.assertEqual("soapenv", generate_prefix(Namespace.SOAP_ENV.uri, ns_map))

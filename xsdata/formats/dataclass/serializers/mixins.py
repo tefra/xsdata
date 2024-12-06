@@ -1,18 +1,14 @@
 import abc
 from abc import ABC
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import (
     Any,
-    Dict,
     Final,
-    Iterable,
-    Iterator,
-    List,
     Literal,
     Optional,
     TextIO,
-    Tuple,
     Union,
 )
 from xml.etree.ElementTree import QName
@@ -42,10 +38,10 @@ class XmlWriterEvent:
     END: Final = "end"
 
 
-StartEvent: TypeAlias = Tuple[Literal["start"], str]
-AttrEvent: TypeAlias = Tuple[Literal["attr"], str, Any]
-DataEvent: TypeAlias = Tuple[Literal["data"], str]
-EndEvent: TypeAlias = Tuple[Literal["end"], str]
+StartEvent: TypeAlias = tuple[Literal["start"], str]
+AttrEvent: TypeAlias = tuple[Literal["attr"], str, Any]
+DataEvent: TypeAlias = tuple[Literal["data"], str]
+EndEvent: TypeAlias = tuple[Literal["end"], str]
 
 EventIterator = Iterator[Union[StartEvent, AttrEvent, DataEvent, EndEvent]]
 
@@ -78,16 +74,16 @@ class EventHandler(abc.ABC):
         "pending_prefixes",
     )
 
-    def __init__(self, config: SerializerConfig, ns_map: Dict):
+    def __init__(self, config: SerializerConfig, ns_map: dict):
         self.config = config
         self.ns_map = ns_map
 
         self.in_tail = False
         self.tail: Optional[str] = None
-        self.attrs: Dict = {}
-        self.ns_context: List[Dict] = []
-        self.pending_tag: Optional[Tuple] = None
-        self.pending_prefixes: List[List] = []
+        self.attrs: dict = {}
+        self.ns_context: list[dict] = []
+        self.pending_tag: Optional[tuple] = None
+        self.pending_prefixes: list[list] = []
 
     def write(self, events: EventIterator):
         """Feed the sax content handler with events.
@@ -268,7 +264,7 @@ class EventHandler(abc.ABC):
         Save the list of prefixes to be removed at the end of the
         current pending tag.
         """
-        prefixes: List[str] = []
+        prefixes: list[str] = []
         self.pending_prefixes.append(prefixes)
 
         try:
@@ -328,7 +324,7 @@ class EventHandler(abc.ABC):
         """End document notification receiver."""
 
     @abc.abstractmethod
-    def start_element(self, name: Tuple[str, str], qname: str, attrs: Dict):
+    def start_element(self, name: tuple[str, str], qname: str, attrs: dict):
         """Start element notification receiver.
 
         Args:
@@ -338,7 +334,7 @@ class EventHandler(abc.ABC):
         """
 
     @abc.abstractmethod
-    def end_element(self, name: Tuple[str, str], qname: str):
+    def end_element(self, name: tuple[str, str], qname: str):
         """End element notification receiver.
 
         Args:
@@ -389,7 +385,7 @@ class EventContentHandler(EventHandler):
         pending_prefixes: The pending element namespace prefixes
     """
 
-    def __init__(self, config: SerializerConfig, ns_map: Dict):
+    def __init__(self, config: SerializerConfig, ns_map: dict):
         super().__init__(config, ns_map)
         self.handler = self.build_handler()
 
@@ -413,7 +409,7 @@ class EventContentHandler(EventHandler):
         """End document entrypoint."""
         self.handler.endDocument()
 
-    def end_element(self, name: Tuple[str, str], qname: str):
+    def end_element(self, name: tuple[str, str], qname: str):
         """End element notification receiver.
 
         Args:
@@ -438,7 +434,7 @@ class EventContentHandler(EventHandler):
         """
         self.handler.endPrefixMapping(prefix)
 
-    def start_element(self, name: Tuple[str, str], qname: str, attrs: Dict):
+    def start_element(self, name: tuple[str, str], qname: str, attrs: dict):
         """Start element notification receiver.
 
         Args:
@@ -476,7 +472,7 @@ class XmlWriter(EventContentHandler, ABC):
         pending_prefixes: The pending element namespace prefixes
     """
 
-    def __init__(self, config: SerializerConfig, output: TextIO, ns_map: Dict):
+    def __init__(self, config: SerializerConfig, output: TextIO, ns_map: dict):
         self.output = output
         super().__init__(config, ns_map)
 
@@ -674,7 +670,7 @@ class EventGenerator:
 
     def convert_mixed_content(
         self,
-        values: List,
+        values: list,
         var: XmlVar,
         namespace: Optional[str],
     ) -> EventIterator:
@@ -909,7 +905,7 @@ class EventGenerator:
         yield XmlWriterEvent.DATA, cls.encode_primitive(value, var)
 
     @classmethod
-    def next_value(cls, obj: Any, meta: XmlMeta) -> Iterator[Tuple[XmlVar, Any]]:
+    def next_value(cls, obj: Any, meta: XmlMeta) -> Iterator[tuple[XmlVar, Any]]:
         """Produce the next non attribute value of a model instance to convert.
 
         The generator will produce the values in the order the fields
@@ -972,7 +968,7 @@ class EventGenerator:
         nillable: bool,
         xsi_type: Optional[str],
         ignore_optionals: bool,
-    ) -> Iterator[Tuple[str, Any]]:
+    ) -> Iterator[tuple[str, Any]]:
         """Produce the next attribute value to convert.
 
         Args:

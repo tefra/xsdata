@@ -1,7 +1,8 @@
 import sys
 from collections import defaultdict
+from collections.abc import Iterator
 from contextlib import suppress
-from typing import Any, Callable, Dict, Iterator, List, Optional, Set, Type
+from typing import Any, Callable, Optional
 
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.compat import class_types
@@ -51,8 +52,8 @@ class XmlContext:
         self.attribute_name_generator = attribute_name_generator
         self.class_type = class_types.get_type(class_type)
 
-        self.cache: Dict[Type, XmlMeta] = {}
-        self.xsi_cache: Dict[str, List[Type]] = defaultdict(list)
+        self.cache: dict[type, XmlMeta] = {}
+        self.xsi_cache: dict[str, list[type]] = defaultdict(list)
         self.models_package = models_package
         self.sys_modules = 0
 
@@ -64,7 +65,7 @@ class XmlContext:
 
     def get_builder(
         self,
-        globalns: Optional[Dict[str, Callable]] = None,
+        globalns: Optional[dict[str, Callable]] = None,
     ) -> XmlMetaBuilder:
         """Return a new xml meta builder instance."""
         return XmlMetaBuilder(
@@ -76,7 +77,7 @@ class XmlContext:
 
     def fetch(
         self,
-        clazz: Type,
+        clazz: type,
         parent_ns: Optional[str] = None,
         xsi_type: Optional[str] = None,
     ) -> XmlMeta:
@@ -115,7 +116,7 @@ class XmlContext:
 
         self.sys_modules = len(sys.modules)
 
-    def is_binding_model(self, clazz: Type[T]) -> bool:
+    def is_binding_model(self, clazz: type[T]) -> bool:
         """Return whether the clazz is a binding model.
 
         If the models package is not empty also validate
@@ -136,7 +137,7 @@ class XmlContext:
             and clazz.__module__.startswith(self.models_package)
         )
 
-    def find_types(self, qname: str) -> List[Type[T]]:
+    def find_types(self, qname: str) -> list[type[T]]:
         """Find all classes that match the given xsi:type qname.
 
         - Ignores native schema types, xs:string, xs:float, xs:int, ...
@@ -155,7 +156,7 @@ class XmlContext:
 
         return []
 
-    def find_type(self, qname: str) -> Optional[Type[T]]:
+    def find_type(self, qname: str) -> Optional[type[T]]:
         """Return the last imported class that matches the given xsi:type qname.
 
         Args:
@@ -164,10 +165,10 @@ class XmlContext:
         Returns:
             A class type or None if no matches.
         """
-        types: List[Type] = self.find_types(qname)
+        types: list[type] = self.find_types(qname)
         return types[-1] if types else None
 
-    def find_type_by_fields(self, field_names: Set[str]) -> Optional[Type[T]]:
+    def find_type_by_fields(self, field_names: set[str]) -> Optional[type[T]]:
         """Find a data class that matches best the given list of field names.
 
         Args:
@@ -179,7 +180,7 @@ class XmlContext:
             fields, return the one with the least extra fields.
         """
 
-        def get_field_diff(clazz: Type) -> int:
+        def get_field_diff(clazz: type) -> int:
             meta = self.cache[clazz]
             local_names = {var.local_name for var in meta.get_all_vars()}
             return len(local_names - field_names)
@@ -195,7 +196,7 @@ class XmlContext:
         choices.sort(key=lambda x: (x[1], x[0].__name__))
         return choices[0][0] if choices else None
 
-    def find_subclass(self, clazz: Type, qname: str) -> Optional[Type]:
+    def find_subclass(self, clazz: type, qname: str) -> Optional[type]:
         """Find a subclass for the given clazz and xsi:type qname.
 
         Compare all classes that match the given xsi:type qname and return the
@@ -209,7 +210,7 @@ class XmlContext:
         Returns:
             The matching class type or None if no matches.
         """
-        types: List[Type] = self.find_types(qname)
+        types: list[type] = self.find_types(qname)
         for tp in types:
             # Why would a xml node with have a xsi:type that points
             # to parent class is beyond me, but it happens, let's protect
@@ -225,9 +226,9 @@ class XmlContext:
 
     def build(
         self,
-        clazz: Type,
+        clazz: type,
         parent_ns: Optional[str] = None,
-        globalns: Optional[Dict[str, Callable]] = None,
+        globalns: Optional[dict[str, Callable]] = None,
     ) -> XmlMeta:
         """Fetch or build the binding metadata for the given class.
 
@@ -244,7 +245,7 @@ class XmlContext:
             self.cache[clazz] = builder.build(clazz, parent_ns)
         return self.cache[clazz]
 
-    def build_recursive(self, clazz: Type, parent_ns: Optional[str] = None):
+    def build_recursive(self, clazz: type, parent_ns: Optional[str] = None):
         """Build the binding metadata for the given class and all of its dependencies.
 
         This method is used in benchmarks!
@@ -261,7 +262,7 @@ class XmlContext:
                     if self.class_type.is_model(tp):
                         self.build_recursive(tp, meta.namespace)
 
-    def local_names_match(self, names: Set[str], clazz: Type) -> bool:
+    def local_names_match(self, names: set[str], clazz: type) -> bool:
         """Check if the given field names match the given class type.
 
         Silently ignore, typing errors. These classes are from third
@@ -289,7 +290,7 @@ class XmlContext:
             return False
 
     @classmethod
-    def is_derived(cls, obj: Any, clazz: Type) -> bool:
+    def is_derived(cls, obj: Any, clazz: type) -> bool:
         """Return whether the obj is a subclass or a parent of the given class type."""
         if obj is None:
             return False
@@ -300,7 +301,7 @@ class XmlContext:
         return any(x is not object and isinstance(obj, x) for x in clazz.__bases__)
 
     @classmethod
-    def get_subclasses(cls, clazz: Type) -> Iterator[Type]:
+    def get_subclasses(cls, clazz: type) -> Iterator[type]:
         """Return an iterator of the given class subclasses."""
         with suppress(TypeError):
             for subclass in clazz.__subclasses__():

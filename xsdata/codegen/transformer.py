@@ -6,7 +6,7 @@ import pickle
 import tempfile
 from collections import defaultdict
 from pathlib import Path
-from typing import Callable, Dict, List, NamedTuple, Optional, Tuple
+from typing import Callable, NamedTuple, Optional
 
 from toposort import CircularDependencyError
 
@@ -108,15 +108,15 @@ class ResourceTransformer:
         preloaded: A uri/content map used as cache
     """
 
-    __slots__ = ("config", "classes", "processed", "preloaded")
+    __slots__ = ("classes", "config", "preloaded", "processed")
 
     def __init__(self, config: GeneratorConfig):
         self.config = config
-        self.classes: List[Class] = []
-        self.processed: List[str] = []
-        self.preloaded: Dict = {}
+        self.classes: list[Class] = []
+        self.processed: list[str] = []
+        self.preloaded: dict = {}
 
-    def process(self, uris: List[str], cache: bool = False):
+    def process(self, uris: list[str], cache: bool = False):
         """Process a list of resolved URI strings.
 
         Args:
@@ -148,7 +148,7 @@ class ResourceTransformer:
         for name, times in stopwatches.items():
             logger.debug(f"{name} - {sum(times) / 1e9}s")
 
-    def process_sources(self, uris: List[str]):
+    def process_sources(self, uris: list[str]):
         """Process a list of resolved URI strings.
 
         Load the source URI strings and map them to codegen
@@ -168,7 +168,7 @@ class ResourceTransformer:
         self.process_xml_documents(sources[TYPE_XML])
         self.process_json_documents(sources[TYPE_JSON])
 
-    def process_definitions(self, uris: List[str]):
+    def process_definitions(self, uris: list[str]):
         """Process a list of wsdl resources.
 
         Args:
@@ -186,7 +186,7 @@ class ResourceTransformer:
             collections.apply(definitions.schemas, self.convert_schema)
             self.convert_definitions(definitions)
 
-    def process_schemas(self, uris: List[str]):
+    def process_schemas(self, uris: list[str]):
         """Process a list of xsd resources.
 
         Args:
@@ -195,13 +195,13 @@ class ResourceTransformer:
         for uri in uris:
             self.process_schema(uri)
 
-    def process_dtds(self, uris: List[str]):
+    def process_dtds(self, uris: list[str]):
         """Process a list of dtd resources.
 
         Args:
             uris: A list of dtd URI strings to process
         """
-        classes: List[Class] = []
+        classes: list[Class] = []
 
         for uri in uris:
             input_stream = self.load_resource(uri)
@@ -225,7 +225,7 @@ class ResourceTransformer:
         if schema:
             self.convert_schema(schema)
 
-    def process_xml_documents(self, uris: List[str]):
+    def process_xml_documents(self, uris: list[str]):
         """Process a list of xml resources.
 
         Args:
@@ -243,7 +243,7 @@ class ResourceTransformer:
 
         self.classes.extend(ClassUtils.reduce_classes(classes))
 
-    def process_json_documents(self, uris: List[str]):
+    def process_json_documents(self, uris: list[str]):
         """Process a list of json resources.
 
         Args:
@@ -305,7 +305,7 @@ class ResourceTransformer:
         """Convert a definitions instance to codegen classes."""
         self.classes.extend(DefinitionsMapper.map(definitions))
 
-    def generate_classes(self, schema: Schema) -> List[Class]:
+    def generate_classes(self, schema: Schema) -> list[Class]:
         """Convert the given schema instance to a list of classes."""
         uri = schema.location
         logger.info("Compiling schema %s", uri or "...")
@@ -409,14 +409,14 @@ class ResourceTransformer:
 
         return TYPE_UNKNOWN
 
-    def analyze_classes(self, classes: List[Class]) -> List[Class]:
+    def analyze_classes(self, classes: list[Class]) -> list[Class]:
         """Analyzer the given class list and return the final list of classes."""
         container = ClassContainer(config=self.config)
         container.extend(classes)
         container.process()
         return list(container)
 
-    def count_classes(self, classes: List[Class]) -> Tuple[int, int]:
+    def count_classes(self, classes: list[Class]) -> tuple[int, int]:
         """Return a tuple of counters for the main and inner classes.
 
         Args:
@@ -433,7 +433,7 @@ class ResourceTransformer:
         return main, inner
 
     @classmethod
-    def get_cache_file(cls, uris: List[str]) -> Path:
+    def get_cache_file(cls, uris: list[str]) -> Path:
         """Return the cache path for the raw mapped classes.
 
         Args:

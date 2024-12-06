@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Iterator, List, Tuple
+from collections.abc import Iterator
 
 from xsdata.codegen.mixins import RelativeHandlerInterface
 from xsdata.codegen.models import AttrType, Class
@@ -52,7 +52,7 @@ class UnnestInnerClasses(RelativeHandlerInterface):
                 target.inner.remove(inner)
 
     @classmethod
-    def find_forward_refs(cls, target: Class) -> Iterator[Tuple[AttrType, Class]]:
+    def find_forward_refs(cls, target: Class) -> Iterator[tuple[AttrType, Class]]:
         """Find all forward references for all inner classes.
 
         Args:
@@ -89,7 +89,7 @@ class UnnestInnerClasses(RelativeHandlerInterface):
         target.local_type = True
 
     @classmethod
-    def update_types(cls, types: List[AttrType], qname: str):
+    def update_types(cls, types: list[AttrType], qname: str):
         """Search and replace forward references.
 
         Return the number changes.

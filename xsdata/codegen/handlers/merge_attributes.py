@@ -1,5 +1,3 @@
-from typing import List
-
 from xsdata.codegen.mixins import HandlerInterface
 from xsdata.codegen.models import Attr, Class
 from xsdata.codegen.utils import ClassUtils
@@ -47,7 +45,7 @@ class MergeAttributes(HandlerInterface):
         Args:
             target: The target class instance
         """
-        result: List[Attr] = []
+        result: list[Attr] = []
         for attr in target.attrs:
             pos = collections.find(result, attr)
             existing = result[pos] if pos > -1 else None

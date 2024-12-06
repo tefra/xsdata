@@ -1,7 +1,8 @@
 import sys
+from collections.abc import Iterator
 from dataclasses import dataclass, field, fields, make_dataclass
 from decimal import Decimal
-from typing import Iterator, List, get_type_hints
+from typing import get_type_hints
 from unittest import TestCase, mock
 from xml.etree.ElementTree import QName
 
@@ -392,7 +393,7 @@ class XmlVarBuilderTests(TestCase):
             self.builder.build(
                 BookForm,
                 "foo",
-                List[int],
+                list[int],
                 {"type": "Attributes"},
                 True,
                 None,
@@ -401,7 +402,7 @@ class XmlVarBuilderTests(TestCase):
             )
 
         self.assertEqual(
-            "Error on BookForm::foo: Xml Attributes does not support typing `typing.List[int]`",
+            "Error on BookForm::foo: Xml Attributes does not support typing `list[int]`",
             str(cm.exception),
         )
 

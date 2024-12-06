@@ -1,7 +1,6 @@
 from collections import defaultdict
 from contextlib import contextmanager
 from time import perf_counter_ns
-from typing import Dict, List
 
 
 @contextmanager
@@ -13,4 +12,4 @@ def stopwatch(name: str):
     stopwatches[name].append(stop_time - start_time)
 
 
-stopwatches: Dict[str, List[int]] = defaultdict(list)
+stopwatches: dict[str, list[int]] = defaultdict(list)

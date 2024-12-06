@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Type
+from typing import Optional
 
 from xsdata.formats.dataclass.models.elements import XmlType, XmlVar
 from xsdata.formats.dataclass.parsers.bases import NodeParser, Parsed
@@ -13,16 +13,16 @@ from xsdata.utils import namespaces
 class TreeParser(NodeParser):
     """Bind xml nodes to a tree of AnyElement objects."""
 
-    handler: Type[XmlHandler] = field(default=default_handler())
+    handler: type[XmlHandler] = field(default=default_handler())
 
     def start(
         self,
-        clazz: Optional[Type],
-        queue: List[XmlNode],
-        objects: List[Parsed],
+        clazz: Optional[type],
+        queue: list[XmlNode],
+        objects: list[Parsed],
         qname: str,
-        attrs: Dict,
-        ns_map: Dict,
+        attrs: dict,
+        ns_map: dict,
     ):
         """Build and queue the XmlNode for the starting element.
 

@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from decimal import Decimal
-from typing import List, Optional
+from typing import Optional
 
 from xsdata.models.datatype import XmlDate
 
@@ -74,7 +74,7 @@ class Comment:
 
 @dataclass
 class Items:
-    item: List["Items.Item"] = field(
+    item: list["Items.Item"] = field(
         default_factory=list,
         metadata={
             "type": "Element",

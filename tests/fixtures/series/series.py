@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import Optional
 
 from xsdata.models.datatype import XmlDate
 
@@ -119,7 +119,7 @@ class Schedule:
             "required": True,
         },
     )
-    days: List[str] = field(
+    days: list[str] = field(
         default_factory=list,
         metadata={
             "type": "Element",
@@ -231,7 +231,7 @@ class Series:
             "required": True,
         },
     )
-    genres: List[str] = field(
+    genres: list[str] = field(
         default_factory=list,
         metadata={
             "type": "Element",

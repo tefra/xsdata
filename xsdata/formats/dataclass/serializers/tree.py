@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from lxml.etree import ElementTree
 
@@ -17,7 +17,7 @@ class TreeSerializer(EventGenerator):
         context: The models context instance
     """
 
-    def render(self, obj: Any, ns_map: Optional[Dict] = None) -> ElementTree:
+    def render(self, obj: Any, ns_map: Optional[dict] = None) -> ElementTree:
         """Serialize the input model instance to a lxml etree instance.
 
         Args:

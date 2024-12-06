@@ -1,5 +1,6 @@
 import abc
-from typing import Callable, Dict, Iterator, List, Optional
+from collections.abc import Iterator
+from typing import Callable, Optional
 
 from xsdata.codegen.models import Attr, Class
 from xsdata.models.config import GeneratorConfig
@@ -17,7 +18,7 @@ class ContainerInterface(abc.ABC):
 
     def __init__(self, config: GeneratorConfig):
         self.config = config
-        self.data: Dict[str, List[Class]] = {}
+        self.data: dict[str, list[Class]] = {}
 
     @abc.abstractmethod
     def __iter__(self) -> Iterator[Class]:
@@ -89,7 +90,7 @@ class ContainerInterface(abc.ABC):
         """
 
     @abc.abstractmethod
-    def extend(self, items: List[Class]):
+    def extend(self, items: list[Class]):
         """Add a list of classes to the container.
 
         Args:
@@ -106,7 +107,7 @@ class ContainerInterface(abc.ABC):
         """
 
     @abc.abstractmethod
-    def set(self, items: List[Class]):
+    def set(self, items: list[Class]):
         """Set the list of classes to the container.
 
         Args:
@@ -140,7 +141,7 @@ class RelativeHandlerInterface(HandlerInterface, abc.ABC):
     def __init__(self, container: ContainerInterface):
         self.container = container
 
-    def base_attrs(self, target: Class) -> List[Attr]:
+    def base_attrs(self, target: Class) -> list[Attr]:
         """Return a list of all parent attrs recursively.
 
         Args:
@@ -150,7 +151,7 @@ class RelativeHandlerInterface(HandlerInterface, abc.ABC):
             A list of attr instances.
 
         """
-        attrs: List[Attr] = []
+        attrs: list[Attr] = []
         for extension in target.extensions:
             base = self.container.find(extension.type.qname)
 

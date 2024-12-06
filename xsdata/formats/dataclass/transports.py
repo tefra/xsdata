@@ -1,5 +1,5 @@
 import abc
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from requests import Response, Session
 
@@ -10,11 +10,11 @@ class Transport(abc.ABC):
     __slots__ = ()
 
     @abc.abstractmethod
-    def get(self, url: str, params: Dict, headers: Dict) -> bytes:
+    def get(self, url: str, params: dict, headers: dict) -> bytes:
         """Send a GET request."""
 
     @abc.abstractmethod
-    def post(self, url: str, data: Any, headers: Dict) -> bytes:
+    def post(self, url: str, data: Any, headers: dict) -> bytes:
         """Send a POST request."""
 
 
@@ -31,7 +31,7 @@ class DefaultTransport(Transport):
         self.timeout = timeout
         self.session = session or Session()
 
-    def get(self, url: str, params: Dict, headers: Dict) -> bytes:
+    def get(self, url: str, params: dict, headers: dict) -> bytes:
         """Send a GET request.
 
         Args:
@@ -53,7 +53,7 @@ class DefaultTransport(Transport):
         )
         return self.handle_response(res)
 
-    def post(self, url: str, data: Any, headers: Dict) -> Any:
+    def post(self, url: str, data: Any, headers: dict) -> Any:
         """Send a POST request.
 
         Args:

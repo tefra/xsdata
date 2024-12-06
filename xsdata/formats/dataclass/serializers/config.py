@@ -1,6 +1,6 @@
 import warnings
 from dataclasses import InitVar, dataclass
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Optional
 
 
 @dataclass
@@ -28,7 +28,7 @@ class SerializerConfig:
     ignore_default_attributes: bool = False
     schema_location: Optional[str] = None
     no_namespace_schema_location: Optional[str] = None
-    globalns: Optional[Dict[str, Callable]] = None
+    globalns: Optional[dict[str, Callable]] = None
 
     # Deprecated
     pretty_print: InitVar[bool] = False

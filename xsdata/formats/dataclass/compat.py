@@ -1,7 +1,8 @@
 import abc
+from collections.abc import Iterator
 from dataclasses import MISSING, fields, is_dataclass
 from types import MappingProxyType
-from typing import Any, Dict, Iterator, Optional, Protocol, Set, Type
+from typing import Any, Optional, Protocol
 
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.models.generics import AnyElement, DerivedElement
@@ -25,21 +26,21 @@ class ClassType(abc.ABC):
 
     @property
     @abc.abstractmethod
-    def any_element(self) -> Type:
+    def any_element(self) -> Any:
         """Return the AnyElement used to bind wildcard element nodes."""
 
     @property
     @abc.abstractmethod
-    def derived_element(self) -> Type:
+    def derived_element(self) -> Any:
         """Return the DerivedElement used to bind ambiguous element nodes."""
 
     @property
-    def any_keys(self) -> Set[str]:
+    def any_keys(self) -> set[str]:
         """Return the field names of the AnyElement class."""
         return {field.name for field in self.get_fields(self.any_element)}
 
     @property
-    def derived_keys(self) -> Set[str]:
+    def derived_keys(self) -> set[str]:
         """Return the field names of the DerivedElement class."""
         return {field.name for field in self.get_fields(self.derived_element)}
 
@@ -67,7 +68,7 @@ class ClassType(abc.ABC):
         """Return the default value or factory of the given model field."""
 
     @abc.abstractmethod
-    def default_choice_value(self, choice: Dict) -> Any:
+    def default_choice_value(self, choice: dict) -> Any:
         """Return the default value or factory of the given model field choice."""
 
     def score_object(self, obj: Any) -> float:
@@ -114,7 +115,7 @@ class ClassTypes:
     __slots__ = "types"
 
     def __init__(self):
-        self.types: Dict[str, ClassType] = {}
+        self.types: dict[str, ClassType] = {}
 
     def register(self, name: str, fmt: ClassType, **_: Any):
         """Register a class type instance by name.
@@ -147,12 +148,12 @@ class Dataclasses(ClassType):
     __slots__ = ()
 
     @property
-    def any_element(self) -> Type:
+    def any_element(self) -> Any:
         """Return the generic any element class."""
         return AnyElement
 
     @property
-    def derived_element(self) -> Type:
+    def derived_element(self) -> Any:
         """Return the generic derived element class."""
         return DerivedElement
 
@@ -186,7 +187,7 @@ class Dataclasses(ClassType):
 
         return default
 
-    def default_choice_value(self, choice: Dict) -> Any:
+    def default_choice_value(self, choice: dict) -> Any:
         """Return the default value or factory of the given model field choice."""
         factory = choice.get("default_factory")
         if callable(factory):

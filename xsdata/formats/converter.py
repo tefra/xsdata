@@ -3,6 +3,7 @@ import base64
 import binascii
 import math
 import re
+from collections.abc import Sequence
 from contextlib import suppress
 from datetime import date, datetime, time
 from decimal import Decimal, InvalidOperation
@@ -10,12 +11,7 @@ from enum import Enum, EnumMeta
 from typing import (
     Any,
     Callable,
-    Dict,
-    List,
     Optional,
-    Sequence,
-    Tuple,
-    Type,
     Union,
     cast,
 )
@@ -65,7 +61,7 @@ class Converter(abc.ABC):
         """
 
     @classmethod
-    def validate_input_type(cls, value: Any, tp: Type):
+    def validate_input_type(cls, value: Any, tp: type):
         """Validate the input value type matches the required type."""
         if not isinstance(value, tp):
             raise ConverterError(
@@ -83,9 +79,9 @@ class ConverterFactory:
     __slots__ = "registry"
 
     def __init__(self):
-        self.registry: Dict[Type, Converter] = {}
+        self.registry: dict[type, Converter] = {}
 
-    def deserialize(self, value: Any, types: Sequence[Type], **kwargs: Any) -> Any:
+    def deserialize(self, value: Any, types: Sequence[type], **kwargs: Any) -> Any:
         """Attempt to convert any value to one of the given types.
 
         Args:
@@ -132,7 +128,7 @@ class ConverterFactory:
     def test(
         self,
         value: Optional[str],
-        types: Sequence[Type],
+        types: Sequence[type],
         strict: bool = False,
         **kwargs: Any,
     ) -> bool:
@@ -166,7 +162,7 @@ class ConverterFactory:
 
         return True
 
-    def register_converter(self, data_type: Type, func: Union[Callable, Converter]):
+    def register_converter(self, data_type: type, func: Union[Callable, Converter]):
         """Register a callable or converter for the given data type.
 
         Args:
@@ -178,7 +174,7 @@ class ConverterFactory:
         else:
             self.registry[data_type] = ProxyConverter(func)
 
-    def unregister_converter(self, data_type: Type):
+    def unregister_converter(self, data_type: type):
         """Unregister the converter for the given data type.
 
         Args:
@@ -189,7 +185,7 @@ class ConverterFactory:
         """
         self.registry.pop(data_type)
 
-    def type_converter(self, data_type: Type) -> Converter:
+    def type_converter(self, data_type: type) -> Converter:
         """Find a suitable converter for given data type.
 
         Iterate over all but last mro items and check for registered
@@ -220,7 +216,7 @@ class ConverterFactory:
         return self.type_converter(value.__class__)
 
     @classmethod
-    def sort_types(cls, types: Sequence[Type]) -> List[Type]:
+    def sort_types(cls, types: Sequence[type]) -> list[type]:
         """Sort a list of types by giving priority to strict types first."""
         if len(types) < 2:
             return list(types)
@@ -228,7 +224,7 @@ class ConverterFactory:
         return sorted(types, key=lambda x: __PYTHON_TYPES_SORTED__.get(x, 0))
 
     @classmethod
-    def explicit_types(cls) -> Tuple[Type, ...]:
+    def explicit_types(cls) -> tuple[type, ...]:
         """Get a list of types that need strict test."""
         return __EXPLICIT_TYPES__
 
@@ -503,7 +499,7 @@ class QNameConverter(Converter):
     def deserialize(
         self,
         value: str,
-        ns_map: Optional[Dict] = None,
+        ns_map: Optional[dict] = None,
         **kwargs: Any,
     ) -> QName:
         """Convert a string value to QName instance.
@@ -534,7 +530,7 @@ class QNameConverter(Converter):
     def serialize(
         self,
         value: QName,
-        ns_map: Optional[Dict] = None,
+        ns_map: Optional[dict] = None,
         **kwargs: Any,
     ) -> str:
         """Convert a QName instance value sto string.
@@ -568,7 +564,7 @@ class QNameConverter(Converter):
         return f"{prefix}:{tag}" if prefix else tag
 
     @staticmethod
-    def resolve(value: str, ns_map: Optional[Dict] = None) -> Tuple[str, str]:
+    def resolve(value: str, ns_map: Optional[dict] = None) -> tuple[str, str]:
         """Split a qname or ns prefixed string value or a uri, name pair.
 
         Args:
@@ -645,7 +641,7 @@ class EnumConverter(Converter):
             values = [value]
 
         length = len(values)
-        for member in cast(Type[Enum], data_type):
+        for member in cast(type[Enum], data_type):
             if self.match(value, values, length, member.value, **kwargs):
                 return member
 

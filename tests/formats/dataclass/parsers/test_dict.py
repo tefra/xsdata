@@ -1,7 +1,7 @@
 import json
 from dataclasses import asdict, dataclass, field
 from decimal import Decimal
-from typing import List, Optional, Union
+from typing import Optional, Union
 from xml.etree.ElementTree import QName
 
 from tests import fixtures_dir
@@ -69,14 +69,14 @@ class DictDecoderTests(FactoryTestCase):
 
     def test_decode_empty_document(self):
         self.assertEqual(BookForm(), self.decoder.decode({}, BookForm))
-        self.assertEqual([], self.decoder.decode([], List[BookForm]))
+        self.assertEqual([], self.decoder.decode([], list[BookForm]))
 
     def test_decode_list_of_objects(self):
         path = fixtures_dir.joinpath("books/books.json")
         data = json.loads(path.read_text())
         book_list = data["book"]
 
-        books = self.decoder.decode(book_list, List[BookForm])
+        books = self.decoder.decode(book_list, list[BookForm])
         self.assertIsInstance(books, list)
         self.assertEqual(2, len(books))
         self.assertIsInstance(books[0], BookForm)
@@ -138,14 +138,13 @@ class DictDecoderTests(FactoryTestCase):
             ),
             ({}, None, "Document is empty, can not detect type"),
             ([], BookForm, "Document is array, expected object"),
-            ({}, List[BookForm], "Document is object, expected array"),
+            ({}, list[BookForm], "Document is object, expected array"),
             (
                 {},
                 Optional[ChoiceType],
                 f"Invalid clazz argument: {Optional[ChoiceType]}",
             ),
-            ([], List[int], f"Invalid clazz argument: {List[int]}"),
-            ([], List, f"Invalid clazz argument: {List}"),
+            ([], list[int], f"Invalid clazz argument: {list[int]}"),
         ]
 
         for source, clazz, exc_msg in invalid_cases:
@@ -391,7 +390,7 @@ class DictDecoderTests(FactoryTestCase):
     def test_bind_text_with_unions(self):
         @dataclass
         class Fixture:
-            x: List[Union[int, float, str, bool]] = field(metadata={"tokens": True})
+            x: list[Union[int, float, str, bool]] = field(metadata={"tokens": True})
 
         values = ["foo", 12.2, "12.2", 12, "12", True, "false"]
 

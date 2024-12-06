@@ -1,13 +1,12 @@
 import unittest
 from dataclasses import dataclass
-from typing import List
 
 from xsdata.codegen.models import CodegenModel
 
 
 @dataclass
 class Foo(CodegenModel):
-    bar: List["Bar"]
+    bar: list["Bar"]
 
     @dataclass
     class Bar(CodegenModel):

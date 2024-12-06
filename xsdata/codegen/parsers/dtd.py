@@ -1,5 +1,5 @@
 import io
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from xsdata.exceptions import ParserError
 from xsdata.models.dtd import (
@@ -106,7 +106,7 @@ class DtdParser:
         )
 
     @classmethod
-    def build_ns_map(cls, prefix: str, attributes: List[DtdAttribute]) -> Dict:
+    def build_ns_map(cls, prefix: str, attributes: list[DtdAttribute]) -> dict:
         """Build the dtd element namespace prefix-URI map.
 
         It also adds common namespaces like xs, xsi, xlink and xml.

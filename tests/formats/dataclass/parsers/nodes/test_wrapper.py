@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from typing import List
 from unittest import TestCase
 
 from xsdata.formats.dataclass.parsers import XmlParser
@@ -12,7 +11,7 @@ class WrapperTests(TestCase):
     def test_namespace(self):
         @dataclass
         class NamespaceWrapper:
-            items: List[str] = field(
+            items: list[str] = field(
                 metadata={
                     "wrapper": "Items",
                     "type": "Element",
@@ -32,7 +31,7 @@ class WrapperTests(TestCase):
     def test_primitive(self):
         @dataclass
         class PrimitiveWrapper:
-            primitive_list: List[str] = field(
+            primitive_list: list[str] = field(
                 metadata={
                     "wrapper": "PrimitiveList",
                     "type": "Element",
@@ -55,7 +54,7 @@ class WrapperTests(TestCase):
 
         @dataclass
         class ElementWrapper:
-            elements: List[ElementObject] = field(
+            elements: list[ElementObject] = field(
                 metadata={"wrapper": "Elements", "type": "Element", "name": "Object"}
             )
 

@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 from xsdata.codegen.mixins import (
     ContainerInterface,
     RelativeHandlerInterface,
@@ -21,7 +19,7 @@ class DetectCircularReferences(RelativeHandlerInterface):
 
     def __init__(self, container: ContainerInterface):
         super().__init__(container)
-        self.reference_types: Dict[int, List[AttrType]] = {}
+        self.reference_types: dict[int, list[AttrType]] = {}
 
     def process(self, target: Class):
         """Go through all the attr types and find circular references.
@@ -38,7 +36,7 @@ class DetectCircularReferences(RelativeHandlerInterface):
             for choice in attr.choices:
                 self.process_types(choice.types, target.ref)
 
-    def process_types(self, types: List[AttrType], class_reference: int):
+    def process_types(self, types: list[AttrType], class_reference: int):
         """Go through the types and find circular references.
 
         Args:

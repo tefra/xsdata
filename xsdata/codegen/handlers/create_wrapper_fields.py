@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Optional
 
 from xsdata.codegen.mixins import RelativeHandlerInterface
 from xsdata.codegen.models import Attr, Class
@@ -61,7 +61,7 @@ class CreateWrapperFields(RelativeHandlerInterface):
 
     def find_source_attr(
         self, parent: Class, attr: Attr
-    ) -> Tuple[bool, Optional[Attr]]:
+    ) -> tuple[bool, Optional[Attr]]:
         """Find the source type for the given attr type instance.
 
         If it's a forward reference, look up the source in

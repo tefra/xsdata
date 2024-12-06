@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Iterator
+from collections.abc import Iterator
 
 from xsdata.codegen.mixins import ContainerInterface, RelativeHandlerInterface
 from xsdata.codegen.models import Attr, AttrType, Class, Extension, Restrictions

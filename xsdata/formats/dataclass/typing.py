@@ -5,8 +5,6 @@ from typing import (
     Callable,
     NamedTuple,
     Optional,
-    Tuple,
-    Type,
     TypeVar,
     Union,
 )
@@ -66,12 +64,12 @@ def evaluate(tp: Any, globalns: Any, localns: Any = None) -> Any:
 
 
 class Result(NamedTuple):
-    types: Tuple[Type[Any], ...]
+    types: tuple[type[Any], ...]
     factory: Optional[Callable] = None
     tokens_factory: Optional[Callable] = None
 
 
-def analyze_token_args(origin: Any, args: Tuple[Any, ...]) -> Tuple[Any]:
+def analyze_token_args(origin: Any, args: tuple[Any, ...]) -> tuple[Any]:
     """Analyze token arguments.
 
     Ensure it only has one argument, filter out ellipsis.
@@ -97,8 +95,8 @@ def analyze_token_args(origin: Any, args: Tuple[Any, ...]) -> Tuple[Any]:
 
 
 def analyze_optional_origin(
-    origin: Any, args: Tuple[Any, ...], types: Tuple[Any, ...]
-) -> Tuple[Any, ...]:
+    origin: Any, args: tuple[Any, ...], types: tuple[Any, ...]
+) -> tuple[Any, ...]:
     """Analyze optional type annotations.
 
     Remove the NoneType, adjust and return the origin, args and types.
@@ -119,11 +117,11 @@ def analyze_optional_origin(
     return origin, args, types
 
 
-def filter_none_type(args: Tuple[Any, ...]) -> Tuple[Any, ...]:
+def filter_none_type(args: tuple[Any, ...]) -> tuple[Any, ...]:
     return tuple(arg for arg in args if arg is not NONE_TYPE)
 
 
-def filter_ellipsis(args: Tuple[Any, ...]) -> Tuple[Any]:
+def filter_ellipsis(args: tuple[Any, ...]) -> tuple[Any]:
     return tuple(arg for arg in args if arg is not Ellipsis)
 
 

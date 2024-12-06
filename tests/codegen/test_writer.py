@@ -1,6 +1,6 @@
+from collections.abc import Iterator
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Iterator, List
 from unittest import mock
 
 from xsdata.codegen.exceptions import CodegenError
@@ -13,7 +13,7 @@ from xsdata.utils.testing import ClassFactory, FactoryTestCase
 
 
 class NoneGenerator(AbstractGenerator):
-    def render(self, classes: List[Class]) -> Iterator[GeneratorResult]:
+    def render(self, classes: list[Class]) -> Iterator[GeneratorResult]:
         pass
 
 

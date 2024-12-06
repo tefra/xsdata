@@ -1,9 +1,8 @@
 import copy
-import warnings
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple, Type, cast
+from typing import Any, Optional, cast
 
-from xsdata.exceptions import ConverterWarning, ParserError
+from xsdata.exceptions import ParserError
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers.mixins import (
     EventsHandler,
@@ -15,7 +14,7 @@ from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.formats.types import T
 from xsdata.models.enums import EventType
 
-Parsed = Tuple[Optional[str], Any]
+Parsed = tuple[Optional[str], Any]
 
 
 @dataclass
@@ -31,13 +30,13 @@ class NodeParser(PushParser):
     """
 
     context: XmlContext = field(default_factory=XmlContext)
-    handler: Type[XmlHandler] = field(default=EventsHandler)
+    handler: type[XmlHandler] = field(default=EventsHandler)
 
     def parse(
         self,
         source: Any,
-        clazz: Optional[Type[T]] = None,
-        ns_map: Optional[Dict[Optional[str], str]] = None,
+        clazz: Optional[type[T]] = None,
+        ns_map: Optional[dict[Optional[str], str]] = None,
     ) -> T:
         """Parse the input file or stream into the target class type.
 
@@ -68,12 +67,12 @@ class NodeParser(PushParser):
 
     def start(
         self,
-        clazz: Optional[Type],
-        queue: List[XmlNode],
-        objects: List[Parsed],
+        clazz: Optional[type],
+        queue: list[XmlNode],
+        objects: list[Parsed],
         qname: str,
-        attrs: Dict,
-        ns_map: Dict,
+        attrs: dict,
+        ns_map: dict,
     ):
         """Build and queue the XmlNode for the starting element.
 
@@ -131,8 +130,8 @@ class NodeParser(PushParser):
 
     def end(
         self,
-        queue: List[XmlNode],
-        objects: List[Parsed],
+        queue: list[XmlNode],
+        objects: list[Parsed],
         qname: str,
         text: Optional[str],
         tail: Optional[str],
@@ -154,12 +153,12 @@ class NodeParser(PushParser):
 
     def find_root_clazz(
         self,
-        clazz: Optional[Type],
+        clazz: Optional[type],
         qname: str,
-        attrs: Dict,
-        ns_map: Dict,
+        attrs: dict,
+        ns_map: dict,
         xsi_type: Optional[str],
-    ) -> Optional[Type]:
+    ) -> Optional[type]:
         """
         Obtain the root clazz, maybe from the provided clazz.
 
@@ -191,16 +190,16 @@ class RecordParser(NodeParser):
         events: The list of recorded events
     """
 
-    events: List = field(init=False, default_factory=list)
+    events: list = field(init=False, default_factory=list)
 
     def start(
         self,
-        clazz: Optional[Type],
-        queue: List[XmlNode],
-        objects: List[Parsed],
+        clazz: Optional[type],
+        queue: list[XmlNode],
+        objects: list[Parsed],
         qname: str,
-        attrs: Dict,
-        ns_map: Dict,
+        attrs: dict,
+        ns_map: dict,
     ):
         """Build and queue the XmlNode for the starting element.
 
@@ -219,8 +218,8 @@ class RecordParser(NodeParser):
 
     def end(
         self,
-        queue: List[XmlNode],
-        objects: List[Parsed],
+        queue: list[XmlNode],
+        objects: list[Parsed],
         qname: str,
         text: Optional[str],
         tail: Optional[str],
@@ -243,7 +242,7 @@ class RecordParser(NodeParser):
         return super().end(queue, objects, qname, text, tail)
 
     def register_namespace(
-        self, ns_map: Dict[Optional[str], str], prefix: Optional[str], uri: str
+        self, ns_map: dict[Optional[str], str], prefix: Optional[str], uri: str
     ):
         """Register the uri prefix in the namespace prefix-URI map.
 

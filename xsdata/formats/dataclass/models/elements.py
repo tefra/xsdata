@@ -1,18 +1,11 @@
 import itertools
 import operator
 import sys
+from collections.abc import Iterator, Mapping, Sequence
 from typing import (
     Any,
     Callable,
-    Dict,
-    Iterator,
-    List,
-    Mapping,
     Optional,
-    Sequence,
-    Set,
-    Tuple,
-    Type,
 )
 
 from xsdata.formats.converter import converter
@@ -38,7 +31,7 @@ class XmlType:
 class MetaMixin:
     """Use this mixin for unit tests only!!!"""
 
-    __slots__: Tuple[str, ...] = ()
+    __slots__: tuple[str, ...] = ()
 
     def __eq__(self, other: Any) -> bool:
         """Implement equality operator."""
@@ -156,8 +149,8 @@ class XmlVar(MetaMixin):
         name: str,
         local_name: str,
         wrapper: Optional[str],
-        types: Sequence[Type],
-        clazz: Optional[Type],
+        types: Sequence[type],
+        clazz: Optional[type],
         init: bool,
         mixed: bool,
         factory: Optional[Callable],
@@ -199,7 +192,7 @@ class XmlVar(MetaMixin):
         self.factory = factory
         self.tokens_factory = tokens_factory
 
-        self.namespace_matches: Optional[Dict[str, bool]] = None
+        self.namespace_matches: Optional[dict[str, bool]] = None
         self.is_clazz_union = self.clazz and len(types) > 1
 
         namespace = default_namespace(namespaces)
@@ -230,7 +223,7 @@ class XmlVar(MetaMixin):
             self.is_text = True
 
     @property
-    def element_types(self) -> Set[Type]:
+    def element_types(self) -> set[type]:
         """Return the unique element types."""
         return {tp for element in self.elements.values() for tp in element.types}
 
@@ -285,7 +278,7 @@ class XmlVar(MetaMixin):
             if element.nillable and is_tokens == element.tokens
         )
 
-    def find_clazz_choice(self, clazz: Type) -> Optional["XmlVar"]:
+    def find_clazz_choice(self, clazz: type) -> Optional["XmlVar"]:
         """Find the best matching choice for the given class.
 
         Best Matches:
@@ -431,7 +424,7 @@ class XmlMeta(MetaMixin):
 
     def __init__(
         self,
-        clazz: Type,
+        clazz: type,
         qname: str,
         target_qname: Optional[str],
         nillable: bool,
@@ -459,7 +452,7 @@ class XmlMeta(MetaMixin):
         self.wrappers = wrappers
 
     @property
-    def element_types(self) -> Set[Type]:
+    def element_types(self) -> set[type]:
         """Return a unique list of all elements types."""
         return {
             tp
@@ -468,7 +461,7 @@ class XmlMeta(MetaMixin):
             for tp in element.types
         }
 
-    def get_element_vars(self) -> List[XmlVar]:
+    def get_element_vars(self) -> list[XmlVar]:
         """Return a sorted list of the class element variables."""
         result = list(
             itertools.chain(self.wildcards, self.choices, *self.elements.values())
@@ -478,12 +471,12 @@ class XmlMeta(MetaMixin):
 
         return sorted(result, key=get_index)
 
-    def get_attribute_vars(self) -> List[XmlVar]:
+    def get_attribute_vars(self) -> list[XmlVar]:
         """Return a sorted list of the class attribute variables."""
         result = itertools.chain(self.any_attributes, self.attributes.values())
         return sorted(result, key=get_index)
 
-    def get_all_vars(self) -> List[XmlVar]:
+    def get_all_vars(self) -> list[XmlVar]:
         """Return a sorted list of all the class variables."""
         result = list(
             itertools.chain(

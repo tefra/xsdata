@@ -43,23 +43,6 @@ The maximum line length of the generated code.
 
 **CLI Option:** `-mll, --max-line-length INTEGER`
 
-### `subscriptableTypes`
-
-Use [PEP-585](https://peps.python.org/pep-0585/) type hinting generics in standard
-collections.
-
-```
-tuple # typing.Tuple
-list # typing.List
-dict # typing.Dict
-set # typing.Set
-type # typing.Type
-```
-
-**Default Value:** `False`
-
-**CLI Option:** `--subscriptable-types / --no-subscriptable-types`
-
 ### `genericCollections`
 
 Use `collections.abc.Iterable` and `collections.abc.Mapping` instead of `List|Tuple` and

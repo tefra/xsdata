@@ -1,22 +1,19 @@
 import re
 import string
-from typing import Any, List, Match, Tuple
+from re import Match
+from typing import Any
 
 stop_words = {
     "",
     "Any",
     "Decimal",
-    "Dict",
     "Enum",
     "False",
-    "List",
     "Meta",
     "None",
     "Optional",
     "QName",
     "True",
-    "Type",
-    "Tuple",
     "Union",
     "and",
     "as",
@@ -76,7 +73,7 @@ def suffix(value: str, sep: str = ":") -> str:
     return split(value, sep)[1]
 
 
-def split(value: str, sep: str = ":") -> Tuple:
+def split(value: str, sep: str = ":") -> tuple:
     """Split the given value with the given separator once."""
     left, _, right = value.partition(sep)
     return (left, right) if right else (None, left)
@@ -136,10 +133,10 @@ def kebab_case(value: str, **kwargs: Any) -> str:
     return "-".join(split_words(value))
 
 
-def split_words(value: str) -> List[str]:
+def split_words(value: str) -> list[str]:
     """Split a string on capital letters and not alphanumeric characters."""
-    words: List[str] = []
-    buffer: List[str] = []
+    words: list[str] = []
+    buffer: list[str] = []
     previous = None
 
     def flush():

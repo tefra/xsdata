@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Optional
 
 from xsdata.codegen.mixins import ContainerInterface, RelativeHandlerInterface
 from xsdata.codegen.models import Attr, AttrType, Class
@@ -22,7 +22,7 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
 
     def __init__(self, container: ContainerInterface):
         super().__init__(container)
-        self.dependencies: Dict = {}
+        self.dependencies: dict = {}
 
     def process(self, target: Class):
         """Process the given class attrs and their types.

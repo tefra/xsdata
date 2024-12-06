@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Type
 
 from lxml import etree
 
@@ -13,7 +12,7 @@ from xsdata.formats.dataclass.serializers import (
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
 
 
-def validate_bindings(schema: Path, clazz: Type):
+def validate_bindings(schema: Path, clazz: type):
     __tracebackhide__ = True
 
     sample = schema.parent.joinpath("sample.xml")

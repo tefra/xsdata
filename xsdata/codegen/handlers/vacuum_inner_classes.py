@@ -1,4 +1,4 @@
-from typing import Iterator
+from collections.abc import Iterator
 
 from xsdata.codegen.mixins import HandlerInterface
 from xsdata.codegen.models import AttrType, Class

@@ -1,5 +1,3 @@
-from typing import List
-
 from xsdata.codegen.mixins import ContainerHandlerInterface
 from xsdata.codegen.models import Class
 from xsdata.logger import logger
@@ -25,7 +23,7 @@ class FilterClasses(ContainerHandlerInterface):
         else:
             logger.warning("No global types exist, will generate all types.")
 
-    def filter_all_globals(self) -> List[Class]:
+    def filter_all_globals(self) -> list[Class]:
         """Filter all globals and any referenced types.
 
         This filter is trying to remove unused simple

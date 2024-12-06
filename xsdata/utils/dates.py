@@ -1,6 +1,7 @@
 import datetime
 from calendar import isleap
-from typing import Any, Iterator, Optional, Union
+from collections.abc import Iterator
+from typing import Any, Optional, Union
 
 
 def parse_date_args(value: Any, fmt: str) -> Iterator[int]:

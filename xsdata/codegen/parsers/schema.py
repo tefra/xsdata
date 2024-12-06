@@ -1,6 +1,6 @@
 import sys
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Type, Union
+from typing import Any, Optional, Union
 from urllib.parse import urljoin
 
 from xsdata.formats.dataclass.parsers.bases import Parsed
@@ -37,7 +37,7 @@ class SchemaParser(UserXmlParser):
     location: Optional[str] = field(default=None)
     target_namespace: Optional[str] = field(default=None)
     index: int = field(default_factory=int, init=False)
-    indices: List[int] = field(default_factory=list, init=False)
+    indices: list[int] = field(default_factory=list, init=False)
     element_form: Optional[str] = field(default=None, init=False)
     attribute_form: Optional[str] = field(default=None, init=False)
     default_attributes: Optional[str] = field(default=None, init=False)
@@ -47,12 +47,12 @@ class SchemaParser(UserXmlParser):
 
     def start(
         self,
-        clazz: Optional[Type[T]],
-        queue: List[XmlNode],
-        objects: List[Parsed],
+        clazz: Optional[type[T]],
+        queue: list[XmlNode],
+        objects: list[Parsed],
         qname: str,
-        attrs: Dict,
-        ns_map: Dict,
+        attrs: dict,
+        ns_map: dict,
     ):
         """Build and queue the XmlNode for the starting element.
 
@@ -73,8 +73,8 @@ class SchemaParser(UserXmlParser):
 
     def end(
         self,
-        queue: List[XmlNode],
-        objects: List[Parsed],
+        queue: list[XmlNode],
+        objects: list[Parsed],
         qname: str,
         text: Optional[str],
         tail: Optional[str],
@@ -102,7 +102,7 @@ class SchemaParser(UserXmlParser):
 
         return obj
 
-    def start_schema(self, attrs: Dict[str, str]):
+    def start_schema(self, attrs: dict[str, str]):
         """Start schema element entrypoint.
 
         Store the element/attribute default forms and the
@@ -361,7 +361,7 @@ class SchemaParser(UserXmlParser):
         )
 
     @classmethod
-    def set_namespace_map(cls, obj: Any, ns_map: Optional[Dict]):
+    def set_namespace_map(cls, obj: Any, ns_map: Optional[dict]):
         """Add common namespaces like xml, xsi, xlink if they are missing.
 
         These prefixes are implied and we need to support them.

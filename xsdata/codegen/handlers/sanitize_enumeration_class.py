@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any
 
 from xsdata.codegen.mixins import RelativeHandlerInterface
 from xsdata.codegen.models import Class
@@ -46,7 +46,7 @@ class SanitizeEnumerationClass(RelativeHandlerInterface):
         if len(target.attrs) != 1 or target.attrs[0].tag != Tag.UNION:
             return
 
-        enums: List[Any] = []
+        enums: list[Any] = []
         for attr_type in target.attrs[0].types:
             if attr_type.forward:
                 enums.extend(target.inner)

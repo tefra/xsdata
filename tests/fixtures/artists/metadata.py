@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 from xsdata.models.datatype import XmlDate, XmlPeriod
 
@@ -111,7 +111,7 @@ class IpiList:
         name = "ipi-list"
         namespace = "http://musicbrainz.org/ns/mmd-2.0#"
 
-    ipi: List[str] = field(
+    ipi: list[str] = field(
         default_factory=list,
         metadata={
             "type": "Element",
@@ -126,7 +126,7 @@ class IsniList:
         name = "isni-list"
         namespace = "http://musicbrainz.org/ns/mmd-2.0#"
 
-    isni: List[str] = field(
+    isni: list[str] = field(
         default_factory=list,
         metadata={
             "type": "Element",
@@ -207,7 +207,7 @@ class AliasList:
             "required": True,
         },
     )
-    alias: List[Alias] = field(
+    alias: list[Alias] = field(
         default_factory=list,
         metadata={
             "type": "Element",

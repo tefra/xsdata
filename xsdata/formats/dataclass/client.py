@@ -1,5 +1,5 @@
 from dataclasses import dataclass, fields
-from typing import Any, Dict, Optional, Type, Union
+from typing import Any, Optional, Union
 
 from xsdata.exceptions import ClientValueError
 from xsdata.formats.dataclass.context import XmlContext
@@ -25,8 +25,8 @@ class Config:
     location: str
     transport: str
     soap_action: str
-    input: Type
-    output: Type
+    input: type
+    output: type
     encoding: Optional[str] = None
 
     @classmethod
@@ -97,7 +97,7 @@ class Client:
         self.serializer = serializer
 
     @classmethod
-    def from_service(cls, obj: Type, **kwargs: Any) -> "Client":
+    def from_service(cls, obj: type, **kwargs: Any) -> "Client":
         """Instantiate client from a service class.
 
         Args:
@@ -115,7 +115,7 @@ class Client:
         """
         return cls(config=Config.from_service(obj, **kwargs))
 
-    def send(self, obj: Any, headers: Optional[Dict] = None) -> Any:
+    def send(self, obj: Any, headers: Optional[dict] = None) -> Any:
         """Build and send a request for the input object.
 
         ```py
@@ -142,7 +142,7 @@ class Client:
         response = self.transport.post(self.config.location, data=data, headers=headers)
         return self.parser.from_bytes(response, self.config.output)
 
-    def prepare_headers(self, headers: Dict) -> Dict:
+    def prepare_headers(self, headers: dict) -> dict:
         """Prepare the request headers.
 
         It merges the custom user headers with the necessary headers
@@ -178,7 +178,7 @@ class Client:
         Raises:
             ClientValueError: If the config input type doesn't match the given object.
         """
-        if isinstance(obj, Dict):
+        if isinstance(obj, dict):
             decoder = DictDecoder(context=self.serializer.context)
             obj = decoder.decode(obj, self.config.input)
 

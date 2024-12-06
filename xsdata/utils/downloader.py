@@ -1,7 +1,7 @@
 import os
 import re
 from pathlib import Path
-from typing import Dict, Optional, Union
+from typing import Optional, Union
 
 from xsdata.codegen import opener
 from xsdata.codegen.parsers import DefinitionsParser, SchemaParser
@@ -24,12 +24,12 @@ class Downloader:
         downloaded: A cache of the downloaded resources
     """
 
-    __slots__ = ("output", "base_path", "downloaded")
+    __slots__ = ("base_path", "downloaded", "output")
 
     def __init__(self, output: Path):
         self.output = output
         self.base_path: Optional[Path] = None
-        self.downloaded: Dict = {}
+        self.downloaded: dict = {}
 
     def wget(self, uri: str, location: Optional[str] = None):
         """Download handler for any uri input with circular protection."""

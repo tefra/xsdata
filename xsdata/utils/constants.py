@@ -1,9 +1,10 @@
 import sys
-from typing import Any, Dict, Sequence, Tuple
+from collections.abc import Sequence
+from typing import Any
 
-EMPTY_MAP: Dict = {}
+EMPTY_MAP: dict = {}
 EMPTY_SEQUENCE: Sequence = []
-EMPTY_TUPLE: Tuple = ()
+EMPTY_TUPLE: tuple = ()
 
 XML_FALSE = sys.intern("false")
 XML_TRUE = sys.intern("true")

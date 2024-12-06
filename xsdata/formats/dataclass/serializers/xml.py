@@ -2,10 +2,8 @@ from dataclasses import dataclass, field
 from io import StringIO
 from typing import (
     Any,
-    Dict,
     Optional,
     TextIO,
-    Type,
 )
 
 from xsdata.formats.dataclass.serializers.mixins import (
@@ -26,9 +24,9 @@ class XmlSerializer(EventGenerator):
         writer: The xml writer class
     """
 
-    writer: Type[XmlWriter] = field(default=DEFAULT_XML_WRITER)
+    writer: type[XmlWriter] = field(default=DEFAULT_XML_WRITER)
 
-    def render(self, obj: Any, ns_map: Optional[Dict] = None) -> str:
+    def render(self, obj: Any, ns_map: Optional[dict] = None) -> str:
         """Serialize the input model instance to xml string.
 
         Args:
@@ -42,7 +40,7 @@ class XmlSerializer(EventGenerator):
         self.write(output, obj, ns_map)
         return output.getvalue()
 
-    def write(self, out: TextIO, obj: Any, ns_map: Optional[Dict] = None):
+    def write(self, out: TextIO, obj: Any, ns_map: Optional[dict] = None):
         """Serialize the given object to the output text stream.
 
         Args:

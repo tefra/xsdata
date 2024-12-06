@@ -1,5 +1,5 @@
 import copy
-from typing import Generator
+from collections.abc import Generator
 from unittest import TestCase
 
 from xsdata.codegen.exceptions import CodegenError

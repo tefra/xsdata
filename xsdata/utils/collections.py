@@ -1,15 +1,9 @@
 from collections import defaultdict
+from collections.abc import Generator, Iterable, Iterator, Sequence
 from typing import (
     Any,
     Callable,
-    Dict,
-    Generator,
-    Iterable,
-    Iterator,
-    List,
     Optional,
-    Sequence,
-    Set,
     TypeVar,
 )
 
@@ -24,7 +18,7 @@ def is_array(value: Any) -> bool:
     return isinstance(value, (list, set, frozenset, Generator))
 
 
-def unique_sequence(items: Iterable[T], key: Optional[str] = None) -> List[T]:
+def unique_sequence(items: Iterable[T], key: Optional[str] = None) -> list[T]:
     """Return a new unique list, preserving the original order.
 
     Args:
@@ -49,12 +43,12 @@ def unique_sequence(items: Iterable[T], key: Optional[str] = None) -> List[T]:
     return [item for item in items if is_new(item)]
 
 
-def remove(items: Iterable[T], predicate: Callable) -> List[T]:
+def remove(items: Iterable[T], predicate: Callable) -> list[T]:
     """Return a new list without the items that match the predicate."""
     return [x for x in items if not predicate(x)]
 
 
-def group_by(items: Iterable[T], key: Callable) -> Dict[Any, List[T]]:
+def group_by(items: Iterable[T], key: Callable) -> dict[Any, list[T]]:
     """Group the items of an iterable object by the result of the callable."""
     result = defaultdict(list)
     for item in items:
@@ -89,19 +83,19 @@ def first(items: Iterator[T]) -> Optional[T]:
     return next(items, None)
 
 
-def prepend(target: List, *args: Any):
+def prepend(target: list, *args: Any):
     """Prepend items to the target list."""
     target[:0] = args
 
 
-def connected_components(lists: List[List[Any]]) -> Iterator[List[Any]]:
+def connected_components(lists: list[list[Any]]) -> Iterator[list[Any]]:
     """Merge lists of lists that share common elements."""
     neighbors = defaultdict(set)
     for each in lists:
         for item in each:
             neighbors[item].update(each)
 
-    def component(node: Any, neigh: Dict[Any, Set], see: Set[Any]):
+    def component(node: Any, neigh: dict[Any, set], see: set[Any]):
         nodes = {node}
         while nodes:
             next_node = nodes.pop()
@@ -109,13 +103,13 @@ def connected_components(lists: List[List[Any]]) -> Iterator[List[Any]]:
             nodes |= neigh[next_node] - see
             yield next_node
 
-    seen: Set[Any] = set()
+    seen: set[Any] = set()
     for item in neighbors:
         if item not in seen:
             yield sorted(component(item, neighbors, seen))
 
 
-def find_connected_component(groups: List[List[Any]], value: Any) -> int:
+def find_connected_component(groups: list[list[Any]], value: Any) -> int:
     """Find the list index that contains the given value."""
     for index, group in enumerate(groups):
         if value in group:

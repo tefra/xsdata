@@ -1,5 +1,5 @@
 import sys
-from typing import Any, Dict, List
+from typing import Any
 
 from xsdata.codegen.mappers.mixins import RawDocumentMapper
 from xsdata.codegen.models import AttrType, Class
@@ -14,7 +14,7 @@ class DictMapper(RawDocumentMapper):
     """
 
     @classmethod
-    def map(cls, data: Dict, name: str, location: str) -> List[Class]:
+    def map(cls, data: dict, name: str, location: str) -> list[Class]:
         """Map a dictionary to classes.
 
         Args:
@@ -29,7 +29,7 @@ class DictMapper(RawDocumentMapper):
         return list(ClassUtils.flatten(target, f"{location}/{name}"))
 
     @classmethod
-    def build_class(cls, data: Dict, name: str) -> Class:
+    def build_class(cls, data: dict, name: str) -> Class:
         """Build a class from a data dictionary.
 
         Args:

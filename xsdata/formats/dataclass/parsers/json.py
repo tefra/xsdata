@@ -2,7 +2,7 @@ import io
 import json
 import pathlib
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Type, Union
+from typing import Any, Callable, Optional, Union
 
 from xsdata.formats.dataclass.parsers import DictDecoder
 from xsdata.formats.types import T
@@ -20,7 +20,7 @@ class JsonParser(DictDecoder):
 
     load_factory: Callable = field(default=json.load)
 
-    def from_path(self, path: pathlib.Path, clazz: Optional[Type[T]] = None) -> T:
+    def from_path(self, path: pathlib.Path, clazz: Optional[type[T]] = None) -> T:
         """Parse the input file into the target class type.
 
         If no clazz is provided, the binding context will try
@@ -35,7 +35,7 @@ class JsonParser(DictDecoder):
         """
         return self.parse(str(path.resolve()), clazz)
 
-    def from_string(self, source: str, clazz: Optional[Type[T]] = None) -> T:
+    def from_string(self, source: str, clazz: Optional[type[T]] = None) -> T:
         """Parse the input source string into the target class type.
 
         If no clazz is provided, the binding context will try
@@ -50,7 +50,7 @@ class JsonParser(DictDecoder):
         """
         return self.from_bytes(source.encode(), clazz)
 
-    def from_bytes(self, source: bytes, clazz: Optional[Type[T]] = None) -> T:
+    def from_bytes(self, source: bytes, clazz: Optional[type[T]] = None) -> T:
         """Parse the input source bytes object into the target class type.
 
         If no clazz is provided, the binding context will try
@@ -65,7 +65,7 @@ class JsonParser(DictDecoder):
         """
         return self.parse(io.BytesIO(source), clazz)
 
-    def parse(self, source: Any, clazz: Optional[Type[T]] = None) -> T:
+    def parse(self, source: Any, clazz: Optional[type[T]] = None) -> T:
         """Parse the input stream into the target class type.
 
         If no clazz is provided, the binding context will try
@@ -81,7 +81,7 @@ class JsonParser(DictDecoder):
         data = self.load_json(source)
         return self.decode(data, clazz)
 
-    def load_json(self, source: Any) -> Union[Dict, List]:
+    def load_json(self, source: Any) -> Union[dict, list]:
         """Load the given json source filename or stream.
 
         Args:

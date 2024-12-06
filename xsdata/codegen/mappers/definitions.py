@@ -1,5 +1,6 @@
 import itertools
-from typing import Dict, Iterator, List, Optional, Tuple
+from collections.abc import Iterator
+from typing import Optional
 
 from xsdata.codegen.models import Attr, AttrType, Class, Restrictions, Status
 from xsdata.formats.dataclass.models.generics import AnyElement
@@ -27,7 +28,7 @@ class DefinitionsMapper:
     """
 
     @classmethod
-    def map(cls, definitions: Definitions) -> List[Class]:
+    def map(cls, definitions: Definitions) -> list[Class]:
         """Main entrypoint for this mapper.
 
         Iterates over their services and their ports and build
@@ -74,7 +75,7 @@ class DefinitionsMapper:
         definitions: Definitions,
         binding: Binding,
         port_type: PortType,
-        config: Dict,
+        config: dict,
     ) -> Iterator[Class]:
         """Map binding operations into binding and service classes.
 
@@ -105,7 +106,7 @@ class DefinitionsMapper:
         definitions: Definitions,
         binding_operation: BindingOperation,
         port_type_operation: PortTypeOperation,
-        config: Dict,
+        config: dict,
         name: str,
     ) -> Iterator[Class]:
         """Map a binding operation to a service and binding classes.
@@ -185,7 +186,7 @@ class DefinitionsMapper:
         Yields:
             An iterator of class instances.
         """
-        messages: List[Tuple[str, BindingMessage, PortTypeMessage, Optional[str]]] = []
+        messages: list[tuple[str, BindingMessage, PortTypeMessage, Optional[str]]] = []
 
         if binding_operation.input:
             messages.append(
@@ -235,11 +236,11 @@ class DefinitionsMapper:
             port_type_operation: The port type operation instance
             target: The target class instance
         """
-        ns_map: Dict = {}
+        ns_map: dict = {}
         body = next(inner for inner in target.inner if inner.name == "Body")
         fault_class = cls.build_inner_class(body, "Fault", target.namespace)
 
-        detail_attrs: List[Attr] = []
+        detail_attrs: list[Attr] = []
         for fault in port_type_operation.faults:
             message = definitions.find_message(text.suffix(fault.message))
             detail_attrs.extend(cls.build_parts_attributes(message.parts, ns_map))
@@ -417,7 +418,7 @@ class DefinitionsMapper:
 
     @classmethod
     def map_binding_message_parts(
-        cls, definitions: Definitions, message: str, extended: AnyElement, ns_map: Dict
+        cls, definitions: Definitions, message: str, extended: AnyElement, ns_map: dict
     ) -> Iterator[Attr]:
         """Find a Message instance and map its parts to attrs.
 
@@ -450,7 +451,7 @@ class DefinitionsMapper:
         yield from cls.build_parts_attributes(message_parts, ns_map)
 
     @classmethod
-    def build_parts_attributes(cls, parts: List[Part], ns_map: Dict) -> Iterator[Attr]:
+    def build_parts_attributes(cls, parts: list[Part], ns_map: dict) -> Iterator[Attr]:
         """Build attributes for the given list of parts.
 
         Args:
@@ -482,7 +483,7 @@ class DefinitionsMapper:
             yield cls.build_attr(name, type_qname, namespace=namespace, native=native)
 
     @classmethod
-    def operation_namespace(cls, config: Dict) -> Optional[str]:
+    def operation_namespace(cls, config: dict) -> Optional[str]:
         """Return the operation namespace by the operation transport.
 
         Args:
@@ -499,7 +500,7 @@ class DefinitionsMapper:
         return namespace
 
     @classmethod
-    def attributes(cls, elements: Iterator[AnyElement]) -> Dict:
+    def attributes(cls, elements: Iterator[AnyElement]) -> dict:
         """Return all attributes from all extended elements as a dictionary.
 
         Args:

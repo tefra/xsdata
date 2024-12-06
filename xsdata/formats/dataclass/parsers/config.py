@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, Optional, Type
+from typing import Any, Callable, Optional
 
 from xsdata.formats.types import T
 
 
-def default_class_factory(cls: Type[T], params: Dict[str, Any]) -> T:
+def default_class_factory(cls: type[T], params: dict[str, Any]) -> T:
     """The default class factory.
 
     To be used as a hook for plugins.
@@ -39,7 +39,7 @@ class ParserConfig:
     base_url: Optional[str] = None
     load_dtd: bool = False
     process_xinclude: bool = False
-    class_factory: Callable[[Type[T], Dict[str, Any]], T] = field(
+    class_factory: Callable[[type[T], dict[str, Any]], T] = field(
         default=default_class_factory
     )
     fail_on_unknown_properties: bool = True

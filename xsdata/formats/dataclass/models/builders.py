@@ -1,18 +1,11 @@
 import sys
 from collections import defaultdict
+from collections.abc import Iterator, Mapping, Sequence
 from enum import Enum
 from typing import (
     Any,
     Callable,
-    Dict,
-    Iterator,
-    List,
-    Mapping,
     Optional,
-    Sequence,
-    Set,
-    Tuple,
-    Type,
     get_type_hints,
 )
 
@@ -34,7 +27,7 @@ from xsdata.utils.collections import first
 from xsdata.utils.constants import EMPTY_SEQUENCE, return_input
 from xsdata.utils.namespaces import build_qname
 
-evaluations: Dict[str, Callable] = {
+evaluations: dict[str, Callable] = {
     XmlType.TEXT: evaluate_text,
     XmlType.ELEMENT: evaluate_element,
     XmlType.ELEMENTS: evaluate_elements,
@@ -108,14 +101,14 @@ class XmlMetaBuilder:
         class_type: ClassType,
         element_name_generator: Callable,
         attribute_name_generator: Callable,
-        globalns: Optional[Dict[str, Callable]] = None,
+        globalns: Optional[dict[str, Callable]] = None,
     ):
         self.class_type = class_type
         self.element_name_generator = element_name_generator
         self.attribute_name_generator = attribute_name_generator
         self.globalns = globalns
 
-    def build(self, clazz: Type, parent_namespace: Optional[str]) -> XmlMeta:
+    def build(self, clazz: type, parent_namespace: Optional[str]) -> XmlMeta:
         """Build the binding metadata for a dataclass and its fields.
 
         Args:
@@ -136,8 +129,8 @@ class XmlMetaBuilder:
         )
 
         attributes = {}
-        elements: Dict[str, List[XmlVar]] = defaultdict(list)
-        wrappers: Dict[str, str] = {}
+        elements: dict[str, list[XmlVar]] = defaultdict(list)
+        wrappers: dict[str, str] = {}
         choices = []
         any_attributes = []
         wildcards = []
@@ -175,7 +168,7 @@ class XmlMetaBuilder:
 
     def build_vars(
         self,
-        clazz: Type,
+        clazz: type,
         namespace: Optional[str],
         element_name_generator: Callable,
         attribute_name_generator: Callable,
@@ -221,7 +214,7 @@ class XmlMetaBuilder:
 
     def build_class_meta(
         self,
-        clazz: Type,
+        clazz: Any,
         parent_namespace: Optional[str] = None,
     ) -> ClassMeta:
         """Build the class meta options and merge with the defaults.
@@ -267,7 +260,7 @@ class XmlMetaBuilder:
         )
 
     @classmethod
-    def find_declared_class(cls, clazz: Type, name: str) -> Type:
+    def find_declared_class(cls, clazz: type, name: str) -> Any:
         """Find the user class that matches the name.
 
         Todo: Honestly I have no idea why we needed this.
@@ -280,7 +273,7 @@ class XmlMetaBuilder:
         raise XmlContextError(f"Failed to detect the declared class for field {name}")
 
     @classmethod
-    def is_inner_class(cls, clazz: Type) -> bool:
+    def is_inner_class(cls, clazz: type) -> bool:
         """Return whether the given type is nested inside another type."""
         return "." in clazz.__qualname__
 
@@ -297,7 +290,7 @@ class XmlMetaBuilder:
 
         return getattr(meta, "namespace", None)
 
-    def default_xml_type(self, clazz: Type) -> str:
+    def default_xml_type(self, clazz: type) -> str:
         """Return the default xml type for the fields of the given dataclass.
 
         If a class has fields with no xml type defined, attempt
@@ -306,7 +299,7 @@ class XmlMetaBuilder:
 
         # Todo hacks like this are so unnecessary...
         """
-        counters: Dict[str, int] = defaultdict(int)
+        counters: dict[str, int] = defaultdict(int)
         for var in self.class_type.get_fields(clazz):
             xml_type = var.metadata.get("type")
             counters[xml_type or "undefined"] += 1
@@ -358,7 +351,7 @@ class XmlVarBuilder:
 
     def build(
         self,
-        model: Type,
+        model: type,
         name: str,
         type_hint: Any,
         metadata: Mapping[str, Any],
@@ -459,9 +452,9 @@ class XmlVarBuilder:
 
     def build_choices(
         self,
-        model: Type,
+        model: type,
         name: str,
-        choices: List[Dict],
+        choices: list[dict],
         factory: Optional[Callable],
         globalns: Any,
         parent_namespace: Optional[str],
@@ -479,7 +472,7 @@ class XmlVarBuilder:
         Yields:
             An iterator of field choice binding metadata instance.
         """
-        existing_types: Set[type] = set()
+        existing_types: set[type] = set()
 
         for choice in choices:
             default_value = self.class_type.default_choice_value(choice)
@@ -539,7 +532,7 @@ class XmlVarBuilder:
         xml_type: Optional[str],
         namespace: Optional[str],
         parent_namespace: Optional[str],
-    ) -> Tuple[str, ...]:
+    ) -> tuple[str, ...]:
         """Resolve a fields supported namespaces.
 
         Only elements and wildcards are allowed to inherit the parent
@@ -576,14 +569,14 @@ class XmlVarBuilder:
         return tuple(result)
 
     @classmethod
-    def is_any_type(cls, types: Sequence[Type], xml_type: str) -> bool:
+    def is_any_type(cls, types: Sequence[type], xml_type: str) -> bool:
         """Return whether the given xml type supports generic values."""
         if xml_type in (XmlType.ELEMENT, XmlType.ELEMENTS):
             return object in types
 
         return False
 
-    def is_typing_supported(self, types: Sequence[Type]) -> bool:
+    def is_typing_supported(self, types: Sequence[type]) -> bool:
         """Validate all types are registered in the converter."""
         for tp in types:
             if (

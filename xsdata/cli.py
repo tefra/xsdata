@@ -2,8 +2,9 @@ import logging
 import platform
 import sys
 import warnings
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 import click
 from click_default_group import DefaultGroup

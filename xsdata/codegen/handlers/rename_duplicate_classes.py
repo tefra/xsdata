@@ -1,5 +1,3 @@
-from typing import Dict, List, Set
-
 from xsdata.codegen.mixins import ContainerHandlerInterface, ContainerInterface
 from xsdata.codegen.models import (
     Attr,
@@ -27,15 +25,15 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
         reserved: The reserved class names or qualified names
     """
 
-    __slots__ = ("use_names", "renames", "merges", "reserved")
+    __slots__ = ("merges", "renames", "reserved", "use_names")
 
     def __init__(self, container: ContainerInterface):
         super().__init__(container)
 
         self.use_names = self.should_use_names()
-        self.renames: Dict[int, str] = {}
-        self.merges: Dict[int, int] = {}
-        self.reserved: Set[str] = set()
+        self.renames: dict[int, str] = {}
+        self.merges: dict[int, int] = {}
+        self.reserved: set[str] = set()
 
     def run(self):
         """Detect and resolve class name conflicts."""
@@ -68,7 +66,7 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
             or len(set(map(get_location, self.container))) == 1
         )
 
-    def merge_classes(self, classes: List[Class]):
+    def merge_classes(self, classes: list[Class]):
         """Remove the duplicate classes and update all references.
 
         Args:
@@ -81,7 +79,7 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
         for item in classes:
             self.merges[item.ref] = replace
 
-    def rename_classes(self, classes: List[Class]):
+    def rename_classes(self, classes: list[Class]):
         """Rename the classes in the list.
 
         Cases:
@@ -154,7 +152,7 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
                 reserved.add(cmp)
                 return qname
 
-    def get_reserved(self) -> Set[str]:
+    def get_reserved(self) -> set[str]:
         """Build the reserved names or qualified names of the container."""
         if not self.reserved:
             getter = get_name if self.use_names else get_qname

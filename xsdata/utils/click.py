@@ -1,14 +1,11 @@
 import enum
 import inspect
 import logging
+from collections.abc import Iterator
 from dataclasses import fields, is_dataclass
 from typing import (
     Any,
     Callable,
-    Dict,
-    Iterator,
-    List,
-    Type,
     TypeVar,
     Union,
     get_type_hints,
@@ -90,7 +87,7 @@ def build_options(obj: Any, parent: str) -> Iterator[Callable[[FC], FC]]:
             )
 
 
-def get_doc_hints(obj: Any) -> Dict[str, str]:
+def get_doc_hints(obj: Any) -> dict[str, str]:
     """Return a param-docstring map of the class arguments."""
     docstrings = inspect.getdoc(obj)
     assert docstrings is not None
@@ -109,7 +106,7 @@ def get_doc_hints(obj: Any) -> Dict[str, str]:
 class EnumChoice(click.Choice):
     """Custom click choice widget for enumerations."""
 
-    def __init__(self, enumeration: Type[enum.Enum]):
+    def __init__(self, enumeration: type[enum.Enum]):
         self.enumeration = enumeration
         super().__init__([e.value for e in enumeration])
 
@@ -121,7 +118,7 @@ class EnumChoice(click.Choice):
 class LogFormatter(logging.Formatter):
     """Custom log formatter with click colors."""
 
-    colors: Dict[str, Any] = {
+    colors: dict[str, Any] = {
         "error": {"fg": "red"},
         "exception": {"fg": "red"},
         "critical": {"fg": "red"},
@@ -147,7 +144,7 @@ class LogHandler(logging.Handler):
 
     def __init__(self, level: Union[int, str] = logging.NOTSET):
         super().__init__(level)
-        self.warnings: List[str] = []
+        self.warnings: list[str] = []
 
     def emit(self, record: logging.LogRecord):
         """Override emit to record warnings."""

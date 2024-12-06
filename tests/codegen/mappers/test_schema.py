@@ -1,5 +1,5 @@
+from collections.abc import Iterator
 from types import GeneratorType
-from typing import Iterator
 from unittest import mock
 
 from xsdata.codegen.mappers import SchemaMapper

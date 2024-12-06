@@ -2,7 +2,7 @@ import sys
 from decimal import Decimal
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional, Tuple, Type
+from typing import Any, Callable, Optional
 from xml.etree.ElementTree import QName
 
 from xsdata.models.datatype import (
@@ -48,7 +48,7 @@ class Namespace(Enum):
         return __STANDARD_NAMESPACES__.get(uri) if uri else None
 
     @classmethod
-    def common(cls) -> Tuple["Namespace", ...]:
+    def common(cls) -> tuple["Namespace", ...]:
         """Return the common namespaces."""
         return Namespace.XS, Namespace.XSI, Namespace.XML, Namespace.XLINK
 
@@ -167,7 +167,7 @@ class DataType(Enum):
         code: str,
         python_type: type,
         fmt: Optional[str] = None,
-        wrapper: Optional[Type] = None,
+        wrapper: Optional[type] = None,
     ):
         self.code = code
         self.type = python_type
@@ -193,7 +193,7 @@ class DataType(Enum):
         return cls.from_type(_type)
 
     @classmethod
-    def from_type(cls, tp: Type) -> "DataType":
+    def from_type(cls, tp: type) -> "DataType":
         """Load from a python type."""
         return __DataTypeIndex__.get(tp, DataType.STRING)
 
@@ -251,7 +251,7 @@ __DataTypeIndex__ = {
     XmlHexBinary: DataType.HEX_BINARY,
     XmlBase64Binary: DataType.BASE64_BINARY,
 }
-__DataTypeInferIndex__: Dict[Type, Callable] = {
+__DataTypeInferIndex__: dict[type, Callable] = {
     int: int_datatype,
     float: float_datatype,
     XmlPeriod: period_datatype,

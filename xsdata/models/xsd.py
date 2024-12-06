@@ -1,9 +1,9 @@
 import sys
 import textwrap
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from typing import Any as Anything
-from typing import Dict, Iterator, Optional
-from typing import List as Array
+from typing import Optional
 from typing import Union as UnionType
 
 from xsdata.formats.dataclass.serializers import XmlSerializer
@@ -56,7 +56,7 @@ class Docstring:
 
         namespace = "http://www.w3.org/1999/xhtml"
 
-    content: Array[object] = array_any_element()
+    content: list[object] = array_any_element()
 
 
 @dataclass
@@ -66,7 +66,7 @@ class Documentation(ElementBase):
     lang: Optional[str] = attribute()
     source: Optional[str] = attribute()
     attributes: Optional["AnyAttribute"] = element()
-    content: Array[object] = array_any_element(mixed=True)
+    content: list[object] = array_any_element(mixed=True)
 
     def tostring(self) -> Optional[str]:
         """Convert the content to a help string."""
@@ -89,15 +89,15 @@ class Appinfo(ElementBase):
 
     source: Optional[str] = attribute()
     any_attribute: Optional["AnyAttribute"] = element(name="anyAttribute")
-    content: Array[object] = array_any_element(mixed=True)
+    content: list[object] = array_any_element(mixed=True)
 
 
 @dataclass
 class Annotation(ElementBase):
     """XSD Annotation model representation."""
 
-    app_infos: Array[Appinfo] = array_element(name="appinfo")
-    documentations: Array[Documentation] = array_element(name="documentation")
+    app_infos: list[Appinfo] = array_element(name="appinfo")
+    documentations: list[Documentation] = array_element(name="documentation")
     any_attribute: Optional["AnyAttribute"] = element(name="anyAttribute")
 
 
@@ -106,7 +106,7 @@ class AnnotationBase(ElementBase):
     """XSD AnnotationBase model representation."""
 
     id: Optional[str] = attribute()
-    annotations: Array[Annotation] = array_element(name="annotation")
+    annotations: list[Annotation] = array_element(name="annotation")
     any_attribute: Optional["AnyAttribute"] = element(name="anyAttribute")
 
     @property
@@ -199,7 +199,7 @@ class SimpleType(AnnotationBase):
         elif self.union:
             yield from self.union.bases
 
-    def get_restrictions(self) -> Dict[str, Anything]:
+    def get_restrictions(self) -> dict[str, Anything]:
         """Return the restrictions dictionary of this element."""
         if self.restriction:
             return self.restriction.get_restrictions()
@@ -231,7 +231,7 @@ class List(AnnotationBase):
         if self.item_type:
             yield self.item_type
 
-    def get_restrictions(self) -> Dict[str, Anything]:
+    def get_restrictions(self) -> dict[str, Anything]:
         """Return the restrictions dictionary of this element."""
         return {"tokens": True}
 
@@ -241,7 +241,7 @@ class Union(AnnotationBase):
     """XSD Union model representation."""
 
     member_types: Optional[str] = attribute(name="memberTypes")
-    simple_types: Array[SimpleType] = array_element(name="simpleType")
+    simple_types: list[SimpleType] = array_element(name="simpleType")
 
     @property
     def bases(self) -> Iterator[str]:
@@ -268,7 +268,7 @@ class Union(AnnotationBase):
         if self.member_types:
             yield from self.member_types.split()
 
-    def get_restrictions(self) -> Dict[str, Anything]:
+    def get_restrictions(self) -> dict[str, Anything]:
         """Return the restrictions dictionary of this element."""
         restrictions = {}
         for simple_type in self.simple_types:
@@ -319,7 +319,7 @@ class Attribute(AnnotationBase):
         datatype = DataType.STRING if self.fixed else DataType.ANY_SIMPLE_TYPE
         return datatype.prefixed(self.xs_prefix)
 
-    def get_restrictions(self) -> Dict[str, Anything]:
+    def get_restrictions(self) -> dict[str, Anything]:
         """Return the restrictions dictionary of this element."""
         if self.use == UseType.REQUIRED:
             restrictions = {"min_occurs": 1, "max_occurs": 1}
@@ -340,8 +340,8 @@ class AttributeGroup(AnnotationBase):
 
     ref: str = attribute(default="")
     name: Optional[str] = attribute()
-    attributes: Array[Attribute] = array_element(name="attribute")
-    attribute_groups: Array["AttributeGroup"] = array_element(name="attributeGroup")
+    attributes: list[Attribute] = array_element(name="attribute")
+    attribute_groups: list["AttributeGroup"] = array_element(name="attributeGroup")
 
     @property
     def is_property(self) -> bool:
@@ -392,7 +392,7 @@ class Any(AnnotationBase):
         """Return the attr types for this element."""
         yield DataType.ANY_TYPE.prefixed(self.xs_prefix)
 
-    def get_restrictions(self) -> Dict[str, Anything]:
+    def get_restrictions(self) -> dict[str, Anything]:
         """Return the restrictions dictionary of this element."""
         max_occurs = sys.maxsize if self.max_occurs == "unbounded" else self.max_occurs
 
@@ -409,15 +409,15 @@ class All(AnnotationBase):
 
     min_occurs: int = attribute(default=1, name="minOccurs")
     max_occurs: UnionType[str, int] = attribute(default=1, name="maxOccurs")
-    any: Array[Any] = array_element(name="any")
-    elements: Array["Element"] = array_element(name="element")
-    groups: Array["Group"] = array_element(name="group")
+    any: list[Any] = array_element(name="any")
+    elements: list["Element"] = array_element(name="element")
+    groups: list["Group"] = array_element(name="group")
 
     def __post_init__(self):
         """Post initialization validations."""
         self.max_occurs = validate_max_occurs(self.min_occurs, self.max_occurs)
 
-    def get_restrictions(self) -> Dict[str, Anything]:
+    def get_restrictions(self) -> dict[str, Anything]:
         """Return the restrictions dictionary of this element."""
         return {
             "path": [("a", id(self), self.min_occurs, self.max_occurs)],
@@ -430,17 +430,17 @@ class Sequence(AnnotationBase):
 
     min_occurs: int = attribute(default=1, name="minOccurs")
     max_occurs: UnionType[str, int] = attribute(default=1, name="maxOccurs")
-    elements: Array["Element"] = array_element(name="element")
-    groups: Array["Group"] = array_element(name="group")
-    choices: Array["Choice"] = array_element(name="choice")
-    sequences: Array["Sequence"] = array_element(name="sequence")
-    any: Array["Any"] = array_element()
+    elements: list["Element"] = array_element(name="element")
+    groups: list["Group"] = array_element(name="group")
+    choices: list["Choice"] = array_element(name="choice")
+    sequences: list["Sequence"] = array_element(name="sequence")
+    any: list["Any"] = array_element()
 
     def __post_init__(self):
         """Post initialization validations."""
         self.max_occurs = validate_max_occurs(self.min_occurs, self.max_occurs)
 
-    def get_restrictions(self) -> Dict[str, Anything]:
+    def get_restrictions(self) -> dict[str, Anything]:
         """Return the restrictions dictionary of this element."""
         return {
             "path": [("s", id(self), self.min_occurs, self.max_occurs)],
@@ -453,17 +453,17 @@ class Choice(AnnotationBase):
 
     min_occurs: int = attribute(default=1, name="minOccurs")
     max_occurs: UnionType[str, int] = attribute(default=1, name="maxOccurs")
-    elements: Array["Element"] = array_element(name="element")
-    groups: Array["Group"] = array_element(name="group")
-    choices: Array["Choice"] = array_element(name="choice")
-    sequences: Array[Sequence] = array_element(name="sequence")
-    any: Array["Any"] = array_element()
+    elements: list["Element"] = array_element(name="element")
+    groups: list["Group"] = array_element(name="group")
+    choices: list["Choice"] = array_element(name="choice")
+    sequences: list[Sequence] = array_element(name="sequence")
+    any: list["Any"] = array_element()
 
     def __post_init__(self):
         """Post initialization validations."""
         self.max_occurs = validate_max_occurs(self.min_occurs, self.max_occurs)
 
-    def get_restrictions(self) -> Dict[str, Anything]:
+    def get_restrictions(self) -> dict[str, Anything]:
         """Return the restrictions dictionary of this element."""
         return {
             "path": [("c", id(self), self.min_occurs, self.max_occurs)],
@@ -497,7 +497,7 @@ class Group(AnnotationBase):
         if self.ref:
             yield self.ref
 
-    def get_restrictions(self) -> Dict[str, Anything]:
+    def get_restrictions(self) -> dict[str, Anything]:
         """Return the restrictions dictionary of this element."""
         return {
             "path": [("g", id(self), self.min_occurs, self.max_occurs)],
@@ -529,9 +529,9 @@ class Extension(AnnotationBase):
     sequence: Optional[Sequence] = element()
     any_attribute: Optional[AnyAttribute] = element(name="anyAttribute")
     open_content: Optional[OpenContent] = element(name="openContent")
-    attributes: Array[Attribute] = array_element(name="attribute")
-    attribute_groups: Array[AttributeGroup] = array_element(name="attributeGroup")
-    assertions: Array[Assertion] = array_element(name="assert")
+    attributes: list[Attribute] = array_element(name="attribute")
+    attribute_groups: list[AttributeGroup] = array_element(name="attributeGroup")
+    assertions: list[Assertion] = array_element(name="assert")
 
     @property
     def bases(self) -> Iterator[str]:
@@ -662,12 +662,12 @@ class Restriction(AnnotationBase):
     choice: Optional[Choice] = element()
     sequence: Optional[Sequence] = element()
     open_content: Optional[OpenContent] = element(name="openContent")
-    attributes: Array[Attribute] = array_element(name="attribute")
-    attribute_groups: Array[AttributeGroup] = array_element(name="attributeGroup")
-    enumerations: Array[Enumeration] = array_element(name="enumeration")
-    asserts: Array[Assertion] = array_element(name="assert")
-    assertions: Array[Assertion] = array_element(name="assertion")
-    any_element: Array[object] = array_any_element()
+    attributes: list[Attribute] = array_element(name="attribute")
+    attribute_groups: list[AttributeGroup] = array_element(name="attributeGroup")
+    enumerations: list[Enumeration] = array_element(name="enumeration")
+    asserts: list[Assertion] = array_element(name="assert")
+    assertions: list[Assertion] = array_element(name="assertion")
+    any_element: list[object] = array_any_element()
     min_exclusive: Optional[MinExclusive] = element(name="minExclusive")
     min_inclusive: Optional[MinInclusive] = element(name="minInclusive")
     min_length: Optional[MinLength] = element(name="minLength")
@@ -678,7 +678,7 @@ class Restriction(AnnotationBase):
     fraction_digits: Optional[FractionDigits] = element(name="fractionDigits")
     length: Optional[Length] = element()
     white_space: Optional[WhiteSpace] = element(name="whiteSpace")
-    patterns: Array[Pattern] = array_element(name="pattern")
+    patterns: list[Pattern] = array_element(name="pattern")
     explicit_timezone: Optional[ExplicitTimezone] = element(name="explicitTimezone")
     simple_type: Optional[SimpleType] = element(name="simpleType")
 
@@ -701,7 +701,7 @@ class Restriction(AnnotationBase):
         if self.base:
             yield self.base
 
-    def get_restrictions(self) -> Dict[str, Anything]:
+    def get_restrictions(self) -> dict[str, Anything]:
         """Return the restrictions dictionary of this element."""
         restrictions = {}
         if self.simple_type:
@@ -766,9 +766,9 @@ class ComplexType(AnnotationBase):
     sequence: Optional[Sequence] = element()
     any_attribute: Optional[AnyAttribute] = element(name="anyAttribute")
     open_content: Optional[OpenContent] = element(name="openContent")
-    attributes: Array[Attribute] = array_element(name="attribute")
-    attribute_groups: Array[AttributeGroup] = array_element(name="attributeGroup")
-    assertion: Array[Assertion] = array_element(name="assert")
+    attributes: list[Attribute] = array_element(name="attribute")
+    attribute_groups: list[AttributeGroup] = array_element(name="attributeGroup")
+    assertion: list[Assertion] = array_element(name="assert")
     abstract: bool = attribute(default=False)
     mixed: bool = attribute(default=False)
     default_attributes_apply: bool = attribute(
@@ -806,7 +806,7 @@ class Unique(AnnotationBase):
     name: Optional[str] = attribute()
     ref: Optional[str] = attribute()
     selector: Optional[Selector] = element()
-    fields: Array[Field] = array_element(name="field")
+    fields: list[Field] = array_element(name="field")
 
 
 @dataclass
@@ -816,7 +816,7 @@ class Key(AnnotationBase):
     name: Optional[str] = attribute()
     ref: Optional[str] = attribute()
     selector: Optional[Selector] = element()
-    fields: Array[Selector] = array_element(name="field")
+    fields: list[Selector] = array_element(name="field")
 
 
 @dataclass
@@ -827,7 +827,7 @@ class Keyref(AnnotationBase):
     ref: Optional[str] = attribute()
     refer: Optional[str] = attribute()
     selector: Optional[Selector] = element()
-    fields: Array[Selector] = array_element(name="field")
+    fields: list[Selector] = array_element(name="field")
 
 
 @dataclass
@@ -854,7 +854,7 @@ class Alternative(AnnotationBase):
         if self.type:
             yield self.type
 
-    def get_restrictions(self) -> Dict[str, Anything]:
+    def get_restrictions(self) -> dict[str, Anything]:
         """Return the restrictions dictionary of this element."""
         return {
             "path": [("alt", id(self), 0, 1)],
@@ -877,10 +877,10 @@ class Element(AnnotationBase):
     target_namespace: Optional[str] = attribute(name="targetNamespace")
     simple_type: Optional[SimpleType] = element(name="simpleType")
     complex_type: Optional[ComplexType] = element(name="complexType")
-    alternatives: Array[Alternative] = array_element(name="alternative")
-    uniques: Array[Unique] = array_element(name="unique")
-    keys: Array[Key] = array_element(name="key")
-    keyrefs: Array[Keyref] = array_element(name="keyref")
+    alternatives: list[Alternative] = array_element(name="alternative")
+    uniques: list[Unique] = array_element(name="unique")
+    keys: list[Key] = array_element(name="key")
+    keyrefs: list[Keyref] = array_element(name="keyref")
     min_occurs: int = attribute(default=1, name="minOccurs")
     max_occurs: UnionType[str, int] = attribute(default=1, name="maxOccurs")
     nillable: bool = attribute(default=False)
@@ -927,11 +927,11 @@ class Element(AnnotationBase):
         yield from (alt.type for alt in self.alternatives if alt.type)
 
     @property
-    def substitutions(self) -> Array[str]:
+    def substitutions(self) -> list[str]:
         """Return a list of the substitution groups."""
         return self.substitution_group.split() if self.substitution_group else []
 
-    def get_restrictions(self) -> Dict[str, Anything]:
+    def get_restrictions(self) -> dict[str, Anything]:
         """Return the restrictions dictionary of this element."""
         restrictions = {
             "min_occurs": self.min_occurs,
@@ -978,10 +978,10 @@ class Redefine(AnnotationBase):
     """XSD Redefine model representation."""
 
     schema_location: Optional[str] = attribute(name="schemaLocation")
-    simple_types: Array[SimpleType] = array_element(name="simpleType")
-    complex_types: Array[ComplexType] = array_element(name="complexType")
-    groups: Array[Group] = array_element(name="group")
-    attribute_groups: Array[AttributeGroup] = array_element(name="attributeGroup")
+    simple_types: list[SimpleType] = array_element(name="simpleType")
+    complex_types: list[ComplexType] = array_element(name="complexType")
+    groups: list[Group] = array_element(name="group")
+    attribute_groups: list[AttributeGroup] = array_element(name="attributeGroup")
     location: Optional[str] = field(default=None, metadata={"type": "Ignore"})
 
 
@@ -990,13 +990,13 @@ class Override(AnnotationBase):
     """XSD Override model representation."""
 
     schema_location: Optional[str] = attribute(name="schemaLocation")
-    simple_types: Array[SimpleType] = array_element(name="simpleType")
-    complex_types: Array[ComplexType] = array_element(name="complexType")
-    groups: Array[Group] = array_element(name="group")
-    attribute_groups: Array[AttributeGroup] = array_element(name="attributeGroup")
-    elements: Array[Element] = array_element(name="element")
-    attributes: Array[Attribute] = array_element(name="attribute")
-    notations: Array[Notation] = array_element(name="notation")
+    simple_types: list[SimpleType] = array_element(name="simpleType")
+    complex_types: list[ComplexType] = array_element(name="complexType")
+    groups: list[Group] = array_element(name="group")
+    attribute_groups: list[AttributeGroup] = array_element(name="attributeGroup")
+    elements: list[Element] = array_element(name="element")
+    attributes: list[Attribute] = array_element(name="attribute")
+    notations: list[Notation] = array_element(name="notation")
     location: Optional[str] = field(default=None, metadata={"type": "Ignore"})
 
 
@@ -1028,18 +1028,18 @@ class Schema(AnnotationBase):
     default_open_content: Optional[DefaultOpenContent] = element(
         name="defaultOpenContent"
     )
-    includes: Array[Include] = array_element(name="include")
-    imports: Array[Import] = array_element(name="import")
-    redefines: Array[Redefine] = array_element(name="redefine")
-    overrides: Array[Override] = array_element(name="override")
-    annotations: Array[Annotation] = array_element(name="annotation")
-    simple_types: Array[SimpleType] = array_element(name="simpleType")
-    complex_types: Array[ComplexType] = array_element(name="complexType")
-    groups: Array[Group] = array_element(name="group")
-    attribute_groups: Array[AttributeGroup] = array_element(name="attributeGroup")
-    elements: Array[Element] = array_element(name="element")
-    attributes: Array[Attribute] = array_element(name="attribute")
-    notations: Array[Notation] = array_element(name="notation")
+    includes: list[Include] = array_element(name="include")
+    imports: list[Import] = array_element(name="import")
+    redefines: list[Redefine] = array_element(name="redefine")
+    overrides: list[Override] = array_element(name="override")
+    annotations: list[Annotation] = array_element(name="annotation")
+    simple_types: list[SimpleType] = array_element(name="simpleType")
+    complex_types: list[ComplexType] = array_element(name="complexType")
+    groups: list[Group] = array_element(name="group")
+    attribute_groups: list[AttributeGroup] = array_element(name="attributeGroup")
+    elements: list[Element] = array_element(name="element")
+    attributes: list[Attribute] = array_element(name="attribute")
+    notations: list[Notation] = array_element(name="notation")
     location: Optional[str] = field(default=None, metadata={"type": "Ignore"})
 
     def included(self) -> Iterator[UnionType[Import, Include, Redefine, Override]]:

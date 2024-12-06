@@ -1,7 +1,8 @@
 import abc
 import datetime
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Dict, Iterator, List, NamedTuple
+from typing import NamedTuple
 
 from xsdata import __version__
 from xsdata.codegen.exceptions import CodegenError
@@ -46,16 +47,16 @@ class AbstractGenerator(abc.ABC):
         return package
 
     @abc.abstractmethod
-    def render(self, classes: List[Class]) -> Iterator[GeneratorResult]:
+    def render(self, classes: list[Class]) -> Iterator[GeneratorResult]:
         """Return an iterator of the generated results."""
 
     @classmethod
-    def group_by_package(cls, classes: List[Class]) -> Dict[Path, List[Class]]:
+    def group_by_package(cls, classes: list[Class]) -> dict[Path, list[Class]]:
         """Group the given list of classes by the target package directory."""
         return group_by(classes, lambda x: package_path(x.target_module))
 
     @classmethod
-    def group_by_module(cls, classes: List[Class]) -> Dict[Path, List[Class]]:
+    def group_by_module(cls, classes: list[Class]) -> dict[Path, list[Class]]:
         """Group the given list of classes by the target module directory."""
         return group_by(classes, lambda x: module_path(x.target_module))
 
@@ -72,7 +73,7 @@ class AbstractGenerator(abc.ABC):
             '"""\n'
         )
 
-    def normalize_packages(self, classes: List[Class]):
+    def normalize_packages(self, classes: list[Class]):
         """Normalize the classes module and package names.
 
         Args:

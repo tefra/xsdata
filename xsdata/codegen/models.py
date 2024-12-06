@@ -2,9 +2,10 @@ import copy
 import operator
 import sys
 import unicodedata
+from collections.abc import Iterator
 from dataclasses import asdict, dataclass, field, fields, replace
 from enum import IntEnum
-from typing import Any, Dict, Iterator, List, Optional, Tuple, Type, TypeVar
+from typing import Any, Optional, TypeVar
 
 from xsdata.codegen.exceptions import CodegenError
 from xsdata.formats.converter import converter
@@ -98,7 +99,7 @@ class Restrictions(CodegenModel):
     choice: Optional[int] = field(default=None, compare=False)
     group: Optional[int] = field(default=None)
     process_contents: Optional[str] = field(default=None)
-    path: List[Tuple[str, int, int, int]] = field(default_factory=list)
+    path: list[tuple[str, int, int, int]] = field(default_factory=list)
 
     @property
     def is_list(self) -> bool:
@@ -155,7 +156,7 @@ class Restrictions(CodegenModel):
         if self.max_occurs is None and source.max_occurs is not None:
             self.max_occurs = source.max_occurs
 
-    def asdict(self, types: Optional[List[Type]] = None) -> Dict:
+    def asdict(self, types: Optional[list[type]] = None) -> dict:
         """Return the initialized only properties as a dictionary.
 
         Skip None or implied values, and optionally use the
@@ -294,8 +295,8 @@ class Attr(CodegenModel):
     default: Optional[str] = field(default=None, compare=False)
     fixed: bool = field(default=False, compare=False)
     mixed: bool = field(default=False, compare=False)
-    types: List[AttrType] = field(default_factory=list, compare=False)
-    choices: List["Attr"] = field(default_factory=list, compare=False)
+    types: list[AttrType] = field(default_factory=list, compare=False)
+    choices: list["Attr"] = field(default_factory=list, compare=False)
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None, compare=False)
     restrictions: Restrictions = field(default_factory=Restrictions, compare=False)
@@ -420,7 +421,7 @@ class Attr(CodegenModel):
         return any(tp is object for tp in self.get_native_types())
 
     @property
-    def native_types(self) -> List[Type]:
+    def native_types(self) -> list[type]:
         """Return a list of all the builtin data types."""
         return list(set(self.get_native_types()))
 
@@ -441,7 +442,7 @@ class Attr(CodegenModel):
         """Return the xml type this attribute is mapped to."""
         return xml_type_map.get(self.tag)
 
-    def get_native_types(self) -> Iterator[Type]:
+    def get_native_types(self) -> Iterator[type]:
         """Yield an iterator of all the native attr types."""
         for tp in self.types:
             datatype = tp.datatype
@@ -531,11 +532,11 @@ class Class(CodegenModel):
     meta_name: Optional[str] = field(default=None)
     default: Any = field(default=None, compare=False)
     fixed: bool = field(default=False, compare=False)
-    substitutions: List[str] = field(default_factory=list)
-    extensions: List[Extension] = field(default_factory=list)
-    attrs: List[Attr] = field(default_factory=list)
-    inner: List["Class"] = field(default_factory=list)
-    ns_map: Dict = field(default_factory=dict)
+    substitutions: list[str] = field(default_factory=list)
+    extensions: list[Extension] = field(default_factory=list)
+    attrs: list[Attr] = field(default_factory=list)
+    inner: list["Class"] = field(default_factory=list)
+    ns_map: dict = field(default_factory=dict)
     parent: Optional["Class"] = field(default=None, compare=False)
 
     @property
@@ -663,7 +664,7 @@ class Class(CodegenModel):
         for _, tp in self.types_with_parents():
             yield tp
 
-    def types_with_parents(self) -> Iterator[Tuple[CodegenModel, AttrType]]:
+    def types_with_parents(self) -> Iterator[tuple[CodegenModel, AttrType]]:
         """Yields all class types with their parent codegen instance."""
         for ext in self.extensions:
             yield ext, ext.type
@@ -685,15 +686,13 @@ class Class(CodegenModel):
             yield attr
             yield attr.restrictions
 
-            for tp in attr.types:
-                yield tp
+            yield from attr.types
 
             for choice in attr.choices:
                 yield choice
                 yield choice.restrictions
 
-                for tp in choice.types:
-                    yield tp
+                yield from choice.types
 
         for ext in self.extensions:
             yield ext
@@ -714,7 +713,7 @@ class Class(CodegenModel):
 
         return any(inner.has_forward_ref() for inner in self.inner)
 
-    def parent_names(self) -> List[str]:
+    def parent_names(self) -> list[str]:
         """Return the outer class names."""
         result = []
         target = self.parent

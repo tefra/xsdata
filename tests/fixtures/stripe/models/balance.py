@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Optional, Tuple
+from typing import Optional
 
 
 @dataclass(order=True, frozen=True)
@@ -113,14 +113,14 @@ class Balance:
             "required": True,
         },
     )
-    available: Tuple[Available, ...] = field(
+    available: tuple[Available, ...] = field(
         default_factory=tuple,
         metadata={
             "type": "Element",
             "min_occurs": 1,
         },
     )
-    connect_reserved: Tuple[ConnectReserved, ...] = field(
+    connect_reserved: tuple[ConnectReserved, ...] = field(
         default_factory=tuple,
         metadata={
             "type": "Element",
@@ -134,7 +134,7 @@ class Balance:
             "required": True,
         },
     )
-    pending: Tuple[Pending, ...] = field(
+    pending: tuple[Pending, ...] = field(
         default_factory=tuple,
         metadata={
             "type": "Element",

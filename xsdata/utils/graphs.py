@@ -1,7 +1,7 @@
-from typing import Dict, Iterator, List, Set
+from collections.abc import Iterator
 
 
-def strongly_connected_components(edges: Dict[str, List[str]]) -> Iterator[Set[str]]:
+def strongly_connected_components(edges: dict[str, list[str]]) -> Iterator[set[str]]:
     """Compute Strongly Connected Components of a directed graph.
 
     From https://code.activestate.com/recipes/578507/ From
@@ -13,12 +13,12 @@ def strongly_connected_components(edges: Dict[str, List[str]]) -> Iterator[Set[s
     Yields:
         A set of the strongly connected components
     """
-    identified: Set[str] = set()
-    stack: List[str] = []
-    index: Dict[str, int] = {}
-    boundaries: List[int] = []
+    identified: set[str] = set()
+    stack: list[str] = []
+    index: dict[str, int] = {}
+    boundaries: list[int] = []
 
-    def dfs(v: str) -> Iterator[Set[str]]:
+    def dfs(v: str) -> Iterator[set[str]]:
         index[v] = len(stack)
         stack.append(v)
         boundaries.append(index[v])

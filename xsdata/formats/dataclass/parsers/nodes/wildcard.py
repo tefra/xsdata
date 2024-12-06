@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Type
+from typing import Optional
 
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.parsers.mixins import XmlNode
@@ -26,10 +26,10 @@ class WildcardNode(XmlNode):
     def __init__(
         self,
         var: XmlVar,
-        attrs: Dict,
-        ns_map: Dict,
+        attrs: dict,
+        ns_map: dict,
         position: int,
-        factory: Type,
+        factory: type,
     ):
         self.var = var
         self.attrs = attrs
@@ -38,7 +38,7 @@ class WildcardNode(XmlNode):
         self.factory = factory
 
     def bind(
-        self, qname: str, text: Optional[str], tail: Optional[str], objects: List
+        self, qname: str, text: Optional[str], tail: Optional[str], objects: list
     ) -> bool:
         """Bind the parsed data into a generic element.
 
@@ -78,7 +78,7 @@ class WildcardNode(XmlNode):
         return True
 
     @classmethod
-    def fetch_any_children(cls, position: int, objects: List) -> List:
+    def fetch_any_children(cls, position: int, objects: list) -> list:
         """Fetch the children of this node in the objects list.
 
         The children are removed from the objects list.
@@ -96,7 +96,7 @@ class WildcardNode(XmlNode):
 
         return children
 
-    def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
+    def child(self, qname: str, attrs: dict, ns_map: dict, position: int) -> XmlNode:
         """Initialize the next child wildcard node to be queued, when an element starts.
 
         This entry point is responsible to create the next node type

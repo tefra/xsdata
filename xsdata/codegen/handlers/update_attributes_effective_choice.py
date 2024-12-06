@@ -1,5 +1,4 @@
 from collections import defaultdict
-from typing import List, Tuple
 
 from xsdata.codegen.mixins import HandlerInterface
 from xsdata.codegen.models import Attr, Class, get_restriction_choice
@@ -70,7 +69,7 @@ class UpdateAttributesEffectiveChoice(HandlerInterface):
     @classmethod
     def reset_effective_choice(
         cls,
-        paths: List[Tuple[str, int, int, int]],
+        paths: list[tuple[str, int, int, int]],
         index: int,
         max_occur: int,
     ):
@@ -88,7 +87,7 @@ class UpdateAttributesEffectiveChoice(HandlerInterface):
                 break
 
     @classmethod
-    def merge_attrs(cls, target: Class, groups: List[List[int]]) -> List[Attr]:
+    def merge_attrs(cls, target: Class, groups: list[list[int]]) -> list[Attr]:
         """Merge same name/tag/namespace attrs.
 
         Args:
@@ -122,7 +121,7 @@ class UpdateAttributesEffectiveChoice(HandlerInterface):
         return attrs
 
     @classmethod
-    def group_repeating_attrs(cls, target: Class) -> List[List[int]]:
+    def group_repeating_attrs(cls, target: Class) -> list[list[int]]:
         """Create a list of indexes of the same attrs.
 
         Example: [

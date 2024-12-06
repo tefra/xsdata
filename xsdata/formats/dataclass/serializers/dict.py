@@ -1,6 +1,7 @@
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Callable, Dict, Iterator, Optional, Tuple
+from typing import Any, Callable, Optional
 
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.context import XmlContext
@@ -9,7 +10,7 @@ from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.utils import collections
 
 
-def filter_none(x: Tuple) -> Dict:
+def filter_none(x: tuple) -> dict:
     """Convert a key-value pairs to dict, ignoring None values.
 
     Args:
@@ -80,7 +81,7 @@ class DictEncoder:
 
         return converter.serialize(value, format=var.format)
 
-    def next_value(self, obj: Any) -> Iterator[Tuple[str, Any]]:
+    def next_value(self, obj: Any) -> Iterator[tuple[str, Any]]:
         """Fetch the next value of a model instance to convert.
 
         Args:

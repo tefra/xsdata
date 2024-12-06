@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Type
+from typing import Optional
 
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.models.elements import XmlMeta, XmlVar
@@ -36,10 +36,10 @@ class StandardNode(XmlNode):
         meta: XmlMeta,
         var: XmlVar,
         datatype: DataType,
-        ns_map: Dict,
+        ns_map: dict,
         config: ParserConfig,
         nillable: bool,
-        derived_factory: Optional[Type],
+        derived_factory: Optional[type],
     ):
         self.meta = meta
         self.var = var
@@ -54,7 +54,7 @@ class StandardNode(XmlNode):
         qname: str,
         text: Optional[str],
         tail: Optional[str],
-        objects: List,
+        objects: list,
     ) -> bool:
         """Bind the parsed data into an object for the ending element.
 
@@ -93,6 +93,6 @@ class StandardNode(XmlNode):
         objects.append((qname, obj))
         return True
 
-    def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
+    def child(self, qname: str, attrs: dict, ns_map: dict, position: int) -> XmlNode:
         """Raise an exception if there is a child element inside this node."""
         raise XmlContextError("StandardNode node doesn't support child nodes!")

@@ -1,5 +1,6 @@
+from collections.abc import Iterator
 from dataclasses import dataclass, field, fields
-from typing import Any, Callable, Dict, Iterator, List, Optional
+from typing import Any, Callable, Optional
 
 from xsdata.codegen.exceptions import CodegenError
 from xsdata.formats.dataclass.models.elements import XmlType
@@ -22,7 +23,7 @@ class ElementBase:
         init=False,
         metadata={"type": "Ignore"},
     )
-    ns_map: Dict[str, str] = field(
+    ns_map: dict[str, str] = field(
         default_factory=dict,
         init=False,
         metadata={"type": "Ignore"},
@@ -142,7 +143,7 @@ class ElementBase:
         yield from ()
 
     @property
-    def substitutions(self) -> List[str]:
+    def substitutions(self) -> list[str]:
         """Return the substitution groups of this element."""
         return []
 
@@ -155,7 +156,7 @@ class ElementBase:
 
         return None
 
-    def get_restrictions(self) -> Dict[str, Any]:
+    def get_restrictions(self) -> dict[str, Any]:
         """Return the restrictions dictionary of this element."""
         return {}
 
@@ -193,7 +194,7 @@ def element(optional: bool = True, **kwargs: Any) -> Any:
     return field(metadata=metadata, **kwargs)
 
 
-def add_default_value(params: Dict, optional: bool):
+def add_default_value(params: dict, optional: bool):
     """Add the default value if it's missing and the optional flag is true."""
     if optional and not ("default" in params or "default_factory" in params):
         params["default"] = None
@@ -213,7 +214,7 @@ def array_any_element(**kwargs: Any) -> Any:
     return field(metadata=metadata, default_factory=list, **kwargs)
 
 
-def extract_metadata(params: Dict, **kwargs: Any) -> Dict:
+def extract_metadata(params: dict, **kwargs: Any) -> dict:
     """Remove dataclasses standard field properties and merge any additional."""
     metadata = {
         key: params.pop(key) for key in list(params.keys()) if key not in FIELD_PARAMS

@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Union
+from typing import Union
 
 
 @dataclass
@@ -35,7 +35,7 @@ class Root:
     class Meta:
         name = "root"
 
-    alpha_or_bravo_or_charlie: List[Union[Alpha, Bravo, List[str]]] = field(
+    alpha_or_bravo_or_charlie: list[Union[Alpha, Bravo, list[str]]] = field(
         default_factory=list,
         metadata={
             "type": "Elements",
@@ -50,7 +50,7 @@ class Root:
                 },
                 {
                     "name": "charlie",
-                    "type": List[str],
+                    "type": list[str],
                     "namespace": "",
                     "default_factory": list,
                     "tokens": True,

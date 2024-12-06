@@ -2,7 +2,7 @@ import copy
 import functools
 from contextlib import suppress
 from dataclasses import replace
-from typing import Any, Dict, List, Optional, Tuple, Type
+from typing import Any, Optional
 
 from xsdata.exceptions import ParserError
 from xsdata.formats.dataclass.context import XmlContext
@@ -48,8 +48,8 @@ class UnionNode(XmlNode):
         self,
         meta: XmlMeta,
         var: XmlVar,
-        attrs: Dict,
-        ns_map: Dict,
+        attrs: dict,
+        ns_map: dict,
         position: int,
         config: ParserConfig,
         context: XmlContext,
@@ -63,9 +63,9 @@ class UnionNode(XmlNode):
         self.context = context
         self.level = 0
         self.candidates = self.filter_candidates()
-        self.events: List[Tuple[str, str, Any, Any]] = []
+        self.events: list[tuple[str, str, Any, Any]] = []
 
-    def filter_candidates(self) -> List[Type]:
+    def filter_candidates(self) -> list[type]:
         """Filter union candidates by fixed attributes."""
         candidates = list(self.var.types)
         fixed_attribute = functools.partial(
@@ -74,7 +74,7 @@ class UnionNode(XmlNode):
 
         return list(filter(fixed_attribute, candidates))
 
-    def filter_fixed_attrs(self, candidate: Type, parent_ns: Optional[str]) -> bool:
+    def filter_fixed_attrs(self, candidate: type, parent_ns: Optional[str]) -> bool:
         """Return whether the node attrs are incompatible with fixed attrs.
 
         Args:
@@ -97,7 +97,7 @@ class UnionNode(XmlNode):
 
         return True
 
-    def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
+    def child(self, qname: str, attrs: dict, ns_map: dict, position: int) -> XmlNode:
         """Record the event for the child element.
 
         This entry point records all events, as it's not possible
@@ -120,7 +120,7 @@ class UnionNode(XmlNode):
         qname: str,
         text: Optional[str],
         tail: Optional[str],
-        objects: List,
+        objects: list,
     ) -> bool:
         """Bind the parsed data into an object for the ending element.
 

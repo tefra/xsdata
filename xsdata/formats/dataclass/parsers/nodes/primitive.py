@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Optional
 
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.models.elements import XmlMeta, XmlVar
@@ -19,7 +19,7 @@ class PrimitiveNode(XmlNode):
 
     __slots__ = "meta", "var", "ns_map", "config"
 
-    def __init__(self, meta: XmlMeta, var: XmlVar, ns_map: Dict, config: ParserConfig):
+    def __init__(self, meta: XmlMeta, var: XmlVar, ns_map: dict, config: ParserConfig):
         self.meta = meta
         self.var = var
         self.ns_map = ns_map
@@ -30,7 +30,7 @@ class PrimitiveNode(XmlNode):
         qname: str,
         text: Optional[str],
         tail: Optional[str],
-        objects: List,
+        objects: list,
     ) -> bool:
         """Bind the parsed data into an object for the ending element.
 
@@ -67,6 +67,6 @@ class PrimitiveNode(XmlNode):
 
         return True
 
-    def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
+    def child(self, qname: str, attrs: dict, ns_map: dict, position: int) -> XmlNode:
         """Raise an exception if there is a child element inside this node."""
         raise XmlContextError("Primitive node doesn't support child nodes!")

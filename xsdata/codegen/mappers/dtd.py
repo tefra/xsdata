@@ -1,5 +1,6 @@
 import sys
-from typing import Any, Dict, Iterator, List, Optional
+from collections.abc import Iterator
+from typing import Any, Optional
 
 from xsdata.codegen.models import Attr, AttrType, Class, Extension, Restrictions
 from xsdata.models.dtd import (
@@ -228,7 +229,7 @@ class DtdMapper:
             cls.build_content(target, content.right, **kwargs)
 
     @classmethod
-    def build_occurs(cls, occur: DtdContentOccur) -> Dict:
+    def build_occurs(cls, occur: DtdContentOccur) -> dict:
         """Calculate min/max occurs from the dtd content occur instance.
 
         Args:
@@ -306,7 +307,7 @@ class DtdMapper:
         target.attrs.append(attr)
 
     @classmethod
-    def build_enumeration(cls, target: Class, name: str, values: List[str]):
+    def build_enumeration(cls, target: Class, name: str, values: list[str]):
         """Build a nested enumeration class from the given values list.
 
         Args:

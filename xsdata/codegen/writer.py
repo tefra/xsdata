@@ -1,4 +1,4 @@
-from typing import ClassVar, Dict, List, Type
+from typing import ClassVar
 
 from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.models import Class
@@ -20,14 +20,14 @@ class CodeWriter:
 
     __slots__ = "generator"
 
-    generators: ClassVar[Dict[str, Type[AbstractGenerator]]] = {
+    generators: ClassVar[dict[str, type[AbstractGenerator]]] = {
         "dataclasses": DataclassGenerator,
     }
 
     def __init__(self, generator: AbstractGenerator):
         self.generator = generator
 
-    def write(self, classes: List[Class]):
+    def write(self, classes: list[Class]):
         """Write the classes to the designated modules.
 
         The classes may be written in the same module or
@@ -68,7 +68,7 @@ class CodeWriter:
         return cls(generator=generator_class(config))
 
     @classmethod
-    def register_generator(cls, name: str, clazz: Type[AbstractGenerator]):
+    def register_generator(cls, name: str, clazz: type[AbstractGenerator]):
         """Register a generator by name.
 
         Args:

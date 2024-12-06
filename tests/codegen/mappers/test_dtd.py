@@ -1,5 +1,5 @@
 import sys
-from typing import Iterator
+from collections.abc import Iterator
 from unittest import mock
 
 from xsdata.codegen.mappers import DtdMapper

@@ -1,4 +1,5 @@
-from typing import Dict, Iterator, List, Optional, Tuple
+from collections.abc import Iterator
+from typing import Optional
 
 from xsdata.codegen.models import Attr, AttrType, Class, Extension, Restrictions
 from xsdata.models.enums import DataType, Tag
@@ -25,7 +26,7 @@ class SchemaMapper:
     """
 
     @classmethod
-    def map(cls, schema: Schema) -> List[Class]:
+    def map(cls, schema: Schema) -> list[Class]:
         """Map schema children elements to classes.
 
         Args:
@@ -45,7 +46,7 @@ class SchemaMapper:
         ]
 
     @classmethod
-    def root_elements(cls, schema: Schema) -> Iterator[Tuple[str, ElementBase]]:
+    def root_elements(cls, schema: Schema) -> Iterator[tuple[str, ElementBase]]:
         """Return the schema root elements.
 
         Qualified Elements:
@@ -121,7 +122,7 @@ class SchemaMapper:
         cls,
         obj: ElementBase,
         target_namespace: Optional[str],
-    ) -> List[str]:
+    ) -> list[str]:
         """Builds a list of qualified substitution group names.
 
         Args:
@@ -199,7 +200,7 @@ class SchemaMapper:
         cls,
         obj: ElementBase,
         parent_restrictions: Restrictions,
-    ) -> Iterator[Tuple[ElementBase, Restrictions]]:
+    ) -> Iterator[tuple[ElementBase, Restrictions]]:
         """Recursively find and return all child elements.
 
         Args:
@@ -289,7 +290,7 @@ class SchemaMapper:
         tag: str,
         target: Class,
         name: str,
-        restrictions: Dict,
+        restrictions: dict,
     ) -> Extension:
         """Create a reference extension for the target class.
 
@@ -345,7 +346,7 @@ class SchemaMapper:
         )
 
     @classmethod
-    def build_attr_types(cls, target: Class, obj: ElementBase) -> List[AttrType]:
+    def build_attr_types(cls, target: Class, obj: ElementBase) -> list[AttrType]:
         """Convert the element types and inner types to an attr types.
 
         Args:

@@ -1,5 +1,5 @@
 from dataclasses import make_dataclass
-from typing import Any, Dict
+from typing import Any
 from unittest import mock
 from unittest.case import TestCase
 
@@ -25,7 +25,7 @@ class NodeParserTests(TestCase):
 
     def test_parse(self):
         class TestHandler(XmlHandler):
-            def parse(self, source: Any, ns_map: Dict) -> Any:
+            def parse(self, source: Any, ns_map: dict) -> Any:
                 return Books()
 
         self.parser.handler = TestHandler

@@ -1,7 +1,8 @@
 import math
 import warnings
 from collections import UserList
-from typing import Any, Callable, Dict, Iterable, Optional, Sequence, Type
+from collections.abc import Iterable, Sequence
+from typing import Any, Callable, Optional
 
 from xsdata.exceptions import ConverterError, ConverterWarning, ParserError
 from xsdata.formats.converter import QNameConverter, converter
@@ -49,7 +50,7 @@ class ParserUtils:
     """Random parser util functions."""
 
     @classmethod
-    def xsi_type(cls, attrs: Dict, ns_map: Dict) -> Optional[str]:
+    def xsi_type(cls, attrs: dict, ns_map: dict) -> Optional[str]:
         """Parse the xsi:type attribute value if present.
 
         Args:
@@ -67,7 +68,7 @@ class ParserUtils:
         return build_qname(namespace, name)
 
     @classmethod
-    def xsi_nil(cls, attrs: Dict) -> Optional[bool]:
+    def xsi_nil(cls, attrs: dict) -> Optional[bool]:
         """Return whether xsi:nil attribute value.
 
         Args:
@@ -86,9 +87,9 @@ class ParserUtils:
         var: XmlVar,
         config: ParserConfig,
         value: Any,
-        ns_map: Optional[Dict] = None,
+        ns_map: Optional[dict] = None,
         default: Any = None,
-        types: Optional[Sequence[Type]] = None,
+        types: Optional[Sequence[type]] = None,
         tokens_factory: Optional[Callable] = None,
         format: Optional[str] = None,
     ) -> Any:
@@ -130,9 +131,9 @@ class ParserUtils:
     def parse_value(
         cls,
         value: Any,
-        types: Sequence[Type],
+        types: Sequence[type],
         default: Optional[Any] = None,
-        ns_map: Optional[Dict] = None,
+        ns_map: Optional[dict] = None,
         tokens_factory: Optional[Callable] = None,
         format: Optional[str] = None,
     ) -> Any:
@@ -185,8 +186,8 @@ class ParserUtils:
 
     @classmethod
     def parse_any_attributes(
-        cls, attrs: Dict[str, str], ns_map: Dict[Optional[str], str]
-    ) -> Dict[str, str]:
+        cls, attrs: dict[str, str], ns_map: dict[Optional[str], str]
+    ) -> dict[str, str]:
         """Parse attributes with qname support.
 
         Example:
@@ -205,7 +206,7 @@ class ParserUtils:
         }
 
     @classmethod
-    def parse_any_attribute(cls, value: str, ns_map: Dict) -> str:
+    def parse_any_attribute(cls, value: str, ns_map: dict) -> str:
         """Expand the value with the full namespace if it has a prefix.
 
         Args:

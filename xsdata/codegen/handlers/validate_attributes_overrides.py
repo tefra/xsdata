@@ -1,5 +1,5 @@
 import sys
-from typing import Dict, List, Optional, Set
+from typing import Optional
 
 from xsdata.codegen.mixins import RelativeHandlerInterface
 from xsdata.codegen.models import Attr, Class, get_slug
@@ -36,8 +36,8 @@ class ValidateAttributesOverrides(RelativeHandlerInterface):
     def prohibit_parent_attrs(
         cls,
         target: Class,
-        explicit_attrs: Set[str],
-        base_attrs_map: Dict[str, List[Attr]],
+        explicit_attrs: set[str],
+        base_attrs_map: dict[str, list[Attr]],
     ):
         """Prepend prohibited parent attrs to the target class.
 
@@ -61,7 +61,7 @@ class ValidateAttributesOverrides(RelativeHandlerInterface):
                 target.attrs.insert(0, attr_restricted)
 
     @classmethod
-    def validate_attrs(cls, target: Class, base_attrs_map: Dict[str, List[Attr]]):
+    def validate_attrs(cls, target: Class, base_attrs_map: dict[str, list[Attr]]):
         """Validate overriding attrs.
 
         Cases:
@@ -99,7 +99,7 @@ class ValidateAttributesOverrides(RelativeHandlerInterface):
         """
         return a.xml_type == b.xml_type and a.namespace == b.namespace
 
-    def base_attrs_map(self, target: Class) -> Dict[str, List[Attr]]:
+    def base_attrs_map(self, target: Class) -> dict[str, list[Attr]]:
         """Create a mapping of qualified names to lists of parent attrs.
 
         Args:

@@ -83,7 +83,7 @@ license-files = ["LICENSE"]
 version = {attr = "xsdata.__version__"}
 
 [tool.ruff]
-target-version = "py38"
+target-version = "py39"
 
 [tool.ruff.lint]
 select = [
@@ -114,8 +114,6 @@ select = [
 ]
 
 ignore = [
-    "ANN101",
-    "ANN102",
     "ANN201",
     "ANN202",
     "ANN204",
@@ -133,6 +131,7 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "**/{tests}/*" = ["ANN001", "ANN002", "ANN003", "E501", "B018", "D"]
+"tests/formats/dataclass/cases/**" = ["UP"]
 "**/utils/testing.py" = ["D"]
 "docs/*" = ["D"]
 

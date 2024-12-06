@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Type
+from typing import Any, Optional
 
 from xsdata.formats.dataclass.parsers.bases import NodeParser, Parsed
 from xsdata.formats.dataclass.parsers.handlers import default_handler
@@ -22,7 +22,7 @@ class XmlParser(NodeParser):
         ns_map: The parsed namespace prefix-URI map
     """
 
-    handler: Type[XmlHandler] = field(default=default_handler())
+    handler: type[XmlHandler] = field(default=default_handler())
 
 
 @dataclass
@@ -44,17 +44,17 @@ class UserXmlParser(NodeParser):
             on duplicate events.
     """
 
-    handler: Type[XmlHandler] = field(default=default_handler())
-    hooks_cache: Dict = field(init=False, default_factory=dict)
+    handler: type[XmlHandler] = field(default=default_handler())
+    hooks_cache: dict = field(init=False, default_factory=dict)
 
     def start(
         self,
-        clazz: Optional[Type],
-        queue: List[XmlNode],
-        objects: List[Parsed],
+        clazz: Optional[type],
+        queue: list[XmlNode],
+        objects: list[Parsed],
         qname: str,
-        attrs: Dict,
-        ns_map: Dict,
+        attrs: dict,
+        ns_map: dict,
     ):
         """Build and queue the XmlNode for the starting element.
 
@@ -73,8 +73,8 @@ class UserXmlParser(NodeParser):
 
     def end(
         self,
-        queue: List[XmlNode],
-        objects: List[Parsed],
+        queue: list[XmlNode],
+        objects: list[Parsed],
         qname: str,
         text: Optional[str],
         tail: Optional[str],

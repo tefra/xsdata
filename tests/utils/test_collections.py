@@ -1,5 +1,5 @@
 from collections import namedtuple
-from typing import Iterator
+from collections.abc import Iterator
 from unittest import TestCase
 
 from xsdata.utils import collections

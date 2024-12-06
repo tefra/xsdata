@@ -1,6 +1,5 @@
 import logging
 import re
-from typing import Dict, List
 
 from toposort import toposort_flatten
 
@@ -28,16 +27,16 @@ class DependenciesResolver:
 
     """
 
-    __slots__ = "registry", "aliases", "imports", "class_list", "class_map"
+    __slots__ = "aliases", "class_list", "class_map", "imports", "registry"
 
-    def __init__(self, registry: Dict[str, str]):
+    def __init__(self, registry: dict[str, str]):
         self.registry = registry
-        self.aliases: Dict[str, str] = {}
-        self.imports: List[Import] = []
-        self.class_list: List[str] = []
-        self.class_map: Dict[str, Class] = {}
+        self.aliases: dict[str, str] = {}
+        self.imports: list[Import] = []
+        self.class_list: list[str] = []
+        self.class_map: dict[str, Class] = {}
 
-    def process(self, classes: List[Class]):
+    def process(self, classes: list[Class]):
         """Resolve the dependencies for the given class list.
 
         Reset previously resolved imports and aliases.
@@ -51,11 +50,11 @@ class DependenciesResolver:
         self.class_list = self.create_class_list(classes)
         self.resolve_imports()
 
-    def sorted_imports(self) -> List[Import]:
+    def sorted_imports(self) -> list[Import]:
         """Return a new sorted by name list of import instances."""
         return sorted(self.imports, key=lambda x: x.name)
 
-    def sorted_classes(self) -> List[Class]:
+    def sorted_classes(self) -> list[Class]:
         """Apply aliases and return the sorted the generated class list."""
         result = []
         for name in self.class_list:
@@ -102,7 +101,7 @@ class DependenciesResolver:
         self.aliases = {imp.qname: imp.alias for imp in self.imports if imp.alias}
 
     @classmethod
-    def resolve_conflicts(cls, imports: List[Import], protected: set):
+    def resolve_conflicts(cls, imports: list[Import], protected: set):
         """Find naming conflicts between imports and generate aliases.
 
         Example:
@@ -142,17 +141,17 @@ class DependenciesResolver:
             raise CodegenError("Failed to resolve dependency", qname=qname)
         return self.registry[qname]
 
-    def import_classes(self) -> List[str]:
+    def import_classes(self) -> list[str]:
         """Return a list of class qnames that need to be imported."""
         return [qname for qname in self.class_list if qname not in self.class_map]
 
     @staticmethod
-    def create_class_list(classes: List[Class]) -> List[str]:
+    def create_class_list(classes: list[Class]) -> list[str]:
         """Use topology sort to return a flat list for all the dependencies."""
         return toposort_flatten({obj.qname: set(obj.dependencies()) for obj in classes})
 
     @staticmethod
-    def create_class_map(classes: List[Class]) -> Dict[str, Class]:
+    def create_class_map(classes: list[Class]) -> dict[str, Class]:
         """Index the list of classes by their qualified names.
 
         Raises:
@@ -161,7 +160,7 @@ class DependenciesResolver:
         Returns:
             A qname-class map.
         """
-        result: Dict[str, Class] = {}
+        result: dict[str, Class] = {}
         for obj in classes:
             if obj.qname in result:
                 raise CodegenError("Duplicate class during resolve", qname=obj.qname)

@@ -1,7 +1,8 @@
+from collections.abc import Iterator, Mapping
 from dataclasses import dataclass, field
 from enum import Enum
 from io import StringIO
-from typing import Any, Iterator, List, Mapping, Set, TextIO, Tuple, Type, Union
+from typing import Any, TextIO, Union
 
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.utils import collections
@@ -47,7 +48,7 @@ class PycodeSerializer:
             obj: The input model instance to serialize
             var_name: The var name to assign the model instance
         """
-        types: Set[Type] = set()
+        types: set[type] = set()
 
         tmp = StringIO()
         for chunk in self.repr_object(obj, 0, types):
@@ -61,7 +62,7 @@ class PycodeSerializer:
         out.write("\n")
 
     @classmethod
-    def build_imports(cls, types: Set[Type]) -> str:
+    def build_imports(cls, types: set[type]) -> str:
         """Build a list of imports from the given types.
 
         Args:
@@ -82,7 +83,7 @@ class PycodeSerializer:
 
         return "".join(sorted(imports))
 
-    def repr_object(self, obj: Any, level: int, types: Set[Type]) -> Iterator[str]:
+    def repr_object(self, obj: Any, level: int, types: set[type]) -> Iterator[str]:
         """Write the given object as repr code.
 
         Args:
@@ -107,9 +108,9 @@ class PycodeSerializer:
 
     def repr_array(
         self,
-        obj: Union[List, Set, Tuple],
+        obj: Union[list, set, tuple],
         level: int,
-        types: Set[Type],
+        types: set[type],
     ) -> Iterator[str]:
         """Convert an iterable object to repr code.
 
@@ -134,7 +135,7 @@ class PycodeSerializer:
 
         yield f"{spaces * level}]"
 
-    def repr_mapping(self, obj: Mapping, level: int, types: Set[Type]) -> Iterator[str]:
+    def repr_mapping(self, obj: Mapping, level: int, types: set[type]) -> Iterator[str]:
         """Convert a map object to repr code.
 
         Args:
@@ -160,7 +161,7 @@ class PycodeSerializer:
 
         yield f"{spaces * level}}}"
 
-    def repr_model(self, obj: Any, level: int, types: Set[Type]) -> Iterator[str]:
+    def repr_model(self, obj: Any, level: int, types: set[type]) -> Iterator[str]:
         """Convert a data model instance to repr code.
 
         Args:

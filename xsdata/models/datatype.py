@@ -2,7 +2,7 @@ import datetime
 import operator
 import re
 from collections import UserString
-from typing import Any, Callable, Dict, NamedTuple, Optional, Union
+from typing import Any, Callable, NamedTuple, Optional, Union
 
 from xsdata.utils.dates import (
     calculate_offset,
@@ -571,7 +571,7 @@ class XmlDuration(UserString):
             seconds=float(seconds) if seconds else None,
         )
 
-    def asdict(self) -> Dict:
+    def asdict(self) -> dict:
         """Return instance as a dict."""
         return self._interval._asdict()
 
@@ -658,7 +658,7 @@ class XmlPeriod(UserString):
 
         return TimePeriod(year=year, month=month, day=day, offset=offset)
 
-    def as_dict(self) -> Dict:
+    def as_dict(self) -> dict:
         """Return date units as dict."""
         return self._period._asdict()
 

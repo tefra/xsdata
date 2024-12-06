@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Dict, Generic, List, Optional, TypeVar
+from typing import Generic, Optional, TypeVar
 
 from xsdata.formats.dataclass.models.elements import XmlType
 
@@ -21,10 +21,10 @@ class AnyElement:
     qname: Optional[str] = field(default=None)
     text: Optional[str] = field(default=None)
     tail: Optional[str] = field(default=None)
-    children: List[object] = field(
+    children: list[object] = field(
         default_factory=list, metadata={"type": XmlType.WILDCARD}
     )
-    attributes: Dict[str, str] = field(
+    attributes: dict[str, str] = field(
         default_factory=dict, metadata={"type": XmlType.ATTRIBUTES}
     )
 

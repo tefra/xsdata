@@ -1,5 +1,4 @@
 from collections import Counter
-from typing import Dict, List, Set, Tuple
 
 from xsdata.codegen.mixins import ContainerInterface, RelativeHandlerInterface
 from xsdata.codegen.models import Attr, Class, Restrictions, get_restriction_choice
@@ -50,7 +49,7 @@ class CreateCompoundFields(RelativeHandlerInterface):
                     self.calculate_choice_min_occurs(attrs)
 
     @classmethod
-    def calculate_choice_min_occurs(cls, attrs: List[Attr]):
+    def calculate_choice_min_occurs(cls, attrs: list[Attr]):
         """Calculate the min occurs restriction of the attrs.
 
         If that attr has a path that includes a xs:choice
@@ -68,7 +67,7 @@ class CreateCompoundFields(RelativeHandlerInterface):
                     attr.restrictions.min_occurs = 0
 
     @classmethod
-    def update_counters(cls, attr: Attr, counters: Dict):
+    def update_counters(cls, attr: Attr, counters: dict):
         """Update the counters dictionary with the attr min/max restrictions.
 
         This method builds a nested counters mapping per path.
@@ -106,7 +105,7 @@ class CreateCompoundFields(RelativeHandlerInterface):
         counters["min"].append(attr.restrictions.min_occurs)
         counters["max"].append(attr.restrictions.max_occurs)
 
-    def group_fields(self, target: Class, attrs: List[Attr]):
+    def group_fields(self, target: Class, attrs: list[Attr]):
         """Group attributes into a new compound field.
 
         Args:
@@ -121,7 +120,7 @@ class CreateCompoundFields(RelativeHandlerInterface):
         names = []
         substitutions = []
         choices = []
-        counters: Dict = {"min": [], "max": []}
+        counters: dict = {"min": [], "max": []}
 
         for attr in attrs:
             ClassUtils.remove_attribute(target, attr)
@@ -147,7 +146,7 @@ class CreateCompoundFields(RelativeHandlerInterface):
         )
         target.attrs.insert(pos, compound_attr)
 
-    def sum_counters(self, counters: Dict) -> Tuple[List[int], List[int]]:
+    def sum_counters(self, counters: dict) -> tuple[list[int], list[int]]:
         """Sum the min/max occurrences for the compound attr.
 
         Args:
@@ -171,8 +170,8 @@ class CreateCompoundFields(RelativeHandlerInterface):
     def choose_name(
         self,
         target: Class,
-        names: List[str],
-        substitutions: List[str],
+        names: list[str],
+        substitutions: list[str],
     ) -> str:
         """Choose a name for the compound attr.
 
@@ -209,7 +208,7 @@ class CreateCompoundFields(RelativeHandlerInterface):
         reserved = self.build_reserved_names(target, names)
         return ClassUtils.unique_name(name, reserved)
 
-    def build_reserved_names(self, target: Class, names: List[str]) -> Set[str]:
+    def build_reserved_names(self, target: Class, names: list[str]) -> set[str]:
         """Build a set of reserved attr names.
 
         The method will also check parent attrs.

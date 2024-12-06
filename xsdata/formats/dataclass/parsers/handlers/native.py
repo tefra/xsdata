@@ -1,5 +1,6 @@
 import functools
-from typing import Any, Dict, Iterable, Iterator, Optional, Tuple
+from collections.abc import Iterable, Iterator
+from typing import Any, Optional
 from urllib.parse import urljoin
 from xml.etree import ElementInclude as xinclude
 from xml.etree import ElementTree as etree
@@ -15,7 +16,7 @@ EVENTS = (EventType.START, EventType.END, EventType.START_NS)
 class XmlEventHandler(XmlHandler):
     """A native xml event handler."""
 
-    def parse(self, source: Any, ns_map: Dict[Optional[str], str]) -> Any:
+    def parse(self, source: Any, ns_map: dict[Optional[str], str]) -> Any:
         """Parse the source XML document.
 
         Args:
@@ -44,7 +45,7 @@ class XmlEventHandler(XmlHandler):
         return self.process_context(ctx, ns_map)
 
     def process_context(
-        self, context: Iterable[Tuple[str, Any]], ns_map: Dict[Optional[str], str]
+        self, context: Iterable[tuple[str, Any]], ns_map: dict[Optional[str], str]
     ) -> Any:
         """Iterate context and push events to main parser.
 
@@ -55,7 +56,7 @@ class XmlEventHandler(XmlHandler):
         Returns:
             An instance of the class type representing the parsed content.
         """
-        element_ns_map: Dict = {}
+        element_ns_map: dict = {}
         for event, element in context:
             if event == EventType.START:
                 self.parser.start(
@@ -87,7 +88,7 @@ class XmlEventHandler(XmlHandler):
 
         return self.objects[-1][1] if self.objects else None
 
-    def merge_parent_namespaces(self, ns_map: Dict[Optional[str], str]) -> Dict:
+    def merge_parent_namespaces(self, ns_map: dict[Optional[str], str]) -> dict:
         """Merge the given prefix-URI map with the parent node map.
 
         This method also registers new prefixes with the parser.
@@ -114,7 +115,7 @@ class XmlEventHandler(XmlHandler):
         return result
 
 
-def iterwalk(element: etree.Element, ns_map: Dict) -> Iterator[Tuple[str, Any]]:
+def iterwalk(element: etree.Element, ns_map: dict) -> Iterator[tuple[str, Any]]:
     """Walk over the element tree and emit events.
 
     The ElementTree doesn't preserve the original namespace prefixes, we

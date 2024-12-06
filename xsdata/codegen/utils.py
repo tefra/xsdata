@@ -1,6 +1,7 @@
 import sys
 from collections import deque
-from typing import Deque, Iterator, List, Optional, Set
+from collections.abc import Iterator
+from typing import Optional
 
 from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.models import (
@@ -259,7 +260,7 @@ class ClassUtils:
         yield target
 
     @classmethod
-    def reduce_classes(cls, classes: List[Class]) -> List[Class]:
+    def reduce_classes(cls, classes: list[Class]) -> list[Class]:
         """Find duplicate classes and attrs and reduce them.
 
         Args:
@@ -280,7 +281,7 @@ class ClassUtils:
         return result
 
     @classmethod
-    def reduce_attributes(cls, classes: List[Class]) -> List[Attr]:
+    def reduce_attributes(cls, classes: list[Class]) -> list[Attr]:
         """Find and merge duplicate attrs from the given class list.
 
         Args:
@@ -309,7 +310,7 @@ class ClassUtils:
         return result
 
     @classmethod
-    def sorted_attrs(cls, classes: List[Class]) -> List[Attr]:
+    def sorted_attrs(cls, classes: list[Class]) -> list[Attr]:
         """Sort and return the attrs from all the class list.
 
         The list contains duplicate classes, the method tries
@@ -321,7 +322,7 @@ class ClassUtils:
         Returns:
             A list of sorted duplicate attr instances.
         """
-        attrs: List[Attr] = []
+        attrs: list[Attr] = []
         classes.sort(key=lambda x: len(x.attrs), reverse=True)
 
         for obj in classes:
@@ -410,7 +411,7 @@ class ClassUtils:
             change.name = f"{change.name}_{change.tag}"
 
     @classmethod
-    def rename_attributes_by_index(cls, attrs: List[Attr], rename: List[Attr]):
+    def rename_attributes_by_index(cls, attrs: list[Attr], rename: list[Attr]):
         """Append the next available index number to all the rename attr names.
 
         Args:
@@ -423,7 +424,7 @@ class ClassUtils:
             rename[index].name = cls.unique_name(name, reserved)
 
     @classmethod
-    def unique_name(cls, name: str, reserved: Set[str]) -> str:
+    def unique_name(cls, name: str, reserved: set[str]) -> str:
         """Append the next available index number to the name.
 
         Args:
@@ -455,7 +456,7 @@ class ClassUtils:
             attr.types = cls.filter_types(attr.types)
 
     @classmethod
-    def filter_types(cls, types: List[AttrType]) -> List[AttrType]:
+    def filter_types(cls, types: list[AttrType]) -> list[AttrType]:
         """Remove duplicate and invalid types.
 
         Invalid:
@@ -500,8 +501,8 @@ class ClassUtils:
         Returns:
             The nested class instance.
         """
-        queue: Deque[Class] = deque()
-        visited: Set[int] = set()
+        queue: deque[Class] = deque()
+        visited: set[int] = set()
 
         if target.inner:
             queue.extend(target.inner)

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 from xsdata.codegen.parsers.schema import SchemaParser
 from xsdata.formats.dataclass.parsers.bases import Parsed
@@ -14,8 +14,8 @@ class DefinitionsParser(SchemaParser):
 
     def end(
         self,
-        queue: List[XmlNode],
-        objects: List[Parsed],
+        queue: list[XmlNode],
+        objects: list[Parsed],
         qname: str,
         text: Optional[str],
         tail: Optional[str],

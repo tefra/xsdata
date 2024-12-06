@@ -1,4 +1,4 @@
-from typing import Optional, Set
+from typing import Optional
 
 from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.mixins import ContainerHandlerInterface
@@ -36,7 +36,7 @@ class ValidateReferences(ContainerHandlerInterface):
 
     def validate_unique_instances(self):
         """Validate all codegen instances are unique."""
-        references: Set[int] = set()
+        references: set[int] = set()
         for item in self.container:
             item_references = {id(child) for child in item.children()}
             if item_references.intersection(references):

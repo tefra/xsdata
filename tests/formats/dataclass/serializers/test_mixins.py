@@ -1,6 +1,6 @@
+from collections.abc import Generator
 from dataclasses import dataclass, field, make_dataclass
 from io import StringIO
-from typing import Generator, List
 from unittest import TestCase
 from xml.etree.ElementTree import QName
 from xml.sax import ContentHandler
@@ -215,7 +215,7 @@ class EventGeneratorTests(TestCase):
     def test_with_primitive_wrapper(self):
         @dataclass
         class PrimitiveWrapper:
-            primitive_list: List[str] = field(
+            primitive_list: list[str] = field(
                 metadata={
                     "wrapper": "PrimitiveList",
                     "type": "Element",
@@ -246,7 +246,7 @@ class EventGeneratorTests(TestCase):
 
         @dataclass
         class ElementWrapper:
-            elements: List[ElementObject] = field(
+            elements: list[ElementObject] = field(
                 metadata={"wrapper": "Elements", "type": "Element", "name": "Object"}
             )
 
@@ -275,7 +275,7 @@ class EventGeneratorTests(TestCase):
     def test_with_wrapper_namespace(self):
         @dataclass
         class NamespaceWrapper:
-            items: List[str] = field(
+            items: list[str] = field(
                 metadata={
                     "wrapper": "Items",
                     "type": "Element",

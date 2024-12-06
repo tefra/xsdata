@@ -1,4 +1,4 @@
-from typing import Generator
+from collections.abc import Generator
 
 from xsdata.codegen.handlers import VacuumInnerClasses
 from xsdata.models.enums import DataType

@@ -1,4 +1,5 @@
-from typing import Callable, Dict, Iterator, List, Optional
+from collections.abc import Iterator
+from typing import Callable, Optional
 
 from xsdata.codegen.handlers import (
     AddAttributeSubstitutions,
@@ -72,7 +73,7 @@ class ClassContainer(ContainerInterface):
         """
         super().__init__(config)
         self.step: int = 0
-        self.processors: Dict[int, List] = {
+        self.processors: dict[int, list] = {
             Steps.UNGROUP: [
                 FlattenAttributeGroups(self),
             ],
@@ -271,7 +272,7 @@ class ClassContainer(ContainerInterface):
         self.data[qname] = [c for c in self.data[qname] if c.ref != item.ref]
         self.add(item)
 
-    def set(self, items: List[Class]):
+    def set(self, items: list[Class]):
         """Set the list of classes to the container.
 
         Args:
@@ -280,7 +281,7 @@ class ClassContainer(ContainerInterface):
         self.data.clear()
         self.extend(items)
 
-    def extend(self, items: List[Class]):
+    def extend(self, items: list[Class]):
         """Add a list of classes to the container.
 
         Args:

@@ -1,5 +1,6 @@
+from collections.abc import Iterator
 from dataclasses import dataclass, field
-from typing import Dict, Iterator, List, Optional, TypeVar
+from typing import Optional, TypeVar
 
 from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.models import get_name
@@ -18,7 +19,7 @@ class Documentation:
         elements: A list of generic any elements
     """
 
-    elements: List[object] = array_any_element()
+    elements: list[object] = array_any_element()
 
 
 @dataclass
@@ -35,7 +36,7 @@ class WsdlElement:
     name: str = attribute()
     documentation: Optional[Documentation] = element()
     location: Optional[str] = field(default=None, metadata={"type": "Ignore"})
-    ns_map: Dict[str, str] = field(
+    ns_map: dict[str, str] = field(
         default_factory=dict, init=False, metadata={"type": "Ignore"}
     )
 
@@ -52,7 +53,7 @@ class ExtensibleElement(WsdlElement):
         extended: A list of generic elements
     """
 
-    extended: List[object] = array_any_element()
+    extended: list[object] = array_any_element()
 
     @property
     def extended_elements(self) -> Iterator[AnyElement]:
@@ -69,7 +70,7 @@ class Types:
         documentation: The type documentation
     """
 
-    schemas: List[Schema] = array_element(name="schema", namespace=Namespace.XS.uri)
+    schemas: list[Schema] = array_element(name="schema", namespace=Namespace.XS.uri)
     documentation: Optional[Documentation] = element()
 
 
@@ -115,7 +116,7 @@ class Message(WsdlElement):
         parts: The message parts
     """
 
-    parts: List[Part] = array_element(name="part")
+    parts: list[Part] = array_element(name="part")
 
 
 @dataclass
@@ -146,7 +147,7 @@ class PortTypeOperation(WsdlElement):
 
     input: PortTypeMessage = element()
     output: PortTypeMessage = element()
-    faults: List[PortTypeMessage] = array_element(name="fault")
+    faults: list[PortTypeMessage] = array_element(name="fault")
 
 
 @dataclass
@@ -162,7 +163,7 @@ class PortType(ExtensibleElement):
         operations: The port type operations
     """
 
-    operations: List[PortTypeOperation] = array_element(name="operation")
+    operations: list[PortTypeOperation] = array_element(name="operation")
 
     def find_operation(self, name: str) -> PortTypeOperation:
         """Find an operation by name or raise an error."""
@@ -199,7 +200,7 @@ class BindingOperation(ExtensibleElement):
 
     input: BindingMessage = element()
     output: BindingMessage = element()
-    faults: List[BindingMessage] = array_element(name="fault")
+    faults: list[BindingMessage] = array_element(name="fault")
 
 
 @dataclass
@@ -217,7 +218,7 @@ class Binding(ExtensibleElement):
     """
 
     type: str = attribute()
-    operations: List[BindingOperation] = array_element(name="operation")
+    operations: list[BindingOperation] = array_element(name="operation")
 
     def unique_operations(self) -> Iterator[BindingOperation]:
         """Yields all unique operation instances."""
@@ -255,7 +256,7 @@ class Service(WsdlElement):
         ports: The service ports
     """
 
-    ports: List[ServicePort] = array_element(name="port")
+    ports: list[ServicePort] = array_element(name="port")
 
 
 @dataclass
@@ -285,11 +286,11 @@ class Definitions(ExtensibleElement):
 
     target_namespace: Optional[str] = attribute(name="targetNamespace")
     types: Optional[Types] = element()
-    imports: List[Import] = array_element(name="import")
-    messages: List[Message] = array_element(name="message")
-    port_types: List[PortType] = array_element(name="portType")
-    bindings: List[Binding] = array_element(name="binding")
-    services: List[Service] = array_element(name="service")
+    imports: list[Import] = array_element(name="import")
+    messages: list[Message] = array_element(name="message")
+    port_types: list[PortType] = array_element(name="portType")
+    bindings: list[Binding] = array_element(name="binding")
+    services: list[Service] = array_element(name="service")
 
     @property
     def schemas(self) -> Iterator[Schema]:
@@ -330,7 +331,7 @@ class Definitions(ExtensibleElement):
 T = TypeVar("T", bound=WsdlElement)
 
 
-def find_or_die(items: List[T], name: str, type_name: str) -> T:
+def find_or_die(items: list[T], name: str, type_name: str) -> T:
     """Find an item by name or raise an error."""
     for msg in items:
         if msg.name == name:

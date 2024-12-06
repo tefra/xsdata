@@ -62,8 +62,8 @@ class FiltersTests(FactoryTestCase):
 
         self.assertEqual("XsString", self.filters.class_name("xs:string"))
         self.assertEqual("FooBarBam", self.filters.class_name("foo:bar_bam"))
-        self.assertEqual("ListType", self.filters.class_name("List"))
-        self.assertEqual("TypeType", self.filters.class_name(".*"))
+        self.assertEqual("List", self.filters.class_name("List"))
+        self.assertEqual("Type", self.filters.class_name(".*"))
         self.assertEqual("Cbad", self.filters.class_name("abcd"))
 
     def test_class_bases(self):
@@ -561,7 +561,7 @@ class FiltersTests(FactoryTestCase):
                 "default_factory": "list",
                 "name": "tok",
                 "tokens": True,
-                "type": "Type[List[str]]",
+                "type": "Type[list[str]]",
             },
         )
 
@@ -631,14 +631,11 @@ class FiltersTests(FactoryTestCase):
         )
         attr.restrictions.max_occurs = 2
         self.assertEqual(
-            'List["A.B.C"]',
+            'list["A.B.C"]',
             self.filters.field_type(self.obj, attr),
         )
 
         self.filters.format.frozen = True
-        self.assertEqual('Tuple["A.B.C", ...]', self.filters.field_type(self.obj, attr))
-
-        self.filters.subscriptable_types = True
         self.assertEqual('tuple["A.B.C", ...]', self.filters.field_type(self.obj, attr))
 
         self.filters.format.frozen = False
@@ -652,21 +649,16 @@ class FiltersTests(FactoryTestCase):
             types=AttrTypeFactory.list(1, qname="foo_bar"),
             restrictions=Restrictions(tokens=True),
         )
-        self.assertEqual("List[FooBar]", self.filters.field_type(self.obj, attr))
+        self.assertEqual("list[FooBar]", self.filters.field_type(self.obj, attr))
 
         attr.restrictions.max_occurs = 2
-        self.assertEqual("List[List[FooBar]]", self.filters.field_type(self.obj, attr))
+        self.assertEqual("list[list[FooBar]]", self.filters.field_type(self.obj, attr))
 
         attr.restrictions.max_occurs = 1
         self.filters.format.frozen = True
-        self.assertEqual("Tuple[FooBar, ...]", self.filters.field_type(self.obj, attr))
+        self.assertEqual("tuple[FooBar, ...]", self.filters.field_type(self.obj, attr))
 
         attr.restrictions.max_occurs = 2
-        self.assertEqual(
-            "Tuple[Tuple[FooBar, ...], ...]", self.filters.field_type(self.obj, attr)
-        )
-
-        self.filters.subscriptable_types = True
         self.assertEqual(
             "tuple[tuple[FooBar, ...], ...]", self.filters.field_type(self.obj, attr)
         )
@@ -677,7 +669,7 @@ class FiltersTests(FactoryTestCase):
         )
         attr.restrictions.max_occurs = 2
         self.assertEqual(
-            'List["A.BossLife"]',
+            'list["A.BossLife"]',
             self.filters.field_type(self.obj_nested_nested_nested, attr),
         )
 
@@ -691,16 +683,11 @@ class FiltersTests(FactoryTestCase):
         attr.restrictions.max_occurs = 2
 
         self.assertEqual(
-            'List[Union["A.B.BossLife", int]]',
+            'list[Union["A.B.BossLife", int]]',
             self.filters.field_type(self.obj_nested_nested_nested, attr),
         )
 
         self.filters.union_type = True
-        self.assertEqual(
-            'List["A.B.BossLife" | int]',
-            self.filters.field_type(self.obj_nested_nested_nested, attr),
-        )
-        self.filters.subscriptable_types = True
         self.assertEqual(
             'list["A.B.BossLife" | int]',
             self.filters.field_type(self.obj_nested_nested_nested, attr),
@@ -709,9 +696,6 @@ class FiltersTests(FactoryTestCase):
     def test_field_type_with_any_attribute(self):
         attr = AttrFactory.any_attribute()
 
-        self.assertEqual("Dict[str, str]", self.filters.field_type(self.obj, attr))
-
-        self.filters.subscriptable_types = True
         self.assertEqual("dict[str, str]", self.filters.field_type(self.obj, attr))
 
         self.filters.generic_collections = True
@@ -756,16 +740,16 @@ class FiltersTests(FactoryTestCase):
             restrictions=Restrictions(min_occurs=0, max_occurs=1),
         )
 
-        expected = "Optional[Union[str, int, List[Decimal]]]"
+        expected = "Optional[Union[str, int, list[Decimal]]]"
         self.assertEqual(expected, self.filters.field_type(self.obj, attr))
 
         attr.restrictions.max_occurs = 2
-        expected = "List[Union[str, int, List[Decimal]]]"
+        expected = "list[Union[str, int, list[Decimal]]]"
         self.assertEqual(expected, self.filters.field_type(self.obj, attr))
 
         attr.restrictions.min_occurs = attr.restrictions.max_occurs = 1
         self.filters.format.kw_only = True
-        expected = "Union[str, int, List[Decimal]]"
+        expected = "Union[str, int, list[Decimal]]"
         self.assertEqual(expected, self.filters.field_type(self.obj, attr))
 
     def test_choice_type(self):
@@ -817,14 +801,13 @@ class FiltersTests(FactoryTestCase):
         choice.restrictions.tokens = True
         target = ClassFactory.create()
         actual = self.filters.choice_type(target, choice)
-        self.assertEqual("Type[List[Union[str, bool]]]", actual)
+        self.assertEqual("Type[list[Union[str, bool]]]", actual)
 
         self.filters.format.frozen = True
         actual = self.filters.choice_type(target, choice)
-        self.assertEqual("Type[Tuple[Union[str, bool], ...]]", actual)
+        self.assertEqual("Type[tuple[Union[str, bool], ...]]", actual)
 
         self.filters.union_type = True
-        self.filters.subscriptable_types = True
         actual = self.filters.choice_type(target, choice)
         self.assertEqual("Type[tuple[str | bool, ...]]", actual)
 
@@ -882,18 +865,6 @@ class FiltersTests(FactoryTestCase):
         self.assertNotIn(expected, self.filters.default_imports("class fooXmlDateTime"))
 
     def test_default_imports_with_typing(self):
-        output = ": Dict["
-        expected = "from typing import Dict"
-        self.assertIn(expected, self.filters.default_imports(output))
-
-        output = ": List["
-        expected = "from typing import List"
-        self.assertIn(expected, self.filters.default_imports(output))
-
-        output = ": Tuple["
-        expected = "from typing import Tuple"
-        self.assertIn(expected, self.filters.default_imports(output))
-
         output = "Optional[ "
         expected = "from typing import Optional"
         self.assertIn(expected, self.filters.default_imports(output))

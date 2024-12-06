@@ -4,7 +4,8 @@ import warnings
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Pattern, TextIO
+from re import Pattern
+from typing import Any, Callable, TextIO
 
 from xsdata import __version__
 from xsdata.codegen.exceptions import CodegenError, CodegenWarning
@@ -75,7 +76,7 @@ class NameCase(Enum):
         return __name_case_func__[self.value]
 
 
-__name_case_func__: Dict[str, Callable] = {
+__name_case_func__: dict[str, Callable] = {
     "originalCase": text.original_case,
     "pascalCase": text.pascal_case,
     "camelCase": text.camel_case,
@@ -223,8 +224,6 @@ class GeneratorOutput:
         compound_fields: Use compound fields for repeatable elements
         wrapper_fields: Generate wrapper fields
         max_line_length: Adjust the maximum line length
-        subscriptable_types: Use PEP-585 generics for standard
-            collections, python>=3.9 Only
         generic_collections: Use generic collections (Iterable, Mapping)
         union_type: Use PEP-604 union type, python>=3.10 Only
         postponed_annotations: Use 563 postponed evaluation of  annotations
@@ -243,7 +242,6 @@ class GeneratorOutput:
     compound_fields: CompoundFields = element(default_factory=CompoundFields)
     wrapper_fields: bool = element(default=False)
     max_line_length: int = attribute(default=79)
-    subscriptable_types: bool = attribute(default=False)
     generic_collections: bool = attribute(default=False)
     union_type: bool = attribute(default=False)
     postponed_annotations: bool = element(default=False)
@@ -363,10 +361,10 @@ class GeneratorAliases:
         module_name: A list of module name aliases
     """
 
-    class_name: List[GeneratorAlias] = array_element()
-    field_name: List[GeneratorAlias] = array_element()
-    package_name: List[GeneratorAlias] = array_element()
-    module_name: List[GeneratorAlias] = array_element()
+    class_name: list[GeneratorAlias] = array_element()
+    field_name: list[GeneratorAlias] = array_element()
+    package_name: list[GeneratorAlias] = array_element()
+    module_name: list[GeneratorAlias] = array_element()
 
 
 @dataclass
@@ -460,7 +458,7 @@ class GeneratorSubstitutions:
         substitution: The list of substitution instances
     """
 
-    substitution: List[GeneratorSubstitution] = array_element()
+    substitution: list[GeneratorSubstitution] = array_element()
 
 
 @dataclass
@@ -475,7 +473,7 @@ class GeneratorExtensions:
         extension: The list of extension instances
     """
 
-    extension: List[GeneratorExtension] = array_element()
+    extension: list[GeneratorExtension] = array_element()
 
 
 @dataclass

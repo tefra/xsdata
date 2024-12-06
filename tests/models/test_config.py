@@ -29,7 +29,7 @@ class GeneratorConfigTests(TestCase):
         expected = (
             '<?xml version="1.0" encoding="UTF-8"?>\n'
             f'<Config xmlns="http://pypi.org/project/xsdata" version="{__version__}">\n'
-            '  <Output maxLineLength="79" subscriptableTypes="false" genericCollections="false" unionType="false">\n'
+            '  <Output maxLineLength="79" genericCollections="false" unionType="false">\n'
             "    <Package>generated</Package>\n"
             '    <Format repr="true" eq="true" order="false" unsafeHash="false" frozen="false" slots="false" kwOnly="false">dataclasses</Format>\n'
             "    <Structure>filenames</Structure>\n"
@@ -72,7 +72,7 @@ class GeneratorConfigTests(TestCase):
         existing = (
             '<?xml version="1.0" encoding="UTF-8"?>\n'
             '<Config xmlns="http://pypi.org/project/xsdata" version="20.8">\n'
-            '  <Output maxLineLength="79" subscriptableTypes="false" unionType="false">\n'
+            '  <Output maxLineLength="79" unionType="false">\n'
             "    <Package>foo.bar</Package>\n"
             "  </Output>\n"
             "  <Conventions>\n"
@@ -90,7 +90,7 @@ class GeneratorConfigTests(TestCase):
         expected = (
             '<?xml version="1.0" encoding="UTF-8"?>\n'
             f'<Config xmlns="http://pypi.org/project/xsdata" version="{__version__}">\n'
-            '  <Output maxLineLength="79" subscriptableTypes="false" genericCollections="false" unionType="false">\n'
+            '  <Output maxLineLength="79" genericCollections="false" unionType="false">\n'
             "    <Package>foo.bar</Package>\n"
             '    <Format repr="true" eq="true" order="false" unsafeHash="false"'
             ' frozen="false" slots="false" kwOnly="false">dataclasses</Format>\n'

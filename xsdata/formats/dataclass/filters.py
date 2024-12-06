@@ -2,17 +2,11 @@ import re
 import sys
 import textwrap
 from collections import defaultdict
+from collections.abc import Iterable, Iterator
 from typing import (
     Any,
     Callable,
-    Dict,
-    Iterable,
-    Iterator,
-    List,
     Optional,
-    Set,
-    Tuple,
-    Type,
 )
 
 from docformatter import configuration, format
@@ -57,7 +51,6 @@ class Filters:
         "docstring_style",
         "max_line_length",
         "union_type",
-        "subscriptable_types",
         "generic_collections",
         "relative_imports",
         "postponed_annotations",
@@ -67,14 +60,14 @@ class Filters:
     )
 
     def __init__(self, config: GeneratorConfig):
-        self.substitutions: Dict[ObjectType, Dict[str, str]] = defaultdict(dict)
+        self.substitutions: dict[ObjectType, dict[str, str]] = defaultdict(dict)
         for sub in config.substitutions.substitution:
             self.substitutions[sub.type][sub.search] = sub.replace
 
-        self.import_patterns: Dict[str, Dict[str, Set[str]]] = defaultdict(
+        self.import_patterns: dict[str, dict[str, set[str]]] = defaultdict(
             lambda: defaultdict(set)
         )
-        self.extensions: Dict[ExtensionType, List[GeneratorExtension]] = defaultdict(
+        self.extensions: dict[ExtensionType, list[GeneratorExtension]] = defaultdict(
             list
         )
         for ext in config.extensions.extension:
@@ -106,7 +99,6 @@ class Filters:
         self.docstring_style: DocstringStyle = config.output.docstring_style
         self.max_line_length: int = config.output.max_line_length
         self.union_type: bool = config.output.union_type
-        self.subscriptable_types: bool = config.output.subscriptable_types
         self.generic_collections: bool = config.output.generic_collections
         self.relative_imports: bool = config.output.relative_imports
         self.postponed_annotations: bool = config.output.postponed_annotations
@@ -173,7 +165,7 @@ class Filters:
 
         return f"@dataclass({', '.join(args)})" if args else "@dataclass"
 
-    def class_params(self, obj: Class) -> Iterator[Tuple[str, str]]:
+    def class_params(self, obj: Class) -> Iterator[tuple[str, str]]:
         """Yield the class variables with their docstring text."""
         is_enum = obj.is_enumeration
         for attr in obj.attrs:
@@ -202,7 +194,7 @@ class Filters:
         name = self.safe_name(name, self.class_safe_prefix, self.class_case)
         return self.apply_substitutions(name, ObjectType.CLASS)
 
-    def class_bases(self, obj: Class, class_name: str) -> List[str]:
+    def class_bases(self, obj: Class, class_name: str) -> list[str]:
         """Return a list of base class names."""
         bases = [self.type_name(x.type) for x in obj.extensions]
 
@@ -217,7 +209,7 @@ class Filters:
 
         return collections.unique_sequence(bases)
 
-    def class_annotations(self, obj: Class, class_name: str) -> List[str]:
+    def class_annotations(self, obj: Class, class_name: str) -> list[str]:
         """Return a list of decorator names."""
         annotations = []
         if self.default_class_annotation:
@@ -252,7 +244,7 @@ class Filters:
         default_value = self.field_default_value(attr, ns_map)
         metadata = self.field_metadata(obj, attr, parent_namespace)
 
-        kwargs: Dict[str, Any] = {}
+        kwargs: dict[str, Any] = {}
         if attr.fixed or attr.is_prohibited:
             kwargs["init"] = False
 
@@ -427,7 +419,7 @@ class Filters:
         obj: Class,
         attr: Attr,
         parent_namespace: Optional[str],
-    ) -> Dict:
+    ) -> dict:
         """Return a metadata dictionary for the given attribute."""
         if attr.is_prohibited:
             return {"type": XmlType.IGNORE}
@@ -464,7 +456,7 @@ class Filters:
         obj: Class,
         attr: Attr,
         parent_namespace: Optional[str],
-    ) -> Optional[Tuple]:
+    ) -> Optional[tuple]:
         """Return a tuple of field metadata if the attr has choices."""
         if not attr.choices:
             return None
@@ -500,7 +492,7 @@ class Filters:
         return tuple(result)
 
     @classmethod
-    def filter_metadata(cls, data: Dict) -> Dict:
+    def filter_metadata(cls, data: dict) -> dict:
         """Filter out false,none keys from the given dict."""
         return {
             key: value
@@ -508,7 +500,7 @@ class Filters:
             if value is not None and value is not False
         }
 
-    def format_arguments(self, data: Dict, indent: int = 0) -> str:
+    def format_arguments(self, data: dict, indent: int = 0) -> str:
         """Return a pretty keyword arguments representation."""
         ind = " " * indent
         fmt = "    {}{}={}"
@@ -532,7 +524,7 @@ class Filters:
 
         return literal_value(data)
 
-    def format_dict(self, data: Dict, indent: int) -> str:
+    def format_dict(self, data: dict, indent: int) -> str:
         """Return a pretty string representation of a dict."""
         ind = " " * indent
         fmt = '    {}"{}": {},'
@@ -682,7 +674,7 @@ class Filters:
 
         return content
 
-    def field_default_value(self, attr: Attr, ns_map: Optional[Dict] = None) -> Any:
+    def field_default_value(self, attr: Attr, ns_map: Optional[dict] = None) -> Any:
         """Generate the field default value/factory for the given attribute."""
         if attr.is_list or (attr.is_tokens and not attr.default):
             return "tuple" if self.format.frozen else "list"
@@ -725,7 +717,7 @@ class Filters:
         return f"{class_name}.{self.constant_name(reference, name)}"
 
     def field_default_tokens(
-        self, attr: Attr, types: List[Type], ns_map: Optional[Dict]
+        self, attr: Attr, types: list[type], ns_map: Optional[dict]
     ) -> str:
         """Generate the default value for tokens fields."""
         assert isinstance(attr.default, str)
@@ -766,7 +758,7 @@ class Filters:
             if self.generic_collections:
                 return "Mapping[str, str]"
 
-            return "dict[str, str]" if self.subscriptable_types else "Dict[str, str]"
+            return "dict[str, str]"
 
         if attr.is_nillable or (
             attr.default is None and (attr.is_optional or not self.format.kw_only)
@@ -840,7 +832,7 @@ class Filters:
         type_names = [self._field_type_name(obj, x, choice=choice) for x in attr.types]
         return self._join_type_names(type_names)
 
-    def _join_type_names(self, type_names: List[str]) -> str:
+    def _join_type_names(self, type_names: list[str]) -> str:
         type_names = collections.unique_sequence(type_names)
         if len(type_names) == 1:
             return type_names[0]
@@ -901,11 +893,10 @@ class Filters:
         if self.generic_collections:
             return "Iterable[{}]"
 
-        fmt = "Tuple[{}, ...]" if self.format.frozen else "List[{}]"
-        return fmt.lower() if self.subscriptable_types else fmt
+        return "tuple[{}, ...]" if self.format.frozen else "list[{}]"
 
     @classmethod
-    def build_import_patterns(cls) -> Dict[str, Dict]:
+    def build_import_patterns(cls) -> dict[str, dict]:
         """Build import search patterns."""
         type_patterns = cls.build_type_patterns
         return {
@@ -913,10 +904,7 @@ class Filters:
             "decimal": {"Decimal": type_patterns("Decimal")},
             "enum": {"Enum": ["(Enum)"]},
             "typing": {
-                "Dict": [": Dict["],
-                "List": [": List["],
                 "Optional": ["Optional["],
-                "Tuple": ["Tuple["],
                 "Union": ["Union["],
                 "ForwardRef": [": ForwardRef("],
                 "Any": type_patterns("Any"),
@@ -936,7 +924,7 @@ class Filters:
         }
 
     @classmethod
-    def build_type_patterns(cls, x: str) -> Tuple:
+    def build_type_patterns(cls, x: str) -> tuple[str, ...]:
         """Return all possible type occurrences in the generated code."""
         return (
             f": {x} =",

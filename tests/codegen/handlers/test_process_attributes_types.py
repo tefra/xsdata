@@ -344,25 +344,28 @@ class ProcessAttributeTypesTests(FactoryTestCase):
         complex_type = ClassFactory.create(qname="a", tag=Tag.COMPLEX_TYPE)
         simple_type = ClassFactory.create(qname="a", tag=Tag.SIMPLE_TYPE)
 
-        actual = self.processor.find_dependency(attr_type, Tag.ELEMENT)
+        actual = self.processor.find_dependency(element, attr_type, Tag.ELEMENT)
         self.assertIsNone(actual)
 
         self.processor.container.add(simple_type)
-        actual = self.processor.find_dependency(attr_type, Tag.ELEMENT)
+        actual = self.processor.find_dependency(element, attr_type, Tag.ELEMENT)
         self.assertEqual(simple_type, actual)
 
         self.processor.container.add(complex_type)
-        actual = self.processor.find_dependency(attr_type, Tag.ELEMENT)
+        actual = self.processor.find_dependency(element, attr_type, Tag.ELEMENT)
         self.assertEqual(complex_type, actual)
 
         self.processor.container.add(element)
-        actual = self.processor.find_dependency(attr_type, Tag.ELEMENT)
+        actual = self.processor.find_dependency(complex_type, attr_type, Tag.ELEMENT)
         self.assertEqual(element, actual)
 
-        actual = self.processor.find_dependency(attr_type, Tag.SIMPLE_TYPE)
+        actual = self.processor.find_dependency(element, attr_type, Tag.ELEMENT)
+        self.assertEqual(complex_type, actual)
+
+        actual = self.processor.find_dependency(element, attr_type, Tag.SIMPLE_TYPE)
         self.assertEqual(simple_type, actual)
 
-        actual = self.processor.find_dependency(attr_type, Tag.EXTENSION)
+        actual = self.processor.find_dependency(element, attr_type, Tag.EXTENSION)
         self.assertEqual(simple_type, actual)
 
     def test_update_restrictions(self):

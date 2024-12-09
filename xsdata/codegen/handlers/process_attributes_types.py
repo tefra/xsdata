@@ -113,16 +113,19 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
         if attr.restrictions.pattern:
             cls.reset_attribute_type(attr_type)
 
-    def find_dependency(self, attr_type: AttrType, tag: str) -> Optional[Class]:
+    def find_dependency(
+        self, target: Class, attr_type: AttrType, tag: str
+    ) -> Optional[Class]:
         """Find the source type from the attr type and tag.
 
         Avoid conflicts by selecting any matching type by qname and preferably:
-            1. Match the candidate object tag
-            2. Match element again complexType
+            1. Match element again complexType with no self reference
+            2. Match the candidate object tag
             3. Match non element and complexType
             4. Anything
 
         Args:
+            target: The target class instance
             attr_type: The attr type instance
             tag: The xml tag name, e.g. Element, Attribute, ComplexType
 
@@ -130,8 +133,10 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
             The source class or None if no match is found
         """
         conditions = (
+            lambda obj: tag == Tag.ELEMENT
+            and obj.tag == Tag.COMPLEX_TYPE
+            and obj is not target,
             lambda obj: obj.tag == tag,
-            lambda obj: tag == Tag.ELEMENT and obj.tag == Tag.COMPLEX_TYPE,
             lambda obj: not obj.is_complex_type,
             lambda x: True,
         )
@@ -184,7 +189,7 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
             attr: The attr instance
             attr_type: The attr type instance
         """
-        source = self.find_dependency(attr_type, attr.tag)
+        source = self.find_dependency(target, attr_type, attr.tag)
         if not source:
             logger.warning("Reset absent type: %s", attr_type.name)
             self.reset_attribute_type(attr_type)

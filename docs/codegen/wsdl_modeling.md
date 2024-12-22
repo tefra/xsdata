@@ -13,7 +13,7 @@ $ pip install xsdata[cli,soap]
 ```
 
 ```console
-$ xsdata --package calculator http://www.dneonline.com/calculator.asmx?WSDL
+$ xsdata generate --package calculator http://www.dneonline.com/calculator.asmx?WSDL
 ```
 
 ## Message Model

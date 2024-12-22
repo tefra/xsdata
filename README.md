@@ -32,7 +32,7 @@ $ pip install xsdata[cli,lxml,soap]
 
 ```console
 $ # Generate models
-$ xsdata tests/fixtures/primer/order.xsd --package tests.fixtures.primer
+$ xsdata generate tests/fixtures/primer/order.xsd --package tests.fixtures.primer
 ```
 
 ```python

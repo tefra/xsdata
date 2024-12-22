@@ -15,7 +15,7 @@ $ pip install xsdata[lxml]
 ## Example
 
 ```console
-$ xsdata --package tests.fixtures.dtd.models tests/fixtures/dtd/complete_example.dtd
+$ xsdata generate --package tests.fixtures.dtd.models tests/fixtures/dtd/complete_example.dtd
 ```
 
 === "DTD Definition"

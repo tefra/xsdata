@@ -26,7 +26,7 @@ print(output.getvalue())
 **Usage**
 
 ```console
-$ xsdata --config project/.xsdata.xml
+$ xsdata generate --config project/.xsdata.xml
 ```
 
 !!! Info "CLI options override the project configuration settings."

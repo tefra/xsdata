@@ -21,7 +21,7 @@ CodeWriter.register_generator("awesome", AwesomeGenerator)
 Which can be used during code generation.
 
 ```console
-$ xsdata --output awesome
+$ xsdata generate --output awesome
 ```
 
 ## `xsdata.plugins.class_types`

@@ -27,13 +27,13 @@ You can instruct the cli to search all subdirectories recursively with the
 `-r, --recursive` flag.
 
 ```console
-$ xsdata project/schemas
-$ xsdata project/schemas --recursive
+$ xsdata generate project/schemas
+$ xsdata generate project/schemas --recursive
 ```
 
 ## Use a filename or URI as source
 
 ```console
-$ xsdata project/schemas/feed.xsd
-$ xsdata http://www.gstatic.com/localfeed/local_feed.xsd
+$ xsdata generate project/schemas/feed.xsd
+$ xsdata generate http://www.gstatic.com/localfeed/local_feed.xsd
 ```

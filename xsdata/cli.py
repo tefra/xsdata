@@ -36,7 +36,20 @@ py_warnings.propagate = False
 logging.captureWarnings(True)
 
 
-@click.group(cls=DefaultGroup, default="generate", default_if_no_args=False)
+class DeprecatedDefaultGroup(DefaultGroup):
+    """Deprecated default group."""
+
+    def get_command(self, ctx: click.Context, cmd_name: str) -> click.Command:
+        """Override to deprecate xsdata <source> shorthand."""
+        if cmd_name not in self.commands:
+            logger.warning(
+                "`xsdata <SOURCE>` is deprecated. "
+                "Use `xsdata generate <SOURCE>` instead."
+            )
+        return super().get_command(ctx, cmd_name)
+
+
+@click.group(cls=DeprecatedDefaultGroup, default="generate", default_if_no_args=False)
 @click.pass_context
 @click.version_option(__version__)
 def cli(ctx: click.Context, **kwargs: Any):

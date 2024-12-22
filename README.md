@@ -74,18 +74,29 @@ Check the [documentation](https://xsdata.readthedocs.io) for more ✨✨✨
 - Support xinclude statements and unknown properties
 - Customize behaviour through config
 
-## Changelog: 24.11 (2024-11-03)
+## Changelog: 24.12 (2024-12-22)
 
 **Fixes**
 
-- Avoid conflict with attributes named value when flattening extensions
-  ([#1085](https://github.com/tefra/xsdata/pull/1085))
+- Set the default value of prohibited fields to None
+  ([#1098](https://github.com/tefra/xsdata/pull/1098))
+
+- Set body and fault as optional in output soap classes
+  ([#1099](https://github.com/tefra/xsdata/pull/1099))
+
+- Resolve a conflict with type location when an element and a complex type have the same
+  name ([#1107](https://github.com/tefra/xsdata/pull/1107))
 
 **Features**
 
-- Add cli config to use generic collections
-  ([#1082](https://github.com/tefra/xsdata/pull/1082))
+- Allow Xml Parser subclasses to override how the root class is located
+  ([#1090](https://github.com/tefra/xsdata/pull/1090))
+
+- Include common soap encoding schema
+  ([#1100](https://github.com/tefra/xsdata/pull/1100))
 
 **Deprecations**
 
-- Drop support for python 3.8
+- Remove subscritable types config option
+- Remove Type,Tuple,List,Dict from stop words
+- Deprecate xsdata <SOURCE> shorthand, use xsdata generate <SOURCE> instead

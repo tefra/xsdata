@@ -44,3 +44,6 @@ jobs:
         repository-url: https://test.pypi.org/legacy/
     - name: Publish distribution 📦 to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        # Temporary workaround for https://github.com/pypa/gh-action-pypi-publish/issues/283
+        attestations: false

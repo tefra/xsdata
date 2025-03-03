@@ -67,7 +67,7 @@ class ClassContainerTests(FactoryTestCase):
 
     @mock.patch.object(ClassContainer, "process_class")
     def test_find(self, mock_process_class) -> None:
-        def process_class(x: Class, step: int):
+        def process_class(x: Class, step: int) -> None:
             x.status = Status.FLATTENED
 
         class_a = ClassFactory.create(qname="a")
@@ -92,7 +92,7 @@ class ClassContainerTests(FactoryTestCase):
         second = ClassFactory.create(qname="{a}b", status=Status.FLATTENED)
         obj.inner.extend((first, second))
 
-        def process_class(x: Class, step: int):
+        def process_class(x: Class, step: int) -> None:
             x.status = Status.FLATTENED
 
         mock_process_class.side_effect = process_class

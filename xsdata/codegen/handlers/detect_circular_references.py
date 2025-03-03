@@ -1,3 +1,5 @@
+from collections.abc import Iterator
+
 from xsdata.codegen.mixins import (
     ContainerInterface,
     RelativeHandlerInterface,
@@ -80,7 +82,7 @@ class DetectCircularReferences(RelativeHandlerInterface):
     def build_reference_types(self) -> None:
         """Build the reference types mapping."""
 
-        def generate(target: Class):
+        def generate(target: Class) -> Iterator[tuple[int, list[AttrType]]]:
             yield target.ref, [tp for tp in target.types() if tp.reference]
 
             for inner in target.inner:

@@ -27,7 +27,7 @@ class CollectionsTests(TestCase):
     def test_is_array(self) -> None:
         fixture = namedtuple("fixture", ["a", "b"])
 
-        def foo():
+        def foo() -> Iterator[int]:
             yield 1
 
         self.assertFalse(collections.is_array(1))

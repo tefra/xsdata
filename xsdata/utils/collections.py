@@ -95,7 +95,7 @@ def connected_components(lists: list[list[Any]]) -> Iterator[list[Any]]:
         for item in each:
             neighbors[item].update(each)
 
-    def component(node: Any, neigh: dict[Any, set], see: set[Any]):
+    def component(node: Any, neigh: dict[Any, set], see: set[Any]) -> Iterator[Any]:
         nodes = {node}
         while nodes:
             next_node = nodes.pop()

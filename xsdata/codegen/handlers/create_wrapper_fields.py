@@ -131,7 +131,7 @@ class CreateWrapperFields(RelativeHandlerInterface):
             Whether the source class can be converted to a wrapper.
         """
 
-        def ns_equal(a: Optional[str], b: Optional[str]):
+        def ns_equal(a: Optional[str], b: Optional[str]) -> bool:
             return (a or "") == (b or "")
 
         return (

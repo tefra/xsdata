@@ -139,7 +139,7 @@ def split_words(value: str) -> list[str]:
     buffer: list[str] = []
     previous = None
 
-    def flush():
+    def flush() -> None:
         if buffer:
             words.append("".join(buffer))
             buffer.clear()

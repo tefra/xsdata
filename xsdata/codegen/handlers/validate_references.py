@@ -1,3 +1,4 @@
+from collections.abc import Iterator
 from typing import Optional
 
 from xsdata.codegen.exceptions import CodegenError
@@ -47,8 +48,8 @@ class ValidateReferences(ContainerHandlerInterface):
     def validate_resolved_references(self) -> None:
         """Validate all types match a class reference and qualified name."""
 
-        def build_reference_map():
-            def build(target: Class):
+        def build_reference_map() -> Iterator[tuple[int, str]]:
+            def build(target: Class) -> Iterator[tuple[int, str]]:
                 yield target.ref, target.qname
 
                 for inner in target.inner:
@@ -76,7 +77,7 @@ class ValidateReferences(ContainerHandlerInterface):
     def validate_parent_references(self) -> None:
         """Validate inner to outer classes is accurate."""
 
-        def _validate(target: Class, parent: Optional[Class] = None):
+        def _validate(target: Class, parent: Optional[Class] = None) -> None:
             actual_qname = actual_ref = expected_qname = expected_ref = None
             if target.parent:
                 actual_qname = target.parent.qname

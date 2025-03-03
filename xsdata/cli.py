@@ -69,7 +69,7 @@ def cli(ctx: click.Context, **kwargs: Any) -> None:
             f"{category.__name__}: {message}" if category else message
         )  # pragma: no cover
 
-    def format_warning_restore():
+    def format_warning_restore() -> None:
         warnings.formatwarning = formatwarning_orig
 
     warnings.formatwarning = format_warning  # type: ignore

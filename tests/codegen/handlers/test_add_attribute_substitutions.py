@@ -24,7 +24,7 @@ class AddAttributeSubstitutionsTests(FactoryTestCase):
     @mock.patch.object(AddAttributeSubstitutions, "process_attribute")
     @mock.patch.object(AddAttributeSubstitutions, "create_substitutions")
     def test_process(self, mock_create_substitutions, mock_process_attribute) -> None:
-        def init_substitutions():
+        def init_substitutions() -> None:
             self.processor.substitutions = {}
 
         mock_create_substitutions.side_effect = init_substitutions

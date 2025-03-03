@@ -53,7 +53,7 @@ class SchemaParser(UserXmlParser):
         qname: str,
         attrs: dict,
         ns_map: dict,
-    ):
+    ) -> None:
         """Build and queue the XmlNode for the starting element.
 
         Override to set the current element index and append it in
@@ -102,7 +102,7 @@ class SchemaParser(UserXmlParser):
 
         return obj
 
-    def start_schema(self, attrs: dict[str, str]):
+    def start_schema(self, attrs: dict[str, str]) -> None:
         """Start schema element entrypoint.
 
         Store the element/attribute default forms and the
@@ -116,7 +116,7 @@ class SchemaParser(UserXmlParser):
         self.attribute_form = attrs.get("attributeFormDefault")
         self.default_attributes = attrs.get("defaultAttributes")
 
-    def end_schema(self, obj: T):
+    def end_schema(self, obj: T) -> None:
         """End schema element entrypoint.
 
         Normalize various properties for the schema and it's children.
@@ -130,7 +130,7 @@ class SchemaParser(UserXmlParser):
             self.add_default_imports(obj)
             self.resolve_schemas_locations(obj)
 
-    def end_attribute(self, obj: T):
+    def end_attribute(self, obj: T) -> None:
         """End attribute element entrypoint.
 
         Assign the schema's default form in the attribute instance,
@@ -143,7 +143,7 @@ class SchemaParser(UserXmlParser):
         if isinstance(obj, xsd.Attribute) and obj.form is None and self.attribute_form:
             obj.form = FormType(self.attribute_form)
 
-    def end_complex_type(self, obj: T):
+    def end_complex_type(self, obj: T) -> None:
         """End complex type element entrypoint.
 
         Post parsing processor to apply default open content and attributes if
@@ -174,7 +174,7 @@ class SchemaParser(UserXmlParser):
         if self.default_open_content.applies_to_empty or self.has_elements(obj):
             obj.open_content = self.default_open_content
 
-    def end_default_open_content(self, obj: T):
+    def end_default_open_content(self, obj: T) -> None:
         """End default open content element entrypoint.
 
         If the open content element mode is suffix, adjust
@@ -193,7 +193,7 @@ class SchemaParser(UserXmlParser):
 
             self.default_open_content = obj
 
-    def end_element(self, obj: T):
+    def end_element(self, obj: T) -> None:
         """End element entrypoint.
 
         Assign the schema's default form in the element instance,
@@ -205,7 +205,7 @@ class SchemaParser(UserXmlParser):
         if isinstance(obj, xsd.Element) and obj.form is None and self.element_form:
             obj.form = FormType(self.element_form)
 
-    def end_extension(self, obj: T):
+    def end_extension(self, obj: T) -> None:
         """End extension element entrypoint.
 
         Assign the schema's default open content in the extension instance,
@@ -232,7 +232,7 @@ class SchemaParser(UserXmlParser):
         if isinstance(obj, xsd.OpenContent) and obj.any and obj.mode == Mode.SUFFIX:
             obj.any.index = sys.maxsize
 
-    def end_restriction(self, obj: T):
+    def end_restriction(self, obj: T) -> None:
         """End restriction element entrypoint.
 
         Assign the schema's default open content in the restriction instance,
@@ -244,7 +244,7 @@ class SchemaParser(UserXmlParser):
         if isinstance(obj, xsd.Restriction) and not obj.open_content:
             obj.open_content = self.default_open_content
 
-    def set_schema_forms(self, obj: xsd.Schema):
+    def set_schema_forms(self, obj: xsd.Schema) -> None:
         """Cascade schema forms to elements and attributes.
 
         Args:
@@ -261,7 +261,7 @@ class SchemaParser(UserXmlParser):
         for child_attribute in obj.attributes:
             child_attribute.form = FormType.QUALIFIED
 
-    def set_schema_namespaces(self, obj: xsd.Schema):
+    def set_schema_namespaces(self, obj: xsd.Schema) -> None:
         """Set the schema target namespace.
 
         If the schema was imported and doesn't have a target namespace,
@@ -272,7 +272,7 @@ class SchemaParser(UserXmlParser):
         """
         obj.target_namespace = obj.target_namespace or self.target_namespace
 
-    def resolve_schemas_locations(self, obj: xsd.Schema):
+    def resolve_schemas_locations(self, obj: xsd.Schema) -> None:
         """Resolve the location attributes of the schema.
 
         This method covers relative paths and implied schema

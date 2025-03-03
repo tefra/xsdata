@@ -6,7 +6,7 @@ from xsdata.formats.dataclass.parsers.tree import TreeParser
 
 
 class TreeParserTests(TestCase):
-    def test_parser(self):
+    def test_parser(self) -> None:
         parser = TreeParser()
         path = fixtures_dir.joinpath("books/bk001.xml")
 

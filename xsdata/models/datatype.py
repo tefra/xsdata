@@ -83,7 +83,11 @@ class XmlDate(NamedTuple):
     @classmethod
     def from_string(cls, string: str) -> "XmlDate":
         """Initialize from string with format `%Y-%m-%dT%z`."""
-        return cls(*parse_date_args(string, DateFormat.DATE))
+        year, month, day, offset = parse_date_args(string, DateFormat.DATE)
+        assert year is not None
+        assert month is not None
+        assert day is not None
+        return cls(year, month, day, offset)
 
     @classmethod
     def from_date(cls, obj: datetime.date) -> "XmlDate":
@@ -197,6 +201,15 @@ class XmlDateTime(NamedTuple):
             fractional_second,
             offset,
         ) = parse_date_args(string, DateFormat.DATE_TIME)
+
+        assert year is not None
+        assert month is not None
+        assert day is not None
+        assert hour is not None
+        assert minute is not None
+        assert second is not None
+        assert fractional_second is not None
+
         validate_date(year, month, day)
         validate_time(hour, minute, second, fractional_second)
 
@@ -384,9 +397,15 @@ class XmlTime(NamedTuple):
     @classmethod
     def from_string(cls, string: str) -> "XmlTime":
         """Initialize from string format `%H:%M:%S%z`."""
-        hour, minute, second, fractional_second, offset = parse_date_args(
+        (hour, minute, second, fractional_second, offset) = parse_date_args(
             string, DateFormat.TIME
         )
+
+        assert hour is not None
+        assert minute is not None
+        assert second is not None
+        assert fractional_second is not None
+
         validate_time(hour, minute, second, fractional_second)
         return cls(hour, minute, second, fractional_second, offset)
 

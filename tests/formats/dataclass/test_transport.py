@@ -9,7 +9,7 @@ class DefaultTransportTest(TestCase):
     @mock.patch.object(Response, "content", new_callable=mock.PropertyMock)
     @mock.patch.object(Response, "raise_for_status")
     @mock.patch.object(Session, "get")
-    def test_get(self, mock_get, mock_raise_for_status, mock_content):
+    def test_get(self, mock_get, mock_raise_for_status, mock_content) -> None:
         transport = DefaultTransport()
         params = {"a": "b"}
         url = "http://endpoint.stub/action"
@@ -30,7 +30,7 @@ class DefaultTransportTest(TestCase):
     @mock.patch.object(Response, "content", new_callable=mock.PropertyMock)
     @mock.patch.object(Response, "raise_for_status")
     @mock.patch.object(Session, "post")
-    def test_post(self, mock_post, mock_raise_for_status, mock_content):
+    def test_post(self, mock_post, mock_raise_for_status, mock_content) -> None:
         transport = DefaultTransport(timeout=1.0)
         data = {"a": "b"}
         url = "http://endpoint.stub/action"
@@ -50,7 +50,7 @@ class DefaultTransportTest(TestCase):
         )
 
     @mock.patch.object(Response, "content", new_callable=mock.PropertyMock)
-    def test_handle_response(self, mock_content):
+    def test_handle_response(self, mock_content) -> None:
         response = Response()
         response.status_code = 200
         mock_content.return_value = b"foobar"

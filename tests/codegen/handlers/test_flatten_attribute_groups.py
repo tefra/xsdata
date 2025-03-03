@@ -8,13 +8,13 @@ from xsdata.utils.testing import AttrFactory, ClassFactory, FactoryTestCase
 
 
 class FlattenAttributeGroupsTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         container = ClassContainer(config=GeneratorConfig())
         self.processor = FlattenAttributeGroups(container=container)
 
-    def test_process(self):
+    def test_process(self) -> None:
         group = ClassFactory.create(qname="group", tag=Tag.GROUP)
         group.attrs = [
             AttrFactory.reference(name="one", qname="inner_one", forward=True),
@@ -45,7 +45,7 @@ class FlattenAttributeGroupsTests(FactoryTestCase):
             self.assertEqual(["one", "two"], [x.name for x in inner.attrs])
             self.assertEqual(0, len(inner.inner))
 
-    def test_process_attribute_with_self_reference(self):
+    def test_process_attribute_with_self_reference(self) -> None:
         group_attr = AttrFactory.attribute_group(name="bar")
         target = ClassFactory.create(qname="bar", tag=Tag.ATTRIBUTE_GROUP)
         target.attrs.append(group_attr)
@@ -56,7 +56,7 @@ class FlattenAttributeGroupsTests(FactoryTestCase):
         self.processor.process_attribute(target, group_attr)
         self.assertFalse(group_attr in target.attrs)
 
-    def test_process_attribute_with_unknown_source(self):
+    def test_process_attribute_with_unknown_source(self) -> None:
         group_attr = AttrFactory.attribute_group(name="bar")
         target = ClassFactory.create()
         target.attrs.append(group_attr)

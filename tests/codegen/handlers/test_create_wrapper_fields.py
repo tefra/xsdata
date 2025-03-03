@@ -12,7 +12,7 @@ from xsdata.utils.testing import (
 
 
 class CreateWrapperFieldsTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.config = GeneratorConfig()
@@ -29,16 +29,16 @@ class CreateWrapperFieldsTests(FactoryTestCase):
         self.source.attrs.append(AttrFactory.native(DataType.STRING, name="item"))
         self.container.extend([self.target, self.source])
 
-    def test_process_skip_with_config_disabled(self):
+    def test_process_skip_with_config_disabled(self) -> None:
         self.config.output.wrapper_fields = False
         self.processor.process(self.target)
         self.assertIsNone(self.target.attrs[0].wrapper)
 
-    def test_process_with_valid_attr_wrapper(self):
+    def test_process_with_valid_attr_wrapper(self) -> None:
         self.processor.process(self.target)
         self.assertEqual("items", self.target.attrs[0].wrapper)
 
-    def test_process_with_forward_reference(self):
+    def test_process_with_forward_reference(self) -> None:
         self.container.remove(self.source)
         self.target.inner.append(self.source)
         self.target.attrs[0].types[0].forward = True
@@ -48,19 +48,19 @@ class CreateWrapperFieldsTests(FactoryTestCase):
         self.assertFalse(self.target.attrs[0].types[0].forward)
         self.assertEqual(0, len(self.target.inner))
 
-    def test_process_with_invalid_attr(self):
+    def test_process_with_invalid_attr(self) -> None:
         self.target.attrs[0].tag = Tag.EXTENSION
         self.processor.process(self.target)
 
         self.assertIsNone(self.target.attrs[0].wrapper)
 
-    def test_process_with_invalid_source(self):
+    def test_process_with_invalid_source(self) -> None:
         self.source.extensions.append(ExtensionFactory.create())
         self.processor.process(self.target)
 
         self.assertIsNone(self.target.attrs[0].wrapper)
 
-    def test_wrap_field(self):
+    def test_wrap_field(self) -> None:
         source = AttrFactory.create()
         attr = AttrFactory.create()
         wrapper = attr.local_name
@@ -70,7 +70,7 @@ class CreateWrapperFieldsTests(FactoryTestCase):
         self.assertEqual(source.local_name, attr.local_name)
         self.assertEqual(wrapper, attr.wrapper)
 
-    def test_validate_attr(self):
+    def test_validate_attr(self) -> None:
         # Not an element
         attr = AttrFactory.create(tag=Tag.EXTENSION)
         self.assertFalse(self.processor.validate_attr(attr))
@@ -88,7 +88,7 @@ class CreateWrapperFieldsTests(FactoryTestCase):
         attr.types = [AttrTypeFactory.create()]
         self.assertTrue(self.processor.validate_attr(attr))
 
-    def test_validate_source(self):
+    def test_validate_source(self) -> None:
         source = ClassFactory.create()
 
         # Has extensions

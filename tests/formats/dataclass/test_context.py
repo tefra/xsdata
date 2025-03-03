@@ -12,14 +12,14 @@ from xsdata.utils.testing import FactoryTestCase, XmlMetaFactory
 
 
 class XmlContextTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.ctx = XmlContext()
         self.ctx.reset()
         super().setUp()
 
     @mock.patch.object(XmlContext, "find_subclass")
     @mock.patch.object(XmlContext, "build")
-    def test_fetch(self, mock_build, mock_find_subclass):
+    def test_fetch(self, mock_build, mock_find_subclass) -> None:
         meta = XmlMetaFactory.create(clazz=Artist, qname="Artist")
         mock_build.return_value = meta
         actual = self.ctx.fetch(Artist, "foo")
@@ -31,7 +31,7 @@ class XmlContextTests(FactoryTestCase):
     @mock.patch.object(XmlContext, "build")
     def test_fetch_with_xsi_type_and_subclass_not_found(
         self, mock_build, mock_find_subclass
-    ):
+    ) -> None:
         meta = XmlMetaFactory.create(
             clazz=Artist,
             qname="Artist",
@@ -49,7 +49,7 @@ class XmlContextTests(FactoryTestCase):
     @mock.patch.object(XmlContext, "build")
     def test_fetch_with_xsi_type_and_subclass_found(
         self, mock_build, mock_find_subclass
-    ):
+    ) -> None:
         meta = XmlMetaFactory.create(clazz=Artist)
         xsi_meta = copy.deepcopy(meta)
         xsi_meta.qname = "XsiType"
@@ -60,21 +60,21 @@ class XmlContextTests(FactoryTestCase):
         self.assertEqual(xsi_meta, actual)
         mock_find_subclass.assert_called_once_with(Artist, "foo")
 
-    def test_find(self):
+    def test_find(self) -> None:
         self.assertIsNone(self.ctx.find_type(str(DataType.FLOAT)))
         self.assertEqual(BookForm, self.ctx.find_type("{urn:books}BookForm"))
 
         self.ctx.xsi_cache["{urn:books}BookForm"].append(BooksForm)
         self.assertEqual(BooksForm, self.ctx.find_type("{urn:books}BookForm"))
 
-    def test_find_type_by_fields(self):
+    def test_find_type_by_fields(self) -> None:
         field_names = {"id", "name", "sort-name"}
         self.assertEqual(BeginArea, self.ctx.find_type_by_fields(field_names))
 
         field_names.update({"please", "dont", "exist"})  # Test matching with more
         self.assertIsNone(self.ctx.find_type_by_fields(field_names))
 
-    def test_local_names_match_remove_clazz_from_cache_on_error(self):
+    def test_local_names_match_remove_clazz_from_cache_on_error(self) -> None:
         undefined = make_dataclass("UndefinedType", [("content", "Literal['yes']")])
         unsupported = make_dataclass("UndefinedType", [("content", Path)])
         uncached = make_dataclass("Uncached", [("content", Path)])
@@ -91,7 +91,7 @@ class XmlContextTests(FactoryTestCase):
         total = [x for types in self.ctx.cache.values() for x in types]
         self.assertEqual(0, len(total))
 
-    def test_find_subclass(self):
+    def test_find_subclass(self) -> None:
         a = make_dataclass("A", fields=[])
         b = make_dataclass("B", fields=[], bases=(a,))
         c = make_dataclass("C", fields=[], bases=(a,))
@@ -104,13 +104,13 @@ class XmlContextTests(FactoryTestCase):
         self.assertIsNone(self.ctx.find_subclass(c, "Unknown"))
         self.assertIsNone(self.ctx.find_subclass(c, "Other"))
 
-    def is_binding_model(self):
+    def is_binding_model(self) -> None:
         self.assertTrue(self.ctx.is_binding_model(ChoiceType))
 
         self.ctx.models_package = "xsdata.models"
         self.assertFalse(self.ctx.is_binding_model(ChoiceType))
 
-    def test_is_derived(self):
+    def test_is_derived(self) -> None:
         a = make_dataclass("A", fields=[])
         b = make_dataclass("B", fields=[], bases=(a,))
         c = make_dataclass("C", fields=[], bases=(a,))
@@ -124,7 +124,7 @@ class XmlContextTests(FactoryTestCase):
         self.assertFalse(self.ctx.is_derived(a(), d))
         self.assertFalse(self.ctx.is_derived(None, d))
 
-    def test_build_recursive(self):
+    def test_build_recursive(self) -> None:
         self.ctx.build_recursive(ChoiceType)
         self.assertEqual(6, len(self.ctx.cache))
 

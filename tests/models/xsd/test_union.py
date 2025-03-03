@@ -13,7 +13,7 @@ from xsdata.models.xsd import (
 
 
 class UnionTests(TestCase):
-    def test_property_bases(self):
+    def test_property_bases(self) -> None:
         obj = Union()
         self.assertIsInstance(obj.bases, Iterator)
         self.assertEqual([], list(obj.bases))
@@ -21,15 +21,15 @@ class UnionTests(TestCase):
         obj.member_types = "foo bar   "
         self.assertEqual(["foo", "bar"], list(obj.bases))
 
-    def test_property_is_property(self):
+    def test_property_is_property(self) -> None:
         obj = Union()
         self.assertTrue(obj.is_property)
 
-    def test_property_real_name(self):
+    def test_property_real_name(self) -> None:
         obj = Union()
         self.assertEqual("value", obj.real_name)
 
-    def test_property_attr_types(self):
+    def test_property_attr_types(self) -> None:
         obj = Union()
         obj.member_types = "thug life"
         self.assertEqual(["thug", "life"], list(obj.attr_types))
@@ -43,7 +43,7 @@ class UnionTests(TestCase):
 
         self.assertEqual(["foo", "bar"], list(obj.attr_types))
 
-    def test_get_restrictions(self):
+    def test_get_restrictions(self) -> None:
         first = Restriction(
             min_exclusive=MinExclusive(value="1"), min_inclusive=MinInclusive(value="2")
         )

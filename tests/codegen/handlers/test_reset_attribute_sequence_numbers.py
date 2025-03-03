@@ -11,7 +11,7 @@ from xsdata.utils.testing import (
 
 
 class ResetAttributeSequencesTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.config = GeneratorConfig()
@@ -19,11 +19,11 @@ class ResetAttributeSequencesTests(FactoryTestCase):
         self.container.step = Steps.FINALIZE
         self.processor = ResetAttributeSequenceNumbers(container=self.container)
 
-    def test_process_without_sequence_fields(self):
+    def test_process_without_sequence_fields(self) -> None:
         target = ClassFactory.elements(2)
         self.processor.process(target)
 
-    def test_process_without_parent_class(self):
+    def test_process_without_parent_class(self) -> None:
         target = ClassFactory.create(
             attrs=[
                 AttrFactory.create(restrictions=Restrictions(sequence=100)),
@@ -39,7 +39,7 @@ class ResetAttributeSequencesTests(FactoryTestCase):
         expected = [1, 1, None, 2, 2]
         self.assertEqual(expected, actual)
 
-    def test_process_with_parent_classes(self):
+    def test_process_with_parent_classes(self) -> None:
         target = ClassFactory.create(
             status=Status.FINALIZING,
             attrs=[

@@ -12,7 +12,7 @@ class UnnestInnerClasses(RelativeHandlerInterface):
 
     __slots__ = ()
 
-    def process(self, target: Class):
+    def process(self, target: Class) -> None:
         """Promote all inner classes recursively.
 
         Args:

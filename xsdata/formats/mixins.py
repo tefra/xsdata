@@ -74,7 +74,7 @@ class AbstractGenerator(abc.ABC):
             '"""\n'
         )
 
-    def normalize_packages(self, classes: list[Class]):
+    def normalize_packages(self, classes: list[Class]) -> None:
         """Normalize the classes module and package names.
 
         Args:

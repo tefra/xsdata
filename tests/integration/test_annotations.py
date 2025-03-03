@@ -12,7 +12,7 @@ from xsdata.utils.testing import load_class
 os.chdir(root)
 
 
-def test_annotations():
+def test_annotations() -> None:
     filepath = fixtures_dir.joinpath("annotations")
     schema = filepath.joinpath("model.xsd")
     runner = CliRunner()

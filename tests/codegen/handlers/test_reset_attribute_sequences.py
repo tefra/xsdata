@@ -4,12 +4,12 @@ from xsdata.utils.testing import AttrFactory, ClassFactory, FactoryTestCase
 
 
 class ResetAttributeSequencesTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.processor = ResetAttributeSequences()
 
-    def test_process(self):
+    def test_process(self) -> None:
         target = ClassFactory.create(
             attrs=[
                 AttrFactory.element(),
@@ -50,7 +50,7 @@ class ResetAttributeSequencesTests(FactoryTestCase):
         expected = [None, None, None, None, None, 3, 3, 4, 4]
         self.assertEqual(expected, actual)
 
-    def test_is_repeatable_sequence(self):
+    def test_is_repeatable_sequence(self) -> None:
         attr = AttrFactory.create()
         self.assertFalse(self.processor.is_repeatable_sequence(attr))
 

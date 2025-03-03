@@ -16,14 +16,14 @@ class ValidateReferences(ContainerHandlerInterface):
         - All global class qualified names must be unique
     """
 
-    def run(self):
+    def run(self) -> None:
         """Validate type references."""
         self.validate_unique_qualified_names()
         self.validate_unique_instances()
         self.validate_resolved_references()
         self.validate_parent_references()
 
-    def validate_unique_qualified_names(self):
+    def validate_unique_qualified_names(self) -> None:
         """Validate all root classes have unique qualified names."""
         duplicate_types = []
         groups = collections.group_by(self.container, get_qname)
@@ -34,7 +34,7 @@ class ValidateReferences(ContainerHandlerInterface):
         if duplicate_types:
             raise CodegenError("Duplicate types found", qnames=duplicate_types)
 
-    def validate_unique_instances(self):
+    def validate_unique_instances(self) -> None:
         """Validate all codegen instances are unique."""
         references: set[int] = set()
         for item in self.container:
@@ -44,7 +44,7 @@ class ValidateReferences(ContainerHandlerInterface):
 
             references.update(item_references)
 
-    def validate_resolved_references(self):
+    def validate_resolved_references(self) -> None:
         """Validate all types match a class reference and qualified name."""
 
         def build_reference_map():
@@ -73,7 +73,7 @@ class ValidateReferences(ContainerHandlerInterface):
                         "Misrepresented reference", cls=item.qname, type=tp.qname
                     )
 
-    def validate_parent_references(self):
+    def validate_parent_references(self) -> None:
         """Validate inner to outer classes is accurate."""
 
         def _validate(target: Class, parent: Optional[Class] = None):

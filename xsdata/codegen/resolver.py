@@ -37,7 +37,7 @@ class DependenciesResolver:
         self.class_list: list[str] = []
         self.class_map: dict[str, Class] = {}
 
-    def process(self, classes: list[Class]):
+    def process(self, classes: list[Class]) -> None:
         """Resolve the dependencies for the given class list.
 
         Reset previously resolved imports and aliases.
@@ -65,7 +65,7 @@ class DependenciesResolver:
                 result.append(obj)
         return result
 
-    def apply_aliases(self, target: Class):
+    def apply_aliases(self, target: Class) -> None:
         """Apply import aliases to the target class.
 
         Update attr and extension types to point to the
@@ -87,7 +87,7 @@ class DependenciesResolver:
 
         collections.apply(target.inner, self.apply_aliases)
 
-    def resolve_imports(self):
+    def resolve_imports(self) -> None:
         """Build the list of class imports and set aliases if necessary."""
         self.imports = [
             Import(qname=qname, source=self.get_class_module(qname))
@@ -97,7 +97,7 @@ class DependenciesResolver:
         self.resolve_conflicts(self.imports, protected)
         self.set_aliases()
 
-    def set_aliases(self):
+    def set_aliases(self) -> None:
         """Store generated aliases."""
         self.aliases = {imp.qname: imp.alias for imp in self.imports if imp.alias}
 

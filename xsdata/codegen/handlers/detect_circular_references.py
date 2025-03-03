@@ -22,7 +22,7 @@ class DetectCircularReferences(RelativeHandlerInterface):
         super().__init__(container)
         self.reference_types: dict[int, list[AttrType]] = {}
 
-    def process(self, target: Class):
+    def process(self, target: Class) -> None:
         """Go through all the attr types and find circular references.
 
         Args:
@@ -37,7 +37,7 @@ class DetectCircularReferences(RelativeHandlerInterface):
             for choice in attr.choices:
                 self.process_types(choice.types, target.ref)
 
-    def process_types(self, types: list[AttrType], class_reference: int):
+    def process_types(self, types: list[AttrType], class_reference: int) -> None:
         """Go through the types and find circular references.
 
         Args:
@@ -77,7 +77,7 @@ class DetectCircularReferences(RelativeHandlerInterface):
 
         return stop in path
 
-    def build_reference_types(self):
+    def build_reference_types(self) -> None:
         """Build the reference types mapping."""
 
         def generate(target: Class):

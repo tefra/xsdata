@@ -5,7 +5,7 @@ from xsdata.utils.hooks import load_entry_points
 
 class HooksTests(TestCase):
     @mock.patch("xsdata.utils.hooks.metadata.entry_points")
-    def test_load_entry_points_with_mapping_api(self, mock_entry_points):
+    def test_load_entry_points_with_mapping_api(self, mock_entry_points) -> None:
         first_ep = mock.Mock()
         second_ep = mock.Mock()
         third_ep = mock.Mock()
@@ -21,7 +21,7 @@ class HooksTests(TestCase):
         self.assertEqual(0, third_ep.load.call_count)
 
     @mock.patch("xsdata.utils.hooks.metadata.entry_points")
-    def test_load_entry_points_with_select_api(self, mock_entry_points):
+    def test_load_entry_points_with_select_api(self, mock_entry_points) -> None:
         first_ep = mock.Mock()
         second_ep = mock.Mock()
 

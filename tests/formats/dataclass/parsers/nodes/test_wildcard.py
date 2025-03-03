@@ -7,7 +7,7 @@ from xsdata.utils.testing import XmlVarFactory
 
 
 class WildcardNodeTests(TestCase):
-    def test_bind(self):
+    def test_bind(self) -> None:
         text = "\n "
         tail = "bar"
         attrs = {"id": "1"}
@@ -46,7 +46,7 @@ class WildcardNodeTests(TestCase):
         node.bind("a", text, tail, objects)
         self.assertEqual("1", objects[-1][1])
 
-    def test_child(self):
+    def test_child(self) -> None:
         attrs = {"id": "1"}
         ns_map = {"ns0": "xsdata"}
         var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo")
@@ -61,6 +61,6 @@ class WildcardNodeTests(TestCase):
         self.assertEqual(ns_map, actual.ns_map)
         self.assertEqual(attrs, actual.attrs)
 
-    def test_fetch_any_children(self):
+    def test_fetch_any_children(self) -> None:
         objects = [(x, x) for x in "abc"]
         self.assertEqual(["b", "c"], WildcardNode.fetch_any_children(1, objects))

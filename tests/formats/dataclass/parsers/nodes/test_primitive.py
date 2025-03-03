@@ -10,13 +10,13 @@ from xsdata.utils.testing import XmlMetaFactory, XmlVarFactory
 
 
 class PrimitiveNodeTests(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.meta = XmlMetaFactory.create(clazz=Artist)
         self.config = ParserConfig()
 
     @mock.patch.object(ParserUtils, "parse_var")
-    def test_bind(self, mock_parse_var):
+    def test_bind(self, mock_parse_var) -> None:
         mock_parse_var.return_value = 13
         var = XmlVarFactory.create(
             xml_type=XmlType.TEXT, name="foo", types=(int,), format="Nope"
@@ -32,7 +32,7 @@ class PrimitiveNodeTests(TestCase):
             meta=self.meta, var=var, config=self.config, value="13", ns_map=ns_map
         )
 
-    def test_bind_nillable_content(self):
+    def test_bind_nillable_content(self) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.TEXT, name="foo", types=(str,), nillable=False
         )
@@ -47,7 +47,7 @@ class PrimitiveNodeTests(TestCase):
         self.assertTrue(node.bind("foo", None, None, objects))
         self.assertIsNone(objects[-1][1])
 
-    def test_bind_nillable_bytes_content(self):
+    def test_bind_nillable_bytes_content(self) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.TEXT,
             name="foo",
@@ -65,7 +65,7 @@ class PrimitiveNodeTests(TestCase):
         self.assertTrue(node.bind("foo", None, None, objects))
         self.assertIsNone(objects[-1][1])
 
-    def test_bind_mixed_with_tail_content(self):
+    def test_bind_mixed_with_tail_content(self) -> None:
         self.meta.mixed_content = True
         var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo", types=(int,))
         node = PrimitiveNode(self.meta, var, {}, self.config)
@@ -75,7 +75,7 @@ class PrimitiveNodeTests(TestCase):
         self.assertEqual((None, "tail"), objects[-1])
         self.assertEqual(13, objects[-2][1])
 
-    def test_bind_mixed_without_tail_content(self):
+    def test_bind_mixed_without_tail_content(self) -> None:
         self.meta.mixed_content = True
         var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo", types=(int,))
         node = PrimitiveNode(self.meta, var, {}, self.config)
@@ -84,7 +84,7 @@ class PrimitiveNodeTests(TestCase):
         self.assertTrue(node.bind("foo", "13", "", objects))
         self.assertEqual(13, objects[-1][1])
 
-    def test_child(self):
+    def test_child(self) -> None:
         var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo")
         node = PrimitiveNode(self.meta, var, {}, self.config)
 

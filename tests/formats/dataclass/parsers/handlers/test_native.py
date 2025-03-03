@@ -14,22 +14,22 @@ from xsdata.formats.dataclass.parsers.handlers.native import get_base_url
 
 
 class XmlEventHandlerTests(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.parser = RecordParser(handler=XmlEventHandler)
 
-    def test_parse(self):
+    def test_parse(self) -> None:
         path = fixtures_dir.joinpath("books/books.xml")
         self.assertEqual(books, self.parser.from_path(path, Books))
         self.assertEqual({"brk": "urn:books"}, self.parser.ns_map)
         self.assertEqual(events, self.parser.events)
 
-    def test_parse_with_default_ns(self):
+    def test_parse_with_default_ns(self) -> None:
         path = fixtures_dir.joinpath("books/books_default_ns.xml")
         self.assertEqual(books, self.parser.from_path(path, Books))
         self.assertEqual({None: "urn:books"}, self.parser.ns_map)
         self.assertEqual(events_default_ns, self.parser.events)
 
-    def test_parse_context_with_unhandled_event(self):
+    def test_parse_context_with_unhandled_event(self) -> None:
         context = [("reverse", None)]
         handler = XmlEventHandler(parser=self.parser, clazz=Books)
 
@@ -38,11 +38,11 @@ class XmlEventHandlerTests(TestCase):
 
         self.assertEqual("Unhandled event: `reverse`.", str(cm.exception))
 
-    def test_parse_with_xml_syntax_error(self):
+    def test_parse_with_xml_syntax_error(self) -> None:
         with self.assertRaises(ParserError):
             self.parser.from_string("<", Books)
 
-    def test_parse_with_element_or_tree(self):
+    def test_parse_with_element_or_tree(self) -> None:
         path = fixtures_dir.joinpath("books/books.xml")
         tree = etree.ElementTree.parse(str(path))
 
@@ -54,7 +54,7 @@ class XmlEventHandlerTests(TestCase):
         self.assertEqual(books.book[0], result)
 
     @pytest.mark.skipif(sys.platform == "win32", reason="urljoin + path sep")
-    def test_parse_with_xinclude(self):
+    def test_parse_with_xinclude(self) -> None:
         path = fixtures_dir.joinpath("books/books-xinclude.xml")
         ns_map = {"ns0": "urn:books"}
 
@@ -63,7 +63,7 @@ class XmlEventHandlerTests(TestCase):
         self.assertEqual(ns_map, self.parser.ns_map)
 
     @pytest.mark.skipif(sys.platform == "win32", reason="urljoin + path sep")
-    def test_parse_with_xinclude_from_memory(self):
+    def test_parse_with_xinclude_from_memory(self) -> None:
         path = fixtures_dir.joinpath("books/books-xinclude.xml")
         ns_map = {"ns0": "urn:books"}
 
@@ -72,7 +72,7 @@ class XmlEventHandlerTests(TestCase):
         self.assertEqual(books, self.parser.from_string(path.read_text(), Books))
         self.assertEqual(ns_map, self.parser.ns_map)
 
-    def test_get_base_url(self):
+    def test_get_base_url(self) -> None:
         self.assertIsNone(get_base_url(None, None))
         self.assertIsNone(get_base_url(None, None))
         self.assertEqual("config/", get_base_url("config/", "/tmp/foo.xml"))

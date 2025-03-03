@@ -66,7 +66,7 @@ def load_class(output: str, clazz_name: str) -> Any:
 class FactoryTestCase(unittest.TestCase):
     maxDiff = None
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         ClassFactory.reset()
         AttrFactory.reset()

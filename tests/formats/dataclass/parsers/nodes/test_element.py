@@ -47,7 +47,7 @@ class ElementNodeTests(FactoryTestCase):
             ns_map={},
         )
 
-    def test_bind(self):
+    def test_bind(self) -> None:
         node = ElementNode(
             position=0,
             meta=self.context.build(SequentialType),
@@ -64,14 +64,14 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual("foo", objects[-1][0])
         self.assertEqual(expected, objects[-1][1])
 
-    def test_bind_nil_value(self):
+    def test_bind_nil_value(self) -> None:
         self.node.xsi_nil = True
         objects = []
 
         self.assertTrue(self.node.bind("foo", None, None, objects))
         self.assertEqual(("foo", None), objects[-1])
 
-    def test_bind_nillable_type(self):
+    def test_bind_nillable_type(self) -> None:
         self.node.meta = self.context.build(NillableType)
         self.node.xsi_nil = True
 
@@ -79,14 +79,14 @@ class ElementNodeTests(FactoryTestCase):
         self.assertTrue(self.node.bind("foo", None, None, objects))
         self.assertEqual(("foo", NillableType(None)), objects[-1])
 
-    def test_bind_fixed_value(self):
+    def test_bind_fixed_value(self) -> None:
         self.node.meta = self.context.build(FixedType)
 
         objects = []
         self.assertTrue(self.node.bind("foo", "abc", None, objects))
         self.assertEqual(("foo", FixedType()), objects[-1])
 
-    def test_bind_with_derived_element(self):
+    def test_bind_with_derived_element(self) -> None:
         self.node.meta = self.context.build(TypeA)
         self.node.derived_factory = DerivedElement
 
@@ -95,7 +95,7 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual("foo", objects[-1][0])
         self.assertEqual(DerivedElement("foo", TypeA(2)), objects[-1][1])
 
-    def test_bind_with_wildcard_var(self):
+    def test_bind_with_wildcard_var(self) -> None:
         self.node.meta = self.context.build(ExtendedType)
         self.node.attrs = {"a": "b"}
         self.node.ns_map = {"ns0": "xsdata"}
@@ -115,7 +115,7 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual("foo", objects[-1][0])
         self.assertEqual(expected, objects[-1][1])
 
-    def test_bind_with_mixed_flag_true(self):
+    def test_bind_with_mixed_flag_true(self) -> None:
         self.node.meta = self.context.build(TypeB)
         self.node.attrs = {"a": "b"}
         self.node.ns_map = {"ns0": "xsdata"}
@@ -132,7 +132,7 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual(None, objects[-1][0])
         self.assertEqual(" tail ", objects[-1][1])
 
-    def test_bind_with_mixed_content_var(self):
+    def test_bind_with_mixed_content_var(self) -> None:
         self.node.meta = self.context.build(Paragraph)
         self.node.attrs = {"a": "b"}
         self.node.ns_map = {"ns0": "xsdata"}
@@ -144,7 +144,7 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual("foo", objects[-1][0])
         self.assertEqual(expected, objects[-1][1])
 
-    def test_bind_wild_text(self):
+    def test_bind_wild_text(self) -> None:
         self.node.meta = self.context.build(ExtendedType)
         var = self.node.meta.wildcards[0]
 
@@ -178,7 +178,7 @@ class ElementNodeTests(FactoryTestCase):
         self.node.bind_wild_text(params, var, "first", None)
         self.assertEqual({"wildcard": ["first", None, "txt", "tail", "tail"]}, params)
 
-    def test_bind_attrs(self):
+    def test_bind_attrs(self) -> None:
         self.node.meta = self.context.build(AttrsType)
         self.node.attrs = {
             "index": "0",
@@ -193,7 +193,7 @@ class ElementNodeTests(FactoryTestCase):
         expected = {"attrs": {"extended": "attr", "{what}ever": "qname"}, "index": 0}
         self.assertEqual(expected, params)
 
-    def test_bind_attrs_with_fail_on_unknown_attributes(self):
+    def test_bind_attrs_with_fail_on_unknown_attributes(self) -> None:
         self.node.meta = self.context.build(AttrsType)
         self.node.config.fail_on_unknown_attributes = True
         self.node.attrs = {
@@ -209,7 +209,7 @@ class ElementNodeTests(FactoryTestCase):
         expected = {"attrs": {"extended": "attr", "{what}ever": "qname"}, "index": 0}
         self.assertEqual(expected, params)
 
-    def test_bind_with_fail_on_unknown_attributes(self):
+    def test_bind_with_fail_on_unknown_attributes(self) -> None:
         self.node.meta = self.context.build(ExtendedType)
         self.node.config.fail_on_unknown_attributes = True
         self.node.attrs = {"a": "b"}
@@ -220,7 +220,7 @@ class ElementNodeTests(FactoryTestCase):
 
         self.assertEqual("Unknown attribute ExtendedType:a", str(cm.exception))
 
-    def test_bind_with_fail_on_unknown_attributes_ignores_xsi_attributes(self):
+    def test_bind_with_fail_on_unknown_attributes_ignores_xsi_attributes(self) -> None:
         self.node.meta = self.context.build(ExtendedType)
         self.node.config.fail_on_unknown_attributes = True
         self.node.attrs = {QNames.XSI_TYPE: "b"}
@@ -230,7 +230,7 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual(1, len(objects))
 
     @mock.patch("xsdata.formats.dataclass.parsers.nodes.element.logger.warning")
-    def test_bind_objects(self, mock_warning):
+    def test_bind_objects(self, mock_warning) -> None:
         self.node.meta = self.context.build(TypeC)
 
         objects = [("x", 1), ("x", 2), ("z", 3.0), ("fixed", "bar")]
@@ -241,7 +241,7 @@ class ElementNodeTests(FactoryTestCase):
 
         mock_warning.assert_called_once_with("Unassigned parsed object %s", "x")
 
-    def test_bind_wild_var(self):
+    def test_bind_wild_var(self) -> None:
         self.node.meta = self.context.build(ExtendedType)
         x = make_dataclass("x", [("value", int)])
 
@@ -259,7 +259,7 @@ class ElementNodeTests(FactoryTestCase):
         }
         self.assertEqual(expected, params)
 
-    def test_bind_wild_list_var(self):
+    def test_bind_wild_list_var(self) -> None:
         self.node.meta = self.context.build(ExtendedListType)
 
         params = {}
@@ -274,7 +274,7 @@ class ElementNodeTests(FactoryTestCase):
         }
         self.assertEqual(expected, params)
 
-    def test_prepare_generic_value(self):
+    def test_prepare_generic_value(self) -> None:
         actual = self.node.prepare_generic_value(None, 1)
         self.assertEqual(1, actual)
 
@@ -290,7 +290,7 @@ class ElementNodeTests(FactoryTestCase):
         actual = self.node.prepare_generic_value("a", fixture("foo"))
         self.assertEqual(fixture("foo"), actual)
 
-    def test_child(self):
+    def test_child(self) -> None:
         var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, name="a", types=(TypeC,))
         attrs = {"a": "b"}
         ns_map = {"ns0": "xsdata"}
@@ -303,7 +303,7 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual(ns_map, actual.ns_map)
         self.assertEqual(position, actual.position)
 
-    def test_child_with_unique_element(self):
+    def test_child_with_unique_element(self) -> None:
         single = XmlVarFactory.create(
             index=1, xml_type=XmlType.ELEMENT, name="cc", types=(TypeC,)
         )
@@ -326,7 +326,7 @@ class ElementNodeTests(FactoryTestCase):
         self.assertNotIn(wildcard.index, self.node.assigned)
 
     @mock.patch.object(ElementNode, "build_node")
-    def test_child_when_failed_to_build_next_node(self, mock_build_node):
+    def test_child_when_failed_to_build_next_node(self, mock_build_node) -> None:
         mock_build_node.return_value = None
         element = XmlVarFactory.create(xml_type=XmlType.ELEMENT, name="a")
         wildcard = XmlVarFactory.create(xml_type=XmlType.WILDCARD, name="a")
@@ -344,7 +344,7 @@ class ElementNodeTests(FactoryTestCase):
         actual = self.node.child("foobar", {}, {}, 0)
         self.assertIsInstance(actual, SkipNode)
 
-    def test_build_node_with_dataclass_union_var(self):
+    def test_build_node_with_dataclass_union_var(self) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT,
             name="a",
@@ -364,7 +364,7 @@ class ElementNodeTests(FactoryTestCase):
 
     @mock.patch.object(ParserUtils, "xsi_type", return_value="foo")
     @mock.patch.object(XmlContext, "fetch")
-    def test_build_node_with_dataclass_var(self, mock_ctx_fetch, mock_xsi_type):
+    def test_build_node_with_dataclass_var(self, mock_ctx_fetch, mock_xsi_type) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT,
             name="a",
@@ -390,7 +390,7 @@ class ElementNodeTests(FactoryTestCase):
     @mock.patch.object(XmlContext, "fetch")
     def test_build_node_with_dataclass_var_and_mismatch_xsi_type(
         self, mock_ctx_fetch, mock_xsi_type
-    ):
+    ) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT,
             name="a",
@@ -415,7 +415,9 @@ class ElementNodeTests(FactoryTestCase):
         mock_ctx_fetch.assert_called_once_with(var.clazz, namespace, xsi_type)
 
     @mock.patch.object(XmlContext, "fetch")
-    def test_build_node_with_dataclass_var_validates_nillable(self, mock_ctx_fetch):
+    def test_build_node_with_dataclass_var_validates_nillable(
+        self, mock_ctx_fetch
+    ) -> None:
         var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, name="a", types=(TypeC,))
         ns_map = {}
         nillable_meta = copy.deepcopy(self.meta)
@@ -431,7 +433,7 @@ class ElementNodeTests(FactoryTestCase):
         attrs = {QNames.XSI_NIL: "false"}
         self.assertIsNone(self.node.build_node(var.qname, var, attrs, ns_map, 10))
 
-    def test_build_node_with_any_type_var_with_matching_xsi_type(self):
+    def test_build_node_with_any_type_var_with_matching_xsi_type(self) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT,
             name="a",
@@ -449,7 +451,7 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual(ns_map, actual.ns_map)
         self.assertFalse(actual.mixed)
 
-    def test_build_node_with_any_type_var_with_datatype(self):
+    def test_build_node_with_any_type_var_with_datatype(self) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT,
             name="a",
@@ -465,7 +467,7 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual(DataType.HEX_BINARY, actual.datatype)
         self.assertIsNone(actual.derived_factory)
 
-    def test_build_node_with_any_type_var_with_no_matching_xsi_type(self):
+    def test_build_node_with_any_type_var_with_no_matching_xsi_type(self) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT,
             name="a",
@@ -482,7 +484,7 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual(attrs, actual.attrs)
         self.assertEqual({}, actual.ns_map)
 
-    def test_build_node_with_any_type_var_with_no_xsi_type(self):
+    def test_build_node_with_any_type_var_with_no_xsi_type(self) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT,
             name="a",
@@ -499,7 +501,9 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual(attrs, actual.attrs)
         self.assertEqual({}, actual.ns_map)
 
-    def test_build_node_with_any_type_var_with_no_xsi_type_and_type_exists(self):
+    def test_build_node_with_any_type_var_with_no_xsi_type_and_type_exists(
+        self,
+    ) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT,
             name="a",
@@ -518,7 +522,7 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual({}, actual.ns_map)
         self.assertFalse(actual.mixed)
 
-    def test_build_node_with_wildcard_var(self):
+    def test_build_node_with_wildcard_var(self) -> None:
         var = XmlVarFactory.create(xml_type=XmlType.WILDCARD, local_name="aaaaa")
         var.process_contents = "skip"
 
@@ -528,7 +532,7 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual(10, actual.position)
         self.assertEqual(var, actual.var)
 
-    def test_build_node_with_primitive_var(self):
+    def test_build_node_with_primitive_var(self) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.TEXT, name="a", types=(int,), default=100
         )

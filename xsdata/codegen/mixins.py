@@ -26,7 +26,7 @@ class ContainerInterface(abc.ABC):
         """Yield an iterator for the class map values."""
 
     @abc.abstractmethod
-    def process(self):
+    def process(self) -> None:
         """Run the processor and filter steps."""
 
     @abc.abstractmethod
@@ -75,7 +75,7 @@ class ContainerInterface(abc.ABC):
         """
 
     @abc.abstractmethod
-    def add(self, item: Class):
+    def add(self, item: Class) -> None:
         """Add class instance to the container.
 
         Args:
@@ -83,7 +83,7 @@ class ContainerInterface(abc.ABC):
         """
 
     @abc.abstractmethod
-    def remove(self, *items: Class):
+    def remove(self, *items: Class) -> None:
         """Safely remove classes from the container.
 
         Args:
@@ -91,7 +91,7 @@ class ContainerInterface(abc.ABC):
         """
 
     @abc.abstractmethod
-    def extend(self, items: list[Class]):
+    def extend(self, items: list[Class]) -> None:
         """Add a list of classes to the container.
 
         Args:
@@ -99,7 +99,7 @@ class ContainerInterface(abc.ABC):
         """
 
     @abc.abstractmethod
-    def reset(self, item: Class, qname: str):
+    def reset(self, item: Class, qname: str) -> None:
         """Update the given class qualified name.
 
         Args:
@@ -108,7 +108,7 @@ class ContainerInterface(abc.ABC):
         """
 
     @abc.abstractmethod
-    def set(self, items: list[Class]):
+    def set(self, items: list[Class]) -> None:
         """Set the list of classes to the container.
 
         Args:
@@ -122,7 +122,7 @@ class HandlerInterface(abc.ABC):
     __slots__ = ()
 
     @abc.abstractmethod
-    def process(self, target: Class):
+    def process(self, target: Class) -> None:
         """Process the given target class.
 
         Args:
@@ -168,7 +168,7 @@ class RelativeHandlerInterface(HandlerInterface, abc.ABC):
         return attrs
 
     @abc.abstractmethod
-    def process(self, target: Class):
+    def process(self, target: Class) -> None:
         """Process entrypoint for a class.
 
         Args:
@@ -190,5 +190,5 @@ class ContainerHandlerInterface(abc.ABC):
         self.container = container
 
     @abc.abstractmethod
-    def run(self):
+    def run(self) -> None:
         """Run the process for the whole container."""

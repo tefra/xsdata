@@ -162,7 +162,7 @@ class OutputFormat:
         """Post initialization method."""
         self.validate()
 
-    def validate(self):
+    def validate(self) -> None:
         """Validate and reset configuration conflicts."""
         if self.order and not self.eq:
             self.eq = True
@@ -253,7 +253,7 @@ class GeneratorOutput:
         """Post initialization method."""
         self.validate()
 
-    def validate(self):
+    def validate(self) -> None:
         """Reset configuration conflicts."""
         if self.union_type and sys.version_info < (3, 10):
             self.union_type = False
@@ -276,7 +276,7 @@ class GeneratorOutput:
                 CodegenWarning,
             )
 
-    def update(self, **kwargs: Any):
+    def update(self, **kwargs: Any) -> None:
         """Update instance attributes recursively."""
         objects.update(self, **kwargs)
         self.format.validate()

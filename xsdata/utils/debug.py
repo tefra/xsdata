@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any
 
 
-def dump(obj: Any):
+def dump(obj: Any) -> None:
     """Write any object into a dump json file.
 
     For internal troubleshooting purposes only!!!

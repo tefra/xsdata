@@ -6,11 +6,11 @@ from xsdata.models.wsdl import Definitions, Import
 
 
 class DefinitionsParserTests(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.parser = DefinitionsParser()
         super().setUp()
 
-    def test_complete(self):
+    def test_complete(self) -> None:
         path = fixtures_dir.joinpath("calculator/services.wsdl").resolve()
         parser = DefinitionsParser(location="here.wsdl")
         definitions = parser.from_path(path, Definitions)
@@ -23,7 +23,7 @@ class DefinitionsParserTests(TestCase):
         self.assertEqual(8, len(definitions.messages))
         self.assertEqual(parser.location, definitions.bindings[0].location)
 
-    def test_end_import(self):
+    def test_end_import(self) -> None:
         parser = DefinitionsParser(location="foo/bar.wsdl")
         imp = Import(location="../hello/foo.wsdl")
 

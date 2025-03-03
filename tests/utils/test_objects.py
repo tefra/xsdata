@@ -5,7 +5,7 @@ from xsdata.utils import objects
 
 
 class ObjectsTests(TestCase):
-    def test_update(self):
+    def test_update(self) -> None:
         obj = SimpleNamespace()
         obj.foo = SimpleNamespace()
         obj.foo.bar = 2

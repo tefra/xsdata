@@ -16,7 +16,7 @@ from xsdata.utils.testing import (
 
 
 class DependenciesResolverTest(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.resolver = DependenciesResolver({})
 
@@ -25,7 +25,7 @@ class DependenciesResolverTest(FactoryTestCase):
     @mock.patch.object(DependenciesResolver, "create_class_map")
     def test_process(
         self, mock_create_class_map, create_class_list, mock_resolve_imports
-    ):
+    ) -> None:
         classes = ClassFactory.list(3)
 
         mock_create_class_map.return_value = {"b": classes[0]}
@@ -43,7 +43,7 @@ class DependenciesResolverTest(FactoryTestCase):
 
         mock_resolve_imports.assert_called_once_with()
 
-    def test_sorted_imports(self):
+    def test_sorted_imports(self) -> None:
         packages = [
             PackageFactory.create(name=x, alias=None, source="foo") for x in "cab"
         ]
@@ -57,7 +57,7 @@ class DependenciesResolverTest(FactoryTestCase):
         self.assertEqual(packages[0], result[2])
 
     @mock.patch.object(DependenciesResolver, "apply_aliases")
-    def test_sorted_classes(self, mock_apply_aliases):
+    def test_sorted_classes(self, mock_apply_aliases) -> None:
         mock_apply_aliases.side_effect = lambda x: x
 
         self.resolver.class_list = ["a", "b", "c", "d"]
@@ -69,7 +69,7 @@ class DependenciesResolverTest(FactoryTestCase):
         self.assertEqual(expected, result)
         mock_apply_aliases.assert_has_calls([mock.call(x) for x in expected])
 
-    def test_apply_aliases(self):
+    def test_apply_aliases(self) -> None:
         self.resolver.aliases = {
             build_qname("xsdata", "d"): "IamD",
             build_qname("xsdata", "a"): "IamA",
@@ -139,7 +139,7 @@ class DependenciesResolverTest(FactoryTestCase):
         mock_get_class_module,
         mock_resolve_conflicts,
         mock_set_aliases,
-    ):
+    ) -> None:
         class_life = ClassFactory.create(qname="life")
         import_names = [
             "foo_1",  # cool
@@ -164,7 +164,7 @@ class DependenciesResolverTest(FactoryTestCase):
         )
         mock_set_aliases.assert_called_once_with()
 
-    def test_resolve_conflicts(self):
+    def test_resolve_conflicts(self) -> None:
         imports = [
             PackageFactory.create(qname="{a}a", source="models.aa"),
             PackageFactory.create(qname="{b}a", source="models.ba"),
@@ -180,7 +180,7 @@ class DependenciesResolverTest(FactoryTestCase):
         self.assertEqual(None, imports[2].alias)
         self.assertEqual("common:penalty", imports[3].alias)
 
-    def test_set_aliases(self):
+    def test_set_aliases(self) -> None:
         self.resolver.imports = [
             PackageFactory.create(qname="{a}a", alias="aa"),
             PackageFactory.create(qname="{b}a", alias="ba"),
@@ -189,7 +189,7 @@ class DependenciesResolverTest(FactoryTestCase):
         self.resolver.set_aliases()
         self.assertEqual({"{a}a": "aa", "{b}a": "ba"}, self.resolver.aliases)
 
-    def test_get_class_module(self):
+    def test_get_class_module(self) -> None:
         class_a = ClassFactory.create()
         self.resolver.registry[class_a.qname] = "foo.bar"
 
@@ -197,23 +197,23 @@ class DependenciesResolverTest(FactoryTestCase):
         with self.assertRaises(CodegenError):
             self.resolver.get_class_module("nope")
 
-    def test_import_classes(self):
+    def test_import_classes(self) -> None:
         self.resolver.class_list = list("abcdefg")
         self.resolver.class_map = {x: x for x in "bdg"}
         self.assertEqual(["a", "c", "e", "f"], self.resolver.import_classes())
 
-    def test_create_class_map(self):
+    def test_create_class_map(self) -> None:
         classes = [ClassFactory.create(qname=name) for name in "ab"]
         expected = {obj.qname: obj for obj in classes}
         self.assertEqual(expected, self.resolver.create_class_map(classes))
 
-    def test_create_class_map_for_duplicate_classes(self):
+    def test_create_class_map_for_duplicate_classes(self) -> None:
         classes = ClassFactory.list(2, qname="a")
         with self.assertRaises(CodegenError):
             self.resolver.create_class_map(classes)
 
     @mock.patch.object(Class, "dependencies")
-    def test_create_class_list(self, mock_dependencies):
+    def test_create_class_list(self, mock_dependencies) -> None:
         classes = ClassFactory.list(3)
         mock_dependencies.side_effect = [
             {build_qname("xsdata", "class_C"), "b"},

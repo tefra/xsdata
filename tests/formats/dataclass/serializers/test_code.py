@@ -11,7 +11,7 @@ class PycodeSerializerTests(TestCase):
     def setUp(self) -> None:
         self.serializer = PycodeSerializer()
 
-    def test_render(self):
+    def test_render(self) -> None:
         result = self.serializer.render(books, var_name="books")
 
         expected = (
@@ -46,7 +46,7 @@ class PycodeSerializerTests(TestCase):
 
         self.assertEqual(expected, result)
 
-    def test_write_class_with_default_values(self):
+    def test_write_class_with_default_values(self) -> None:
         books = Books(book=[BookForm(author="me")])
         result = self.serializer.render(books, var_name="books")
         expected = (
@@ -64,7 +64,7 @@ class PycodeSerializerTests(TestCase):
         )
         self.assertEqual(expected, result)
 
-    def test_write_string_with_unicode_characters(self):
+    def test_write_string_with_unicode_characters(self) -> None:
         books = Books(book=[BookForm(author="Backslashes \\ One Two \x12 Three")])
         result = self.serializer.render(books, var_name="books")
         expected = (
@@ -82,7 +82,7 @@ class PycodeSerializerTests(TestCase):
         )
         self.assertEqual(expected, result)
 
-    def test_write_object_with_empty_array(self):
+    def test_write_object_with_empty_array(self) -> None:
         iterator = self.serializer.repr_object([], 0, set())
         self.assertEqual("[]", "".join(iterator))
 
@@ -92,18 +92,18 @@ class PycodeSerializerTests(TestCase):
         iterator = self.serializer.repr_object(set(), 0, set())
         self.assertEqual("set()", "".join(iterator))
 
-    def test_write_object_with_mapping(self):
+    def test_write_object_with_mapping(self) -> None:
         iterator = self.serializer.repr_object({}, 0, set())
         self.assertEqual("{}", "".join(iterator))
 
         iterator = self.serializer.repr_object({"foo": "bar"}, 0, set())
         self.assertEqual("{\n    'foo': 'bar',\n}", "".join(iterator))
 
-    def test_write_object_with_enum(self):
+    def test_write_object_with_enum(self) -> None:
         iterator = self.serializer.repr_object(Namespace.SOAP11, 0, set())
         self.assertEqual("Namespace.SOAP11", "".join(iterator))
 
-    def test_build_imports_with_nested_types(self):
+    def test_build_imports_with_nested_types(self) -> None:
         expected = "from tests.fixtures.models import Parent\n"
         actual = self.serializer.build_imports({Parent.Inner})
         self.assertEqual(expected, actual)

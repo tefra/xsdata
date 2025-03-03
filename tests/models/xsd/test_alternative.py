@@ -4,7 +4,7 @@ from xsdata.models.xsd import Alternative
 
 
 class AlternativeTests(TestCase):
-    def test_property_real_name(self):
+    def test_property_real_name(self) -> None:
         obj = Alternative()
         self.assertEqual("value", obj.real_name)
 
@@ -14,13 +14,13 @@ class AlternativeTests(TestCase):
         obj.test = "@type='text'"
         self.assertEqual("type_text", obj.real_name)
 
-    def test_property_bases(self):
+    def test_property_bases(self) -> None:
         obj = Alternative()
         self.assertEqual([], list(obj.bases))
 
         obj.type = "foo"
         self.assertEqual(["foo"], list(obj.bases))
 
-    def test_get_restrictions(self):
+    def test_get_restrictions(self) -> None:
         obj = Alternative()
         self.assertEqual({"path": [("alt", id(obj), 0, 1)]}, obj.get_restrictions())

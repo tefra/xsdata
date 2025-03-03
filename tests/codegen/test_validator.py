@@ -15,7 +15,7 @@ from xsdata.utils.testing import (
 
 
 class ClassValidatorTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.container = ClassContainer(config=GeneratorConfig())
@@ -29,7 +29,7 @@ class ClassValidatorTests(FactoryTestCase):
         mock_remove_invalid_classes,
         mock_handle_duplicate_types,
         mock_merge_global_types,
-    ):
+    ) -> None:
         first = ClassFactory.create()
         second = first.clone()
         third = ClassFactory.create()
@@ -41,7 +41,7 @@ class ClassValidatorTests(FactoryTestCase):
         mock_handle_duplicate_types.assert_called_once_with([first, second])
         mock_merge_global_types.assert_called_once_with([first, second])
 
-    def test_remove_invalid_classes(self):
+    def test_remove_invalid_classes(self) -> None:
         first = ClassFactory.create(
             extensions=[
                 ExtensionFactory.create(AttrTypeFactory.native(DataType.BOOLEAN)),
@@ -62,7 +62,7 @@ class ClassValidatorTests(FactoryTestCase):
         self.assertEqual([second, third], classes)
 
     @mock.patch("xsdata.codegen.mappers.definitions.logger.warning")
-    def test_handle_duplicate_types(self, mock_warning):
+    def test_handle_duplicate_types(self, mock_warning) -> None:
         one = ClassFactory.create(tag=Tag.ELEMENT)
         two = one.clone()
         three = one.clone()
@@ -79,7 +79,7 @@ class ClassValidatorTests(FactoryTestCase):
     @mock.patch.object(ClassValidator, "merge_redefined_type")
     def test_handle_duplicate_types_with_redefined_type(
         self, mock_merge_redefined_type
-    ):
+    ) -> None:
         one = ClassFactory.create(tag=Tag.ELEMENT)
         two = one.clone()
         three = one.clone()
@@ -93,7 +93,7 @@ class ClassValidatorTests(FactoryTestCase):
             [mock.call(two, one), mock.call(three, one)]
         )
 
-    def test_merge_global_types(self):
+    def test_merge_global_types(self) -> None:
         one = ClassFactory.create(
             qname="foo",
             tag=Tag.ELEMENT,
@@ -142,7 +142,7 @@ class ClassValidatorTests(FactoryTestCase):
     @mock.patch.object(ClassUtils, "copy_attributes")
     def test_merge_redefined_type_with_circular_extension(
         self, mock_copy_attributes, mock_copy_extensions
-    ):
+    ) -> None:
         source = ClassFactory.create()
         target = source.clone()
 
@@ -157,7 +157,9 @@ class ClassValidatorTests(FactoryTestCase):
         mock_copy_extensions.assert_called_once_with(source, target, ext_a)
 
     @mock.patch.object(ClassUtils, "copy_group_attributes")
-    def test_merge_redefined_type_with_circular_group(self, mock_copy_group_attributes):
+    def test_merge_redefined_type_with_circular_group(
+        self, mock_copy_group_attributes
+    ) -> None:
         source = ClassFactory.create()
         target = source.clone()
         target.container = Tag.REDEFINE
@@ -169,7 +171,7 @@ class ClassValidatorTests(FactoryTestCase):
 
         mock_copy_group_attributes.assert_called_once_with(source, target, second_attr)
 
-    def test_select_winner(self):
+    def test_select_winner(self) -> None:
         classes = ClassFactory.list(2)
         self.assertEqual(-1, self.validator.select_winner(classes))
 

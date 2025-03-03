@@ -9,7 +9,7 @@ from xsdata.utils.testing import load_class
 os.chdir(root)
 
 
-def test_books_schema():
+def test_books_schema() -> None:
     schema = fixtures_dir.joinpath("books/schema.xsd")
     package = "tests.fixtures.books"
     runner = CliRunner()

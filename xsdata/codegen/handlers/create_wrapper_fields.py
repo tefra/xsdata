@@ -12,7 +12,7 @@ class CreateWrapperFields(RelativeHandlerInterface):
         container: The class container instance
     """
 
-    def process(self, target: Class):
+    def process(self, target: Class) -> None:
         """Process the given class attrs and choices.
 
         Args:

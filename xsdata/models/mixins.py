@@ -194,7 +194,7 @@ def element(optional: bool = True, **kwargs: Any) -> Any:
     return field(metadata=metadata, **kwargs)
 
 
-def add_default_value(params: dict, optional: bool):
+def add_default_value(params: dict, optional: bool) -> None:
     """Add the default value if it's missing and the optional flag is true."""
     if optional and not ("default" in params or "default_factory" in params):
         params["default"] = None

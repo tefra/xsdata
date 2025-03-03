@@ -16,20 +16,20 @@ class NoneGenerator(AbstractGenerator):
 
 
 class AbstractGeneratorTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         config = GeneratorConfig()
         self.generator = NoneGenerator(config)
         super().setUp()
 
-    def test_module_name(self):
+    def test_module_name(self) -> None:
         self.assertEqual("a", self.generator.module_name("a"))
 
-    def test_package_name(self):
+    def test_package_name(self) -> None:
         self.assertEqual("a", self.generator.package_name("a"))
 
     @mock.patch.object(NoneGenerator, "module_name", return_value="mod")
     @mock.patch.object(NoneGenerator, "package_name", return_value="pck")
-    def test_normalize_packages(self, *args):
+    def test_normalize_packages(self, *args) -> None:
         classes = [
             ClassFactory.create(qname="{a}a", package="bar", module="mod"),
             ClassFactory.create(qname="{a}b", package="bar", module="mod"),
@@ -49,7 +49,7 @@ class AbstractGeneratorTests(FactoryTestCase):
             self.generator.normalize_packages(ClassFactory.list(1))
 
     @mock.patch("datetime.datetime", wraps=datetime.datetime)
-    def test_render_header(self, mock_datetime):
+    def test_render_header(self, mock_datetime) -> None:
         actual = self.generator.render_header()
         self.assertEqual("", actual)
         mock_datetime.now.return_value = datetime.datetime(

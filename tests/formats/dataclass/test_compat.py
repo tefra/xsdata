@@ -6,7 +6,7 @@ from xsdata.formats.dataclass.compat import Dataclasses
 
 
 class ClassTypeTests(TestCase):
-    def test_score_object(self):
+    def test_score_object(self) -> None:
         class_type = Dataclasses()
         self.assertEqual(-1.0, class_type.score_object(None))
 
@@ -19,13 +19,13 @@ class ClassTypeTests(TestCase):
 
 
 class DataclassesTests(TestCase):
-    def test_is_model(self):
+    def test_is_model(self) -> None:
         class_type = Dataclasses()
         self.assertTrue(class_type.is_model(TypeA))
         self.assertTrue(class_type.is_model(TypeA(1)))
         self.assertFalse(class_type.is_model(1))
 
-    def test_verify_model(self):
+    def test_verify_model(self) -> None:
         class_type = Dataclasses()
         class_type.verify_model(TypeA)
 

@@ -4,7 +4,7 @@ from collections.abc import Iterator
 from typing import Any, Optional, Union
 
 
-def parse_date_args(value: Any, fmt: str) -> Iterator[int]:
+def parse_date_args(value: Any, fmt: str) -> Iterator[Optional[int]]:
     """Parse the fmt args from the value."""
     if not isinstance(value, str):
         raise ValueError("")
@@ -88,7 +88,7 @@ def monthlen(year: int, month: int) -> int:
     return mdays[month] + (month == 2 and isleap(year))
 
 
-def validate_date(year: int, month: int, day: int):
+def validate_date(year: int, month: int, day: int) -> None:
     """Validate the given year, month day is a valid date."""
     if not 1 <= month <= 12:
         raise ValueError("Month must be in 1..12")
@@ -98,7 +98,7 @@ def validate_date(year: int, month: int, day: int):
         raise ValueError(f"Day must be in 1..{max_days}")
 
 
-def validate_time(hour: int, minute: int, second: int, franctional_second: int):
+def validate_time(hour: int, minute: int, second: int, franctional_second: int) -> None:
     """Validate the time args are valid."""
     if not 0 <= hour <= 24:
         raise ValueError("Hour must be in 0..24")
@@ -142,7 +142,7 @@ class DateTimeParser:
         self.vidx = 0
         self.fidx = 0
 
-    def parse(self) -> Iterator[int]:
+    def parse(self) -> Iterator[Optional[int]]:
         """Yield the parsed datetime string arguments."""
         try:
             while self.fidx < self.flen:
@@ -176,14 +176,14 @@ class DateTimeParser:
         """Return the current evaluated character of the datetime string."""
         return self.value[self.vidx]
 
-    def skip(self, char: str):
+    def skip(self, char: str) -> None:
         """Validate and skip over the given char."""
         if not self.has_more() or self.peek() != char:
             raise ValueError
 
         self.vidx += 1
 
-    def parse_var(self, var: str):
+    def parse_var(self, var: str) -> Iterator[Optional[int]]:
         """Parse the given var from the datetime string."""
         if var in SIMPLE_TWO_DIGITS_FORMATS:
             yield self.parse_digits(2)

@@ -41,7 +41,7 @@ class DefinitionsParser(SchemaParser):
 
         return obj
 
-    def end_import(self, obj: T):
+    def end_import(self, obj: T) -> None:
         """End import element entrypoint.
 
         Resolve the location path of import elements.

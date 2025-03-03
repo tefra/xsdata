@@ -8,7 +8,7 @@ class ResetAttributeSequences(HandlerInterface):
 
     __slots__ = ()
 
-    def process(self, target: Class):
+    def process(self, target: Class) -> None:
         """Process entrypoint for classes.
 
         Reset Cases:

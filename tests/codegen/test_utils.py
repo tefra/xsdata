@@ -16,7 +16,7 @@ from xsdata.utils.testing import (
 
 
 class ClassUtilsTests(FactoryTestCase):
-    def test_find_value_attr(self):
+    def test_find_value_attr(self) -> None:
         target = ClassFactory.create()
         with self.assertRaises(CodegenError):
             ClassUtils.find_value_attr(target)
@@ -29,7 +29,7 @@ class ClassUtilsTests(FactoryTestCase):
         actual = ClassUtils.find_value_attr(target)
         self.assertEqual(target.attrs[1], actual)
 
-    def test_remove_attribute(self):
+    def test_remove_attribute(self) -> None:
         target = ClassFactory.elements(1)
         attr = target.attrs[0]
 
@@ -37,7 +37,7 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual(0, len(target.attrs))
 
     @mock.patch.object(ClassUtils, "is_orphan_inner")
-    def test_clean_inner_classes(self, mock_is_orphan_inner):
+    def test_clean_inner_classes(self, mock_is_orphan_inner) -> None:
         mock_is_orphan_inner.side_effect = [True, False, True]
 
         target = ClassFactory.create()
@@ -49,7 +49,7 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual(1, len(target.inner))
         self.assertEqual(survivor, target.inner[0])
 
-    def test_is_orphan_inner(self):
+    def test_is_orphan_inner(self) -> None:
         inner = ClassFactory.create(qname="thug")
         target = ClassFactory.create(
             attrs=[
@@ -70,7 +70,9 @@ class ClassUtilsTests(FactoryTestCase):
 
     @mock.patch.object(ClassUtils, "copy_inner_classes")
     @mock.patch.object(ClassUtils, "clone_attribute")
-    def test_copy_attributes(self, mock_clone_attribute, mock_copy_inner_classes):
+    def test_copy_attributes(
+        self, mock_clone_attribute, mock_copy_inner_classes
+    ) -> None:
         mock_clone_attribute.side_effect = lambda x, y: x.clone()
         target = ClassFactory.create(
             attrs=[AttrFactory.create(name="a"), AttrFactory.create(name="b")]
@@ -105,7 +107,9 @@ class ClassUtilsTests(FactoryTestCase):
 
     @mock.patch.object(ClassUtils, "copy_inner_classes")
     @mock.patch.object(ClassUtils, "clone_attribute")
-    def test_copy_group_attributes(self, mock_clone_attribute, mock_copy_inner_classes):
+    def test_copy_group_attributes(
+        self, mock_clone_attribute, mock_copy_inner_classes
+    ) -> None:
         mock_clone_attribute.side_effect = lambda x, y: x.clone()
         source = ClassFactory.elements(2)
         source.inner.append(ClassFactory.create())
@@ -133,7 +137,7 @@ class ClassUtilsTests(FactoryTestCase):
             ]
         )
 
-    def test_copy_extensions(self):
+    def test_copy_extensions(self) -> None:
         target = ClassFactory.create(extensions=ExtensionFactory.list(1))
         source = ClassFactory.create(extensions=ExtensionFactory.list(2))
         link_extension = ExtensionFactory.create()
@@ -145,7 +149,7 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual(2, target.extensions[1].restrictions.max_occurs)
         self.assertEqual(2, target.extensions[2].restrictions.max_occurs)
 
-    def test_clone_attribute(self):
+    def test_clone_attribute(self) -> None:
         attr = AttrFactory.create(
             restrictions=Restrictions(length=1),
             types=[
@@ -162,7 +166,7 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertIsNot(attr, clone)
 
     @mock.patch.object(ClassUtils, "copy_inner_class")
-    def test_copy_inner_classes(self, mock_copy_inner_class):
+    def test_copy_inner_classes(self, mock_copy_inner_class) -> None:
         source = ClassFactory.create()
         target = ClassFactory.create()
         attr = AttrFactory.create(types=AttrTypeFactory.list(3))
@@ -177,7 +181,7 @@ class ClassUtilsTests(FactoryTestCase):
             ]
         )
 
-    def test_copy_inner_class(self):
+    def test_copy_inner_class(self) -> None:
         source = ClassFactory.create()
         inner = ClassFactory.create(
             qname="a", module="b", package="c", status=Status.FLATTENED
@@ -196,7 +200,7 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertIs(Status.RAW, target.inner[0].status)
         self.assertIs(Status.FLATTENED, inner.status)
 
-    def test_copy_inner_class_check_circular_reference(self):
+    def test_copy_inner_class_check_circular_reference(self) -> None:
         source = ClassFactory.create()
         target = ClassFactory.create()
         attr_type = AttrTypeFactory.create(forward=True, qname=target.qname)
@@ -206,7 +210,7 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertTrue(attr_type.circular)
         self.assertEqual(0, len(target.inner))
 
-    def test_copy_inner_class_with_missing_inner(self):
+    def test_copy_inner_class_with_missing_inner(self) -> None:
         source = ClassFactory.create()
         target = ClassFactory.create()
         attr_type = AttrTypeFactory.create(forward=True, qname=target.qname)
@@ -214,7 +218,7 @@ class ClassUtilsTests(FactoryTestCase):
         with self.assertRaises(CodegenError):
             ClassUtils.copy_inner_class(source, target, attr_type)
 
-    def test_flatten(self):
+    def test_flatten(self) -> None:
         target = ClassFactory.create(
             qname="{xsdata}root", attrs=AttrFactory.list(3), inner=ClassFactory.list(2)
         )
@@ -237,7 +241,7 @@ class ClassUtilsTests(FactoryTestCase):
             self.assertEqual(1, len(attr.types))
             self.assertFalse(attr.types[0].forward)
 
-    def test_reduce_classes(self):
+    def test_reduce_classes(self) -> None:
         class_a = ClassFactory.elements(3)
         class_a_clone = class_a.clone()
         class_a_clone.mixed = True
@@ -254,7 +258,7 @@ class ClassUtilsTests(FactoryTestCase):
         )
         self.assertEqual(["attr_E", "attr_F"], [x.name for x in result[1].attrs])
 
-    def test_reduce_attributes(self):
+    def test_reduce_attributes(self) -> None:
         restrictions = Restrictions(min_occurs=1, max_occurs=1)
         attr_a = AttrFactory.create(name="a", restrictions=restrictions.clone())
         attr_b = AttrFactory.create(name="b", restrictions=restrictions.clone())
@@ -273,7 +277,7 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual(0, result[2].restrictions.min_occurs)
         self.assertEqual(0, result[3].restrictions.min_occurs)
 
-    def test_merge_attributes(self):
+    def test_merge_attributes(self) -> None:
         a = AttrFactory.native(DataType.INT, name="a")
         c = AttrFactory.native(DataType.FLOAT, name="c")
 
@@ -293,7 +297,7 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual(4, c.restrictions.max_occurs)
         self.assertEqual(1, c.restrictions.sequence)
 
-    def test_rename_duplicate_attributes(self):
+    def test_rename_duplicate_attributes(self) -> None:
         attrs = [
             AttrFactory.create(name="a", tag=Tag.ELEMENT),
             AttrFactory.create(name="a", tag=Tag.ATTRIBUTE),
@@ -333,7 +337,7 @@ class ClassUtilsTests(FactoryTestCase):
         ]
         self.assertEqual(expected, [x.name for x in attrs])
 
-    def test_rename_attribute_by_preference(self):
+    def test_rename_attribute_by_preference(self) -> None:
         one = AttrFactory.create(name="a", tag=Tag.ELEMENT)
         two = AttrFactory.create(name="a", tag=Tag.ATTRIBUTE)
 
@@ -359,7 +363,7 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual("a_Element", one.name)
         self.assertEqual("a", two.name)
 
-    def test_filter_types(self):
+    def test_filter_types(self) -> None:
         xs_string = AttrTypeFactory.native(DataType.STRING)
         xs_error = AttrTypeFactory.native(DataType.ERROR)
         xs_any = AttrTypeFactory.native(DataType.ANY_TYPE)
@@ -387,7 +391,7 @@ class ClassUtilsTests(FactoryTestCase):
         actual = ClassUtils.filter_types(types)
         self.assertEqual(1, len(actual))
 
-    def test_find_nested(self):
+    def test_find_nested(self) -> None:
         a = ClassFactory.create(qname="a")
         b = ClassFactory.create(qname="b")
         c = ClassFactory.create(qname="c")

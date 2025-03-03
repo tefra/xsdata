@@ -22,7 +22,7 @@ class ClassValidator:
         """Initialize the class validator."""
         self.container = container
 
-    def process(self):
+    def process(self) -> None:
         """Main process entrypoint.
 
         Runs on groups of classes with the same
@@ -43,7 +43,7 @@ class ClassValidator:
             if len(classes) > 1:
                 self.merge_global_types(classes)
 
-    def remove_invalid_classes(self, classes: list[Class]):
+    def remove_invalid_classes(self, classes: list[Class]) -> None:
         """Remove classes with undefined extensions.
 
         Args:

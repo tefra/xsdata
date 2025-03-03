@@ -17,20 +17,22 @@ from xsdata.utils.testing import (
 
 
 class FlattenClassExtensionsTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         container = ClassContainer(config=GeneratorConfig())
         self.processor = FlattenClassExtensions(container=container)
 
     @mock.patch.object(FlattenClassExtensions, "process_extension")
-    def test_process_with_no_extensions(self, mock_process_extension):
+    def test_process_with_no_extensions(self, mock_process_extension) -> None:
         target = ClassFactory.elements(1)
         self.processor.process(target)
         self.assertEqual(0, mock_process_extension.call_count)
 
     @mock.patch.object(FlattenClassExtensions, "process_native_extension")
-    def test_process_extension_with_native_type(self, mock_flatten_extension_native):
+    def test_process_extension_with_native_type(
+        self, mock_flatten_extension_native
+    ) -> None:
         extension = ExtensionFactory.native(DataType.STRING)
         target = ClassFactory.elements(1, extensions=[extension])
 
@@ -40,7 +42,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
     @mock.patch.object(FlattenClassExtensions, "process_dependency_extension")
     def test_process_extension_with_dependency_type(
         self, mock_process_dependency_extension
-    ):
+    ) -> None:
         extension = ExtensionFactory.create(AttrTypeFactory.create("foo"))
         target = ClassFactory.elements(1, extensions=[extension])
 
@@ -55,7 +57,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
         mock_find_dependency,
         mock_process_simple_extension,
         mock_process_complex_extension,
-    ):
+    ) -> None:
         extension = ExtensionFactory.create()
         target = ClassFactory.create(extensions=[extension])
         mock_find_dependency.return_value = None
@@ -73,7 +75,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
         mock_find_dependency,
         mock_process_simple_extension,
         mock_process_complex_extension,
-    ):
+    ) -> None:
         extension = ExtensionFactory.create()
         target = ClassFactory.create(extensions=[extension])
         source = ClassFactory.create(tag=Tag.SIMPLE_TYPE)
@@ -92,7 +94,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
         mock_find_dependency,
         mock_process_simple_extension,
         mock_process_complex_extension,
-    ):
+    ) -> None:
         extension = ExtensionFactory.create()
         target = ClassFactory.create(extensions=[extension])
         source = ClassFactory.create(tag=Tag.COMPLEX_TYPE)
@@ -104,7 +106,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
 
         mock_process_simple_extension.assert_called_once_with(source, target, extension)
 
-    def test_process_enum_extension_with_enum_source(self):
+    def test_process_enum_extension_with_enum_source(self) -> None:
         source = ClassFactory.enumeration(3)
         target = ClassFactory.enumeration(2)
         target.attrs[1].name = source.attrs[2].name
@@ -119,7 +121,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
         self.assertEqual(0, len(target.extensions))
         self.assertEqual(source.attrs[2], target.attrs[1])
 
-    def test_process_enum_extension_with_simple_source(self):
+    def test_process_enum_extension_with_simple_source(self) -> None:
         base = ClassFactory.enumeration(2)
         base.attrs[0].types = [
             AttrTypeFactory.native(DataType.FLOAT),
@@ -147,7 +149,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
         )
         self.assertEqual(["string", "int"], [tp.name for tp in target.attrs[1].types])
 
-    def test_process_enum_extension_with_complex_source(self):
+    def test_process_enum_extension_with_complex_source(self) -> None:
         source = ClassFactory.create(
             tag=Tag.COMPLEX_TYPE,
             attrs=[
@@ -173,7 +175,9 @@ class FlattenClassExtensionsTests(FactoryTestCase):
         self.assertEqual("Yes", target.attrs[0].default)
         self.assertEqual(expected.types, target.attrs[0].types)
 
-    def test_process_enum_extension_with_complex_source_and_multiple_members(self):
+    def test_process_enum_extension_with_complex_source_and_multiple_members(
+        self,
+    ) -> None:
         source = ClassFactory.elements(2)
         target = ClassFactory.enumeration(2)
         extension = ExtensionFactory.reference(source.qname)
@@ -194,7 +198,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
         mock_find_dependency,
         mock_process_simple_extension,
         mock_process_complex_extension,
-    ):
+    ) -> None:
         extension = ExtensionFactory.create()
         target = ClassFactory.create(extensions=[extension])
         source = ClassFactory.create(tag=Tag.COMPLEX_TYPE)
@@ -208,7 +212,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
         )
 
     @mock.patch.object(FlattenClassExtensions, "add_default_attribute")
-    def test_process_extension_native(self, mock_add_default_attribute):
+    def test_process_extension_native(self, mock_add_default_attribute) -> None:
         extension = ExtensionFactory.create()
         target = ClassFactory.elements(1)
 
@@ -218,14 +222,14 @@ class FlattenClassExtensionsTests(FactoryTestCase):
     @mock.patch.object(FlattenClassExtensions, "replace_attributes_type")
     def test_process_native_extension_with_enumeration_target(
         self, mock_replace_attributes_type
-    ):
+    ) -> None:
         extension = ExtensionFactory.create()
         target = ClassFactory.enumeration(1)
 
         self.processor.process_native_extension(target, extension)
         mock_replace_attributes_type.assert_called_once_with(target, extension)
 
-    def test_process_simple_extension_with_circular_reference(self):
+    def test_process_simple_extension_with_circular_reference(self) -> None:
         extension = ExtensionFactory.create()
         target = ClassFactory.create(extensions=[extension])
         self.processor.process_simple_extension(target, target, extension)
@@ -234,7 +238,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
     @mock.patch.object(FlattenClassExtensions, "add_default_attribute")
     def test_process_simple_extension_when_source_is_enumeration_and_target_is_not(
         self, mock_add_default_attribute
-    ):
+    ) -> None:
         source = ClassFactory.enumeration(2)
         target = ClassFactory.elements(1)
         extension = ExtensionFactory.create()
@@ -246,7 +250,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
     @mock.patch.object(FlattenClassExtensions, "add_default_attribute")
     def test_process_simple_extension_when_target_is_enumeration_and_source_is_not(
         self, mock_add_default_attribute, mock_copy_attributes
-    ):
+    ) -> None:
         extension = ExtensionFactory.create()
         source = ClassFactory.elements(2)
         target = ClassFactory.enumeration(1, extensions=[extension])
@@ -259,7 +263,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
     @mock.patch.object(ClassUtils, "copy_attributes")
     def test_process_simple_extension_when_source_and_target_are_enumerations(
         self, mock_copy_attributes
-    ):
+    ) -> None:
         source = ClassFactory.enumeration(2)
         target = ClassFactory.enumeration(1)
         extension = ExtensionFactory.create()
@@ -270,7 +274,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
     @mock.patch.object(ClassUtils, "copy_attributes")
     def test_process_simple_extension_when_source_and_target_are_not_enumerations(
         self, mock_copy_attributes
-    ):
+    ) -> None:
         source = ClassFactory.elements(2)
         target = ClassFactory.elements(1)
         extension = ExtensionFactory.create()
@@ -282,7 +286,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
     @mock.patch.object(FlattenClassExtensions, "should_remove_extension")
     def test_process_complex_extension_removes_extension(
         self, mock_should_remove_extension, mock_copy_attributes
-    ):
+    ) -> None:
         mock_should_remove_extension.return_value = True
         extension = ExtensionFactory.create()
         target = ClassFactory.elements(1, extensions=[extension])
@@ -301,7 +305,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
     @mock.patch.object(FlattenClassExtensions, "should_flatten_extension")
     def test_process_complex_extension_copies_attributes(
         self, mock_compare_attributes, mock_should_flatten_extension
-    ):
+    ) -> None:
         mock_should_flatten_extension.return_value = True
         extension = ExtensionFactory.create()
         target = ClassFactory.create()
@@ -316,7 +320,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
     @mock.patch.object(FlattenClassExtensions, "should_remove_extension")
     def test_process_complex_extension_ignores_extension(
         self, mock_should_remove_extension, mock_should_flatten_extension
-    ):
+    ) -> None:
         mock_should_remove_extension.return_value = False
         mock_should_flatten_extension.return_value = False
         extension = ExtensionFactory.create()
@@ -327,7 +331,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
         self.assertEqual(1, len(target.extensions))
         self.assertEqual(id(source), extension.type.reference)
 
-    def test_find_dependency(self):
+    def test_find_dependency(self) -> None:
         attr_type = AttrTypeFactory.create(qname="a")
 
         self.assertIsNone(self.processor.find_dependency(attr_type))
@@ -340,7 +344,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
         self.processor.container.add(simple)
         self.assertEqual(simple, self.processor.find_dependency(attr_type))
 
-    def test_should_remove_extension(self):
+    def test_should_remove_extension(self) -> None:
         source = ClassFactory.create()
         target = ClassFactory.create()
         extension = ExtensionFactory.create(tag=Tag.EXTENSION)
@@ -384,7 +388,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
         ]
         self.assertTrue(callback(source, target, extension))
 
-    def test_should_flatten_extension(self):
+    def test_should_flatten_extension(self) -> None:
         source = ClassFactory.create(tag=Tag.COMPLEX_TYPE)
         target = ClassFactory.create(tag=Tag.ELEMENT)
 
@@ -411,7 +415,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
         target = ClassFactory.elements(1)
         self.assertTrue(self.processor.should_flatten_extension(source, target))
 
-    def test_replace_attributes_type(self):
+    def test_replace_attributes_type(self) -> None:
         extension = ExtensionFactory.create()
         target = ClassFactory.elements(2)
         target.extensions.append(extension)
@@ -424,7 +428,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
         self.assertEqual(extension.type, target.attrs[1].types[0])
         self.assertEqual(0, len(target.extensions))
 
-    def test_add_default_attribute(self):
+    def test_add_default_attribute(self) -> None:
         xs_string = AttrTypeFactory.native(DataType.STRING)
         extension = ExtensionFactory.create(
             xs_string, Restrictions(min_occurs=1, max_occurs=1)
@@ -453,7 +457,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
         self.assertEqual(expected, item.attrs[0])
         self.assertEqual(expected_restrictions, item.attrs[0].restrictions)
 
-    def test_add_default_attribute_with_any_type(self):
+    def test_add_default_attribute_with_any_type(self) -> None:
         extension = ExtensionFactory.create(
             AttrTypeFactory.native(DataType.ANY_TYPE),
             Restrictions(min_occurs=1, max_occurs=1),
@@ -475,7 +479,7 @@ class FlattenClassExtensionsTests(FactoryTestCase):
         self.assertEqual(expected, item.attrs[0])
         self.assertEqual(expected.restrictions, item.attrs[0].restrictions)
 
-    def test_get_or_create_attribute_ignore_existing_attribute(self):
+    def test_get_or_create_attribute_ignore_existing_attribute(self) -> None:
         target = ClassFactory.create()
         attr = AttrFactory.create(tag=Tag.ATTRIBUTE, name="value")
 

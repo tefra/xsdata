@@ -15,7 +15,7 @@ from xsdata.utils.testing import (
 
 
 class AddAttributeSubstitutionsTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         container = ClassContainer(config=GeneratorConfig())
@@ -23,7 +23,7 @@ class AddAttributeSubstitutionsTests(FactoryTestCase):
 
     @mock.patch.object(AddAttributeSubstitutions, "process_attribute")
     @mock.patch.object(AddAttributeSubstitutions, "create_substitutions")
-    def test_process(self, mock_create_substitutions, mock_process_attribute):
+    def test_process(self, mock_create_substitutions, mock_process_attribute) -> None:
         def init_substitutions():
             self.processor.substitutions = {}
 
@@ -39,7 +39,7 @@ class AddAttributeSubstitutionsTests(FactoryTestCase):
         mock_create_substitutions.assert_called_once()
 
     @mock.patch("xsdata.utils.collections.find")
-    def test_process_attribute(self, mock_find):
+    def test_process_attribute(self, mock_find) -> None:
         target = ClassFactory.create(
             attrs=[
                 AttrFactory.create(types=[AttrTypeFactory.create("foo")]),
@@ -90,7 +90,7 @@ class AddAttributeSubstitutionsTests(FactoryTestCase):
         self.assertEqual(4, len(target.attrs))
 
     @mock.patch.object(AddAttributeSubstitutions, "create_substitution")
-    def test_create_substitutions(self, mock_create_substitution):
+    def test_create_substitutions(self, mock_create_substitution) -> None:
         ns = "xsdata"
         classes = [
             ClassFactory.create(
@@ -116,7 +116,7 @@ class AddAttributeSubstitutionsTests(FactoryTestCase):
             [mock.call(classes[0]), mock.call(classes[0]), mock.call(classes[1])]
         )
 
-    def test_create_substitution(self):
+    def test_create_substitution(self) -> None:
         item = ClassFactory.elements(1, qname=build_qname("foo", "bar"))
         actual = self.processor.create_substitution(item)
 
@@ -129,7 +129,7 @@ class AddAttributeSubstitutionsTests(FactoryTestCase):
 
         self.assertEqual(expected, actual)
 
-    def test_prepare_substituted(self):
+    def test_prepare_substituted(self) -> None:
         attr = AttrFactory.create()
         attr.restrictions.min_occurs = 1
         attr.restrictions.path.append(("s", 0, 1, 1))

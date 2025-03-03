@@ -31,7 +31,7 @@ class CreateCompoundFields(RelativeHandlerInterface):
         super().__init__(container)
         self.config = container.config.output.compound_fields
 
-    def process(self, target: Class):
+    def process(self, target: Class) -> None:
         """Process the attrs of class that belong in the same choice.
 
         If the compound fields configuration is enabled replace the
@@ -106,7 +106,7 @@ class CreateCompoundFields(RelativeHandlerInterface):
         counters["min"].append(attr.restrictions.min_occurs)
         counters["max"].append(attr.restrictions.max_occurs)
 
-    def group_fields(self, target: Class, attrs: list[Attr]):
+    def group_fields(self, target: Class, attrs: list[Attr]) -> None:
         """Group attributes into a new compound field.
 
         Args:

@@ -9,7 +9,7 @@ from xsdata.models.datatype import XmlDate
 
 
 class JsonSerializerTests(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.books = Books(
             book=[
@@ -55,13 +55,13 @@ class JsonSerializerTests(TestCase):
             ]
         }
 
-    def test_render(self):
+    def test_render(self) -> None:
         serializer = JsonSerializer(dict_factory=DictFactory.FILTER_NONE)
         actual = serializer.render(self.books)
 
         self.assertEqual(self.expected, json.loads(actual))
 
-    def test_indent(self):
+    def test_indent(self) -> None:
         config = SerializerConfig(indent="    ")
         serializer = JsonSerializer(config=config)
 

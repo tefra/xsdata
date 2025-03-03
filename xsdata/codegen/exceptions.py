@@ -15,7 +15,7 @@ class CodegenError(ClickException):
         super().__init__(message)
         self.meta = kwargs
 
-    def show(self, file: Optional[IO[Any]] = None):
+    def show(self, file: Optional[IO[Any]] = None) -> None:
         """Echo codegen error message and details."""
         echo("=========")
         super().show(file)

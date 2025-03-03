@@ -4,11 +4,11 @@ from xsdata.utils.testing import AttrFactory, ClassFactory, FactoryTestCase
 
 
 class UpdateAttributesEffectiveChoiceTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.processor = UpdateAttributesEffectiveChoice()
 
-    def test_process(self):
+    def test_process(self) -> None:
         target = ClassFactory.create(
             attrs=[
                 AttrFactory.attribute(
@@ -60,7 +60,7 @@ class UpdateAttributesEffectiveChoiceTests(FactoryTestCase):
         expected = [("i", None, 1, 1), ("a", -1, 3, 3), ("b", -1, 2, 2)]
         self.assertEqual(expected, actual)
 
-    def test_process_symmetrical_sequence(self):
+    def test_process_symmetrical_sequence(self) -> None:
         restrictions = Restrictions(
             sequence=1,
             min_occurs=1,
@@ -111,7 +111,7 @@ class UpdateAttributesEffectiveChoiceTests(FactoryTestCase):
         ]
         self.assertEqual(expected, actual)
 
-    def test_process_enumeration(self):
+    def test_process_enumeration(self) -> None:
         target = ClassFactory.create(
             attrs=[
                 AttrFactory.enumeration(name="a"),
@@ -124,7 +124,7 @@ class UpdateAttributesEffectiveChoiceTests(FactoryTestCase):
 
         self.assertEqual(3, len(target.attrs))
 
-    def test_reset_effective_choice_for_coverage(self):
+    def test_reset_effective_choice_for_coverage(self) -> None:
         paths = [("g", 0, 1, 1), ("g", 1, 1, 1)]
         self.processor.reset_effective_choice(paths, 3, 4)
 

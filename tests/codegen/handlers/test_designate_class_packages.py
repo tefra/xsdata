@@ -12,13 +12,13 @@ from xsdata.utils.testing import AttrFactory, ClassFactory, FactoryTestCase
 
 
 class DesignateClassPackagesTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.config = GeneratorConfig()
         self.container = ClassContainer(config=self.config)
         self.handler = DesignateClassPackages(container=self.container)
 
-    def test_group_by_filenames(self):
+    def test_group_by_filenames(self) -> None:
         voc = "file://HL7V3/NE2008/coreschemas/voc.xsd"
         prpa = "file://HL7V3/NE2008/multicacheschemas/PRPA_MT201307UV02.xsd"
         coct = "file://HL7V3/NE2008/multicacheschemas/COCT_MT080000UV.xsd"
@@ -61,7 +61,7 @@ class DesignateClassPackagesTests(FactoryTestCase):
         self.assertEqual("foo", local_one[0].package)
         self.assertEqual("foo", local_two[0].package)
 
-    def test_group_by_namespace(self):
+    def test_group_by_namespace(self) -> None:
         classes = [
             ClassFactory.create(qname="{myNS.tempuri.org}a", location="foo"),
             ClassFactory.create(qname="{myNS.tempuri.org}b", location="foo"),
@@ -81,7 +81,7 @@ class DesignateClassPackagesTests(FactoryTestCase):
         self.assertEqual("myNS", classes[1].module)
         self.assertEqual("bar", classes[2].module)
 
-    def test_group_all_together(self):
+    def test_group_all_together(self) -> None:
         classes = [
             ClassFactory.create(qname="{a}a", location="foo"),
             ClassFactory.create(qname="{a}b", location="foo"),
@@ -112,7 +112,7 @@ class DesignateClassPackagesTests(FactoryTestCase):
         self.assertEqual("foo", classes[1].module)
         self.assertEqual("foo", classes[2].module)
 
-    def test_group_by_strong_components(self):
+    def test_group_by_strong_components(self) -> None:
         classes = ClassFactory.list(4)
         classes[0].attrs.append(AttrFactory.reference(classes[1].qname))
         classes[1].attrs.append(AttrFactory.reference(classes[2].qname))
@@ -136,7 +136,7 @@ class DesignateClassPackagesTests(FactoryTestCase):
         self.assertEqual("class_E", classes[2].module)
         self.assertEqual("class_E", classes[3].module)
 
-    def test_group_by_namespace_clusters(self):
+    def test_group_by_namespace_clusters(self) -> None:
         classes = [
             ClassFactory.create("{urn:foo-bar:com}a"),
             ClassFactory.create("{urn:foo-bar:add}b"),
@@ -164,7 +164,7 @@ class DesignateClassPackagesTests(FactoryTestCase):
         self.assertEqual("models.bar.foo.add", classes[2].package)
         self.assertEqual("models.bar.foo.add", classes[3].package)
 
-    def test_group_by_namespace_clusters_raises_exception(self):
+    def test_group_by_namespace_clusters_raises_exception(self) -> None:
         classes = [
             ClassFactory.create("{urn:foo-bar:com}a"),
             ClassFactory.create("{urn:foo-bar:add}b"),
@@ -184,7 +184,7 @@ class DesignateClassPackagesTests(FactoryTestCase):
         with self.assertRaises(CodegenError):
             self.handler.run()
 
-    def test_combine_ns_package(self):
+    def test_combine_ns_package(self) -> None:
         namespace = "urn:foo-bar:add"
         result = self.handler.combine_ns_package(namespace)
         self.assertEqual(["generated", "bar", "foo", "add"], result)

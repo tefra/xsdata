@@ -163,7 +163,9 @@ class ConverterFactory:
 
         return True
 
-    def register_converter(self, data_type: type, func: Union[Callable, Converter]):
+    def register_converter(
+        self, data_type: type, func: Union[Callable, Converter]
+    ) -> None:
         """Register a callable or converter for the given data type.
 
         Args:
@@ -175,7 +177,7 @@ class ConverterFactory:
         else:
             self.registry[data_type] = ProxyConverter(func)
 
-    def unregister_converter(self, data_type: type):
+    def unregister_converter(self, data_type: type) -> None:
         """Unregister the converter for the given data type.
 
         Args:

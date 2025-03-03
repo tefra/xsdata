@@ -9,7 +9,7 @@ class FlattenAttributeGroups(RelativeHandlerInterface):
 
     __slots__ = ()
 
-    def process(self, target: Class):
+    def process(self, target: Class) -> None:
         """Iterate over all group attributes and apply handler logic.
 
         Group attributes can refer to attributes or other group
@@ -27,7 +27,7 @@ class FlattenAttributeGroups(RelativeHandlerInterface):
         if repeat:
             self.process(target)
 
-    def process_attribute(self, target: Class, attr: Attr):
+    def process_attribute(self, target: Class, attr: Attr) -> None:
         """Process a group/attributeGroup attr.
 
         Steps:

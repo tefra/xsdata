@@ -8,12 +8,12 @@ from xsdata.utils.testing import AttrFactory, ClassFactory, FactoryTestCase
 
 
 class ClassContainerTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.container = ClassContainer(config=GeneratorConfig())
 
-    def test_initialize(self):
+    def test_initialize(self) -> None:
         classes = [
             ClassFactory.create(qname="{xsdata}foo", tag=Tag.ELEMENT),
             ClassFactory.create(qname="{xsdata}foo", tag=Tag.COMPLEX_TYPE),
@@ -66,7 +66,7 @@ class ClassContainerTests(FactoryTestCase):
         self.assertEqual(expected, actual)
 
     @mock.patch.object(ClassContainer, "process_class")
-    def test_find(self, mock_process_class):
+    def test_find(self, mock_process_class) -> None:
         def process_class(x: Class, step: int):
             x.status = Status.FLATTENED
 
@@ -86,7 +86,7 @@ class ClassContainerTests(FactoryTestCase):
         mock_process_class.assert_called_once_with(class_a, Steps.FLATTEN)
 
     @mock.patch.object(ClassContainer, "process_class")
-    def test_find_inner(self, mock_process_class):
+    def test_find_inner(self, mock_process_class) -> None:
         obj = ClassFactory.create()
         first = ClassFactory.create(qname="{a}a")
         second = ClassFactory.create(qname="{a}b", status=Status.FLATTENED)
@@ -102,7 +102,7 @@ class ClassContainerTests(FactoryTestCase):
         self.assertEqual(second, self.container.find_inner(obj, "{a}b"))
         mock_process_class.assert_called_once_with(first, Steps.FLATTEN)
 
-    def test_first(self):
+    def test_first(self) -> None:
         obj = ClassFactory.create()
         self.container.add(obj)
         self.assertEqual(obj, self.container.first(obj.qname))
@@ -110,7 +110,7 @@ class ClassContainerTests(FactoryTestCase):
         with self.assertRaises(KeyError):
             self.container.first("aa")
 
-    def test_process_class(self):
+    def test_process_class(self) -> None:
         target = ClassFactory.create(
             inner=[ClassFactory.elements(2), ClassFactory.elements(1)]
         )
@@ -124,7 +124,7 @@ class ClassContainerTests(FactoryTestCase):
         self.assertEqual(Status.FINALIZED, target.inner[0].status)
         self.assertEqual(Status.FINALIZED, target.inner[1].status)
 
-    def test_process_classes(self):
+    def test_process_classes(self) -> None:
         target = ClassFactory.create()
         inner = ClassFactory.enumeration(2, qname="enumeration")
 
@@ -139,7 +139,7 @@ class ClassContainerTests(FactoryTestCase):
         for obj in self.container:
             self.assertEqual(Status.FLATTENED, obj.status)
 
-    def test_filter_classes(self):
+    def test_filter_classes(self) -> None:
         complex_type = ClassFactory.elements(1)
         enum_1 = ClassFactory.enumeration(2)
         complex_type.attrs[0].types[0].reference = enum_1.ref
@@ -157,7 +157,7 @@ class ClassContainerTests(FactoryTestCase):
         container.filter_classes()
         self.assertEqual(expected, list(container))
 
-    def test_remove_groups(self):
+    def test_remove_groups(self) -> None:
         classes = [
             ClassFactory.create(tag=Tag.ATTRIBUTE_GROUP),
             ClassFactory.create(tag=Tag.GROUP),

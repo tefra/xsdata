@@ -20,10 +20,10 @@ from xsdata.utils.testing import XmlVarFactory
 class NodeParserTests(TestCase):
     maxDiff = None
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.parser = NodeParser()
 
-    def test_parse(self):
+    def test_parse(self) -> None:
         class TestHandler(XmlHandler):
             def parse(self, source: Any, ns_map: dict) -> Any:
                 return Books()
@@ -31,14 +31,14 @@ class NodeParserTests(TestCase):
         self.parser.handler = TestHandler
         self.assertEqual(Books(), self.parser.parse([], Books, {}))
 
-    def test_parse_when_result_type_is_wrong(self):
+    def test_parse_when_result_type_is_wrong(self) -> None:
         parser = self.parser
         with self.assertRaises(ParserError) as cm:
             parser.parse([], Books)
 
         self.assertEqual("Failed to create target class `Books`", str(cm.exception))
 
-    def test_parse_with_fail_on_converter_warnings(self):
+    def test_parse_with_fail_on_converter_warnings(self) -> None:
         parser = NodeParser(handler=XmlEventHandler)
         parser.config.fail_on_converter_warnings = True
 
@@ -51,7 +51,7 @@ class NodeParserTests(TestCase):
             str(cm.exception),
         )
 
-    def test_start(self):
+    def test_start(self) -> None:
         queue = []
         objects = []
 
@@ -85,7 +85,7 @@ class NodeParserTests(TestCase):
         self.assertIsNone(actual.derived_factory)
         self.assertIsNone(actual.xsi_type)
 
-    def test_start_with_undefined_class(self):
+    def test_start_with_undefined_class(self) -> None:
         parser = self.parser
         queue = []
         objects = []
@@ -113,7 +113,7 @@ class NodeParserTests(TestCase):
             "No class found matching root: {unknown}hopefully", str(cm.exception)
         )
 
-    def test_start_with_any_type_root(self):
+    def test_start_with_any_type_root(self) -> None:
         parser = self.parser
         queue = []
         objects = []
@@ -134,7 +134,7 @@ class NodeParserTests(TestCase):
         self.assertEqual(DerivedElement, actual.derived_factory)
         self.assertEqual("{urn:books}books", actual.xsi_type)
 
-    def test_start_with_derived_class(self):
+    def test_start_with_derived_class(self) -> None:
         a = make_dataclass("a", fields=[])
         b = make_dataclass("b", fields=[], bases=(a,))
 
@@ -159,7 +159,7 @@ class NodeParserTests(TestCase):
         self.assertEqual(DerivedElement, actual.derived_factory)
         self.assertEqual("b", actual.xsi_type)
 
-    def test_start_with_nillable_element(self):
+    def test_start_with_nillable_element(self) -> None:
         a = make_dataclass("a", fields=[])
 
         parser = NodeParser()
@@ -177,7 +177,7 @@ class NodeParserTests(TestCase):
         self.assertTrue("b", actual.xsi_nil)
 
     @mock.patch.object(PrimitiveNode, "bind", return_value=True)
-    def test_end(self, mock_assemble):
+    def test_end(self, mock_assemble) -> None:
         parser = NodeParser()
         objects = [("q", "result")]
         queue = []
@@ -189,7 +189,7 @@ class NodeParserTests(TestCase):
         self.assertEqual(("q", "result"), objects[-1])
         mock_assemble.assert_called_once_with("author", "foobar", None, objects)
 
-    def test_end_with_no_result(self):
+    def test_end_with_no_result(self) -> None:
         parser = NodeParser()
         objects = [("q", "result")]
         queue = [SkipNode()]
@@ -197,7 +197,7 @@ class NodeParserTests(TestCase):
         self.assertFalse(parser.end(queue, objects, "author", "foobar", None))
         self.assertEqual(0, len(queue))
 
-    def test_register_namespace(self):
+    def test_register_namespace(self) -> None:
         parser = NodeParser()
         ns_map = {}
         parser.register_namespace(ns_map, "bar", "foo")

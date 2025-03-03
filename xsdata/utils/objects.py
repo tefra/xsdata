@@ -3,7 +3,7 @@ from typing import Any
 from xml.etree.ElementTree import QName
 
 
-def update(obj: Any, **kwargs: Any):
+def update(obj: Any, **kwargs: Any) -> None:
     """Update an object from keyword arguments with dotted keys."""
 
     def attrsetter(obj: Any, attr: str, value: Any):

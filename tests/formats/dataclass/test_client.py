@@ -29,7 +29,7 @@ response = """
 
 
 class ClientTests(TestCase):
-    def test__init__(self):
+    def test__init__(self) -> None:
         config = Config.from_service(CalculatorSoapAdd, transport="foobar")
 
         client = Client(config)
@@ -41,7 +41,7 @@ class ClientTests(TestCase):
         client = Client(config, serializer=XmlSerializer())
         self.assertIs(client.parser.context, client.serializer.context)
 
-    def test_from_service(self):
+    def test_from_service(self) -> None:
         client = Client.from_service(CalculatorSoapAdd, location="http://testurl.com")
 
         actual = asdict(client.config)
@@ -58,7 +58,7 @@ class ClientTests(TestCase):
         self.assertEqual(expected, actual)
 
     @mock.patch.object(DefaultTransport, "post")
-    def test_send_with_dict_params(self, mock_post):
+    def test_send_with_dict_params(self, mock_post) -> None:
         mock_post.return_value = response.encode()
 
         client = Client.from_service(CalculatorSoapAdd)
@@ -83,7 +83,7 @@ class ClientTests(TestCase):
         )
 
     @mock.patch.object(DefaultTransport, "post")
-    def test_send_with_instance_object(self, mock_post):
+    def test_send_with_instance_object(self, mock_post) -> None:
         mock_post.return_value = response.encode()
 
         client = Client.from_service(CalculatorSoapAdd)
@@ -104,14 +104,14 @@ class ClientTests(TestCase):
             },
         )
 
-    def test_prepare_payload_with_encoding(self):
+    def test_prepare_payload_with_encoding(self) -> None:
         client = Client.from_service(HelloGetHelloAsString, encoding="utf-8")
         result = client.prepare_payload(
             {"Body": {"getHelloAsString": {"arg0": "Χριστόδουλος"}}}
         )
         self.assertIn("Χριστόδουλος".encode(), result)
 
-    def test_prepare_payload_raises_error_with_type_mismatch(self):
+    def test_prepare_payload_raises_error_with_type_mismatch(self) -> None:
         client = Client.from_service(CalculatorSoapAdd)
 
         with self.assertRaises(ClientValueError) as cm:
@@ -123,7 +123,7 @@ class ClientTests(TestCase):
             str(cm.exception),
         )
 
-    def test_prepare_headers(self):
+    def test_prepare_headers(self) -> None:
         config = Config(
             style="document",
             location="",
@@ -144,7 +144,9 @@ class ClientTests(TestCase):
         result = client.prepare_headers({})
         self.assertEqual({"SOAPAction": "add", "content-type": "text/xml"}, result)
 
-    def test_prepare_headers_raises_error_with_unsupported_binding_transport(self):
+    def test_prepare_headers_raises_error_with_unsupported_binding_transport(
+        self,
+    ) -> None:
         config = Config.from_service(CalculatorSoapAdd, transport="foobar")
         client = Client(config=config)
 

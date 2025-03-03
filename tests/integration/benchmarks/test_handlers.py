@@ -29,13 +29,13 @@ fixtures = {number: make_books(number) for number in numbers}
 @pytest.mark.benchmark(disable_gc=True, group="Serialize")
 @pytest.mark.parametrize("number", numbers)
 @pytest.mark.parametrize("writer", writers_list)
-def test_serialize(benchmark, writer, number):
+def test_serialize(benchmark, writer, number) -> None:
     benchmark(write, number, fixtures[number], writer)
 
 
 @pytest.mark.benchmark(disable_gc=True, group="Parse")
 @pytest.mark.parametrize("number", numbers)
 @pytest.mark.parametrize("handler", readers_list)
-def test_parse(benchmark, handler, number):
+def test_parse(benchmark, handler, number) -> None:
     src = xsdata_temp_dir.joinpath(f"benchmark_{number}.xml").read_bytes()
     benchmark(parse, src, handler)

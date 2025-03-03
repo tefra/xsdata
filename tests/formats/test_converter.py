@@ -16,7 +16,7 @@ from xsdata.models.enums import UseType
 
 
 class ConverterFactoryTests(unittest.TestCase):
-    def test_deserialize(self):
+    def test_deserialize(self) -> None:
         with self.assertRaises(ConverterError) as cm:
             converter.deserialize("a", [int])
 
@@ -25,7 +25,7 @@ class ConverterFactoryTests(unittest.TestCase):
         self.assertFalse(converter.deserialize("false", [int, bool]))
         self.assertEqual(1, converter.deserialize("1", [int, bool]))
 
-    def test_serialize(self):
+    def test_serialize(self) -> None:
         self.assertEqual(None, converter.serialize(None))
         self.assertEqual("1", converter.serialize(1))
         self.assertEqual("1 2 3", converter.serialize([1, "2", 3]))
@@ -37,7 +37,7 @@ class ConverterFactoryTests(unittest.TestCase):
         self.assertEqual("0.0000000877683", converter.serialize(Decimal("8.77683E-8")))
         self.assertEqual("8.77683E-08", converter.serialize(float("8.77683E-8")))
 
-    def test_test(self):
+    def test_test(self) -> None:
         self.assertTrue(converter.test("1", [int]))
         self.assertTrue(converter.test("1", [float]))
         self.assertFalse(converter.test("1", [float], strict=True))
@@ -66,7 +66,7 @@ class ConverterFactoryTests(unittest.TestCase):
         self.assertFalse(converter.test(".0", [float], strict=True))
         self.assertTrue(converter.test("1.0", [float]))
 
-    def test_unknown_converter(self):
+    def test_unknown_converter(self) -> None:
         class A:
             pass
 
@@ -77,7 +77,7 @@ class ConverterFactoryTests(unittest.TestCase):
             f"No converter registered for `{A.__qualname__}`", str(cm.exception)
         )
 
-    def test_register_converter(self):
+    def test_register_converter(self) -> None:
         class MinusOneInt(int):
             pass
 
@@ -96,7 +96,7 @@ class ConverterFactoryTests(unittest.TestCase):
         self.assertEqual("3", converter.serialize(MinusOneInt("3")))
         converter.unregister_converter(MinusOneInt)
 
-    def test_register_converter_with_lambda(self):
+    def test_register_converter_with_lambda(self) -> None:
         class MinusOneInt(int):
             pass
 
@@ -107,38 +107,38 @@ class ConverterFactoryTests(unittest.TestCase):
 
 
 class StrConverterTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.converter = converter.type_converter(str)
 
-    def test_deserialize(self):
+    def test_deserialize(self) -> None:
         self.assertEqual("a", self.converter.deserialize("a"))
         self.assertEqual("1", self.converter.deserialize(1))
 
-    def test_serialize(self):
+    def test_serialize(self) -> None:
         self.assertEqual("a", self.converter.serialize("a"))
         self.assertEqual("1", self.converter.serialize(1))
 
 
 class StringConverterTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.converter = converter.type_converter(str)
 
-    def test_deserialize(self):
+    def test_deserialize(self) -> None:
         string = "foo"
         self.assertIs(string, self.converter.deserialize(string))
         self.assertEqual("1", self.converter.deserialize(1))
 
-    def test_serialize(self):
+    def test_serialize(self) -> None:
         string = "foo"
         self.assertIs(string, self.converter.serialize(string))
         self.assertEqual("1", self.converter.serialize(1))
 
 
 class BoolConverterTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.converter = converter.type_converter(bool)
 
-    def test_deserialize(self):
+    def test_deserialize(self) -> None:
         for invalid in ("True", "False", 1, 0):
             with self.assertRaises(ConverterError):
                 self.converter.deserialize(invalid)
@@ -150,16 +150,16 @@ class BoolConverterTests(unittest.TestCase):
         self.assertTrue(self.converter.deserialize(True))
         self.assertFalse(self.converter.deserialize(False))
 
-    def test_serialize(self):
+    def test_serialize(self) -> None:
         self.assertEqual("true", self.converter.serialize(True))
         self.assertEqual("false", self.converter.serialize(False))
 
 
 class IntConverterTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.converter = converter.type_converter(int)
 
-    def test_deserialize(self):
+    def test_deserialize(self) -> None:
         with self.assertRaises(ConverterError):
             self.converter.deserialize("a")
 
@@ -167,22 +167,22 @@ class IntConverterTests(unittest.TestCase):
         self.assertEqual(2, self.converter.deserialize("+2"))
         self.assertEqual(-2, self.converter.deserialize("-2"))
 
-    def test_serialize(self):
+    def test_serialize(self) -> None:
         self.assertEqual("2", self.converter.serialize(2))
 
 
 class FloatConverterTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.converter = converter.type_converter(float)
 
-    def test_deserialize(self):
+    def test_deserialize(self) -> None:
         with self.assertRaises(ConverterError):
             self.converter.deserialize("a")
 
         self.assertEqual(2.0, self.converter.deserialize("2"))
         self.assertEqual(2.1, self.converter.deserialize("2.1"))
 
-    def test_serialize(self):
+    def test_serialize(self) -> None:
         self.assertEqual("2.1", self.converter.serialize(2.1))
         self.assertEqual("INF", self.converter.serialize(float("inf")))
         self.assertEqual("INF", self.converter.serialize(float("+inf")))
@@ -192,10 +192,10 @@ class FloatConverterTests(unittest.TestCase):
 
 
 class BytesConverterTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.converter = converter.type_converter(bytes)
 
-    def test_serialize_with_base16_format(self):
+    def test_serialize_with_base16_format(self) -> None:
         inputs = [
             ("312d\n322d33", "312D322D33"),
             ("312D \t322D33", "312D322D33"),
@@ -209,7 +209,7 @@ class BytesConverterTests(unittest.TestCase):
             self.assertEqual(b"1-2-3", obj)
             self.assertEqual(expected, output)
 
-    def test_serialize_with_base64_format(self):
+    def test_serialize_with_base64_format(self) -> None:
         obj = self.converter.deserialize("MS0yLTM=", format="base64")
         output = self.converter.serialize(obj, format="base64")
 
@@ -217,7 +217,7 @@ class BytesConverterTests(unittest.TestCase):
         self.assertEqual(b"1-2-3", obj)
         self.assertEqual("MS0yLTM=", output)
 
-    def test_serialize_raises_exception(self):
+    def test_serialize_raises_exception(self) -> None:
         with self.assertRaises(ConverterError) as cm:
             self.converter.deserialize(1, format="foo")
 
@@ -229,7 +229,7 @@ class BytesConverterTests(unittest.TestCase):
         with self.assertRaises(ConverterError):
             self.converter.deserialize("AA~AA", format="base64")
 
-    def test_unknown_formats(self):
+    def test_unknown_formats(self) -> None:
         with self.assertRaises(ConverterError):
             self.converter.serialize("foo")
 
@@ -246,16 +246,16 @@ class BytesConverterTests(unittest.TestCase):
 
 
 class DecimalConverterTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.converter = converter.type_converter(Decimal)
 
-    def test_deserialize(self):
+    def test_deserialize(self) -> None:
         with self.assertRaises(ConverterError):
             self.converter.deserialize("a")
 
         self.assertEqual(Decimal(1), self.converter.deserialize("1"))
 
-    def test_serialize(self):
+    def test_serialize(self) -> None:
         self.assertEqual("2.1", self.converter.serialize(Decimal("2.1")))
         self.assertEqual("INF", self.converter.serialize(Decimal("inf")))
         self.assertEqual("INF", self.converter.serialize(Decimal("+inf")))
@@ -266,10 +266,10 @@ class DecimalConverterTests(unittest.TestCase):
 
 
 class DateTimeConverterTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.converter = converter.type_converter(datetime)
 
-    def test_converter(self):
+    def test_converter(self) -> None:
         original = "21 June 2018 15:40"
         fmt = "%d %B %Y %H:%M"
         obj = self.converter.deserialize(original, format=fmt)
@@ -277,14 +277,14 @@ class DateTimeConverterTests(unittest.TestCase):
         self.assertEqual(datetime(2018, 6, 21, 15, 40), obj)
         self.assertEqual(original, self.converter.serialize(obj, format=fmt))
 
-    def test_serialize_raises_exception(self):
+    def test_serialize_raises_exception(self) -> None:
         with self.assertRaises(ConverterError):
             self.converter.serialize(datetime(2018, 6, 21, 15, 40))
 
         with self.assertRaises(ConverterError):
             self.converter.serialize(1, format="")
 
-    def test_deserialize_raises_exception(self):
+    def test_deserialize_raises_exception(self) -> None:
         with self.assertRaises(ConverterError):
             self.converter.deserialize("21 June 2018 15:40", format="%Y")
 
@@ -299,10 +299,10 @@ class DateTimeConverterTests(unittest.TestCase):
 
 
 class DateConverterTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.converter = converter.type_converter(date)
 
-    def test_converter(self):
+    def test_converter(self) -> None:
         original = "21 June 2018"
         fmt = "%d %B %Y"
         obj = self.converter.deserialize(original, format=fmt)
@@ -312,10 +312,10 @@ class DateConverterTests(unittest.TestCase):
 
 
 class TimeConverterTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.converter = converter.type_converter(time)
 
-    def test_converter(self):
+    def test_converter(self) -> None:
         original = "1255"
         fmt = "%H%M"
         obj = self.converter.deserialize(original, format=fmt)
@@ -325,10 +325,10 @@ class TimeConverterTests(unittest.TestCase):
 
 
 class QNameConverterTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.converter = converter.type_converter(QName)
 
-    def test_deserialize(self):
+    def test_deserialize(self) -> None:
         convert = self.converter.deserialize
 
         invalid = ["a:b", "", " ", "{a}1b", "{a} b", "{|}b", "a a"]
@@ -341,7 +341,7 @@ class QNameConverterTests(unittest.TestCase):
         self.assertEqual(QName("a"), convert("a", ns_map={}))
         self.assertEqual(QName("aa", "b"), convert("a:b", ns_map={"a": "aa"}))
 
-    def test_serialize(self):
+    def test_serialize(self) -> None:
         ns_map = {"c_prefix": "c"}
         convert = self.converter.serialize
 
@@ -366,14 +366,14 @@ class EnumA(Enum):
 
 
 class EnumConverterTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.converter = converter.type_converter(Enum)
 
     @pytest.mark.skipif(
         sys.version_info == (3, 11, 1, "final", 0),
         reason="https://github.com/python/cpython/issues/100098",
     )
-    def test_deserialize(self):
+    def test_deserialize(self) -> None:
         convert = self.converter.deserialize
         self.assertEqual(EnumA.C, convert("2.1", data_type=EnumA))
         self.assertEqual(EnumA.C, convert(2.1, data_type=EnumA))
@@ -392,7 +392,7 @@ class EnumConverterTests(unittest.TestCase):
         with self.assertRaises(ConverterError):
             convert("nope", data_type=EnumA)
 
-    def test_serialize(self):
+    def test_serialize(self) -> None:
         ns_map = {}
         self.assertEqual("ns0:b", self.converter.serialize(EnumA.A, ns_map=ns_map))
         self.assertEqual("INF", self.converter.serialize(EnumA.B))
@@ -400,46 +400,46 @@ class EnumConverterTests(unittest.TestCase):
 
 
 class ProxyConverterTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.converter = ProxyConverter(lambda x: int(x))
 
-    def test_deserialize(self):
+    def test_deserialize(self) -> None:
         with self.assertRaises(ConverterError):
             self.converter.deserialize("a")
 
         self.assertEqual(1, self.converter.deserialize("1"))
 
-    def test_serialize(self):
+    def test_serialize(self) -> None:
         self.assertEqual("1", self.converter.serialize(1))
 
 
 class XmlDurationConverterTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.converter = converter.type_converter(XmlDuration)
 
-    def test_deserialize(self):
+    def test_deserialize(self) -> None:
         self.assertIsInstance(self.converter.deserialize("P20M"), XmlDuration)
 
         with self.assertRaises(ConverterError):
             self.converter.deserialize("P-20M")
 
-    def test_serialize(self):
+    def test_serialize(self) -> None:
         actual = self.converter.serialize(XmlDuration("PT3S"))
         self.assertEqual("PT3S", actual)
         self.assertNotIsInstance(actual, XmlDuration)
 
 
 class XmlPeriodConverterTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.converter = converter.type_converter(XmlPeriod)
 
-    def test_deserialize(self):
+    def test_deserialize(self) -> None:
         self.assertIsInstance(self.converter.deserialize("---15Z"), XmlPeriod)
 
         with self.assertRaises(ConverterError):
             self.converter.deserialize("---1Z")
 
-    def test_serialize(self):
+    def test_serialize(self) -> None:
         actual = self.converter.serialize(XmlPeriod("---15Z"))
         self.assertEqual("---15Z", actual)
         self.assertNotIsInstance(actual, XmlPeriod)

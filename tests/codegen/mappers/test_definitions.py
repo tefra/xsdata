@@ -1,8 +1,9 @@
 from collections.abc import Generator
+from typing import Any
 from unittest import mock
 
 from xsdata.codegen.mappers import DefinitionsMapper
-from xsdata.codegen.models import Class, Status
+from xsdata.codegen.models import Attr, Class, Status
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.models.enums import DataType, Namespace, Tag
 from xsdata.models.wsdl import (
@@ -22,7 +23,7 @@ from xsdata.utils.namespaces import build_qname
 from xsdata.utils.testing import AttrFactory, ClassFactory, FactoryTestCase
 
 
-def mock_create_inner(target: Class, name: str):
+def mock_create_inner(target: Class, name: str) -> Class:
     for inner in target.inner:
         if inner.name == name:
             return inner
@@ -32,13 +33,13 @@ def mock_create_inner(target: Class, name: str):
     return inner
 
 
-def mock_create_attr(*args, **kwargs):
+def mock_create_attr(*args: Any, **kwargs: Any) -> list[Attr]:
     return AttrFactory.list(1)
 
 
 class DefinitionsMapperTests(FactoryTestCase):
     @mock.patch.object(DefinitionsMapper, "map_port")
-    def test_map(self, mock_map_port):
+    def test_map(self, mock_map_port) -> None:
         classes = [
             ClassFactory.list(2),
             ClassFactory.list(3),
@@ -62,7 +63,7 @@ class DefinitionsMapperTests(FactoryTestCase):
     @mock.patch.object(Definitions, "find_binding")
     def test_map_port(
         self, mock_find_binding, mock_find_port_type, mock_attributes, mock_map_binding
-    ):
+    ) -> None:
         definitions = Definitions()
         service_port = ServicePort(binding="zaa:port", extended=[AnyElement()])
         port_type = PortType(name="Calc")
@@ -100,7 +101,7 @@ class DefinitionsMapperTests(FactoryTestCase):
     @mock.patch.object(DefinitionsMapper, "attributes")
     def test_map_binding(
         self, mock_attributes, mock_find_operation, mock_map_binding_operation
-    ):
+    ) -> None:
         definitions = Definitions()
         port_type = PortType(name="Calc")
         binding = Binding(
@@ -154,7 +155,7 @@ class DefinitionsMapperTests(FactoryTestCase):
     @mock.patch.object(DefinitionsMapper, "operation_namespace")
     def test_map_binding_operation(
         self, mock_operation_namespace, mock_map_binding_operation_messages
-    ):
+    ) -> None:
         definitions = Definitions(target_namespace="xsdata")
         operation = BindingOperation(name="Add", location="foo.wsdl")
         operation.ns_map["foo"] = "bar"
@@ -205,7 +206,7 @@ class DefinitionsMapperTests(FactoryTestCase):
     @mock.patch.object(DefinitionsMapper, "build_envelope_class")
     def test_map_binding_operation_messages(
         self, mock_build_envelope_class, mock_build_envelope_fault
-    ):
+    ) -> None:
         definitions = Definitions()
         operation = BindingOperation()
         port_operation = PortTypeOperation()
@@ -279,7 +280,7 @@ class DefinitionsMapperTests(FactoryTestCase):
     @mock.patch.object(DefinitionsMapper, "build_envelope_class")
     def test_map_binding_operation_messages_with_style_rpc(
         self, mock_build_envelope_class, mock_build_message_class
-    ):
+    ) -> None:
         definitions = Definitions()
         operation = BindingOperation()
         port_operation = PortTypeOperation()
@@ -323,7 +324,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         mock_get_or_create_inner_class,
         mock_map_binding_message_parts,
         mock_map_port_type_message,
-    ):
+    ) -> None:
         mock_get_or_create_inner_class.side_effect = mock_create_inner
         mock_map_binding_message_parts.side_effect = mock_create_attr
 
@@ -407,7 +408,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         mock_get_or_create_inner_class,
         mock_map_binding_message_parts,
         mock_map_port_type_message,
-    ):
+    ) -> None:
         mock_get_or_create_inner_class.side_effect = mock_create_inner
         mock_map_binding_message_parts.side_effect = mock_create_attr
         mock_map_port_type_message.side_effect = mock_create_attr
@@ -482,7 +483,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         result.inner.clear()
         self.assertEqual(expected, result)
 
-    def test_build_envelope_fault(self):
+    def test_build_envelope_fault(self) -> None:
         body = ClassFactory.create(qname="Body")
         target = ClassFactory.create()
         target.inner.append(body)
@@ -507,7 +508,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         for attr in body.attrs:
             self.assertTrue(attr.is_optional)
 
-    def test_build_envelope_fault_with_detail_messages(self):
+    def test_build_envelope_fault_with_detail_messages(self) -> None:
         body = ClassFactory.create(qname="Body")
         target = ClassFactory.create()
         target.inner.append(body)
@@ -548,7 +549,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         self.assertEqual(expected_fault_attrs, body.inner[0].attrs)
         self.assertEqual(expected_fault_detail_attrs, body.inner[0].inner[0].attrs)
 
-    def test_build_envelope_fault_raises_error_if_missing_inner_body(self):
+    def test_build_envelope_fault_raises_error_if_missing_inner_body(self) -> None:
         target = ClassFactory.create()
         operation = PortTypeOperation()
         definitions = Definitions()
@@ -560,7 +561,7 @@ class DefinitionsMapperTests(FactoryTestCase):
     @mock.patch.object(Definitions, "find_message")
     def test_map_binding_message_parts_with_part_token(
         self, mock_find_message, mock_create_message_attributes
-    ):
+    ) -> None:
         definitions = Definitions()
         message_name = "session"
         ns_map = {}
@@ -590,7 +591,7 @@ class DefinitionsMapperTests(FactoryTestCase):
     @mock.patch.object(Definitions, "find_message")
     def test_map_binding_message_parts_with_token_parts(
         self, mock_find_message, mock_create_message_attributes
-    ):
+    ) -> None:
         definitions = Definitions()
         message_name = "session"
         ns_map = {}
@@ -623,7 +624,7 @@ class DefinitionsMapperTests(FactoryTestCase):
     @mock.patch.object(Definitions, "find_message")
     def test_map_binding_message_parts_with_all_parts(
         self, mock_find_message, mock_create_message_attributes
-    ):
+    ) -> None:
         definitions = Definitions()
         message_name = "session"
         ns_map = {}
@@ -653,7 +654,7 @@ class DefinitionsMapperTests(FactoryTestCase):
     @mock.patch.object(Definitions, "find_message")
     def test_map_binding_message_parts_with_original_message(
         self, mock_find_message, mock_create_message_attributes
-    ):
+    ) -> None:
         definitions = Definitions
         message_name = "foo:bar"
         ns_map = {}
@@ -680,7 +681,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         mock_find_message.assert_called_once_with("bar")
 
     @mock.patch("xsdata.codegen.mappers.definitions.logger.warning")
-    def test_build_parts_attributes(self, mock_warning):
+    def test_build_parts_attributes(self, mock_warning) -> None:
         p_one = Part(element="a:bar")
         p_one.ns_map["a"] = "great"
         p_two = Part(name="arg0", type="xs:string")
@@ -708,7 +709,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         mock_warning.assert_called_once_with("Skip untyped message part %s", "arg2")
 
     @mock.patch.object(DefinitionsMapper, "build_parts_attributes")
-    def test_build_message_class(self, mock_create_message_attributes):
+    def test_build_message_class(self, mock_create_message_attributes) -> None:
         message = Message(name="bar", parts=[Part()])
         message.ns_map["foo"] = "bar"
         definitions = Definitions(messages=[message], target_namespace="xsdata")
@@ -728,7 +729,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         )
         self.assertEqual(expected, actual)
 
-    def test_get_or_create_inner_class(self):
+    def test_get_or_create_inner_class(self) -> None:
         target = ClassFactory.create(
             location="foo", package=None, ns_map={"foo": "bar"}
         )
@@ -752,7 +753,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         repeat = DefinitionsMapper.build_inner_class(target, "body")
         self.assertIs(repeat, actual)
 
-    def test_map_port_type_message(self):
+    def test_map_port_type_message(self) -> None:
         port_type_message = PortTypeMessage(message="foo:bar")
         port_type_message.ns_map["foo"] = "foobar"
         target_namespace = "xsdata"
@@ -777,7 +778,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         self.assertIsInstance(actual, Generator)
         self.assertEqual([expected], list(actual))
 
-    def test_operation_namespace(self):
+    def test_operation_namespace(self) -> None:
         self.assertIsNone(DefinitionsMapper.operation_namespace({}))
         self.assertIsNone(DefinitionsMapper.operation_namespace({"transport": "foo"}))
         self.assertEqual(
@@ -787,7 +788,7 @@ class DefinitionsMapperTests(FactoryTestCase):
             ),
         )
 
-    def test_attributes(self):
+    def test_attributes(self) -> None:
         elements = [
             None,
             "string",

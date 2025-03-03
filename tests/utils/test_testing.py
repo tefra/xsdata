@@ -5,11 +5,11 @@ from xsdata.utils.testing import load_class
 
 
 class TestingTests(TestCase):
-    def test_load(self):
+    def test_load(self) -> None:
         output = "Generating package: tests.fixtures.books.books"
         self.assertEqual(BooksForm, load_class(output, "BooksForm"))
 
-    def test_load_class_raises_exception(self):
+    def test_load_class_raises_exception(self) -> None:
         output = "Generating package: generated.foo.bar"
 
         with self.assertRaises(ModuleNotFoundError):

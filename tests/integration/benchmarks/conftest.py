@@ -5,7 +5,7 @@ xsdata_temp_dir.mkdir(parents=True, exist_ok=True)
 context = XmlContext()
 
 
-def pytest_unconfigure(config):
+def pytest_unconfigure(config) -> None:
     for tmp_file in xsdata_temp_dir.glob("*"):
         tmp_file.unlink()
 

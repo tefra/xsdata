@@ -1,7 +1,7 @@
 import sys
 
 
-def main():
+def main() -> None:
     """Cli entry point."""
     try:
         from xsdata.cli import cli

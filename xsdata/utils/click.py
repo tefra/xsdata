@@ -149,7 +149,7 @@ class LogHandler(logging.Handler):
         super().__init__(level)
         self.warnings: list[str] = []
 
-    def emit(self, record: logging.LogRecord):
+    def emit(self, record: logging.LogRecord) -> None:
         """Override emit to record warnings."""
         try:
             msg = self.format(record)
@@ -160,7 +160,7 @@ class LogHandler(logging.Handler):
         except Exception:  # pragma: no cover
             self.handleError(record)
 
-    def emit_warnings(self):
+    def emit_warnings(self) -> None:
         """Print all recorded warnings to click stdout."""
         num = len(self.warnings)
         if num:

@@ -34,7 +34,7 @@ class DictDecoderTests(FactoryTestCase):
 
         self.decoder = DictDecoder()
 
-    def test_decode(self):
+    def test_decode(self) -> None:
         path = fixtures_dir.joinpath("books/books.json")
         source = json.loads(path.read_text())
         books = self.decoder.decode(source, Books)
@@ -67,11 +67,11 @@ class DictDecoderTests(FactoryTestCase):
             books.book[1],
         )
 
-    def test_decode_empty_document(self):
+    def test_decode_empty_document(self) -> None:
         self.assertEqual(BookForm(), self.decoder.decode({}, BookForm))
         self.assertEqual([], self.decoder.decode([], list[BookForm]))
 
-    def test_decode_list_of_objects(self):
+    def test_decode_list_of_objects(self) -> None:
         path = fixtures_dir.joinpath("books/books.json")
         data = json.loads(path.read_text())
         book_list = data["book"]
@@ -82,7 +82,7 @@ class DictDecoderTests(FactoryTestCase):
         self.assertIsInstance(books[0], BookForm)
         self.assertIsInstance(books[1], BookForm)
 
-    def test_decode_with_unknown_class(self):
+    def test_decode_with_unknown_class(self) -> None:
         path = fixtures_dir.joinpath("books/books.json")
         source = json.loads(path.read_text())
         books = self.decoder.decode(source)
@@ -95,7 +95,7 @@ class DictDecoderTests(FactoryTestCase):
         self.assertIsInstance(book_list[0], BookForm)
         self.assertIsInstance(book_list[1], BookForm)
 
-    def test_decode_with_fail_on_converter_warnings(self):
+    def test_decode_with_fail_on_converter_warnings(self) -> None:
         json_str = {"x": "foo"}
         self.decoder.config.fail_on_converter_warnings = True
         with self.assertRaises(ParserError) as cm:
@@ -106,7 +106,7 @@ class DictDecoderTests(FactoryTestCase):
             str(cm.exception),
         )
 
-    def test_decode_wrapper(self):
+    def test_decode_wrapper(self) -> None:
         data = {
             "alphas": {"alpha": "value"},
             "bravos": {"bravo": [1, 2]},
@@ -129,7 +129,7 @@ class DictDecoderTests(FactoryTestCase):
         )
         self.assertEqual(expected, actual)
 
-    def test_verify_type(self):
+    def test_verify_type(self) -> None:
         invalid_cases = [
             (
                 {"not": 1, "found": 1},
@@ -153,7 +153,7 @@ class DictDecoderTests(FactoryTestCase):
 
             self.assertEqual(exc_msg, str(cm.exception))
 
-    def test_bind_dataclass_with_unknown_property(self):
+    def test_bind_dataclass_with_unknown_property(self) -> None:
         data = {"unknown": True}
         with self.assertRaises(ParserError) as cm:
             self.decoder.bind_dataclass(data, Books)
@@ -163,7 +163,7 @@ class DictDecoderTests(FactoryTestCase):
         self.decoder.config.fail_on_unknown_properties = False
         self.assertEqual(Books(), self.decoder.bind_dataclass(data, Books))
 
-    def test_bind_dataclass_with_required_fields(self):
+    def test_bind_dataclass_with_required_fields(self) -> None:
         obj = self.decoder.bind_dataclass({"x": 1, "y": "a", "z": None}, TypeD)
 
         self.assertEqual(1, obj.x)
@@ -173,14 +173,14 @@ class DictDecoderTests(FactoryTestCase):
         with self.assertRaises(ParserError):
             self.decoder.bind_dataclass({"x": 1, "y": "a"}, TypeD)
 
-    def test_bind_dataclass_with_fixed_field(self):
+    def test_bind_dataclass_with_fixed_field(self) -> None:
         obj = self.decoder.bind_dataclass({"value": "abc"}, FixedType)
         self.assertEqual("abc", obj.value)
 
         with self.assertRaises(ParserError):
             self.decoder.bind_dataclass({"value": "abcd"}, FixedType)
 
-    def test_bind_derived_dataclass(self):
+    def test_bind_derived_dataclass(self) -> None:
         data = {
             "qname": "{urn:books}BookForm",
             "type": None,
@@ -198,7 +198,7 @@ class DictDecoderTests(FactoryTestCase):
         )
         self.assertEqual(expected, actual)
 
-    def test_bind_derived_dataclass_with_xsi_type(self):
+    def test_bind_derived_dataclass_with_xsi_type(self) -> None:
         data = {
             "qname": "foobar",
             "type": "{urn:books}BookForm",
@@ -229,7 +229,7 @@ class DictDecoderTests(FactoryTestCase):
             data["type"] = None
             self.decoder.bind_dataclass(data, DerivedElement)
 
-    def test_bind_dataclass_union(self):
+    def test_bind_dataclass_union(self) -> None:
         data = {"element": {"x": 1, "y": "foo", "z": "1.0"}}
         actual = self.decoder.bind_dataclass(data, UnionType)
 
@@ -244,26 +244,26 @@ class DictDecoderTests(FactoryTestCase):
             str(cm.exception),
         )
 
-    def test_bind_dataclass_subclasses(self):
+    def test_bind_dataclass_subclasses(self) -> None:
         data = {"element": {"x": "1", "y": "foo", "z": "1.0"}}
         actual = self.decoder.bind_dataclass(data, BaseType)
 
         self.assertIsInstance(actual.element, BaseC)
 
-    def test_bind_attributes(self):
+    def test_bind_attributes(self) -> None:
         data = {"attrs": {"a": 1, "b": 2}, "index": 1}
 
         actual = self.decoder.bind_dataclass(data, AttrsType)
         self.assertEqual(data["attrs"], actual.attrs)
         self.assertIsNot(data["attrs"], actual.attrs)
 
-    def test_bind_simple_type_with_wildcard_var(self):
+    def test_bind_simple_type_with_wildcard_var(self) -> None:
         data = {"any": 1, "wildcard": 2}
         actual = self.decoder.bind_dataclass(data, ExtendedType)
         self.assertEqual(1, actual.any)
         self.assertEqual(2, actual.wildcard)
 
-    def test_bind_simple_type_with_elements_var(self):
+    def test_bind_simple_type_with_elements_var(self) -> None:
         data = {"choice": ["1.0", 1, ["1.2"], "{a}b"]}
 
         actual = self.decoder.bind_dataclass(data, ChoiceType)
@@ -283,12 +283,12 @@ class DictDecoderTests(FactoryTestCase):
             str(cm.exception),
         )
 
-    def test_bind_simple_type_with_optional_elements_var(self):
+    def test_bind_simple_type_with_optional_elements_var(self) -> None:
         data = {"a_or_b": None}
         actual = self.decoder.bind_dataclass(data, OptionalChoiceType)
         self.assertIsNone(None, actual.a_or_b)
 
-    def test_bind_any_element(self):
+    def test_bind_any_element(self) -> None:
         data = {
             "wildcard": {
                 "qname": "a",
@@ -303,12 +303,12 @@ class DictDecoderTests(FactoryTestCase):
             self.decoder.bind_dataclass(data, ExtendedType),
         )
 
-    def test_bind_choice_dataclass(self):
+    def test_bind_choice_dataclass(self) -> None:
         data = {"choice": [{"x": 1}, {"x": 1, "y": "a"}]}
         expected = ChoiceType(choice=[TypeA(x=1), TypeB(x=1, y="a")])
         self.assertEqual(expected, self.decoder.bind_dataclass(data, ChoiceType))
 
-    def test_bind_derived_value_with_choice_var(self):
+    def test_bind_derived_value_with_choice_var(self) -> None:
         data = {
             "choice": [
                 {
@@ -340,19 +340,19 @@ class DictDecoderTests(FactoryTestCase):
             str(cm.exception),
         )
 
-    def test_bind_derived_value_with_simple_type(self):
+    def test_bind_derived_value_with_simple_type(self) -> None:
         data = {"choice": [{"qname": "float", "value": 1, "type": None}]}
 
         actual = self.decoder.bind_dataclass(data, ChoiceType)
         expected = ChoiceType(choice=[DerivedElement(qname="float", value=1)])
         self.assertEqual(expected, actual)
 
-    def test_bind_wildcard_dataclass(self):
+    def test_bind_wildcard_dataclass(self) -> None:
         data = {"a": None, "wildcard": {"x": 1}}
         expected = ExtendedType(wildcard=TypeA(x=1))
         self.assertEqual(expected, self.decoder.bind_dataclass(data, ExtendedType))
 
-    def test_bind_wildcard_with_derived_dataclass(self):
+    def test_bind_wildcard_with_derived_dataclass(self) -> None:
         data = {
             "wildcard": {
                 "qname": "b",
@@ -370,7 +370,7 @@ class DictDecoderTests(FactoryTestCase):
         )
         self.assertEqual(expected, self.decoder.bind_dataclass(data, ExtendedType))
 
-    def test_bind_any_type_with_derived_dataclass(self):
+    def test_bind_any_type_with_derived_dataclass(self) -> None:
         data = {
             "any": {
                 "qname": "any",
@@ -387,7 +387,7 @@ class DictDecoderTests(FactoryTestCase):
 
         self.assertEqual("Unable to locate xsi:type `notexists`", str(cm.exception))
 
-    def test_bind_text_with_unions(self):
+    def test_bind_text_with_unions(self) -> None:
         @dataclass
         class Fixture:
             x: list[Union[int, float, str, bool]] = field(metadata={"tokens": True})
@@ -398,7 +398,7 @@ class DictDecoderTests(FactoryTestCase):
         expected = ["foo", 12.2, 12.2, 12, 12, True, False]
         self.assertEqual({"x": expected}, asdict(result))
 
-    def test_find_var(self):
+    def test_find_var(self) -> None:
         meta = self.decoder.context.build(TypeB)
         xml_vars = meta.get_all_vars()
 

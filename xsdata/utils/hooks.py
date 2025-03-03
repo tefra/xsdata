@@ -1,7 +1,7 @@
 from importlib import metadata
 
 
-def load_entry_points(name: str):
+def load_entry_points(name: str) -> None:
     """Load the plugins for the given hook name."""
     entry_points = metadata.entry_points()
 

@@ -7,7 +7,7 @@ from xsdata.models.enums import DataType
 
 
 class DataTypeTests(TestCase):
-    def test_from_value_int(self):
+    def test_from_value_int(self) -> None:
         self.assertEqual(DataType.SHORT, DataType.from_value(-32768))
         self.assertEqual(DataType.SHORT, DataType.from_value(32767))
 
@@ -24,14 +24,14 @@ class DataTypeTests(TestCase):
         self.assertEqual(DataType.INTEGER, DataType.from_value(-9223372036854775809))
         self.assertEqual(DataType.INTEGER, DataType.from_value(9223372036854775808))
 
-    def test_from_value_float(self):
+    def test_from_value_float(self) -> None:
         self.assertEqual(DataType.FLOAT, DataType.from_value(-1.175494351e-38))
         self.assertEqual(DataType.FLOAT, DataType.from_value(3.402823466e38))
 
         self.assertEqual(DataType.DOUBLE, DataType.from_value(-1.175494352e-38))
         self.assertEqual(DataType.DOUBLE, DataType.from_value(3.402823467e38))
 
-    def test_from_value_period(self):
+    def test_from_value_period(self) -> None:
         g_day = XmlPeriod("---20-02:44")
         self.assertEqual(DataType.G_DAY, DataType.from_value(g_day))
 
@@ -47,7 +47,7 @@ class DataTypeTests(TestCase):
         g_year = XmlPeriod("2021")
         self.assertEqual(DataType.G_YEAR, DataType.from_value(g_year))
 
-    def test_from_value_simple(self):
+    def test_from_value_simple(self) -> None:
         self.assertEqual(DataType.BOOLEAN, DataType.from_value(True))
         self.assertEqual(DataType.DECIMAL, DataType.from_value(Decimal("1.1")))
         self.assertEqual(DataType.QNAME, DataType.from_value(QName("a")))

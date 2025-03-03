@@ -42,7 +42,7 @@ class CodegenModel:
         clone = copy.deepcopy(self)
         return replace(clone, **kwargs) if kwargs else clone
 
-    def swap(self, source: "CodegenModel"):
+    def swap(self, source: "CodegenModel") -> None:
         """Swap the instance attributes from the source instance."""
         for f in fields(self):
             value = copy.deepcopy(getattr(source, f.name))
@@ -116,7 +116,7 @@ class Restrictions(CodegenModel):
         """Return whether the max occurs is zero."""
         return self.max_occurs == 0
 
-    def merge(self, source: "Restrictions"):
+    def merge(self, source: "Restrictions") -> None:
         """Update properties from another instance.
 
         Args:

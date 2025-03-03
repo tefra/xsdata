@@ -12,7 +12,7 @@ from xsdata.formats.dataclass.serializers.config import SerializerConfig
 
 
 class TypeMappingTests(TestCase):
-    def test_type_mapping(self):
+    def test_type_mapping(self) -> None:
         city1 = City(name="footown")
         street1 = Street(name="foostreet")
         house1 = House(number=23)

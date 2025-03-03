@@ -52,7 +52,7 @@ class DeprecatedDefaultGroup(DefaultGroup):
 @click.group(cls=DeprecatedDefaultGroup, default="generate", default_if_no_args=False)
 @click.pass_context
 @click.version_option(__version__)
-def cli(ctx: click.Context, **kwargs: Any):
+def cli(ctx: click.Context, **kwargs: Any) -> None:
     """Xsdata command line interface."""
     logger.setLevel(logging.INFO)
     formatwarning_orig = warnings.formatwarning
@@ -79,7 +79,7 @@ def cli(ctx: click.Context, **kwargs: Any):
 
 @cli.command("init-config")
 @click.argument("output", type=click.Path(), default=".xsdata.xml")
-def init_config(**kwargs: Any):
+def init_config(**kwargs: Any) -> None:
     """Create or update a configuration file."""
     file_path = Path(kwargs["output"])
     if file_path.exists():
@@ -104,7 +104,7 @@ def init_config(**kwargs: Any):
     default="./",
     help="Output directory, default cwd",
 )
-def download(source: str, output: str):
+def download(source: str, output: str) -> None:
     """Download a schema or a definition locally with all its dependencies."""
     downloader = Downloader(output=Path(output).resolve())
     downloader.wget(source)
@@ -125,7 +125,7 @@ def download(source: str, output: str):
 @click.option("--cache", is_flag=True, default=False, help="Cache sources loading")
 @click.option("--debug", is_flag=True, default=False, help="Show debug messages")
 @model_options(GeneratorOutput)
-def generate(**kwargs: Any):
+def generate(**kwargs: Any) -> None:
     """Generate code from xsd, dtd, wsdl, xml and json files.
 
     The input source can be either a filepath, uri or a directory

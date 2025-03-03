@@ -12,7 +12,7 @@ from xsdata.utils.testing import load_class
 os.chdir(root)
 
 
-def test_xml_documents():
+def test_xml_documents() -> None:
     filepath = fixtures_dir.joinpath("artists")
     package = "tests.fixtures.artists"
     runner = CliRunner()

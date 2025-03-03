@@ -26,7 +26,7 @@ class RestrictionsTests(TestCase):
             process_contents="skip",
         )
 
-    def test_property_is_list(self):
+    def test_property_is_list(self) -> None:
         restrictions = Restrictions()
         self.assertFalse(restrictions.is_list)
 
@@ -36,11 +36,11 @@ class RestrictionsTests(TestCase):
         restrictions.max_occurs = 2
         self.assertTrue(restrictions.is_list)
 
-    def test_property_is_prohibited(self):
+    def test_property_is_prohibited(self) -> None:
         self.assertFalse(Restrictions().is_prohibited)
         self.assertTrue(Restrictions(max_occurs=0).is_prohibited)
 
-    def test_merge(self):
+    def test_merge(self) -> None:
         source = Restrictions(min_length=2, max_length=10, format="base16")
         target = Restrictions(min_length=1, pattern=r"[A-Z]")
 
@@ -51,7 +51,7 @@ class RestrictionsTests(TestCase):
         self.assertEqual(r"[A-Z]", target.pattern)
         self.assertEqual("base16", target.format)
 
-    def test_merge_ignore_nillable(self):
+    def test_merge_ignore_nillable(self) -> None:
         parent = Restrictions(nillable=True)
         child = Restrictions()
 
@@ -62,7 +62,7 @@ class RestrictionsTests(TestCase):
         child.merge(parent)
         self.assertFalse(child.nillable)
 
-    def test_merge_occurs(self):
+    def test_merge_occurs(self) -> None:
         a = Restrictions()
         b = Restrictions()
 
@@ -77,7 +77,7 @@ class RestrictionsTests(TestCase):
         self.assertEqual(0, a.min_occurs)
         self.assertEqual(1, a.max_occurs)
 
-    def test_asdict(self):
+    def test_asdict(self) -> None:
         expected = {
             "explicit_timezone": "+1",
             "fraction_digits": 2,
@@ -102,7 +102,7 @@ class RestrictionsTests(TestCase):
         expected["required"] = True
         self.assertEqual(expected, self.restrictions.asdict())
 
-    def test_asdict_with_types(self):
+    def test_asdict_with_types(self) -> None:
         expected = {
             "explicit_timezone": "+1",
             "fraction_digits": 2,
@@ -121,7 +121,7 @@ class RestrictionsTests(TestCase):
         }
         self.assertEqual(expected, self.restrictions.asdict(types=[float]))
 
-    def test_asdict_with_implied_types(self):
+    def test_asdict_with_implied_types(self) -> None:
         restrictions = Restrictions(min_occurs=1, max_occurs=4)
         self.assertEqual({"max_occurs": 4, "min_occurs": 1}, restrictions.asdict())
 
@@ -131,7 +131,7 @@ class RestrictionsTests(TestCase):
         restrictions.max_occurs = sys.maxsize
         self.assertEqual({}, restrictions.asdict())
 
-    def test_asdict_with_process_contents(self):
+    def test_asdict_with_process_contents(self) -> None:
         restrictions = Restrictions(process_contents="skip")
         self.assertEqual({"process_contents": "skip"}, restrictions.asdict())
 

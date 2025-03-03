@@ -11,7 +11,7 @@ from xsdata.utils.testing import (
 
 
 class SanitizeEnumerationClassTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.root_enum = ClassFactory.enumeration(2)
@@ -37,7 +37,7 @@ class SanitizeEnumerationClassTests(FactoryTestCase):
         self.container.add(self.root_enum)
         self.processor = SanitizeEnumerationClass(container=self.container)
 
-    def test_filter(self):
+    def test_filter(self) -> None:
         target = ClassFactory.elements(2)
         self.processor.process(target)
 
@@ -48,23 +48,23 @@ class SanitizeEnumerationClassTests(FactoryTestCase):
         self.assertEqual(1, len(target.attrs))
         self.assertTrue(target.attrs[0].is_enumeration)
 
-    def test_flatten_skip_if_class_has_more_than_one_attribute(self):
+    def test_flatten_skip_if_class_has_more_than_one_attribute(self) -> None:
         self.target.attrs.append(AttrFactory.create())
         self.processor.process(self.target)
         self.assertFalse(self.target.is_enumeration)
         self.assertEqual(2, len(self.target.attrs))
 
-    def test_flatten_skip_when_attribute_tag_is_not_union(self):
+    def test_flatten_skip_when_attribute_tag_is_not_union(self) -> None:
         self.target.attrs[0].tag = Tag.ELEMENT
         self.processor.process(self.target)
         self.assertFalse(self.target.is_enumeration)
 
-    def test_flatten_skip_when_types_is_not_enumeration_union(self):
+    def test_flatten_skip_when_types_is_not_enumeration_union(self) -> None:
         self.target.attrs[0].types.append(AttrTypeFactory.native(DataType.INT))
         self.processor.process(self.target)
         self.assertFalse(self.target.is_enumeration)
 
-    def test_flatten_merges_enumeration_unions(self):
+    def test_flatten_merges_enumeration_unions(self) -> None:
         self.processor.process(self.target)
         self.assertTrue(self.target.is_enumeration)
 

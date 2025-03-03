@@ -20,7 +20,7 @@ class UnionNodeTests(TestCase):
         self.context = XmlContext()
         self.config = ParserConfig()
 
-    def test_child(self):
+    def test_child(self) -> None:
         attrs = {"id": "1"}
         ns_map = {"ns0": "xsdata"}
         meta = XmlMetaFactory.create(clazz=Artist)
@@ -40,7 +40,7 @@ class UnionNodeTests(TestCase):
         self.assertEqual([("start", "foo", attrs, ns_map)], node.events)
         self.assertIsNot(attrs, node.events[0][2])
 
-    def test_bind_appends_end_event_when_level_not_zero(self):
+    def test_bind_appends_end_event_when_level_not_zero(self) -> None:
         meta = XmlMetaFactory.create(clazz=Artist)
         var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo")
         node = UnionNode(
@@ -60,7 +60,7 @@ class UnionNodeTests(TestCase):
         self.assertEqual(0, node.level)
         self.assertEqual([("end", "bar", "text", "tail")], node.events)
 
-    def test_filter_fixed_attrs(self):
+    def test_filter_fixed_attrs(self) -> None:
         a = make_dataclass(
             "A",
             [("x", int, field(init=False, default=1, metadata={"type": "Attribute"}))],
@@ -95,7 +95,7 @@ class UnionNodeTests(TestCase):
         )
         self.assertEqual([a, b, int], node.candidates)
 
-    def test_bind_returns_best_matching_object(self):
+    def test_bind_returns_best_matching_object(self) -> None:
         item = make_dataclass(
             "Item", [("value", str), ("a", int, attribute()), ("b", int, attribute())]
         )
@@ -145,7 +145,7 @@ class UnionNodeTests(TestCase):
         self.assertTrue(node.bind("item", "a", None, objects))
         self.assertEqual("a", objects[-1][1])
 
-    def test_bind_raises_parser_error_on_failure(self):
+    def test_bind_raises_parser_error_on_failure(self) -> None:
         meta = self.context.build(UnionType)
         var = next(meta.find_children("element"))
 

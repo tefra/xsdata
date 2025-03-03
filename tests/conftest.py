@@ -12,7 +12,7 @@ from xsdata.formats.dataclass.serializers import (
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
 
 
-def validate_bindings(schema: Path, clazz: type):
+def validate_bindings(schema: Path, clazz: type) -> None:
     __tracebackhide__ = True
 
     sample = schema.parent.joinpath("sample.xml")

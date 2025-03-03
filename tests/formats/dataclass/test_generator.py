@@ -11,7 +11,7 @@ from xsdata.utils.testing import ClassFactory, FactoryTestCase
 
 
 class DataclassGeneratorTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.maxDiff = None
         config = GeneratorConfig()
@@ -27,7 +27,7 @@ class DataclassGeneratorTests(FactoryTestCase):
         mock_render_package,
         mock_validate_imports,
         mock_ruff_code,
-    ):
+    ) -> None:
         classes = [
             ClassFactory.create(package="foo.bar", module="tests"),
             ClassFactory.create(package="bar.foo", module="tests"),
@@ -63,7 +63,7 @@ class DataclassGeneratorTests(FactoryTestCase):
         mock_render_module.assert_has_calls([mock.call(mock.ANY, [x]) for x in classes])
         mock_validate_imports.assert_called_once()
 
-    def test_render_package(self):
+    def test_render_package(self) -> None:
         classes = [
             ClassFactory.create(qname="a", package="foo", module="tests"),
             ClassFactory.create(qname="b", package="foo", module="tests"),
@@ -91,7 +91,7 @@ class DataclassGeneratorTests(FactoryTestCase):
         )
         self.assertEqual(expected, actual)
 
-    def test_render_module(self):
+    def test_render_module(self) -> None:
         classes = [
             ClassFactory.enumeration(2, help="\n\nI am enum  "),
             ClassFactory.elements(2),
@@ -150,7 +150,7 @@ class DataclassGeneratorTests(FactoryTestCase):
 
         self.assertEqual(expected, actual)
 
-    def test_render_module_with_mixed_target_namespaces(self):
+    def test_render_module_with_mixed_target_namespaces(self) -> None:
         classes = [
             ClassFactory.elements(1, qname="{foo}bar"),
             ClassFactory.elements(1, qname="{bar}foo"),
@@ -193,7 +193,7 @@ class DataclassGeneratorTests(FactoryTestCase):
 
         self.assertEqual(expected, actual)
 
-    def test_module_name(self):
+    def test_module_name(self) -> None:
         self.assertEqual("foo_bar", self.generator.module_name("fooBar"))
         self.assertEqual("foo_bar_wtf", self.generator.module_name("fooBar.wtf"))
         self.assertEqual("mod_1111", self.generator.module_name("1111"))
@@ -201,14 +201,14 @@ class DataclassGeneratorTests(FactoryTestCase):
         self.assertEqual("foo_bar_bam", self.generator.module_name("foo:bar_bam"))
         self.assertEqual("bar_bam", self.generator.module_name("urn:bar_bam"))
 
-    def test_package_name(self):
+    def test_package_name(self) -> None:
         self.assertEqual(
             "foo.bar_bar.pkg_1", self.generator.package_name("Foo.BAR_bar.1")
         )
 
         self.assertEqual("", self.generator.package_name(""))
 
-    def test_ruff_code_with_invalid_code(self):
+    def test_ruff_code_with_invalid_code(self) -> None:
         src_code = (
             "class AlternativeText:\n"
             "    class Meta:\n"

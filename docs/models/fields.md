@@ -259,7 +259,7 @@ Elements type represents repeatable choice elements. It's more commonly referred
     A compound field can not contain ambiguous types because it's impossible to infer the
     element from the actual value.
 
-    The xml contenxt will raise an error. The solution is to introduce intermediate
+    The xml context will raise an error. The solution is to introduce intermediate
     simple types or subclasses per element. This will resolve xml roundtrips but
     it will not work for certain json roundtrips.
 

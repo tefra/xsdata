@@ -840,7 +840,7 @@ class Filters:
         if self.union_type:
             return " | ".join(type_names)
 
-        return f'Union[{", ".join(type_names)}]'
+        return f"Union[{', '.join(type_names)}]"
 
     def _field_type_name(
         self, obj: Class, attr_type: AttrType, choice: bool = False

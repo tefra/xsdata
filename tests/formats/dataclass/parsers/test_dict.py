@@ -221,7 +221,7 @@ class DictDecoderTests(FactoryTestCase):
             self.decoder.bind_dataclass(data, DerivedElement)
 
         self.assertEqual(
-            "Unable to locate derived model with" " properties(['author', 'title'])",
+            "Unable to locate derived model with properties(['author', 'title'])",
             str(cm.exception),
         )
 

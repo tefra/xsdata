@@ -314,7 +314,7 @@ class FiltersTests(FactoryTestCase):
         mock_field_metadata.return_value = {}
         str_attr = AttrFactory.create(types=[type_str], tag=Tag.RESTRICTION)
         result = self.filters.field_definition(self.obj, str_attr, None)
-        expected = "field(\n" "        default=None\n" "    )"
+        expected = "field(\n        default=None\n    )"
         self.assertEqual(expected, result)
 
     def test_field_default_value_with_value_none(self):
@@ -891,9 +891,7 @@ class FiltersTests(FactoryTestCase):
 
     def test_default_imports_combo(self):
         output = (
-            "@dataclass\n"
-            "class Foo:\n"
-            "    field: Optional[str] = field(default=None)"
+            "@dataclass\nclass Foo:\n    field: Optional[str] = field(default=None)"
         )
 
         expected = (

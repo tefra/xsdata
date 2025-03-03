@@ -49,7 +49,7 @@ class DataTypeTests(TestCase):
 
     def test_from_value_simple(self):
         self.assertEqual(DataType.BOOLEAN, DataType.from_value(True))
-        self.assertEqual(DataType.DECIMAL, DataType.from_value(Decimal(1.1)))
+        self.assertEqual(DataType.DECIMAL, DataType.from_value(Decimal("1.1")))
         self.assertEqual(DataType.QNAME, DataType.from_value(QName("a")))
         self.assertEqual(DataType.STRING, DataType.from_value("a"))
         self.assertEqual(DataType.DATE, DataType.from_value(XmlDate(2021, 1, 1)))

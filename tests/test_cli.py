@@ -54,7 +54,7 @@ class CliTests(TestCase):
 
         source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
         result = self.runner.invoke(cli, ["generate", str(source), "--package", "foo"])
-        expected = "=========\n" "Error: Testing\n" "foo: bar\n"
+        expected = "=========\nError: Testing\nfoo: bar\n"
 
         self.assertIn(expected, result.output)
 

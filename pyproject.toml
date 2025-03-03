@@ -111,6 +111,8 @@ select = [
     "RET",
     # Ruff rules
     "RUF",
+    # Flake Simplify
+    "SIM",
 ]
 
 ignore = [

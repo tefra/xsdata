@@ -111,6 +111,7 @@ class ResourceTransformer:
     __slots__ = ("classes", "config", "preloaded", "processed")
 
     def __init__(self, config: GeneratorConfig):
+        """Initialize the transformer."""
         self.config = config
         self.classes: list[Class] = []
         self.processed: list[str] = []

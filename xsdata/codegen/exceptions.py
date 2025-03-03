@@ -11,6 +11,7 @@ class CodegenError(ClickException):
     """Unexpected state during code generation related errors."""
 
     def __init__(self, message: str, **kwargs: Any):
+        """Click exception constructor with metadata."""
         super().__init__(message)
         self.meta = kwargs
 

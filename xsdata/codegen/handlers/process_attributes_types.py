@@ -21,6 +21,7 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
     __slots__ = "dependencies"
 
     def __init__(self, container: ContainerInterface):
+        """Initialize the class."""
         super().__init__(container)
         self.dependencies: dict = {}
 

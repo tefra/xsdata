@@ -28,6 +28,7 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
     __slots__ = ("merges", "renames", "reserved", "use_names")
 
     def __init__(self, container: ContainerInterface):
+        """Initialize the rename duplicate class handler."""
         super().__init__(container)
 
         self.use_names = self.should_use_names()

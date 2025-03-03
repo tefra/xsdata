@@ -30,6 +30,7 @@ class DependenciesResolver:
     __slots__ = "aliases", "class_list", "class_map", "imports", "registry"
 
     def __init__(self, registry: dict[str, str]):
+        """Initialize the resolver."""
         self.registry = registry
         self.aliases: dict[str, str] = {}
         self.imports: list[Import] = []

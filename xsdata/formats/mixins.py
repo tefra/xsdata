@@ -36,6 +36,7 @@ class AbstractGenerator(abc.ABC):
     __slots__ = "config"
 
     def __init__(self, config: GeneratorConfig):
+        """Initialize the generator."""
         self.config = config
 
     def module_name(self, module: str) -> str:

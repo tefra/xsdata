@@ -19,6 +19,7 @@ class ClassValidator:
     __slots__ = "container"
 
     def __init__(self, container: ContainerInterface):
+        """Initialize the class validator."""
         self.container = container
 
     def process(self):

@@ -6,6 +6,7 @@ from dataclasses import fields, is_dataclass
 from typing import (
     Any,
     Callable,
+    ClassVar,
     TypeVar,
     Union,
     get_type_hints,
@@ -107,6 +108,7 @@ class EnumChoice(click.Choice):
     """Custom click choice widget for enumerations."""
 
     def __init__(self, enumeration: type[enum.Enum]):
+        """Initialize the enum choice widget."""
         self.enumeration = enumeration
         super().__init__([e.value for e in enumeration])
 
@@ -118,7 +120,7 @@ class EnumChoice(click.Choice):
 class LogFormatter(logging.Formatter):
     """Custom log formatter with click colors."""
 
-    colors: dict[str, Any] = {
+    colors: ClassVar[dict[str, Any]] = {
         "error": {"fg": "red"},
         "exception": {"fg": "red"},
         "critical": {"fg": "red"},
@@ -143,6 +145,7 @@ class LogHandler(logging.Handler):
     """Custom click log handler to record warnings."""
 
     def __init__(self, level: Union[int, str] = logging.NOTSET):
+        """Initialize the log handler."""
         super().__init__(level)
         self.warnings: list[str] = []
 

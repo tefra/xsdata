@@ -510,6 +510,7 @@ class XmlDuration(UserString):
     """
 
     def __init__(self, value: str) -> None:
+        """Initialize with the given string."""
         super().__init__(value)
         self._interval = self._parse_interval(value)
 
@@ -606,6 +607,7 @@ class XmlPeriod(UserString):
     """
 
     def __init__(self, value: str) -> None:
+        """Initialize a xs:period."""
         value = value.strip()
         super().__init__(value)
         self._period = self._parse_period(value)

@@ -134,6 +134,7 @@ class DateTimeParser:
     """
 
     def __init__(self, value: str, fmt: str):
+        """Initialize a DateTimeParser instance."""
         self.format = fmt
         self.value = value
         self.vlen = len(value)

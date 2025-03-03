@@ -17,6 +17,7 @@ class ContainerInterface(abc.ABC):
     __slots__ = ("config", "data")
 
     def __init__(self, config: GeneratorConfig):
+        """Initialize the container."""
         self.config = config
         self.data: dict[str, list[Class]] = {}
 
@@ -139,6 +140,7 @@ class RelativeHandlerInterface(HandlerInterface, abc.ABC):
     __slots__ = "container"
 
     def __init__(self, container: ContainerInterface):
+        """Initialize the class."""
         self.container = container
 
     def base_attrs(self, target: Class) -> list[Attr]:
@@ -184,6 +186,7 @@ class ContainerHandlerInterface(abc.ABC):
     __slots__ = "container"
 
     def __init__(self, container: ContainerInterface):
+        """Initialize the class."""
         self.container = container
 
     @abc.abstractmethod

@@ -27,6 +27,7 @@ class Downloader:
     __slots__ = ("base_path", "downloaded", "output")
 
     def __init__(self, output: Path):
+        """Initialize the downloader."""
         self.output = output
         self.base_path: Optional[Path] = None
         self.downloaded: dict = {}

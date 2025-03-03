@@ -18,6 +18,7 @@ class DetectCircularReferences(RelativeHandlerInterface):
     __slots__ = "container", "reference_types"
 
     def __init__(self, container: ContainerInterface):
+        """Initialize the class."""
         super().__init__(container)
         self.reference_types: dict[int, list[AttrType]] = {}
 

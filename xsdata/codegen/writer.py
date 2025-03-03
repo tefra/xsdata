@@ -25,6 +25,7 @@ class CodeWriter:
     }
 
     def __init__(self, generator: AbstractGenerator):
+        """Initialize CodeWriter."""
         self.generator = generator
 
     def write(self, classes: list[Class]):

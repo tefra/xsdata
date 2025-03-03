@@ -21,6 +21,7 @@ class AddAttributeSubstitutions(RelativeHandlerInterface):
     __slots__ = "substitutions"
 
     def __init__(self, container: ContainerInterface):
+        """Initialize the class."""
         super().__init__(container)
         self.substitutions: Optional[dict[str, list[Attr]]] = None
 

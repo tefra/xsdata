@@ -79,6 +79,7 @@ class ConverterFactory:
     __slots__ = "registry"
 
     def __init__(self):
+        """Initialize the registry."""
         self.registry: dict[type, Converter] = {}
 
     def deserialize(self, value: Any, types: Sequence[type], **kwargs: Any) -> Any:
@@ -827,6 +828,7 @@ class ProxyConverter(Converter):
     __slots__ = "factory"
 
     def __init__(self, factory: Callable):
+        """Initialize the proxy converter."""
         self.factory = factory
 
     def deserialize(self, value: Any, **kwargs: Any) -> Any:

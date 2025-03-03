@@ -27,6 +27,7 @@ class DisambiguateChoices(RelativeHandlerInterface):
     __slots__ = "unnest_classes"
 
     def __init__(self, container: ContainerInterface):
+        """Initialize the class."""
         super().__init__(container)
         self.unnest_classes = container.config.output.unnest_classes
 

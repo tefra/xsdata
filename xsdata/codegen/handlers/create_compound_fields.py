@@ -27,6 +27,7 @@ class CreateCompoundFields(RelativeHandlerInterface):
     __slots__ = "config"
 
     def __init__(self, container: ContainerInterface):
+        """Initialize the class."""
         super().__init__(container)
         self.config = container.config.output.compound_fields
 

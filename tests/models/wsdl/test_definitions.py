@@ -9,7 +9,7 @@ from xsdata.models.xsd import Schema
 
 
 class DefinitionsTests(TestCase):
-    def test_property_schemas(self):
+    def test_property_schemas(self) -> None:
         obj = Definitions()
 
         self.assertIsInstance(obj.schemas, Generator)
@@ -23,7 +23,7 @@ class DefinitionsTests(TestCase):
 
         self.assertEqual(schemas, list(obj.schemas))
 
-    def test_find_binding(self):
+    def test_find_binding(self) -> None:
         res = Binding(name="foo")
         obj = Definitions(bindings=[res])
 
@@ -32,7 +32,7 @@ class DefinitionsTests(TestCase):
         with self.assertRaises(CodegenError):
             obj.find_binding("nope")
 
-    def test_find_message(self):
+    def test_find_message(self) -> None:
         res = Message(name="foo")
         obj = Definitions(messages=[res])
 
@@ -41,7 +41,7 @@ class DefinitionsTests(TestCase):
         with self.assertRaises(CodegenError):
             obj.find_message("nope")
 
-    def test_find_port_type(self):
+    def test_find_port_type(self) -> None:
         res = PortType(name="foo")
         obj = Definitions(port_types=[res])
 
@@ -50,7 +50,7 @@ class DefinitionsTests(TestCase):
         with self.assertRaises(CodegenError):
             obj.find_port_type("nope")
 
-    def test_merge(self):
+    def test_merge(self) -> None:
         target = Definitions()
         source = Definitions()
         source.types = Types()

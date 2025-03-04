@@ -2,8 +2,7 @@ from collections import namedtuple
 from typing import Any
 
 from xsdata.exceptions import ConverterError
-from xsdata.formats.converter import Converter
-from xsdata.formats.converter import converter
+from xsdata.formats.converter import Converter, converter
 
 Telephone = namedtuple('Telephone', ['country_code', 'area_code', 'number'])
 
@@ -15,7 +14,7 @@ class PhoneConverter(Converter):
         if len(parts) == 3:
             return Telephone(*map(int, parts))
 
-        raise ConverterError()
+        raise ConverterError
 
     def serialize(self, value: Telephone, **kwargs: Any) -> str:
         return "-".join(map(str, value))

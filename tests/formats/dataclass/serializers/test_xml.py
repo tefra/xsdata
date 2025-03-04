@@ -6,12 +6,12 @@ from xsdata.formats.dataclass.serializers.config import SerializerConfig
 
 
 class XmlSerializerTests(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         config = SerializerConfig(indent="  ")
         self.serializer = XmlSerializer(config=config)
         super().setUp()
 
-    def test_render(self):
+    def test_render(self) -> None:
         result = self.serializer.render(books, ns_map={None: "urn:books"})
         expected = (
             '<?xml version="1.0" encoding="UTF-8"?>\n'

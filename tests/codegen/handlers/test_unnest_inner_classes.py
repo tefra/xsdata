@@ -10,12 +10,12 @@ from xsdata.utils.testing import (
 
 
 class UnnestInnerClassesTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.container = ClassContainer(config=GeneratorConfig())
         self.processor = UnnestInnerClasses(container=self.container)
 
-    def test_process_with_config_enabled(self):
+    def test_process_with_config_enabled(self) -> None:
         self.container.config.output.unnest_classes = True
         a = ClassFactory.create()
         b = ClassFactory.create()
@@ -38,7 +38,7 @@ class UnnestInnerClassesTests(FactoryTestCase):
         self.assertEqual(c.qname, b.attrs[0].types[0].qname)
         self.assertEqual(b.qname, c.attrs[0].types[0].qname)
 
-    def test_process_with_config_disabled_promotes_only_enumerations(self):
+    def test_process_with_config_disabled_promotes_only_enumerations(self) -> None:
         self.container.config.output.unnest_classes = False
         a = ClassFactory.create()
         b = ClassFactory.create()
@@ -60,7 +60,7 @@ class UnnestInnerClassesTests(FactoryTestCase):
         self.assertEqual(1, len(a.inner))
         self.assertEqual(0, len(b.inner))
 
-    def test_process_with_orphan_nested_class(self):
+    def test_process_with_orphan_nested_class(self) -> None:
         self.container.config.output.unnest_classes = True
         a = ClassFactory.create()
         b = ClassFactory.create()
@@ -77,7 +77,7 @@ class UnnestInnerClassesTests(FactoryTestCase):
         self.assertEqual(0, len(a.inner))
         self.assertEqual(1, len(b.inner))
 
-    def test_update_inner_class(self):
+    def test_update_inner_class(self) -> None:
         a = ClassFactory.create(qname="a")
         b = ClassFactory.create(qname="b")
         c = ClassFactory.create(qname="c")
@@ -93,7 +93,7 @@ class UnnestInnerClassesTests(FactoryTestCase):
         self.assertIsNone(c.parent)
         self.assertEqual(0, len(b.inner))
 
-    def test_update_types(self):
+    def test_update_types(self) -> None:
         types = [
             AttrTypeFactory.create(qname="a", forward=True),
             AttrTypeFactory.create(qname="a", forward=True),

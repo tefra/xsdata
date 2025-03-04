@@ -12,13 +12,13 @@ from xsdata.utils.testing import (
 
 
 class RenameDuplicateClassesTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.container = ClassContainer(config=GeneratorConfig())
         self.processor = RenameDuplicateClasses(container=self.container)
 
-    def test_run_renames_classes_with_duplicate_qnames(self):
+    def test_run_renames_classes_with_duplicate_qnames(self) -> None:
         classes = [
             ClassFactory.create(qname="{foo}A", tag=Tag.ELEMENT),
             ClassFactory.create(qname="{foo}a", tag=Tag.ELEMENT),
@@ -41,7 +41,7 @@ class RenameDuplicateClassesTests(FactoryTestCase):
         self.assertEqual("_b_1", classes[3].qname)
         self.assertEqual("b_2", classes[4].qname)
 
-    def test_run_merges_same_classes(self):
+    def test_run_merges_same_classes(self) -> None:
         first = ClassFactory.create()
         second = first.clone()
         third = first.clone()
@@ -57,7 +57,7 @@ class RenameDuplicateClassesTests(FactoryTestCase):
         )
 
     @mock.patch.object(RenameDuplicateClasses, "add_numeric_suffix")
-    def test_rename_classes(self, mock_add_numeric_suffix):
+    def test_rename_classes(self, mock_add_numeric_suffix) -> None:
         classes = [
             ClassFactory.create(qname="_a", tag=Tag.ELEMENT),
             ClassFactory.create(qname="_A", tag=Tag.ELEMENT),
@@ -78,7 +78,7 @@ class RenameDuplicateClassesTests(FactoryTestCase):
         )
 
     @mock.patch.object(RenameDuplicateClasses, "add_abstract_suffix")
-    def test_rename_classes_with_abstract_type(self, mock_add_abstract_suffix):
+    def test_rename_classes_with_abstract_type(self, mock_add_abstract_suffix) -> None:
         classes = [
             ClassFactory.create(qname="_a", tag=Tag.ELEMENT),
             ClassFactory.create(qname="_A", tag=Tag.ELEMENT, abstract=True),
@@ -88,7 +88,7 @@ class RenameDuplicateClassesTests(FactoryTestCase):
         mock_add_abstract_suffix.assert_called_once_with(classes[1])
 
     @mock.patch.object(RenameDuplicateClasses, "add_numeric_suffix")
-    def test_rename_classes_protects_single_element(self, mock_rename_class):
+    def test_rename_classes_protects_single_element(self, mock_rename_class) -> None:
         classes = [
             ClassFactory.create(qname="_a", tag=Tag.ELEMENT),
             ClassFactory.create(qname="a", tag=Tag.COMPLEX_TYPE),
@@ -97,7 +97,7 @@ class RenameDuplicateClassesTests(FactoryTestCase):
 
         mock_rename_class.assert_called_once_with(classes[1])
 
-    def test_add_numeric_suffix_by_slug(self):
+    def test_add_numeric_suffix_by_slug(self) -> None:
         target = ClassFactory.create(qname="{foo}_a")
         self.processor.container.add(target)
         self.processor.container.add(ClassFactory.create(qname="{foo}a_1"))
@@ -112,7 +112,7 @@ class RenameDuplicateClassesTests(FactoryTestCase):
         self.assertEqual([], self.container.data["{foo}_a"])
         self.assertEqual({target.ref: target.qname}, self.processor.renames)
 
-    def test_add_numeric_suffix_by_name(self):
+    def test_add_numeric_suffix_by_name(self) -> None:
         target = ClassFactory.create(qname="{foo}_a")
         self.processor.use_names = True
         self.processor.container.add(target)
@@ -128,7 +128,7 @@ class RenameDuplicateClassesTests(FactoryTestCase):
         self.assertEqual([], self.container.data["{foo}_a"])
         self.assertEqual({target.ref: target.qname}, self.processor.renames)
 
-    def test_add_abstract_suffix(self):
+    def test_add_abstract_suffix(self) -> None:
         target = ClassFactory.create(qname="{xsdata}line", abstract=True)
         self.processor.container.add(target)
 
@@ -138,7 +138,7 @@ class RenameDuplicateClassesTests(FactoryTestCase):
         self.assertEqual("line", target.meta_name)
         self.assertEqual({target.ref: target.qname}, self.processor.renames)
 
-    def test_update_references(self):
+    def test_update_references(self) -> None:
         target = ClassFactory.create()
         target.attrs.append(AttrFactory.reference(qname="foo", reference=1))
         target.attrs.append(

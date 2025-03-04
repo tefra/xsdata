@@ -1,11 +1,6 @@
-from dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass, field
 from decimal import Decimal
-from typing import Dict, Any
-from typing import List
-from typing import Optional
-from typing import Type
-from typing import Union
+from typing import Any, Optional, Union
 from xml.etree.ElementTree import QName
 
 __NAMESPACE__ = "xsdata"
@@ -82,12 +77,12 @@ class ExtendedType:
 
 @dataclass
 class ExtendedListType:
-    wildcard: List[object] = field(default_factory=list, metadata={"type": "Wildcard"})
+    wildcard: list[object] = field(default_factory=list, metadata={"type": "Wildcard"})
 
 
 @dataclass
 class ChoiceType:
-    choice: List[object] = field(
+    choice: list[object] = field(
         metadata={
             "type": "Elements",
             "choices": (
@@ -96,8 +91,8 @@ class ChoiceType:
                 {"name": "int", "type": int},
                 {"name": "float", "type": float},
                 {"name": "qname", "type": QName},
-                {"name": "union", "type": Type["UnionType"], "namespace": "foo"},
-                {"name": "tokens", "type": List[Decimal], "tokens": True, "default_factory": list},
+                {"name": "union", "type": type["UnionType"], "namespace": "foo"},
+                {"name": "tokens", "type": list[Decimal], "tokens": True, "default_factory": list},
                 {
                     "wildcard": True,
                     "type": object,
@@ -146,25 +141,25 @@ class BaseType:
 @dataclass
 class AttrsType:
     index: int = field(metadata={"type": "Attribute"})
-    attrs: Dict[str, str] = field(metadata={"type": "Attributes", "namespace": "##any"})
+    attrs: dict[str, str] = field(metadata={"type": "Attributes", "namespace": "##any"})
     fixed: str = field(init=False, default="ignored", metadata={"type": "Attribute"})
 
 
 @dataclass
 class SequentialType:
     a0: Optional[str] = field(default=None, metadata={"type": "Attribute"})
-    a1: Dict[str, str] = field(default_factory=dict, metadata={"type": "Attributes"})
-    a2: List[str] = field(
+    a1: dict[str, str] = field(default_factory=dict, metadata={"type": "Attributes"})
+    a2: list[str] = field(
         default_factory=list, metadata={"type": "Attribute", "tokens": True}
     )
     x0: Optional[int] = field(default=None)
-    x1: List[int] = field(
+    x1: list[int] = field(
         default_factory=list, metadata={"type": "Element", "sequence": 1}
     )
-    x2: List[int] = field(
+    x2: list[int] = field(
         default_factory=list, metadata={"type": "Element", "sequence": 1}
     )
-    x3: List[int] = field(
+    x3: list[int] = field(
         default_factory=list, metadata={"type": "Element", "sequence": 2}
     )
     x4: Optional[int] = field(
@@ -187,7 +182,7 @@ class Paragraph:
     class Meta:
         name = "p"
 
-    content: List[object] = field(
+    content: list[object] = field(
         default_factory=list,
         metadata={
             "type": "Wildcard",

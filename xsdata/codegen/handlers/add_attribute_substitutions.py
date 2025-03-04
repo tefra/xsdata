@@ -21,10 +21,11 @@ class AddAttributeSubstitutions(RelativeHandlerInterface):
     __slots__ = "substitutions"
 
     def __init__(self, container: ContainerInterface):
+        """Initialize the class."""
         super().__init__(container)
         self.substitutions: Optional[dict[str, list[Attr]]] = None
 
-    def process(self, target: Class):
+    def process(self, target: Class) -> None:
         """Process the given class attrs for substitution groups.
 
         This method will ignore attrs in the class derived from
@@ -42,7 +43,7 @@ class AddAttributeSubstitutions(RelativeHandlerInterface):
             if not (attr.is_enumeration or attr.is_wildcard):
                 self.process_attribute(target, attr)
 
-    def process_attribute(self, target: Class, attr: Attr):
+    def process_attribute(self, target: Class, attr: Attr) -> None:
         """Add substitution attrs that refer to the attr type.
 
         If the given attr is referenced in substitution groups
@@ -79,7 +80,7 @@ class AddAttributeSubstitutions(RelativeHandlerInterface):
 
                 self.process_attribute(target, clone)
 
-    def create_substitutions(self):
+    def create_substitutions(self) -> None:
         """Build the substitutions mapping of type names to attr values.
 
         The values are simple reference attrs that we can easily

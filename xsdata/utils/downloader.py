@@ -27,11 +27,12 @@ class Downloader:
     __slots__ = ("base_path", "downloaded", "output")
 
     def __init__(self, output: Path):
+        """Initialize the downloader."""
         self.output = output
         self.base_path: Optional[Path] = None
         self.downloaded: dict = {}
 
-    def wget(self, uri: str, location: Optional[str] = None):
+    def wget(self, uri: str, location: Optional[str] = None) -> None:
         """Download handler for any uri input with circular protection."""
         if not (uri in self.downloaded or (location and location in self.downloaded)):
             self.downloaded[uri] = None
@@ -48,13 +49,13 @@ class Downloader:
 
             self.write_file(uri, location, input_stream.decode())
 
-    def parse_schema(self, uri: str, content: bytes):
+    def parse_schema(self, uri: str, content: bytes) -> None:
         """Convert content to a schema instance and process all sub imports."""
         parser = SchemaParser(location=uri)
         schema = parser.from_bytes(content, Schema)
         self.wget_included(schema)
 
-    def parse_definitions(self, uri: str, content: bytes):
+    def parse_definitions(self, uri: str, content: bytes) -> None:
         """Convert content to a definitions instance and process all sub imports."""
         parser = DefinitionsParser(location=uri)
         definitions = parser.from_bytes(content, Definitions)
@@ -63,14 +64,14 @@ class Downloader:
         for schema in definitions.schemas:
             self.wget_included(schema)
 
-    def wget_included(self, definition: Union[Schema, Definitions]):
+    def wget_included(self, definition: Union[Schema, Definitions]) -> None:
         """Download the definitions included resources."""
         for included in definition.included():
             if included.location:
                 schema_location = getattr(included, "schema_location", None)
                 self.wget(included.location, schema_location)
 
-    def adjust_base_path(self, uri: str):
+    def adjust_base_path(self, uri: str) -> None:
         """Adjust base path for every new uri loaded.
 
         Example runs:
@@ -103,7 +104,7 @@ class Downloader:
 
         return content
 
-    def write_file(self, uri: str, location: Optional[str], content: str):
+    def write_file(self, uri: str, location: Optional[str], content: str) -> None:
         """Write the downloaded uri to a local file.
 
         Keep track of all the written file paths, in case we have to

@@ -4,12 +4,12 @@ from xsdata.utils.testing import AttrFactory, ClassFactory, FactoryTestCase
 
 
 class CalculateAttributePathsTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.processor = CalculateAttributePaths()
 
-    def test_process(self):
+    def test_process(self) -> None:
         target = ClassFactory.create(
             attrs=[
                 AttrFactory.enumeration(),

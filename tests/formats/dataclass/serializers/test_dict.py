@@ -11,7 +11,7 @@ from xsdata.utils.testing import XmlVarFactory
 
 
 class DictEncoderTests(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.encoder = DictEncoder(dict_factory=DictFactory.FILTER_NONE)
         self.books = Books(
@@ -58,26 +58,26 @@ class DictEncoderTests(TestCase):
             ]
         }
 
-    def test_encode(self):
+    def test_encode(self) -> None:
         actual = self.encoder.encode(self.books)
         self.assertEqual(self.expected, actual)
 
-    def test_encode_list_of_objects(self):
+    def test_encode_list_of_objects(self) -> None:
         actual = self.encoder.encode(self.books.book)
         self.assertEqual(self.expected["book"], actual)
 
-    def test_encode_with_enum(self):
+    def test_encode_with_enum(self) -> None:
         obj = Attribute()
         actual = self.encoder.encode(obj)
 
         self.assertEqual("optional", actual["use"])
 
-    def test_convert_namedtuple(self):
+    def test_convert_namedtuple(self) -> None:
         var = XmlVarFactory.create(types=(Telephone,))
         actual = self.encoder.encode(Telephone(30, 234, 56783), var)
         self.assertEqual("30-234-56783", actual)
 
-    def test_convert_wrapper(self):
+    def test_convert_wrapper(self) -> None:
         obj = Wrapper(alpha=["value"])
         value = self.encoder.encode(obj)
         expected = {
@@ -88,7 +88,7 @@ class DictEncoderTests(TestCase):
 
         self.assertEqual(expected, value)
 
-    def test_next_value(self):
+    def test_next_value(self) -> None:
         book = self.books.book[0]
 
         actual = [name for name, value in self.encoder.next_value(book)]
@@ -109,7 +109,7 @@ class DictEncoderTests(TestCase):
         actual = [name for name, value in self.encoder.next_value(book)]
         self.assertEqual(expected, actual)
 
-    def test_generics(self):
+    def test_generics(self) -> None:
         self.obj = AnyElement(
             children=[
                 AnyElement(qname="foo", text="bar"),

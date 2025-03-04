@@ -38,7 +38,7 @@ from xsdata.utils.testing import (
 class SchemaMapperTests(FactoryTestCase):
     @mock.patch.object(SchemaMapper, "build_class")
     @mock.patch.object(SchemaMapper, "root_elements")
-    def test_map(self, mock_root_elements, mock_build_class):
+    def test_map(self, mock_root_elements, mock_build_class) -> None:
         simple_type = ComplexType()
         complex_type = ComplexType()
         schema = Schema(target_namespace="fooNS", location="foo.xsd")
@@ -56,7 +56,7 @@ class SchemaMapperTests(FactoryTestCase):
 
         mock_root_elements.assert_called_once_with(schema)
 
-    def test_root_elements(self):
+    def test_root_elements(self) -> None:
         override = Override()
         redefine = Redefine()
 
@@ -91,7 +91,7 @@ class SchemaMapperTests(FactoryTestCase):
         ]
         self.assertEqual(expected, list(iterator))
 
-    def test_element_namespace(self):
+    def test_element_namespace(self) -> None:
         target_ns = "foobar"
 
         element = Element(ref="foo:something")
@@ -141,7 +141,7 @@ class SchemaMapperTests(FactoryTestCase):
         mock_build_class_extensions,
         mock_build_class_attributes,
         mock_element_namespace,
-    ):
+    ) -> None:
         mock_real_name.return_value = "name"
         mock_display_help.return_value = "sos"
         mock_is_abstract.return_value = True
@@ -176,7 +176,7 @@ class SchemaMapperTests(FactoryTestCase):
         self.assertEqual(expected, result)
 
     @mock.patch.object(SchemaMapper, "children_extensions")
-    def test_build_class_extensions(self, mock_children_extensions):
+    def test_build_class_extensions(self, mock_children_extensions) -> None:
         bar_type = AttrTypeFactory.create(qname="bar")
         foo_type = AttrTypeFactory.create(qname="foo")
 
@@ -198,7 +198,7 @@ class SchemaMapperTests(FactoryTestCase):
         self.assertEqual(3, len(item.extensions))
         self.assertCountEqual([bar, self_ext, foo], item.extensions)
 
-    def test_element_children(self):
+    def test_element_children(self) -> None:
         sequence_one = Sequence(elements=[Element(), Element()])
         sequence_one.index = 1
         sequence_two = Sequence(max_occurs=2, elements=[Element(), Element()])
@@ -228,7 +228,7 @@ class SchemaMapperTests(FactoryTestCase):
         self.assertIsInstance(children, GeneratorType)
         self.assertEqual(expected, list(children))
 
-    def test_element_children_with_parents_restrictions(self):
+    def test_element_children_with_parents_restrictions(self) -> None:
         choice = Choice(elements=[Element(name="elem1")])
         complex_type = ComplexType(
             sequence=Sequence(choices=[choice], min_occurs=0, max_occurs=3)
@@ -243,7 +243,7 @@ class SchemaMapperTests(FactoryTestCase):
         )
         self.assertEqual(expected, restrictions)
 
-    def test_children_extensions(self):
+    def test_children_extensions(self) -> None:
         complex_type = ComplexType(
             attributes=[Attribute() for _ in range(2)],
             simple_content=SimpleContent(restriction=Restriction(base="bk:b")),
@@ -286,7 +286,7 @@ class SchemaMapperTests(FactoryTestCase):
         mock_get_restrictions,
         mock_element_namespace,
         mock_build_attr_types,
-    ):
+    ) -> None:
         item = ClassFactory.create(ns_map={"bar": "foo"})
 
         mock_build_attr_types.return_value = AttrTypeFactory.list(1, qname="int")
@@ -321,7 +321,7 @@ class SchemaMapperTests(FactoryTestCase):
 
     @mock.patch.object(Attribute, "attr_types", new_callable=mock.PropertyMock)
     @mock.patch.object(SchemaMapper, "build_inner_classes")
-    def test_build_attr_types(self, mock_build_inner_classes, mock_attr_types):
+    def test_build_attr_types(self, mock_build_inner_classes, mock_attr_types) -> None:
         mock_attr_types.return_value = ["xs:integer", "xs:string"]
         mock_build_inner_classes.return_value = []
 
@@ -340,7 +340,7 @@ class SchemaMapperTests(FactoryTestCase):
     @mock.patch.object(SchemaMapper, "build_inner_classes")
     def test_build_attr_types_when_obj_has_inner_class(
         self, mock_build_inner_classes, mock_attr_types
-    ):
+    ) -> None:
         inner_class = ClassFactory.create(qname="foo")
         mock_attr_types.return_value = ["xs:integer", "xs:string"]
         mock_build_inner_classes.return_value = [inner_class]
@@ -363,7 +363,7 @@ class SchemaMapperTests(FactoryTestCase):
     @mock.patch.object(SchemaMapper, "build_inner_classes")
     def test_build_attr_types_when_obj_has_no_types(
         self, mock_build_inner_classes, mock_attr_types, mock_default_type
-    ):
+    ) -> None:
         mock_attr_types.return_value = ""
         mock_build_inner_classes.return_value = []
         mock_default_type.return_value = "xs:string"
@@ -376,7 +376,7 @@ class SchemaMapperTests(FactoryTestCase):
         self.assertEqual(AttrTypeFactory.native(DataType.STRING), actual[0])
 
     @mock.patch.object(SchemaMapper, "build_class")
-    def test_build_inner_classes(self, mock_build_class):
+    def test_build_inner_classes(self, mock_build_class) -> None:
         inner_classes = ClassFactory.list(2)
         mock_build_class.side_effect = inner_classes
 
@@ -407,7 +407,7 @@ class SchemaMapperTests(FactoryTestCase):
         )
 
     @mock.patch.object(SchemaMapper, "build_class")
-    def test_build_inner_classes_with_enumeration(self, mock_build_class):
+    def test_build_inner_classes_with_enumeration(self, mock_build_class) -> None:
         inner = ClassFactory.enumeration(2)
         mock_build_class.return_value = inner
 

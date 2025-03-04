@@ -4,7 +4,7 @@ from xsdata.models.wsdl import Binding, BindingOperation
 
 
 class BindingTests(TestCase):
-    def test_unique_operations(self):
+    def test_unique_operations(self) -> None:
         binding = Binding(
             type="foo",
             operations=[

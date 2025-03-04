@@ -13,7 +13,7 @@ class FlattenClassExtensions(RelativeHandlerInterface):
 
     __slots__ = ()
 
-    def process(self, target: Class):
+    def process(self, target: Class) -> None:
         """Process a class' extensions.
 
         Args:
@@ -22,7 +22,7 @@ class FlattenClassExtensions(RelativeHandlerInterface):
         for extension in target.extensions.copy():
             self.process_extension(target, extension)
 
-    def process_extension(self, target: Class, extension: Extension):
+    def process_extension(self, target: Class, extension: Extension) -> None:
         """Process a class extension.
 
         Slit the process to native xsd extensions and user defined
@@ -54,7 +54,7 @@ class FlattenClassExtensions(RelativeHandlerInterface):
         else:
             cls.add_default_attribute(target, extension)
 
-    def process_dependency_extension(self, target: Class, extension: Extension):
+    def process_dependency_extension(self, target: Class, extension: Extension) -> None:
         """Process user defined extension types.
 
         Case:
@@ -83,7 +83,7 @@ class FlattenClassExtensions(RelativeHandlerInterface):
         source: Class,
         target: Class,
         extension: Optional[Extension],
-    ):
+    ) -> None:
         """Process an enumeration class extension.
 
         Cases:
@@ -129,7 +129,7 @@ class FlattenClassExtensions(RelativeHandlerInterface):
             for attr in target.attrs
         ]
 
-    def merge_enumeration_types(self, source: Class, target: Class):
+    def merge_enumeration_types(self, source: Class, target: Class) -> None:
         """Merge the enumeration attr types and restrictions.
 
         Args:

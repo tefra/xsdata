@@ -33,6 +33,7 @@ class Namespace(Enum):
     SOAP_ENC = ("http://schemas.xmlsoap.org/soap/encoding/", "soapenc")
 
     def __init__(self, uri: str, prefix: str):
+        """Initialize namespace."""
         self.uri = uri
         self.prefix = prefix
 
@@ -169,6 +170,7 @@ class DataType(Enum):
         fmt: Optional[str] = None,
         wrapper: Optional[type] = None,
     ):
+        """Initialize DataType."""
         self.code = code
         self.type = python_type
         self.format = fmt

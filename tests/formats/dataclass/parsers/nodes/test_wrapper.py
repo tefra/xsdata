@@ -8,7 +8,7 @@ class WrapperTests(TestCase):
     def setUp(self) -> None:
         self.parser = XmlParser()
 
-    def test_namespace(self):
+    def test_namespace(self) -> None:
         @dataclass
         class NamespaceWrapper:
             items: list[str] = field(
@@ -28,7 +28,7 @@ class WrapperTests(TestCase):
         self.assertEqual(obj.items[0], "a")
         self.assertEqual(obj.items[1], "b")
 
-    def test_primitive(self):
+    def test_primitive(self) -> None:
         @dataclass
         class PrimitiveWrapper:
             primitive_list: list[str] = field(
@@ -47,7 +47,7 @@ class WrapperTests(TestCase):
         self.assertEqual(obj.primitive_list[0], "Value 1")
         self.assertEqual(obj.primitive_list[1], "Value 2")
 
-    def test_element(self):
+    def test_element(self) -> None:
         @dataclass
         class ElementObject:
             content: str = field(metadata={"type": "Element"})

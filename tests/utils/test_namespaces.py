@@ -17,7 +17,7 @@ from xsdata.utils.namespaces import (
 
 
 class NamespacesTests(TestCase):
-    def test_load_prefix(self):
+    def test_load_prefix(self) -> None:
         ns_map: dict = {}
         self.assertEqual("ns0", load_prefix("a", ns_map))
         self.assertEqual("ns0", load_prefix("a", ns_map))
@@ -32,7 +32,7 @@ class NamespacesTests(TestCase):
         }
         self.assertEqual(expected, ns_map)
 
-    def test_generate_prefix(self):
+    def test_generate_prefix(self) -> None:
         ns_map: dict = {}
         self.assertEqual("ns0", generate_prefix("a", ns_map))
         self.assertEqual("xs", generate_prefix(Namespace.XS.uri, ns_map))
@@ -47,12 +47,12 @@ class NamespacesTests(TestCase):
         }
         self.assertEqual(expected, ns_map)
 
-    def test_prefix_exists(self):
+    def test_prefix_exists(self) -> None:
         self.assertFalse(prefix_exists("a", {}))
         self.assertTrue(prefix_exists("a", {"foo": "a"}))
         self.assertTrue(prefix_exists("a", {None: "a"}))
 
-    def test_clean_prefixes(self):
+    def test_clean_prefixes(self) -> None:
         ns_map = {"": "a", None: "b", "foo": ""}
         self.assertEqual({None: "a"}, clean_prefixes(ns_map))
 
@@ -65,7 +65,7 @@ class NamespacesTests(TestCase):
         ns_map = {"bb": "b", None: "b", "c": 1}
         self.assertEqual({"bb": "b", "c": 1}, clean_prefixes(ns_map))
 
-    def test_clean_uri(self):
+    def test_clean_uri(self) -> None:
         self.assertEqual("any", clean_uri("##any"))
         self.assertEqual("a", clean_uri("urn:a"))
         self.assertEqual("a_com/b", clean_uri("http://a.com/b.xsd"))
@@ -73,7 +73,7 @@ class NamespacesTests(TestCase):
         self.assertEqual("a_com/b", clean_uri("https://a.com/b.wsdl"))
         self.assertEqual("a_com/b", clean_uri("https://www.a.com/b.xsd"))
 
-    def test_build_qname(self):
+    def test_build_qname(self) -> None:
         self.assertEqual("{a}b", build_qname("a", "b"))
         self.assertEqual("b", build_qname("", "b"))
         self.assertEqual("b", build_qname(None, "b"))
@@ -85,7 +85,7 @@ class NamespacesTests(TestCase):
         with self.assertRaises(ValueError):
             build_qname(None, None)
 
-    def test_split_qname(self):
+    def test_split_qname(self) -> None:
         self.assertEqual(("a", "b"), split_qname("{a}b"))
         self.assertEqual((None, "b"), split_qname("b"))
         self.assertEqual((None, "{"), split_qname("{"))
@@ -94,28 +94,28 @@ class NamespacesTests(TestCase):
         with self.assertRaises(IndexError):
             split_qname("")
 
-    def test_is_ncname(self):
+    def test_is_ncname(self) -> None:
         self.assertFalse(is_ncname(""))
         self.assertFalse(is_ncname(":abc123"))
         self.assertFalse(is_ncname("9abc123"))
         self.assertFalse(is_ncname("abc:123"))
         self.assertTrue(is_ncname("a_1.2-b3"))
 
-    def test_is_uri(self):
+    def test_is_uri(self) -> None:
         self.assertFalse(is_uri("|"))
         self.assertFalse(is_uri(""))
         self.assertTrue(is_uri("a"))
         self.assertTrue(is_uri("urn:books"))
         self.assertTrue(is_uri(Namespace.XS.uri))
 
-    def test_is_default(self):
+    def test_is_default(self) -> None:
         self.assertFalse(is_default("foo", {}))
         self.assertFalse(is_default("foo", {"a": "foo"}))
         self.assertTrue(is_default("foo", {"": "foo"}))
         self.assertTrue(is_default("foo", {None: "foo"}))
         self.assertTrue(is_default("foo", {"a": "foo", None: "foo"}))
 
-    def test_to_package_name(self):
+    def test_to_package_name(self) -> None:
         cases = {
             "http://www.w3.org/XML/1998/namespace": "org.w3.XML.1998.namespace",
             "http://www.w3.org/XML/2008/06/xlink.xsd": "org.w3.XML.2008.06.xlink",

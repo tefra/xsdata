@@ -111,12 +111,13 @@ class ResourceTransformer:
     __slots__ = ("classes", "config", "preloaded", "processed")
 
     def __init__(self, config: GeneratorConfig):
+        """Initialize the transformer."""
         self.config = config
         self.classes: list[Class] = []
         self.processed: list[str] = []
         self.preloaded: dict = {}
 
-    def process(self, uris: list[str], cache: bool = False):
+    def process(self, uris: list[str], cache: bool = False) -> None:
         """Process a list of resolved URI strings.
 
         Args:
@@ -148,7 +149,7 @@ class ResourceTransformer:
         for name, times in stopwatches.items():
             logger.debug(f"{name} - {sum(times) / 1e9}s")
 
-    def process_sources(self, uris: list[str]):
+    def process_sources(self, uris: list[str]) -> None:
         """Process a list of resolved URI strings.
 
         Load the source URI strings and map them to codegen
@@ -168,7 +169,7 @@ class ResourceTransformer:
         self.process_xml_documents(sources[TYPE_XML])
         self.process_json_documents(sources[TYPE_JSON])
 
-    def process_definitions(self, uris: list[str]):
+    def process_definitions(self, uris: list[str]) -> None:
         """Process a list of wsdl resources.
 
         Args:
@@ -186,7 +187,7 @@ class ResourceTransformer:
             collections.apply(definitions.schemas, self.convert_schema)
             self.convert_definitions(definitions)
 
-    def process_schemas(self, uris: list[str]):
+    def process_schemas(self, uris: list[str]) -> None:
         """Process a list of xsd resources.
 
         Args:
@@ -195,7 +196,7 @@ class ResourceTransformer:
         for uri in uris:
             self.process_schema(uri)
 
-    def process_dtds(self, uris: list[str]):
+    def process_dtds(self, uris: list[str]) -> None:
         """Process a list of dtd resources.
 
         Args:
@@ -213,7 +214,7 @@ class ResourceTransformer:
 
         self.classes.extend(classes)
 
-    def process_schema(self, uri: str, namespace: Optional[str] = None):
+    def process_schema(self, uri: str, namespace: Optional[str] = None) -> None:
         """Parse and convert schema to codegen models.
 
         Args:
@@ -225,7 +226,7 @@ class ResourceTransformer:
         if schema:
             self.convert_schema(schema)
 
-    def process_xml_documents(self, uris: list[str]):
+    def process_xml_documents(self, uris: list[str]) -> None:
         """Process a list of xml resources.
 
         Args:
@@ -243,7 +244,7 @@ class ResourceTransformer:
 
         self.classes.extend(ClassUtils.reduce_classes(classes))
 
-    def process_json_documents(self, uris: list[str]):
+    def process_json_documents(self, uris: list[str]) -> None:
         """Process a list of json resources.
 
         Args:
@@ -269,7 +270,7 @@ class ResourceTransformer:
 
         self.classes.extend(ClassUtils.reduce_classes(classes))
 
-    def process_classes(self):
+    def process_classes(self) -> None:
         """Process the generated classes and write or print the output."""
         class_num, inner_num = self.count_classes(self.classes)
         if class_num:
@@ -287,7 +288,7 @@ class ResourceTransformer:
             with stopwatch(CodeWriter.__name__):
                 writer.write(classes)
 
-    def convert_schema(self, schema: Schema):
+    def convert_schema(self, schema: Schema) -> None:
         """Convert a schema instance to codegen classes.
 
         Process recursively any schema imports.
@@ -301,7 +302,7 @@ class ResourceTransformer:
 
         self.classes.extend(self.generate_classes(schema))
 
-    def convert_definitions(self, definitions: Definitions):
+    def convert_definitions(self, definitions: Definitions) -> None:
         """Convert a definitions instance to codegen classes."""
         self.classes.extend(DefinitionsMapper.map(definitions))
 

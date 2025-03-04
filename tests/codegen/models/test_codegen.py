@@ -14,7 +14,7 @@ class Foo(CodegenModel):
 
 
 class CodegenModelTests(unittest.TestCase):
-    def test_clone(self):
+    def test_clone(self) -> None:
         obj = Foo(bar=[Foo.Bar("one"), Foo.Bar("two")])
         actual = obj.clone()
 
@@ -23,7 +23,7 @@ class CodegenModelTests(unittest.TestCase):
         self.assertIsNot(obj.bar[0], actual.bar[0])
         self.assertIsNot(obj.bar[1], actual.bar[1])
 
-    def test_swap(self):
+    def test_swap(self) -> None:
         obj = Foo(bar=[Foo.Bar("one")])
         src = Foo(bar=[Foo.Bar("two")])
 

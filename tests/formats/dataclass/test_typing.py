@@ -17,7 +17,7 @@ from xsdata.formats.dataclass.typing import (
 )
 
 
-def test_evaluate_with_typevar():
+def test_evaluate_with_typevar() -> None:
     result = evaluate(type["str"], None)
     assert result is str
 
@@ -26,7 +26,7 @@ def test_evaluate_with_typevar():
 
 
 @pytest.mark.parametrize("case,expected", attribute.tokens)
-def test_evaluate_attribute_with_tokens(case, expected):
+def test_evaluate_attribute_with_tokens(case, expected) -> None:
     if expected:
         assert expected == evaluate_attribute(case, tokens=True)
     else:
@@ -35,7 +35,7 @@ def test_evaluate_attribute_with_tokens(case, expected):
 
 
 @pytest.mark.parametrize("case,expected", attribute.not_tokens)
-def test_evaluate_attribute_without_tokens(case, expected):
+def test_evaluate_attribute_without_tokens(case, expected) -> None:
     if expected:
         assert expected == evaluate_attribute(case, tokens=False)
     else:
@@ -44,7 +44,7 @@ def test_evaluate_attribute_without_tokens(case, expected):
 
 
 @pytest.mark.parametrize("case,expected", attributes.cases)
-def test_evaluate_attributes(case, expected):
+def test_evaluate_attributes(case, expected) -> None:
     if expected:
         assert expected == evaluate_attributes(case)
     else:
@@ -53,7 +53,7 @@ def test_evaluate_attributes(case, expected):
 
 
 @pytest.mark.parametrize("case,expected", element.tokens)
-def test_evaluate_element_with_tokens(case, expected):
+def test_evaluate_element_with_tokens(case, expected) -> None:
     if expected:
         assert expected == evaluate_element(case, tokens=True)
     else:
@@ -62,7 +62,7 @@ def test_evaluate_element_with_tokens(case, expected):
 
 
 @pytest.mark.parametrize("case,expected", element.not_tokens)
-def test_evaluate_element_without_tokens(case, expected):
+def test_evaluate_element_without_tokens(case, expected) -> None:
     if expected:
         assert expected == evaluate_element(case, tokens=False)
     else:
@@ -71,7 +71,7 @@ def test_evaluate_element_without_tokens(case, expected):
 
 
 @pytest.mark.parametrize("case,expected", elements.cases)
-def test_evaluate_elements(case, expected):
+def test_evaluate_elements(case, expected) -> None:
     if expected:
         assert expected == evaluate_elements(case)
     else:
@@ -80,7 +80,7 @@ def test_evaluate_elements(case, expected):
 
 
 @pytest.mark.parametrize("case,expected", wildcard.cases)
-def test_evaluate_wildcard(case, expected):
+def test_evaluate_wildcard(case, expected) -> None:
     if expected:
         assert expected == evaluate_wildcard(case)
     else:

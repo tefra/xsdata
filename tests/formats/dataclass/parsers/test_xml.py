@@ -10,13 +10,13 @@ from xsdata.utils.testing import FactoryTestCase, XmlMetaFactory, XmlVarFactory
 
 
 class UserXmlParserTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.parser = UserXmlParser()
         self.parser.objects = [(x, x) for x in "abcde"]
 
     @mock.patch.object(UserXmlParser, "emit_event")
-    def test_start(self, mock_emit_event):
+    def test_start(self, mock_emit_event) -> None:
         attrs = {"a": "b"}
         queue = []
 
@@ -28,7 +28,7 @@ class UserXmlParserTests(FactoryTestCase):
         )
 
     @mock.patch.object(UserXmlParser, "emit_event")
-    def test_end(self, mock_emit_event):
+    def test_end(self, mock_emit_event) -> None:
         objects = []
         queue = []
         meta = XmlMetaFactory.create(clazz=Artist)
@@ -42,7 +42,7 @@ class UserXmlParserTests(FactoryTestCase):
         mock_emit_event.assert_called_once_with(EventType.END, "enabled", obj=result)
 
     @mock.patch.object(UserXmlParser, "emit_event")
-    def test_end_with_no_result(self, mock_emit_event):
+    def test_end_with_no_result(self, mock_emit_event) -> None:
         objects = []
         queue = [SkipNode()]
 
@@ -52,7 +52,7 @@ class UserXmlParserTests(FactoryTestCase):
         self.assertEqual(0, len(queue))
         self.assertEqual(0, mock_emit_event.call_count)
 
-    def test_emit_event(self):
+    def test_emit_event(self) -> None:
         mock_func = mock.Mock()
         self.parser.foo_bar_el = mock_func
 

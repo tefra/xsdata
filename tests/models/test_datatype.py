@@ -9,7 +9,7 @@ def filter_none(mapping: dict) -> dict:
 
 
 class XmlDateTests(TestCase):
-    def test_from_string(self):
+    def test_from_string(self) -> None:
         examples = {
             "2002-01-01-00:00": XmlDate(2002, 1, 1, 0),
             "2002-01-01-02:15": XmlDate(2002, 1, 1, -135),
@@ -22,7 +22,7 @@ class XmlDateTests(TestCase):
             actual = XmlDate.from_string(value)
             self.assertEqual(expected, actual, value)
 
-    def test_from_string_invalid(self):
+    def test_from_string_invalid(self) -> None:
         examples = [
             "a",
             1,
@@ -34,7 +34,7 @@ class XmlDateTests(TestCase):
             with self.assertRaises(ValueError, msg=example):
                 XmlDate.from_string(example)
 
-    def test_str(self):
+    def test_str(self) -> None:
         examples = {
             "2002-01-01-00:00": "2002-01-01Z",
             "2002-01-01-02:15": "2002-01-01-02:15",
@@ -48,7 +48,7 @@ class XmlDateTests(TestCase):
             actual = XmlDate.from_string(value)
             self.assertEqual(expected, str(actual), value)
 
-    def test_repr(self):
+    def test_repr(self) -> None:
         examples = {
             "2002-01-01-00:00": "XmlDate(2002, 1, 1, 0)",
             "2002-01-01-02:15": "XmlDate(2002, 1, 1, -135)",
@@ -62,7 +62,7 @@ class XmlDateTests(TestCase):
             actual = XmlDate.from_string(value)
             self.assertEqual(expected, repr(actual), value)
 
-    def test_datetime_helpers(self):
+    def test_datetime_helpers(self) -> None:
         tz_plus_two = timezone(timedelta(minutes=120))
 
         obj = datetime(2021, 1, 1, 0, 0, tzinfo=tz_plus_two)
@@ -92,7 +92,7 @@ class XmlDateTests(TestCase):
         now = datetime.now()
         self.assertEqual(XmlDate.from_datetime(now), XmlDate.today())
 
-    def test_replace(self):
+    def test_replace(self) -> None:
         actual = XmlDate(2021, 1, 1, 120)
         self.assertIsNot(actual, actual.replace())
         self.assertEqual("2022-01-01+02:00", str(actual.replace(2022)))
@@ -101,7 +101,7 @@ class XmlDateTests(TestCase):
         self.assertEqual("2022-12-25+02:00", str(actual.replace(2022, 12, 25)))
         self.assertEqual("2022-12-25+00:10", str(actual.replace(2022, 12, 25, 10)))
 
-    def test_comparisons(self):
+    def test_comparisons(self) -> None:
         a = XmlDate(2021, 1, 1)
         b = XmlDate(2021, 1, 2)
 
@@ -116,7 +116,7 @@ class XmlDateTests(TestCase):
 
 
 class XmlDateTimeTests(TestCase):
-    def test_from_string(self):
+    def test_from_string(self) -> None:
         examples = {
             "2002-01-01T12:01:01-00:00": XmlDateTime(2002, 1, 1, 12, 1, 1, 0, 0),
             "2002-01-01T12:01:01-02:15": XmlDateTime(2002, 1, 1, 12, 1, 1, 0, -135),
@@ -134,7 +134,7 @@ class XmlDateTimeTests(TestCase):
             actual = XmlDateTime.from_string(value)
             self.assertEqual(expected, actual, value)
 
-    def test_from_string_invalid(self):
+    def test_from_string_invalid(self) -> None:
         examples = [
             "a",
             1,
@@ -149,7 +149,7 @@ class XmlDateTimeTests(TestCase):
             with self.assertRaises(ValueError, msg=example):
                 XmlDateTime.from_string(example)
 
-    def test_str(self):
+    def test_str(self) -> None:
         examples = {
             "2002-01-01T12:01:01-00:00": "2002-01-01T12:01:01Z",
             "2002-01-01T12:01:01-02:15": "2002-01-01T12:01:01-02:15",
@@ -169,7 +169,7 @@ class XmlDateTimeTests(TestCase):
             actual = XmlDateTime.from_string(value)
             self.assertEqual(expected or value, str(actual), value)
 
-    def test_repr(self):
+    def test_repr(self) -> None:
         examples = {
             "2002-01-01T12:01:01-00:00": "XmlDateTime(2002, 1, 1, 12, 1, 1, 0, 0)",
             "2002-01-01T12:01:01-02:15": "XmlDateTime(2002, 1, 1, 12, 1, 1, 0, -135)",
@@ -187,7 +187,7 @@ class XmlDateTimeTests(TestCase):
             actual = XmlDateTime.from_string(value)
             self.assertEqual(expected, repr(actual), value)
 
-    def test_datetime_helpers(self):
+    def test_datetime_helpers(self) -> None:
         tz_plus_135 = timezone(timedelta(seconds=8100))
 
         obj = datetime(2002, 1, 1, 12, 1, 1, tzinfo=tz_plus_135)
@@ -223,7 +223,7 @@ class XmlDateTimeTests(TestCase):
             XmlDateTime.utcnow().replace(fractional_second=0, second=0, minute=1),
         )
 
-    def test_comparisons(self):
+    def test_comparisons(self) -> None:
         a = XmlDateTime.from_string("2010-09-20T12:00:00Z")
         b = XmlDateTime.from_string("2010-09-20T13:00:00.000+01:00")
         c = a.replace(second=1)
@@ -242,7 +242,7 @@ class XmlDateTimeTests(TestCase):
         b = XmlDateTime.from_string("-2010-09-20T13:00:00.000+01:00")
         self.assertEqual(a, b)
 
-    def test_replace(self):
+    def test_replace(self) -> None:
         actual = XmlDateTime(2002, 1, 1, 12, 1, 1, 0, -120)
         self.assertIsNot(actual, actual.replace())
         self.assertEqual("2022-01-01T12:01:01-02:00", str(actual.replace(2022)))
@@ -276,7 +276,7 @@ class XmlDateTimeTests(TestCase):
 
 
 class XmlTimeTests(TestCase):
-    def test_from_string(self):
+    def test_from_string(self) -> None:
         examples = {
             "12:01:01-00:00": XmlTime(12, 1, 1, 0, 0),
             "12:01:01-02:15": XmlTime(12, 1, 1, 0, -135),
@@ -291,7 +291,7 @@ class XmlTimeTests(TestCase):
             actual = XmlTime.from_string(value)
             self.assertEqual(expected, actual, value)
 
-    def test_from_string_invalid(self):
+    def test_from_string_invalid(self) -> None:
         examples = [
             "a",
             1,
@@ -303,7 +303,7 @@ class XmlTimeTests(TestCase):
             with self.assertRaises(ValueError, msg=example):
                 XmlTime.from_string(example)
 
-    def test_str(self):
+    def test_str(self) -> None:
         examples = {
             "12:01:01-00:00": "12:01:01Z",
             "12:01:01-02:15": "12:01:01-02:15",
@@ -318,7 +318,7 @@ class XmlTimeTests(TestCase):
             actual = XmlTime.from_string(value)
             self.assertEqual(expected or value, str(actual), value)
 
-    def test_repr(self):
+    def test_repr(self) -> None:
         examples = {
             "12:01:01-00:00": "XmlTime(12, 1, 1, 0, 0)",
             "12:01:01-02:15": "XmlTime(12, 1, 1, 0, -135)",
@@ -333,7 +333,7 @@ class XmlTimeTests(TestCase):
             actual = XmlTime.from_string(value)
             self.assertEqual(expected, repr(actual), value)
 
-    def test_datetime_helpers(self):
+    def test_datetime_helpers(self) -> None:
         tz_minus_120 = timezone(timedelta(minutes=-120))
 
         obj = time(12, 1, 1, 1, tzinfo=tz_minus_120)
@@ -369,7 +369,7 @@ class XmlTimeTests(TestCase):
             XmlTime.utcnow().replace(fractional_second=0, second=0, minute=1),
         )
 
-    def test_comparisons(self):
+    def test_comparisons(self) -> None:
         a = XmlTime.from_string("12:00:00Z")
         b = XmlTime.from_string("13:00:00.000+01:00")
         c = XmlTime.from_string("13:00:00.000")
@@ -385,7 +385,7 @@ class XmlTimeTests(TestCase):
         self.assertEqual(a, b)
         self.assertNotEqual(a, True)
 
-    def test_replace(self):
+    def test_replace(self) -> None:
         actual = XmlTime(12, 1, 1, 1, 0)
         self.assertIsNot(actual, actual.replace())
         self.assertEqual("14:01:01.000000001Z", str(actual.replace(14)))
@@ -397,7 +397,7 @@ class XmlTimeTests(TestCase):
 
 
 class XmlDurationTests(TestCase):
-    def test_properties(self):
+    def test_properties(self) -> None:
         duration = XmlDuration("P2Y6M5DT12H35M30.5S")
         self.assertEqual(2, duration.years)
         self.assertEqual(6, duration.months)
@@ -407,7 +407,7 @@ class XmlDurationTests(TestCase):
         self.assertEqual(30.5, duration.seconds)
         self.assertFalse(duration.negative)
 
-    def test_init_valid(self):
+    def test_init_valid(self) -> None:
         fixtures = {
             "P2Y6M5DT12H35M30.5S": {
                 "days": 5,
@@ -433,7 +433,7 @@ class XmlDurationTests(TestCase):
             self.assertEqual(expected, filter_none(obj.asdict()), f"Failed in: {value}")
             self.assertEqual(value, str(obj), f"Failed out: {value}")
 
-    def test_init_invalid(self):
+    def test_init_invalid(self) -> None:
         fixtures = [
             True,
             "P-20M",
@@ -451,11 +451,11 @@ class XmlDurationTests(TestCase):
             with self.assertRaises(ValueError, msg=fixture):
                 XmlDuration(fixture)
 
-    def test_repr(self):
+    def test_repr(self) -> None:
         obj = XmlDuration("PT20M")
         self.assertEqual('XmlDuration("PT20M")', repr(obj))
 
-    def test_user_string(self):
+    def test_user_string(self) -> None:
         obj = XmlDuration("PT20M")
         obj_b = obj + "5.0S"
         expected = {
@@ -473,7 +473,7 @@ class XmlDurationTests(TestCase):
 
 
 class XmlPeriodTests(TestCase):
-    def test_properties(self):
+    def test_properties(self) -> None:
         period = XmlPeriod("2001-10+02:00")
         self.assertEqual(2001, period.year)
         self.assertEqual(10, period.month)
@@ -486,7 +486,7 @@ class XmlPeriodTests(TestCase):
         self.assertEqual(20, period.day)
         self.assertEqual(-164, period.offset)
 
-    def test_init_valid(self):
+    def test_init_valid(self) -> None:
         fixtures = {
             "--05---05:00": {"month": 5, "offset": -300},
             "---01 ": {"day": 1},
@@ -523,7 +523,7 @@ class XmlPeriodTests(TestCase):
         for value, expected in fixtures.items():
             self.assertEqual(expected, filter_none(XmlPeriod(value).as_dict()))
 
-    def test_init_invalid(self):
+    def test_init_invalid(self) -> None:
         fixtures = [
             # gDay
             "--30-",
@@ -552,11 +552,11 @@ class XmlPeriodTests(TestCase):
             with self.assertRaises(ValueError, msg=value):
                 XmlPeriod(value)
 
-    def test_repr(self):
+    def test_repr(self) -> None:
         obj = XmlPeriod("--02-29")
         self.assertEqual('XmlPeriod("--02-29")', repr(obj))
 
-    def test_equal(self):
+    def test_equal(self) -> None:
         a = XmlPeriod("--02-29")
         b = XmlPeriod("--02-29")
         c = XmlPeriod("--03-30")

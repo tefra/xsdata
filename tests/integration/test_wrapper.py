@@ -10,7 +10,7 @@ from xsdata.utils.testing import load_class
 os.chdir(root)
 
 
-def test_xml_documents():
+def test_xml_documents() -> None:
     schema = fixtures_dir.joinpath("wrapper/schema.xsd")
     package = "tests.fixtures.wrapper.models"
     runner = CliRunner()

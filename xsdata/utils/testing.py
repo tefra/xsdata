@@ -66,7 +66,7 @@ def load_class(output: str, clazz_name: str) -> Any:
 class FactoryTestCase(unittest.TestCase):
     maxDiff = None
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         ClassFactory.reset()
         AttrFactory.reset()
@@ -105,7 +105,7 @@ class Factory(abc.ABC):
 
 
 class ClassFactory(Factory):
-    tags = [Tag.ELEMENT, Tag.ATTRIBUTE, Tag.COMPLEX_TYPE, Tag.SIMPLE_TYPE]
+    tags = (Tag.ELEMENT, Tag.ATTRIBUTE, Tag.COMPLEX_TYPE, Tag.SIMPLE_TYPE)
     counter = 65
 
     @classmethod
@@ -198,7 +198,7 @@ class ClassFactory(Factory):
 
 class ExtensionFactory(Factory):
     counter = 65
-    tags = [Tag.ELEMENT, Tag.EXTENSION, Tag.RESTRICTION]
+    tags = (Tag.ELEMENT, Tag.EXTENSION, Tag.RESTRICTION)
 
     @classmethod
     def create(
@@ -262,7 +262,7 @@ class AttrTypeFactory(Factory):
 
 
 class AttrFactory(Factory):
-    tags = [Tag.ATTRIBUTE, Tag.ELEMENT, Tag.RESTRICTION]
+    tags = (Tag.ATTRIBUTE, Tag.ELEMENT, Tag.RESTRICTION)
     counter = 65
 
     @classmethod

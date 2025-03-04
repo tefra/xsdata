@@ -10,7 +10,7 @@ class SanitizeEnumerationClass(RelativeHandlerInterface):
 
     __slots__ = ()
 
-    def process(self, target: Class):
+    def process(self, target: Class) -> None:
         """Process entrypoint for classes.
 
         Steps:
@@ -34,7 +34,7 @@ class SanitizeEnumerationClass(RelativeHandlerInterface):
         if enumerations:
             target.attrs = enumerations
 
-    def flatten(self, target: Class):
+    def flatten(self, target: Class) -> None:
         """Flatten attrs derived from xs:union of enumeration classes.
 
         Find the enumeration classes and merge all of their members in

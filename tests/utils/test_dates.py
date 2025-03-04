@@ -4,7 +4,7 @@ from xsdata.utils.dates import parse_date_args, validate_date, validate_time
 
 
 class DatesUtilsTests(TestCase):
-    def test_parse_date_args(self):
+    def test_parse_date_args(self) -> None:
         args = parse_date_args("2002-01-02T12:14:30-01:22", "%Y-%m-%dT%H:%M:%S%z")
 
         self.assertEqual(2002, next(args))
@@ -17,21 +17,21 @@ class DatesUtilsTests(TestCase):
         self.assertEqual(-82, next(args))
         self.assertIsNone(next(args, None))
 
-    def test_parse_date_args_microsecond(self):
+    def test_parse_date_args_microsecond(self) -> None:
         args = parse_date_args("55.1345", "%S")
 
         self.assertEqual(55, next(args))
         self.assertEqual(134500000, next(args))
         self.assertIsNone(next(args, None))
 
-    def test_parse_date_args_nanosecond(self):
+    def test_parse_date_args_nanosecond(self) -> None:
         args = parse_date_args("55.1345678", "%S")
 
         self.assertEqual(55, next(args))
         self.assertEqual(134567800, next(args))
         self.assertIsNone(next(args, None))
 
-    def test_parse_date_args_year(self):
+    def test_parse_date_args_year(self) -> None:
         args = parse_date_args("-1970-05", "%Y-%m")
 
         self.assertEqual(-1970, next(args))
@@ -62,26 +62,26 @@ class DatesUtilsTests(TestCase):
         with self.assertRaises(ValueError):
             next(parse_date_args("00009", "%Y"))
 
-    def test_parse_date_args_utc_timezone(self):
+    def test_parse_date_args_utc_timezone(self) -> None:
         args = parse_date_args("Z", "%z")
 
         self.assertEqual(0, next(args))
         self.assertIsNone(next(args, None))
 
-    def test_parse_date_args_optional_timezone(self):
+    def test_parse_date_args_optional_timezone(self) -> None:
         args = parse_date_args("2020", "%Y%z")
 
         self.assertEqual(2020, next(args))
         self.assertIsNone(None, next(args))
         self.assertIsNone(next(args, None))
 
-    def test_parse_date_args_trim_input(self):
+    def test_parse_date_args_trim_input(self) -> None:
         args = parse_date_args("\n Z ", "%z")
 
         self.assertEqual(0, next(args))
         self.assertIsNone(next(args, None))
 
-    def test_parse_date_args_raises_value_error(self):
+    def test_parse_date_args_raises_value_error(self) -> None:
         cases = {
             "2002-12-01": "%F",  # Unknown var
             "2002-01-01": "%Y",  # Mismatch format
@@ -98,7 +98,7 @@ class DatesUtilsTests(TestCase):
                 f"String '{value}' does not match format '{fmt}'", str(cm.exception)
             )
 
-    def test_validate_date(self):
+    def test_validate_date(self) -> None:
         invalid = {
             (0, 0, 0): "Month must be in 1..12",
             (0, 2, 0): "Day must be in 1..29",
@@ -111,7 +111,7 @@ class DatesUtilsTests(TestCase):
 
             self.assertEqual(msg, str(cm.exception))
 
-    def test_validate_time(self):
+    def test_validate_time(self) -> None:
         invalid = {
             (-1, 0, 0, 0): "Hour must be in 0..24",
             (25, 0, 0, 0): "Hour must be in 0..24",

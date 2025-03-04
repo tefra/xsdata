@@ -31,7 +31,7 @@ from xsdata.utils.testing import FactoryTestCase, XmlMetaFactory, XmlVarFactory
 
 
 class XmlMetaBuilderTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.builder = XmlMetaBuilder(
             class_type=class_types.get_type("dataclasses"),
@@ -40,7 +40,7 @@ class XmlMetaBuilderTests(FactoryTestCase):
         )
 
     @mock.patch.object(XmlMetaBuilder, "build_vars")
-    def test_build(self, mock_build_vars):
+    def test_build(self, mock_build_vars) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT, name="foo", namespaces=("foo",), types=(int,)
         )
@@ -59,7 +59,7 @@ class XmlMetaBuilderTests(FactoryTestCase):
         )
 
     @mock.patch.object(XmlMetaBuilder, "build_vars", return_value=[])
-    def test_build_with_parent_namespace(self, mock_build_vars):
+    def test_build_with_parent_namespace(self, mock_build_vars) -> None:
         result = self.builder.build(Country, "http://xsdata")
 
         self.assertEqual(build_qname("http://xsdata", "country"), result.qname)
@@ -68,13 +68,13 @@ class XmlMetaBuilderTests(FactoryTestCase):
         )
 
     @mock.patch.object(XmlMetaBuilder, "build_vars", return_value=[])
-    def test_build_with_no_meta_name_and_name_generator(self, *args):
+    def test_build_with_no_meta_name_and_name_generator(self, *args) -> None:
         self.builder.element_name_generator = text.snake_case
         result = self.builder.build(BookForm, None)
 
         self.assertEqual("book_form", result.qname)
 
-    def test_build_block_meta_inheritance(self):
+    def test_build_block_meta_inheritance(self) -> None:
         @dataclass
         class Bar:
             class Meta:
@@ -95,13 +95,13 @@ class XmlMetaBuilderTests(FactoryTestCase):
         result = self.builder.build(Thug, None)
         self.assertEqual("thug", result.qname)
 
-    def test_build_with_no_dataclass_raises_exception(self, *args):
+    def test_build_with_no_dataclass_raises_exception(self, *args) -> None:
         with self.assertRaises(XmlContextError) as cm:
             self.builder.build(int, None)
 
         self.assertEqual(f"Type '{int}' is not a dataclass.", str(cm.exception))
 
-    def test_build_locates_globalns_per_field(self):
+    def test_build_locates_globalns_per_field(self) -> None:
         actual = self.builder.build(ChoiceTypeChild, None)
         self.assertEqual(1, len(actual.choices))
         self.assertEqual(7, len(actual.choices[0].elements))
@@ -109,19 +109,19 @@ class XmlMetaBuilderTests(FactoryTestCase):
         with self.assertRaises(XmlContextError):
             self.builder.find_declared_class(object, "foo")
 
-    def test_build_locates_parent_namespace_per_field(self):
+    def test_build_locates_parent_namespace_per_field(self) -> None:
         actual = self.builder.build(TypeNS1, None)
         self.assertEqual(["{ns2}x1", "{ns1}x2"], list(actual.elements.keys()))
 
-    def test_build_inner_type_has_no_target_qname(self):
+    def test_build_inner_type_has_no_target_qname(self) -> None:
         actual = self.builder.build(Parent.Inner, None)
         self.assertIsNone(actual.target_qname)
 
-    def test_build_local_type_has_no_target_qname(self):
+    def test_build_local_type_has_no_target_qname(self) -> None:
         actual = self.builder.build(Parent, None)
         self.assertIsNone(actual.target_qname)
 
-    def test_target_namespace(self):
+    def test_target_namespace(self) -> None:
         class Meta:
             namespace = "bar"
             target_namespace = "foo"
@@ -136,7 +136,7 @@ class XmlMetaBuilderTests(FactoryTestCase):
 
         self.assertEqual("gl", self.builder.target_namespace(Module, Meta))
 
-    def test_build_vars(self):
+    def test_build_vars(self) -> None:
         result = self.builder.build_vars(BookForm, None, text.pascal_case, str.upper)
         self.assertIsInstance(result, Iterator)
 
@@ -212,14 +212,14 @@ class XmlMetaBuilderTests(FactoryTestCase):
         for var in result:
             self.assertIsNone(var.clazz)
 
-    def test_build_vars_with_ignore_types(self):
+    def test_build_vars_with_ignore_types(self) -> None:
         result = self.builder.build_vars(TypeB, None, return_input, return_input)
         self.assertIsInstance(result, Iterator)
 
         actual = list(result)
         self.assertEqual(2, len(actual))
 
-    def test_default_xml_type(self):
+    def test_default_xml_type(self) -> None:
         cls = make_dataclass("a", [("x", int)])
         self.assertEqual(XmlType.TEXT, self.builder.default_xml_type(cls))
 
@@ -264,7 +264,7 @@ class XmlVarBuilderTests(TestCase):
 
         super().setUp()
 
-    def test_build_with_choice_field(self):
+    def test_build_with_choice_field(self) -> None:
         globalns = sys.modules[ChoiceType.__module__].__dict__
         type_hints = get_type_hints(ChoiceType)
         class_field = fields(ChoiceType)[0]
@@ -367,7 +367,7 @@ class XmlVarBuilderTests(TestCase):
 
         self.assertEqual(expected, actual)
 
-    def test_build_with_ambiguous_choices(self):
+    def test_build_with_ambiguous_choices(self) -> None:
         type_hints = get_type_hints(AmbiguousChoiceType)
         class_field = fields(AmbiguousChoiceType)[0]
 
@@ -388,7 +388,7 @@ class XmlVarBuilderTests(TestCase):
             str(cm.exception),
         )
 
-    def test_build_validates_result(self):
+    def test_build_validates_result(self) -> None:
         with self.assertRaises(XmlContextError) as cm:
             self.builder.build(
                 BookForm,
@@ -406,7 +406,7 @@ class XmlVarBuilderTests(TestCase):
             str(cm.exception),
         )
 
-    def test_resolve_namespaces(self):
+    def test_resolve_namespaces(self) -> None:
         func = self.builder.resolve_namespaces
 
         actual = func(XmlType.ELEMENT, "foo", "bar")

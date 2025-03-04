@@ -16,7 +16,7 @@ from xsdata.utils.testing import (
 class DictMapperTests(FactoryTestCase):
     @mock.patch.object(ClassUtils, "flatten")
     @mock.patch.object(DictMapper, "build_class")
-    def test_map(self, mock_build_class, mock_flatten):
+    def test_map(self, mock_build_class, mock_flatten) -> None:
         data = {"value": 1}
         root_class = ClassFactory.create()
         flat_classes = ClassFactory.list(5)
@@ -31,7 +31,7 @@ class DictMapperTests(FactoryTestCase):
         mock_build_class.assert_called_once_with(data, "root")
         mock_flatten.assert_called_once_with(root_class, "tests/root")
 
-    def test_build_class(self):
+    def test_build_class(self) -> None:
         data = {"a": 1, "b": True}
         actual = DictMapper.build_class(data, "root")
         expected = ClassFactory.create(
@@ -57,7 +57,7 @@ class DictMapperTests(FactoryTestCase):
         )
         self.assertEqual(expected, actual)
 
-    def test_build_class_attribute_from_list(self):
+    def test_build_class_attribute_from_list(self) -> None:
         target = ClassFactory.create()
         data = [1, True, 1.1]
 
@@ -76,7 +76,7 @@ class DictMapperTests(FactoryTestCase):
         self.assertEqual(expected, target.attrs[0])
         self.assertEqual(restrictions, target.attrs[0].restrictions)
 
-    def test_build_class_attribute_from_empty_list(self):
+    def test_build_class_attribute_from_empty_list(self) -> None:
         target = ClassFactory.create()
         data = []
 
@@ -93,7 +93,7 @@ class DictMapperTests(FactoryTestCase):
         self.assertEqual(expected, target.attrs[0])
         self.assertEqual(restrictions, target.attrs[0].restrictions)
 
-    def test_build_class_attribute_from_dict(self):
+    def test_build_class_attribute_from_dict(self) -> None:
         target = ClassFactory.create()
         data = {"sub1": 1, "sub2": "value", "sub3": None}
         DictMapper.build_class_attribute(target, "a", data)

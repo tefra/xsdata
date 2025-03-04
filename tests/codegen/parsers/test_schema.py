@@ -29,11 +29,11 @@ from xsdata.models.xsd import (
 
 
 class SchemaParserTests(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.parser = SchemaParser()
         super().setUp()
 
-    def test_complete(self):
+    def test_complete(self) -> None:
         xsd = """<?xml version="1.0" encoding="utf-8"?>
         <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
             <xs:simpleType name="CountryType">
@@ -62,7 +62,7 @@ class SchemaParserTests(TestCase):
             4, schema.simple_types[0].annotations[0].documentations[0].index
         )
 
-    def test_start_schema(self):
+    def test_start_schema(self) -> None:
         self.parser.start_schema({})
 
         self.assertIsNone(self.parser.element_form)
@@ -80,7 +80,7 @@ class SchemaParserTests(TestCase):
         self.assertEqual("unqualified", self.parser.attribute_form)
         self.assertEqual("tns:attr", self.parser.default_attributes)
 
-    def test_set_schema_forms_default(self):
+    def test_set_schema_forms_default(self) -> None:
         schema = Schema()
         schema.elements.append(Element())
         schema.elements.append(Element())
@@ -98,7 +98,7 @@ class SchemaParserTests(TestCase):
         for child_attribute in schema.attributes:
             self.assertEqual(FormType.QUALIFIED, child_attribute.form)
 
-    def test_set_schema_forms(self):
+    def test_set_schema_forms(self) -> None:
         schema = Schema()
         schema.elements.append(Element())
         schema.elements.append(Element())
@@ -118,7 +118,7 @@ class SchemaParserTests(TestCase):
         for child_attribute in schema.attributes:
             self.assertEqual(FormType.QUALIFIED, child_attribute.form)
 
-    def test_set_schema_namespaces(self):
+    def test_set_schema_namespaces(self) -> None:
         schema = Schema()
 
         self.parser.set_schema_namespaces(schema)
@@ -132,7 +132,7 @@ class SchemaParserTests(TestCase):
         self.parser.set_schema_namespaces(schema)
         self.assertEqual("foo", schema.target_namespace)
 
-    def test_set_namespace_map(self):
+    def test_set_namespace_map(self) -> None:
         schema = Schema()
         ns_map = {}
 
@@ -166,7 +166,7 @@ class SchemaParserTests(TestCase):
         self.parser.set_namespace_map(foo, ns_map)
         self.assertFalse(hasattr(foo, "ns_map"))
 
-    def test_add_default_imports(self):
+    def test_add_default_imports(self) -> None:
         schema = Schema()
         schema.imports.append(Import(namespace="foo"))
 
@@ -183,7 +183,7 @@ class SchemaParserTests(TestCase):
     @mock.patch.object(SchemaParser, "resolve_path")
     def test_resolve_schemas_locations(
         self, mock_resolve_path, mock_resolve_local_path
-    ):
+    ) -> None:
         schema = Schema()
         self.parser.resolve_schemas_locations(schema)
 
@@ -221,7 +221,7 @@ class SchemaParserTests(TestCase):
         for sub in schema.included():
             self.assertEqual(Path.cwd().joinpath(sub.location), sub.location)
 
-    def test_resolve_path(self):
+    def test_resolve_path(self) -> None:
         self.assertIsNone(self.parser.resolve_path("foo"))
         iam = Path(__file__)
 
@@ -232,7 +232,7 @@ class SchemaParserTests(TestCase):
         actual = self.parser.resolve_path(iam.name)
         self.assertEqual(iam.as_uri(), actual)
 
-    def test_resolve_local_path(self):
+    def test_resolve_local_path(self) -> None:
         self.assertIsNone(self.parser.resolve_local_path("foo", "bar"))
         self.assertIsNone(self.parser.resolve_local_path("foo", None))
         self.assertIsNone(self.parser.resolve_local_path(None, None))
@@ -255,7 +255,7 @@ class SchemaParserTests(TestCase):
             self.parser.resolve_local_path("../xsi.xsd", Namespace.XSI.uri),
         )
 
-    def test_end_attribute(self):
+    def test_end_attribute(self) -> None:
         attribute = Attribute()
 
         self.parser.end_attribute(attribute)
@@ -269,7 +269,7 @@ class SchemaParserTests(TestCase):
         self.parser.end_attribute(obj)
         self.assertIsNone(obj.form)
 
-    def test_end_complex_type(self):
+    def test_end_complex_type(self) -> None:
         complex_type = ComplexType()
         not_complex_type = Element()
 
@@ -312,7 +312,7 @@ class SchemaParserTests(TestCase):
         self.parser.end_complex_type(complex_type)
         self.assertIs(default_open_content, complex_type.open_content)
 
-    def test_end_default_open_content(self):
+    def test_end_default_open_content(self) -> None:
         default_open_content = DefaultOpenContent()
         default_open_content.any = Any()
 
@@ -328,7 +328,7 @@ class SchemaParserTests(TestCase):
         self.parser.end_default_open_content(obj)
         self.assertIsNone(obj.open_content)
 
-    def test_end_Element(self):
+    def test_end_Element(self) -> None:
         obj = Element()
         self.parser.end_element(obj)
         self.assertIsNone(obj.form)
@@ -341,7 +341,7 @@ class SchemaParserTests(TestCase):
         self.parser.end_element(obj)
         self.assertIsNone(obj.form)
 
-    def test_end_extension(self):
+    def test_end_extension(self) -> None:
         extension = Extension()
         not_extension = Element()
 
@@ -363,7 +363,7 @@ class SchemaParserTests(TestCase):
         self.parser.end_extension(obj)
         self.assertIsNone(obj.open_content)
 
-    def test_end_open_content(self):
+    def test_end_open_content(self) -> None:
         open_content = OpenContent()
         open_content.any = Any()
 
@@ -378,7 +378,7 @@ class SchemaParserTests(TestCase):
         self.parser.end_open_content(obj)
         self.assertEqual(0, obj.any.index)
 
-    def test_end_restriction(self):
+    def test_end_restriction(self) -> None:
         restriction = Restriction()
         not_restriction = Element()
 
@@ -410,7 +410,7 @@ class SchemaParserTests(TestCase):
         mock_set_schema_namespaces,
         mock_add_default_imports,
         mock_resolve_schemas_locations,
-    ):
+    ) -> None:
         schema = Schema()
         schema.elements.append(Element())
         schema.elements.append(Element())
@@ -429,7 +429,7 @@ class SchemaParserTests(TestCase):
         mock_add_default_imports.assert_called_once_with(schema)
         mock_resolve_schemas_locations.assert_called_once_with(schema)
 
-    def test_has_elements(self):
+    def test_has_elements(self) -> None:
         restriction = Restriction()
         restriction.sequence = Sequence()
         restriction.sequence.any_attribute = AnyAttribute()

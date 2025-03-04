@@ -14,7 +14,7 @@ from xsdata.utils.testing import (
 
 
 class CreateCompoundFieldsTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.config = GeneratorConfig()
@@ -23,7 +23,7 @@ class CreateCompoundFieldsTests(FactoryTestCase):
         self.processor = CreateCompoundFields(container=self.container)
 
     @mock.patch.object(CreateCompoundFields, "group_fields")
-    def test_process(self, mock_group_fields):
+    def test_process(self, mock_group_fields) -> None:
         target = ClassFactory.elements(8)
         # First group repeating
         target.attrs[0].restrictions.choice = "1"
@@ -45,7 +45,7 @@ class CreateCompoundFieldsTests(FactoryTestCase):
             ]
         )
 
-    def test_process_with_config_enabled_false_calculate_min_occurs(self):
+    def test_process_with_config_enabled_false_calculate_min_occurs(self) -> None:
         self.processor.config.enabled = False
         target = ClassFactory.elements(5)
         target.attrs[0].restrictions.choice = 1
@@ -70,7 +70,7 @@ class CreateCompoundFieldsTests(FactoryTestCase):
         expected = [(2, 3), (2, 3), (0, 3), (0, 3), (2, 3)]
         self.assertEqual(expected, actual)
 
-    def test_group_fields(self):
+    def test_group_fields(self) -> None:
         target = ClassFactory.create(attrs=AttrFactory.list(4))
         target.attrs[0].restrictions.choice = 1
         target.attrs[1].restrictions.choice = 1
@@ -123,7 +123,7 @@ class CreateCompoundFieldsTests(FactoryTestCase):
         self.assertEqual(expected, target.attrs[0])
         self.assertEqual(expected_res, target.attrs[0].restrictions)
 
-    def test_group_fields_with_effective_choices_sums_occurs(self):
+    def test_group_fields_with_effective_choices_sums_occurs(self) -> None:
         target = ClassFactory.create(attrs=AttrFactory.list(2))
         target.attrs[0].restrictions.choice = -1
         target.attrs[1].restrictions.choice = -1
@@ -138,7 +138,7 @@ class CreateCompoundFieldsTests(FactoryTestCase):
         self.assertEqual(1, len(target.attrs))
         self.assertEqual(expected_res, target.attrs[0].restrictions)
 
-    def test_choose_name(self):
+    def test_choose_name(self) -> None:
         target = ClassFactory.create()
 
         actual = self.processor.choose_name(target, ["a", "b", "c"], [])
@@ -170,7 +170,7 @@ class CreateCompoundFieldsTests(FactoryTestCase):
         actual = self.processor.choose_name(target, ["a", "b", "c"], ["d", "f"])
         self.assertEqual("a_Or_b_Or_c", actual)
 
-    def test_build_reserved_names(self):
+    def test_build_reserved_names(self) -> None:
         base = ClassFactory.create(
             attrs=[
                 AttrFactory.create("standalone"),
@@ -203,7 +203,7 @@ class CreateCompoundFieldsTests(FactoryTestCase):
 
         self.assertEqual(expected, actual)
 
-    def test_build_attr_choice(self):
+    def test_build_attr_choice(self) -> None:
         attr = AttrFactory.create(
             name="a", namespace="xsdata", default="123", help="help", fixed=True
         )
@@ -241,7 +241,7 @@ class CreateCompoundFieldsTests(FactoryTestCase):
         self.assertEqual(attr.help, actual.help)
         self.assertFalse(actual.fixed)
 
-    def test_sum_counters(self):
+    def test_sum_counters(self) -> None:
         counters = {
             ("g", 184, 1, 1): {
                 "min": [],
@@ -273,7 +273,7 @@ class CreateCompoundFieldsTests(FactoryTestCase):
         result = self.processor.sum_counters(counters)
         self.assertEqual((0, 3), (sum(result[0]), sum(result[1])))
 
-    def test_update_counters(self):
+    def test_update_counters(self) -> None:
         attr = AttrFactory.create()
         attr.restrictions.min_occurs = 2
         attr.restrictions.max_occurs = 3

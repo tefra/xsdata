@@ -1,3 +1,5 @@
+from collections.abc import Iterator
+
 from xsdata.codegen.mixins import (
     ContainerInterface,
     RelativeHandlerInterface,
@@ -18,10 +20,11 @@ class DetectCircularReferences(RelativeHandlerInterface):
     __slots__ = "container", "reference_types"
 
     def __init__(self, container: ContainerInterface):
+        """Initialize the class."""
         super().__init__(container)
         self.reference_types: dict[int, list[AttrType]] = {}
 
-    def process(self, target: Class):
+    def process(self, target: Class) -> None:
         """Go through all the attr types and find circular references.
 
         Args:
@@ -36,7 +39,7 @@ class DetectCircularReferences(RelativeHandlerInterface):
             for choice in attr.choices:
                 self.process_types(choice.types, target.ref)
 
-    def process_types(self, types: list[AttrType], class_reference: int):
+    def process_types(self, types: list[AttrType], class_reference: int) -> None:
         """Go through the types and find circular references.
 
         Args:
@@ -76,10 +79,10 @@ class DetectCircularReferences(RelativeHandlerInterface):
 
         return stop in path
 
-    def build_reference_types(self):
+    def build_reference_types(self) -> None:
         """Build the reference types mapping."""
 
-        def generate(target: Class):
+        def generate(target: Class) -> Iterator[tuple[int, list[AttrType]]]:
             yield target.ref, [tp for tp in target.types() if tp.reference]
 
             for inner in target.inner:

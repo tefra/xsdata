@@ -24,38 +24,38 @@ class XmlValTests(TestCase):
     def setUp(self) -> None:
         self.context = XmlContext()
 
-    def test_property_qname(self):
+    def test_property_qname(self) -> None:
         var = XmlVarFactory.create(name="a", local_name="A", namespaces=("B",))
         self.assertEqual("{B}A", var.qname)
 
-    def test_property_wrapper_qname(self):
+    def test_property_wrapper_qname(self) -> None:
         var = XmlVarFactory.create(
             name="a", local_name="A", wrapper="AA", namespaces=("B",)
         )
         self.assertEqual("{B}AA", var.wrapper_qname)
 
-    def test_property_clazz(self):
+    def test_property_clazz(self) -> None:
         var = XmlVarFactory.create(name="foo")
         self.assertIsNone(var.clazz)
 
         var = XmlVarFactory.create(name="foo", types=(TypeA,))
         self.assertEqual(TypeA, var.clazz)
 
-    def test_property_is_clazz_union(self):
+    def test_property_is_clazz_union(self) -> None:
         var = XmlVarFactory.create(name="foo", types=(TypeA,))
         self.assertFalse(var.is_clazz_union)
 
         var = XmlVarFactory.create(name="foo", types=(TypeA, int))
         self.assertTrue(var.is_clazz_union)
 
-    def test_property_element_types(self):
+    def test_property_element_types(self) -> None:
         meta = self.context.build(ChoiceType)
         var = meta.choices[0]
         self.assertEqual(
             {TypeA, TypeB, int, float, QName, UnionType, Decimal}, var.element_types
         )
 
-    def test_find_choice(self):
+    def test_find_choice(self) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENTS,
             name="foo",
@@ -88,7 +88,7 @@ class XmlValTests(TestCase):
         self.assertEqual(var.wildcards[1], var.find_choice("{a}a"))
         self.assertEqual(var.wildcards[0], var.find_choice("{foo}a"))
 
-    def test_find_value_choice(self):
+    def test_find_value_choice(self) -> None:
         meta = self.context.build(ChoiceType)
         var = meta.choices[0]
 
@@ -100,7 +100,7 @@ class XmlValTests(TestCase):
         der = make_dataclass("Der", fields=[], bases=(TypeA,))
         self.assertEqual(var.elements["a"], var.find_value_choice(der(1), True))
 
-    def test_is_optional(self):
+    def test_is_optional(self) -> None:
         var = XmlVarFactory.create(xml_type=XmlType.ATTRIBUTE, name="att")
 
         self.assertTrue(var.is_optional(None))
@@ -112,7 +112,7 @@ class XmlValTests(TestCase):
         var.required = True
         self.assertFalse(var.is_optional([1, 2, 3]))
 
-    def test_match_namespace(self):
+    def test_match_namespace(self) -> None:
         var = XmlVarFactory.create(xml_type=XmlType.WILDCARD, name="foo")
         self.assertTrue(var.match_namespace("a"))
 
@@ -157,7 +157,7 @@ class XmlMetaTests(TestCase):
             any_attributes=[],
         )
 
-    def test__repr__(self):
+    def test__repr__(self) -> None:
         expected = (
             "XmlMeta("
             "clazz=<class 'tests.fixtures.models.TypeA'>, "
@@ -176,11 +176,11 @@ class XmlMetaTests(TestCase):
         )
         self.assertEqual(expected, repr(self.meta))
 
-    def test_property_element_types(self):
+    def test_property_element_types(self) -> None:
         meta = self.context.build(UnionType)
         self.assertEqual({TypeA, TypeB, TypeC, TypeD}, meta.element_types)
 
-    def test_find_attribute(self):
+    def test_find_attribute(self) -> None:
         a = XmlVarFactory.create(xml_type=XmlType.ATTRIBUTE, name="a")
         b = XmlVarFactory.create(xml_type=XmlType.ATTRIBUTE, name="b")
 
@@ -191,7 +191,7 @@ class XmlMetaTests(TestCase):
         self.assertEqual(b, self.meta.find_attribute("b"))
 
     @mock.patch.object(XmlVar, "match_namespace")
-    def test_find_any_attributes(self, mock_match_namespace):
+    def test_find_any_attributes(self, mock_match_namespace) -> None:
         mock_match_namespace.side_effect = [False, False, False, True]
 
         attributes = [
@@ -207,7 +207,7 @@ class XmlMetaTests(TestCase):
 
         mock_match_namespace.assert_has_calls([mock.call("a") for _ in range(4)])
 
-    def test_find_wildcard(self):
+    def test_find_wildcard(self) -> None:
         wildcards = [
             XmlVarFactory.create(xml_type=XmlType.WILDCARD, namespaces=("a",)),
             XmlVarFactory.create(xml_type=XmlType.WILDCARD, namespaces=("b",)),
@@ -232,14 +232,14 @@ class XmlMetaTests(TestCase):
         )
         self.assertIs(wildcards[2], self.meta.find_wildcard("{c}random"))
 
-    def test_find_any_wildcard(self):
+    def test_find_any_wildcard(self) -> None:
         meta = self.context.build(TypeDuplicate)
         self.assertIsNone(meta.find_any_wildcard())
 
         meta = self.context.build(ExtendedType)
         self.assertEqual("wildcard", meta.find_any_wildcard().qname)
 
-    def test_find_children(self):
+    def test_find_children(self) -> None:
         meta = self.context.build(TypeDuplicate)
         self.assertIsNone(next(meta.find_children("a"), None))
         self.assertEqual(["x", "x1"], [el.name for el in meta.find_children("x")])

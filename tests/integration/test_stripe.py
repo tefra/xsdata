@@ -13,7 +13,7 @@ from xsdata.utils.testing import filter_none, load_class
 os.chdir(root)
 
 
-def test_json_documents():
+def test_json_documents() -> None:
     filepath = fixtures_dir.joinpath("stripe")
     runner = CliRunner()
     result = runner.invoke(

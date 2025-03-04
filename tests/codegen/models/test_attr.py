@@ -6,7 +6,7 @@ from xsdata.utils.testing import AttrFactory, AttrTypeFactory, FactoryTestCase
 
 
 class AttrTests(FactoryTestCase):
-    def test__post__init__(self):
+    def test__post__init__(self) -> None:
         attr = AttrFactory.create(name="$")
         self.assertEqual("$", attr.local_name)
         self.assertEqual("DOLLAR SIGN", attr.name)
@@ -15,7 +15,7 @@ class AttrTests(FactoryTestCase):
         self.assertEqual("$", attr.local_name)
         self.assertEqual("dollar", attr.name)
 
-    def test__eq__(self):
+    def test__eq__(self) -> None:
         attr = AttrFactory.element()
         clone = attr.clone()
 
@@ -34,30 +34,30 @@ class AttrTests(FactoryTestCase):
         attr.namespace = __file__
         self.assertNotEqual(attr, clone)
 
-    def test_can_be_restricted(self):
+    def test_can_be_restricted(self) -> None:
         self.assertFalse(AttrFactory.create(tag=Tag.ATTRIBUTE).can_be_restricted())
         self.assertFalse(AttrFactory.create(tag=Tag.EXTENSION).can_be_restricted())
         self.assertFalse(AttrFactory.create(tag=Tag.RESTRICTION).can_be_restricted())
         self.assertTrue(AttrFactory.create(tag=Tag.ELEMENT).can_be_restricted())
 
-    def test_property_key(self):
+    def test_property_key(self) -> None:
         attr = AttrFactory.attribute(name="a", namespace="b")
         self.assertEqual("Attribute.b.a", attr.key)
 
-    def test_property_qname(self):
+    def test_property_qname(self) -> None:
         attr = AttrFactory.attribute(name="a", namespace="b")
         self.assertEqual("{b}a", attr.qname)
 
-    def test_property_is_attribute(self):
+    def test_property_is_attribute(self) -> None:
         self.assertTrue(AttrFactory.attribute().is_attribute)
         self.assertTrue(AttrFactory.any_attribute().is_attribute)
         self.assertFalse(AttrFactory.element().is_attribute)
 
-    def test_property_is_enumeration(self):
+    def test_property_is_enumeration(self) -> None:
         self.assertTrue(AttrFactory.enumeration().is_enumeration)
         self.assertFalse(AttrFactory.element().is_enumeration)
 
-    def test_property_is_factory(self):
+    def test_property_is_factory(self) -> None:
         self.assertTrue(AttrFactory.any_attribute().is_factory)
 
         element = AttrFactory.element()
@@ -66,7 +66,7 @@ class AttrTests(FactoryTestCase):
         element.restrictions.max_occurs = 2
         self.assertTrue(element.is_factory)
 
-    def test_property_is_forward_ref(self):
+    def test_property_is_forward_ref(self) -> None:
         attr = AttrFactory.create()
         self.assertFalse(attr.is_forward_ref)
 
@@ -78,7 +78,7 @@ class AttrTests(FactoryTestCase):
         attr.types.append(AttrTypeFactory.create("foo", forward=True))
         self.assertTrue(attr.is_forward_ref)
 
-    def test_property_is_circular_ref(self):
+    def test_property_is_circular_ref(self) -> None:
         attr = AttrFactory.create()
         self.assertFalse(attr.is_circular_ref)
 
@@ -90,47 +90,47 @@ class AttrTests(FactoryTestCase):
         attr.types.append(AttrTypeFactory.create("foo", circular=True))
         self.assertTrue(attr.is_circular_ref)
 
-    def test_property_is_group(self):
+    def test_property_is_group(self) -> None:
         self.assertTrue(AttrFactory.group().is_group)
         self.assertTrue(AttrFactory.attribute_group().is_group)
         self.assertFalse(AttrFactory.element().is_group)
 
-    def test_property_is_list(self):
+    def test_property_is_list(self) -> None:
         attr = AttrFactory.create(restrictions=Restrictions(max_occurs=2))
         self.assertTrue(attr.is_list)
 
         attr.restrictions.max_occurs = 1
         self.assertFalse(attr.is_list)
 
-    def test_property_is_prohibited(self):
+    def test_property_is_prohibited(self) -> None:
         attr = AttrFactory.create(restrictions=Restrictions(max_occurs=0))
         self.assertTrue(attr.is_prohibited)
 
         attr.restrictions.max_occurs = 1
         self.assertFalse(attr.is_list)
 
-    def test_property_is_optional(self):
+    def test_property_is_optional(self) -> None:
         attr = AttrFactory.create(restrictions=Restrictions(min_occurs=0))
         self.assertTrue(attr.is_optional)
 
         attr.restrictions.min_occurs = 1
         self.assertFalse(attr.is_optional)
 
-    def test_property_is_suffix(self):
+    def test_property_is_suffix(self) -> None:
         attr = AttrFactory.create()
         self.assertFalse(attr.is_suffix)
 
         attr.index = sys.maxsize
         self.assertTrue(attr.is_suffix)
 
-    def test_property_is_wild_attr(self):
+    def test_property_is_wild_attr(self) -> None:
         attr = AttrFactory.create()
         self.assertFalse(attr.is_wildcard)
 
         attr = AttrFactory.any()
         self.assertTrue(attr.is_wildcard)
 
-    def test_property_is_xsi_type(self):
+    def test_property_is_xsi_type(self) -> None:
         attr = AttrFactory.create()
         self.assertFalse(attr.is_xsi_type)
 
@@ -140,12 +140,12 @@ class AttrTests(FactoryTestCase):
         attr.name = "type"
         self.assertTrue(attr.is_xsi_type)
 
-    def test_property_is_nameless(self):
+    def test_property_is_nameless(self) -> None:
         self.assertFalse(AttrFactory.create(tag=Tag.ELEMENT).is_nameless)
         self.assertFalse(AttrFactory.create(tag=Tag.ATTRIBUTE).is_nameless)
         self.assertTrue(AttrFactory.create(tag=Tag.ANY).is_nameless)
 
-    def test_property_is_any_type(self):
+    def test_property_is_any_type(self) -> None:
         attr = AttrFactory.create(
             types=[
                 AttrTypeFactory.create(qname="foo"),
@@ -157,7 +157,7 @@ class AttrTests(FactoryTestCase):
         attr.types.append(AttrTypeFactory.native(DataType.ANY_SIMPLE_TYPE))
         self.assertTrue(attr.is_any_type)
 
-    def test_property_native_types(self):
+    def test_property_native_types(self) -> None:
         attr = AttrFactory.create(
             types=[
                 AttrTypeFactory.create(qname="foo"),
@@ -170,7 +170,7 @@ class AttrTests(FactoryTestCase):
 
         self.assertCountEqual([float, int], attr.native_types)
 
-    def test_property_user_types(self):
+    def test_property_user_types(self) -> None:
         attr = AttrFactory.create(
             types=[
                 AttrTypeFactory.create(qname="foo"),
@@ -182,7 +182,7 @@ class AttrTests(FactoryTestCase):
 
         self.assertCountEqual([attr.types[0], attr.types[-1]], list(attr.user_types))
 
-    def test_property_xml_type(self):
+    def test_property_xml_type(self) -> None:
         attr = AttrFactory.create(tag=Tag.ELEMENT)
         self.assertEqual("Element", attr.xml_type)
 

@@ -16,7 +16,7 @@ os.chdir(root)
 
 
 class CalculatorServiceTests(TestCase):
-    def test_wsdl_codegen(self):
+    def test_wsdl_codegen(self) -> None:
         schema = fixtures_dir.joinpath("calculator/services.wsdl")
         package = "tests.fixtures.calculator"
         runner = CliRunner()
@@ -29,7 +29,7 @@ class CalculatorServiceTests(TestCase):
         self.assertEqual("Envelope", clazz.Meta.name)
 
     @mock.patch.object(DefaultTransport, "post")
-    def test_client(self, mock_most):
+    def test_client(self, mock_most) -> None:
         url = "http://www.dneonline.com/calculator.asmx"
         request = fixtures_dir.joinpath("calculator/AddRQ.xml").read_text()
         response = fixtures_dir.joinpath("calculator/AddRS.xml").read_bytes()

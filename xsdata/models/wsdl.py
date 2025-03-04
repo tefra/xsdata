@@ -310,7 +310,7 @@ class Definitions(ExtensibleElement):
         """Find a port type by name or raise an error."""
         return find_or_die(self.port_types, name, "PortType")
 
-    def merge(self, source: "Definitions"):
+    def merge(self, source: "Definitions") -> None:
         """Merge the source instance with this instance."""
         if not self.types:
             self.types = source.types

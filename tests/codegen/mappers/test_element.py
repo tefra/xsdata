@@ -17,7 +17,7 @@ from xsdata.utils.testing import (
 class ElementMapperTests(FactoryTestCase):
     @mock.patch.object(ClassUtils, "flatten")
     @mock.patch.object(ElementMapper, "build_class")
-    def test_map(self, mock_build_class, mock_flatten):
+    def test_map(self, mock_build_class, mock_flatten) -> None:
         element = AnyElement(qname="{xsdata}root")
         root_class = ClassFactory.create()
         flat_classes = ClassFactory.list(5)
@@ -32,7 +32,7 @@ class ElementMapperTests(FactoryTestCase):
         mock_build_class.assert_called_once_with(element, "xsdata")
         mock_flatten.assert_called_once_with(root_class, "tests/root")
 
-    def test_build_class_simple_type(self):
+    def test_build_class_simple_type(self) -> None:
         element = AnyElement(
             qname="{xsdata}root",
             attributes={"{foo}bar": "1", "{bar}foo": "2.0"},
@@ -76,7 +76,7 @@ class ElementMapperTests(FactoryTestCase):
             self.assertEqual(1, attr.restrictions.min_occurs)
             self.assertEqual(1, attr.restrictions.max_occurs)
 
-    def test_build_class_complex_type(self):
+    def test_build_class_complex_type(self) -> None:
         element = AnyElement(
             qname="{xsdata}root",
             children=[
@@ -116,7 +116,7 @@ class ElementMapperTests(FactoryTestCase):
         actual.inner.clear()
         self.assertEqual(expected, actual)
 
-    def test_build_class_with_sequences(self):
+    def test_build_class_with_sequences(self) -> None:
         element = AnyElement(
             qname="root",
             children=[
@@ -200,7 +200,7 @@ class ElementMapperTests(FactoryTestCase):
         )
         self.assertEqual(expected, actual)
 
-    def test_build_class_mixed_content(self):
+    def test_build_class_mixed_content(self) -> None:
         element = AnyElement(
             qname="{xsdata}root",
             children=[
@@ -247,7 +247,7 @@ class ElementMapperTests(FactoryTestCase):
         actual = ElementMapper.build_class(element, None)
         self.assertTrue(actual.mixed)
 
-    def test_build_class_nillable(self):
+    def test_build_class_nillable(self) -> None:
         element = AnyElement(qname="{xsdata}root", attributes={QNames.XSI_NIL: "1"})
         target = ElementMapper.build_class(element, None)
         self.assertTrue(target.nillable)
@@ -256,7 +256,7 @@ class ElementMapperTests(FactoryTestCase):
         target = ElementMapper.build_class(element, None)
         self.assertTrue(target.nillable)
 
-    def test_build_class_ignore_invalid(self):
+    def test_build_class_ignore_invalid(self) -> None:
         element = AnyElement(
             qname="{xsdata}root",
             children=[
@@ -267,7 +267,7 @@ class ElementMapperTests(FactoryTestCase):
         actual = ElementMapper.build_class(element, None)
         self.assertEqual(0, len(actual.attrs))
 
-    def test_build_attr_type(self):
+    def test_build_attr_type(self) -> None:
         actual = ElementMapper.build_attr_type(QNames.XSI_TYPE, "")
         self.assertEqual(str(DataType.QNAME), actual.qname)
         self.assertTrue(actual.native)
@@ -292,7 +292,7 @@ class ElementMapperTests(FactoryTestCase):
         self.assertEqual(str(DataType.FLOAT), actual.qname)
         self.assertTrue(actual.native)
 
-    def test_add_attribute(self):
+    def test_add_attribute(self) -> None:
         target = ClassFactory.elements(2)
         attr = target.attrs[0].clone()
         attr.index += 1
@@ -310,7 +310,7 @@ class ElementMapperTests(FactoryTestCase):
         ElementMapper.add_attribute(target, attr)
         self.assertEqual(3, len(target.attrs))
 
-    def test_select_namespace(self):
+    def test_select_namespace(self) -> None:
         self.assertEqual("a", ElementMapper.select_namespace("a", "a", Tag.ELEMENT))
         self.assertEqual("b", ElementMapper.select_namespace("b", "a", Tag.ELEMENT))
         self.assertEqual("", ElementMapper.select_namespace(None, "a", Tag.ELEMENT))
@@ -319,7 +319,7 @@ class ElementMapperTests(FactoryTestCase):
         self.assertEqual("b", ElementMapper.select_namespace("b", "a", Tag.ATTRIBUTE))
         self.assertIsNone(ElementMapper.select_namespace(None, "a", Tag.ATTRIBUTE))
 
-    def test_sequential_groups(self):
+    def test_sequential_groups(self) -> None:
         a = AnyElement(qname="a")
         b = AnyElement(qname="b")
         c = AnyElement(qname="c")

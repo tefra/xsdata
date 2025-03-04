@@ -14,13 +14,13 @@ from xsdata.utils.testing import (
 
 
 class SanitizeAttributesDefaultValueTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         container = ClassContainer(config=GeneratorConfig())
         self.processor = SanitizeAttributesDefaultValue(container=container)
 
-    def test_process_attribute_with_enumeration(self):
+    def test_process_attribute_with_enumeration(self) -> None:
         target = ClassFactory.create()
         attr = AttrFactory.enumeration()
         attr.restrictions.max_occurs = 2
@@ -30,7 +30,7 @@ class SanitizeAttributesDefaultValueTests(FactoryTestCase):
         self.assertTrue(attr.fixed)
 
     @mock.patch.object(SanitizeAttributesDefaultValue, "process_attribute")
-    def test_process_with_attr_choices(self, mock_process_attribute):
+    def test_process_with_attr_choices(self, mock_process_attribute) -> None:
         choice = AttrFactory.create(
             name="attr_B_Or_attr_C",
             tag="Choice",
@@ -62,7 +62,7 @@ class SanitizeAttributesDefaultValueTests(FactoryTestCase):
     @mock.patch.object(SanitizeAttributesDefaultValue, "should_reset_required")
     def test_process_attribute(
         self, mock_should_reset_required, mock_should_reset_default, mock_process_types
-    ):
+    ) -> None:
         target = ClassFactory.create()
         mock_should_reset_required.side_effect = [
             True,
@@ -106,7 +106,7 @@ class SanitizeAttributesDefaultValueTests(FactoryTestCase):
         self.processor.process_attribute(target, attr)
         self.assertIsNone(attr.default)
 
-    def test_should_reset_required(self):
+    def test_should_reset_required(self) -> None:
         attr = AttrFactory.create()
         self.assertFalse(self.processor.should_reset_required(attr))
 
@@ -119,7 +119,7 @@ class SanitizeAttributesDefaultValueTests(FactoryTestCase):
         attr = AttrFactory.any()
         self.assertTrue(self.processor.should_reset_required(attr))
 
-    def test_should_reset_default(self):
+    def test_should_reset_default(self) -> None:
         attr = AttrFactory.create()
         self.assertFalse(self.processor.should_reset_default(attr))
 
@@ -156,7 +156,7 @@ class SanitizeAttributesDefaultValueTests(FactoryTestCase):
         mock_is_valid_native_value,
         mock_reset_attribute_types,
         mock_warning,
-    ):
+    ) -> None:
         mock_is_valid_external_value.side_effect = [True, False, False]
         mock_is_valid_native_value.side_effect = [True, False]
 
@@ -180,7 +180,7 @@ class SanitizeAttributesDefaultValueTests(FactoryTestCase):
             [str(DataType.INT)],
         )
 
-    def test_is_valid_native_value(self):
+    def test_is_valid_native_value(self) -> None:
         target = ClassFactory.create()
 
         # Not native types
@@ -228,7 +228,7 @@ class SanitizeAttributesDefaultValueTests(FactoryTestCase):
     @mock.patch.object(SanitizeAttributesDefaultValue, "is_valid_inner_type")
     def test_is_valid_external_value(
         self, mock_is_valid_inner_type, mock_is_valid_enum_type
-    ):
+    ) -> None:
         mock_is_valid_inner_type.side_effect = [False, False, False, True]
         mock_is_valid_enum_type.side_effect = [False, False, True]
 
@@ -247,7 +247,7 @@ class SanitizeAttributesDefaultValueTests(FactoryTestCase):
         self.assertTrue(self.processor.is_valid_external_value(target, attr))
         self.assertTrue(self.processor.is_valid_external_value(target, attr))
 
-    def test_is_valid_inner_type(self):
+    def test_is_valid_inner_type(self) -> None:
         source = ClassFactory.elements(2)
 
         attr_type = AttrTypeFactory.create()
@@ -268,7 +268,7 @@ class SanitizeAttributesDefaultValueTests(FactoryTestCase):
         self.assertTrue(source.attrs[2].fixed)
         self.assertEqual("abc", source.attrs[2].default)
 
-    def test_is_valid_enum_type(self):
+    def test_is_valid_enum_type(self) -> None:
         enumeration = ClassFactory.enumeration(2, qname="{a}root")
         enumeration.attrs[0].default = "1"
         enumeration.attrs[0].name = "one"
@@ -287,7 +287,7 @@ class SanitizeAttributesDefaultValueTests(FactoryTestCase):
         self.assertFalse(self.processor.is_valid_enum_type(enumeration, attr))
         self.assertEqual("3", attr.default)
 
-    def test_find_inner_type(self):
+    def test_find_inner_type(self) -> None:
         target = ClassFactory.create()
         attr_type = AttrTypeFactory.create("foo")
         foo = ClassFactory.create(qname="foo")
@@ -300,7 +300,7 @@ class SanitizeAttributesDefaultValueTests(FactoryTestCase):
         target.inner.append(bar)
         self.assertIs(bar, self.processor.find_inner_type(target, attr_type))
 
-    def test_reset_attribute_types(self):
+    def test_reset_attribute_types(self) -> None:
         attr = AttrFactory.create(
             types=[
                 AttrTypeFactory.native(DataType.INT),

@@ -25,7 +25,7 @@ class DesignateClassPackages(ContainerHandlerInterface):
 
     __slots__ = ()
 
-    def run(self):
+    def run(self) -> None:
         """Group classes to packages and modules based on the output structure style.
 
         Structure Styles:
@@ -47,7 +47,7 @@ class DesignateClassPackages(ContainerHandlerInterface):
         else:
             self.group_by_filenames()
 
-    def group_by_filenames(self):
+    def group_by_filenames(self) -> None:
         """Group classes by their schema file location.
 
         The classes are organized by the common paths of the
@@ -85,7 +85,7 @@ class DesignateClassPackages(ContainerHandlerInterface):
                     "\n".join(locations),
                 )
 
-    def group_by_namespace(self):
+    def group_by_namespace(self) -> None:
         """Group classes by their target namespace.
 
         Example:
@@ -98,7 +98,7 @@ class DesignateClassPackages(ContainerHandlerInterface):
             package = ".".join(parts)
             self.assign(classes, package, module)
 
-    def group_all_together(self):
+    def group_all_together(self) -> None:
         """Group all classes together in the same module."""
         package_parts = self.container.config.output.package.split(".")
         module = package_parts.pop()
@@ -106,7 +106,7 @@ class DesignateClassPackages(ContainerHandlerInterface):
 
         self.assign(self.container, package, module)
 
-    def group_by_strong_components(self):
+    def group_by_strong_components(self) -> None:
         """Find circular imports and cluster their classes together.
 
         This grouping ideally creates a class per file, if there
@@ -118,7 +118,7 @@ class DesignateClassPackages(ContainerHandlerInterface):
             module = classes[0].name
             self.assign(classes, package, module)
 
-    def group_by_namespace_clusters(self):
+    def group_by_namespace_clusters(self) -> None:
         """Group strongly connected classes together by namespaces."""
         for group in self.strongly_connected_classes():
             classes = self.sort_classes(group)

@@ -15,13 +15,13 @@ from xsdata.utils.testing import (
 
 
 class ValidateAttributesOverridesTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.container = ClassContainer(config=GeneratorConfig())
         self.processor = ValidateAttributesOverrides(container=self.container)
 
-    def test_prohibit_parent_attrs(self):
+    def test_prohibit_parent_attrs(self) -> None:
         child = ClassFactory.create(
             status=Status.FLATTENING,
             attrs=[
@@ -60,7 +60,9 @@ class ValidateAttributesOverridesTests(FactoryTestCase):
 
     @mock.patch.object(ValidateAttributesOverrides, "resolve_conflict")
     @mock.patch.object(ValidateAttributesOverrides, "validate_override")
-    def test_validate_attrs(self, mock_validate_override, mock_resolve_conflict):
+    def test_validate_attrs(
+        self, mock_validate_override, mock_resolve_conflict
+    ) -> None:
         class_a = ClassFactory.create(
             status=Status.FLATTENING,
             attrs=[
@@ -93,14 +95,14 @@ class ValidateAttributesOverridesTests(FactoryTestCase):
             class_a.attrs[1], class_c.attrs[1]
         )
 
-    def test_validate_attrs_remove_non_overriding_prohibited_attrs(self):
+    def test_validate_attrs_remove_non_overriding_prohibited_attrs(self) -> None:
         target = ClassFactory.elements(1)
         target.attrs[0].restrictions.max_occurs = 0
 
         self.processor.process(target)
         self.assertEqual(0, len(target.attrs))
 
-    def test_overrides(self):
+    def test_overrides(self) -> None:
         a = AttrFactory.create(tag=Tag.SIMPLE_TYPE)
         b = a.clone()
 
@@ -112,7 +114,7 @@ class ValidateAttributesOverridesTests(FactoryTestCase):
         b.namespace = "foo"
         self.assertFalse(self.processor.overrides(a, b))
 
-    def test_validate_override(self):
+    def test_validate_override(self) -> None:
         attr_a = AttrFactory.create()
         attr_b = attr_a.clone()
         attr_b.parent = ClassFactory.create().qname
@@ -196,7 +198,7 @@ class ValidateAttributesOverridesTests(FactoryTestCase):
         self.processor.validate_override(target, attr_a.clone(), attr_b)
         self.assertEqual(attr_a, target.attrs[0])
 
-    def test_resolve_conflicts(self):
+    def test_resolve_conflicts(self) -> None:
         a = AttrFactory.create(name="foo", tag=Tag.ATTRIBUTE)
         b = a.clone()
         b.tag = Tag.ELEMENT

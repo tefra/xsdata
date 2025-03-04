@@ -5,7 +5,7 @@ from xsdata.formats.dataclass.serializers import JsonSerializer, XmlSerializer
 from xsdata.models.datatype import XmlDate
 
 
-def make_books(how_many: int):
+def make_books(how_many: int) -> Books:
     return Books(
         book=[
             BookForm(
@@ -29,23 +29,23 @@ def make_books(how_many: int):
     )
 
 
-def parse(source, handler):
+def parse(source, handler) -> None:
     parser = XmlParser(context=context, handler=handler)
     parser.from_bytes(source, Books)
 
 
-def parse_json(source):
+def parse_json(source) -> None:
     parser = JsonParser(context=context)
     parser.from_bytes(source, Books)
 
 
-def write(size, obj, writer):
+def write(size, obj, writer) -> None:
     with xsdata_temp_dir.joinpath(f"benchmark_{size}.xml").open("w") as f:
         serializer = XmlSerializer(writer=writer, context=context)
         serializer.write(f, obj)
 
 
-def write_json(size, obj):
+def write_json(size, obj) -> None:
     with xsdata_temp_dir.joinpath(f"benchmark_{size}.json").open("w") as f:
         serializer = JsonSerializer(context=context)
         serializer.write(f, obj)

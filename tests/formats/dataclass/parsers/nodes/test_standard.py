@@ -10,13 +10,13 @@ from xsdata.utils.testing import XmlMetaFactory, XmlVarFactory
 
 
 class StandardNodeTests(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.meta = XmlMetaFactory.create(clazz=Artist)
         self.var = XmlVarFactory.create()
         self.config = ParserConfig()
 
-    def test_bind_simple(self):
+    def test_bind_simple(self) -> None:
         datatype = DataType.INT
         node = StandardNode(
             self.meta, self.var, datatype, {}, self.config, False, False
@@ -26,7 +26,7 @@ class StandardNodeTests(TestCase):
         self.assertTrue(node.bind("a", "13", None, objects))
         self.assertEqual(("a", 13), objects[-1])
 
-    def test_bind_derived(self):
+    def test_bind_derived(self) -> None:
         datatype = DataType.INT
         node = StandardNode(
             self.meta, self.var, datatype, {}, self.config, False, DerivedElement
@@ -36,7 +36,7 @@ class StandardNodeTests(TestCase):
         self.assertTrue(node.bind("a", "13", None, objects))
         self.assertEqual(("a", DerivedElement("a", 13)), objects[-1])
 
-    def test_bind_wrapper_type(self):
+    def test_bind_wrapper_type(self) -> None:
         datatype = DataType.HEX_BINARY
         node = StandardNode(
             self.meta, self.var, datatype, {}, self.config, False, DerivedElement
@@ -46,7 +46,7 @@ class StandardNodeTests(TestCase):
         self.assertTrue(node.bind("a", "13", None, objects))
         self.assertEqual(("a", DerivedElement(qname="a", value=b"\x13")), objects[-1])
 
-    def test_bind_nillable(self):
+    def test_bind_nillable(self) -> None:
         datatype = DataType.STRING
         node = StandardNode(self.meta, self.var, datatype, {}, self.config, True, None)
         objects = []
@@ -58,7 +58,7 @@ class StandardNodeTests(TestCase):
         self.assertTrue(node.bind("a", None, None, objects))
         self.assertEqual(("a", ""), objects[-1])
 
-    def test_child(self):
+    def test_child(self) -> None:
         datatype = DataType.STRING
         node = StandardNode(
             self.meta, self.var, datatype, {}, self.config, False, False

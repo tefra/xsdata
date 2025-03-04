@@ -5,7 +5,7 @@ from xsdata.formats.dataclass.serializers.config import SerializerConfig
 
 
 class SerializerConfigTest(unittest.TestCase):
-    def test_deprecated_fields(self):
+    def test_deprecated_fields(self) -> None:
         with warnings.catch_warnings(record=True) as w:
             config = SerializerConfig(pretty_print=True)
             self.assertEqual("  ", config.indent)

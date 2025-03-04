@@ -8,13 +8,13 @@ from xsdata.models.xsd import Alternative, ComplexType, Element, SimpleType
 
 
 class ElementBaseTests(TestCase):
-    def test_property_class_name(self):
+    def test_property_class_name(self) -> None:
         class Foo(ElementBase):
             pass
 
         self.assertEqual("Foo", Foo().class_name)
 
-    def test_property_default_type(self):
+    def test_property_default_type(self) -> None:
         element = ElementBase()
         self.assertEqual("string", element.default_type)
 
@@ -22,7 +22,7 @@ class ElementBaseTests(TestCase):
         element.ns_map["xsd"] = Namespace.XS.uri
         self.assertEqual("xsd:string", element.default_type)
 
-    def test_property_default_value(self):
+    def test_property_default_value(self) -> None:
         element = ElementBase()
         self.assertIsNone(element.default_value)
 
@@ -39,16 +39,16 @@ class ElementBaseTests(TestCase):
         element.fixed = ""
         self.assertEqual("", element.default_value)
 
-    def test_property_display_help(self):
+    def test_property_display_help(self) -> None:
         element = ElementBase()
         self.assertIsNone(element.display_help)
 
-    def test_property_bases(self):
+    def test_property_bases(self) -> None:
         element = ElementBase()
         self.assertIsInstance(element.bases, Iterator)
         self.assertEqual([], list(element.bases))
 
-    def test_property_has_children(self):
+    def test_property_has_children(self) -> None:
         element = ElementBase()
         self.assertFalse(element.has_children)
 
@@ -58,14 +58,14 @@ class ElementBaseTests(TestCase):
         element.complex_type = ComplexType()
         self.assertTrue(element.has_children)
 
-    def test_property_has_form(self):
+    def test_property_has_form(self) -> None:
         element = ElementBase()
         self.assertFalse(element.has_form)
 
         element.form = None
         self.assertTrue(element.has_form)
 
-    def test_property_is_abstract(self):
+    def test_property_is_abstract(self) -> None:
         element = ElementBase()
         self.assertFalse(element.is_abstract)
 
@@ -75,11 +75,11 @@ class ElementBaseTests(TestCase):
         element.abstract = True
         self.assertTrue(element.is_abstract)
 
-    def test_property_is_property(self):
+    def test_property_is_property(self) -> None:
         element = ElementBase()
         self.assertFalse(element.is_property)
 
-    def test_property_is_fixed(self):
+    def test_property_is_fixed(self) -> None:
         element = ElementBase()
         self.assertFalse(element.is_fixed)
 
@@ -89,18 +89,18 @@ class ElementBaseTests(TestCase):
         element.fixed = "foo"
         self.assertTrue(element.is_fixed)
 
-    def test_property_is_mixed(self):
+    def test_property_is_mixed(self) -> None:
         element = ElementBase()
         self.assertFalse(element.is_mixed)
 
-    def test_property_is_nillable(self):
+    def test_property_is_nillable(self) -> None:
         element = ElementBase()
         self.assertFalse(element.is_nillable)
 
         element.nillable = True
         self.assertTrue(element.is_nillable)
 
-    def test_property_is_qualified(self):
+    def test_property_is_qualified(self) -> None:
         element = ElementBase()
         self.assertFalse(element.is_qualified)
 
@@ -121,11 +121,11 @@ class ElementBaseTests(TestCase):
         element.ref = "foo"
         self.assertTrue(element.is_qualified)
 
-    def test_property_is_wildcard(self):
+    def test_property_is_wildcard(self) -> None:
         element = ElementBase()
         self.assertFalse(element.is_wildcard)
 
-    def test_property_prefix(self):
+    def test_property_prefix(self) -> None:
         element = ElementBase()
         self.assertIsNone(element.prefix)
 
@@ -135,14 +135,14 @@ class ElementBaseTests(TestCase):
         element.ref = "foo:bar"
         self.assertEqual("foo", element.prefix)
 
-    def test_property_raw_namespace(self):
+    def test_property_raw_namespace(self) -> None:
         element = ElementBase()
         self.assertIsNone(element.raw_namespace)
 
         element.target_namespace = "tns"
         self.assertEqual("tns", element.raw_namespace)
 
-    def test_property_real_name(self):
+    def test_property_real_name(self) -> None:
         element = ElementBase()
 
         with self.assertRaises(CodegenError):
@@ -154,23 +154,23 @@ class ElementBaseTests(TestCase):
         element.name = "foo:bar"
         self.assertEqual("bar", element.real_name)
 
-    def test_property_attr(self):
+    def test_property_attr(self) -> None:
         element = ElementBase()
         self.assertIsInstance(element.attr_types, Iterator)
         self.assertEqual([], list(element.attr_types))
 
-    def test_property_substitutions(self):
+    def test_property_substitutions(self) -> None:
         element = ElementBase()
         self.assertEqual([], element.substitutions)
 
-    def test_property_xs_prefix(self):
+    def test_property_xs_prefix(self) -> None:
         element = ElementBase()
         self.assertIsNone(element.xs_prefix)
 
         element.ns_map = {"a": "a", "foo": Namespace.XS.uri}
         self.assertEqual("foo", element.xs_prefix)
 
-    def test_children(self):
+    def test_children(self) -> None:
         one = SimpleType(id="1")
         two = ComplexType(id="10")
         three = Alternative(id="11")

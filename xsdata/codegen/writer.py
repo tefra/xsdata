@@ -25,9 +25,10 @@ class CodeWriter:
     }
 
     def __init__(self, generator: AbstractGenerator):
+        """Initialize CodeWriter."""
         self.generator = generator
 
-    def write(self, classes: list[Class]):
+    def write(self, classes: list[Class]) -> None:
         """Write the classes to the designated modules.
 
         The classes may be written in the same module or

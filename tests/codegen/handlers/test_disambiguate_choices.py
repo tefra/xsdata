@@ -16,13 +16,13 @@ from xsdata.utils.testing import (
 class DisambiguateChoicesTest(FactoryTestCase):
     maxDiff = None
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.container = ClassContainer(config=GeneratorConfig())
         self.handler = DisambiguateChoices(self.container)
 
-    def test_process_with_duplicate_wildcards(self):
+    def test_process_with_duplicate_wildcards(self) -> None:
         compound = AttrFactory.create(tag=Tag.CHOICE, types=[])
         target = ClassFactory.create()
         target.attrs.append(compound)
@@ -50,7 +50,7 @@ class DisambiguateChoicesTest(FactoryTestCase):
         self.assertEqual(1, wildcard.restrictions.min_occurs)
         self.assertEqual(4, wildcard.restrictions.max_occurs)
 
-    def test_process_with_duplicate_simple_types(self):
+    def test_process_with_duplicate_simple_types(self) -> None:
         compound = AttrFactory.create(tag=Tag.CHOICE)
         compound.types.clear()
         target = ClassFactory.create()
@@ -73,7 +73,7 @@ class DisambiguateChoicesTest(FactoryTestCase):
 
         self.assertEqual([], [x.qname for x in compound.types])
 
-    def test_process_with_duplicate_any_types(self):
+    def test_process_with_duplicate_any_types(self) -> None:
         compound = AttrFactory.create(tag=Tag.CHOICE, types=[])
         target = ClassFactory.create()
         target.attrs.append(compound)
@@ -93,7 +93,7 @@ class DisambiguateChoicesTest(FactoryTestCase):
         self.assertEqual("a", target.inner[0].qname)
         self.assertEqual("{xs}b", target.inner[1].qname)
 
-    def test_process_with_duplicate_complex_types(self):
+    def test_process_with_duplicate_complex_types(self) -> None:
         compound = AttrFactory.any()
         target = ClassFactory.create()
         target.attrs.append(compound)
@@ -117,7 +117,7 @@ class DisambiguateChoicesTest(FactoryTestCase):
 
         self.assertEqual(DataType.ANY_TYPE, compound.types[0].datatype)
 
-    def test_disambiguate_choice_with_unnest_true(self):
+    def test_disambiguate_choice_with_unnest_true(self) -> None:
         target = ClassFactory.create()
         attr = AttrFactory.reference(qname="a")
 
@@ -131,7 +131,7 @@ class DisambiguateChoicesTest(FactoryTestCase):
 
         self.assertIsNotNone(container.find(attr.qname))
 
-    def test_disambiguate_choice_with_circular_ref(self):
+    def test_disambiguate_choice_with_circular_ref(self) -> None:
         target = ClassFactory.create()
         attr = AttrFactory.reference(qname="a")
         attr.types[0].circular = True
@@ -142,7 +142,7 @@ class DisambiguateChoicesTest(FactoryTestCase):
         self.assertTrue(attr.types[0].circular)
         self.assertIsNotNone(self.container.find(attr.qname))
 
-    def test_find_ambiguous_choices_ignore_wildcards(self):
+    def test_find_ambiguous_choices_ignore_wildcards(self) -> None:
         """Wildcards are merged."""
         attr = AttrFactory.create()
         attr.choices.append(AttrFactory.any())
@@ -156,7 +156,7 @@ class DisambiguateChoicesTest(FactoryTestCase):
         result = self.handler.find_ambiguous_choices(attr)
         self.assertEqual(["this"], [x.name for x in result])
 
-    def test_is_simple_type(self):
+    def test_is_simple_type(self) -> None:
         attr = AttrFactory.native(DataType.STRING)
         self.assertTrue(self.handler.is_simple_type(attr))
 
@@ -170,7 +170,7 @@ class DisambiguateChoicesTest(FactoryTestCase):
         attr = AttrFactory.reference(qname=complex.qname)
         self.assertFalse(self.handler.is_simple_type(attr))
 
-    def test_create_ref_class(self):
+    def test_create_ref_class(self) -> None:
         source = ClassFactory.create(
             status=Status.RESOLVED,
             location="here.xsd",
@@ -191,7 +191,7 @@ class DisambiguateChoicesTest(FactoryTestCase):
         self.assertEqual(source.ns_map, result.ns_map)
         self.assertEqual(attr.restrictions.nillable, result.nillable)
 
-    def test_create_ref_class_creates_unique_inner_names(self):
+    def test_create_ref_class_creates_unique_inner_names(self) -> None:
         source = ClassFactory.create(
             status=Status.RESOLVED,
             location="here.xsd",
@@ -203,7 +203,7 @@ class DisambiguateChoicesTest(FactoryTestCase):
 
         self.assertEqual("a_1", result.name)
 
-    def test_add_any_type_value(self):
+    def test_add_any_type_value(self) -> None:
         target = ClassFactory.elements(2)
         source = AttrFactory.any()
         self.handler.add_any_type_value(target, source)
@@ -216,7 +216,7 @@ class DisambiguateChoicesTest(FactoryTestCase):
         self.assertFalse(last.restrictions.is_optional)
         self.assertFalse(last.restrictions.is_list)
 
-    def test_add_simply_type_value(self):
+    def test_add_simply_type_value(self) -> None:
         target = ClassFactory.elements(2)
         source = AttrFactory.native(
             DataType.STRING,
@@ -236,7 +236,7 @@ class DisambiguateChoicesTest(FactoryTestCase):
         self.assertEqual([], last.restrictions.path)
         self.assertFalse(last.restrictions.nillable)
 
-    def test_add_extension(self):
+    def test_add_extension(self) -> None:
         target = ClassFactory.create()
         source = AttrFactory.reference("{xs}type")
         source.types[0].forward = True

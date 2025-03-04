@@ -8,7 +8,7 @@ class FilterClasses(ContainerHandlerInterface):
 
     __slots__ = ()
 
-    def run(self):
+    def run(self) -> None:
         """Main entrypoint to filter the class container.
 
         In order for a class to be considered global it has

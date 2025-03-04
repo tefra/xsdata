@@ -20,7 +20,7 @@ from xsdata.models.xsd import (
 
 
 class RestrictionTests(TestCase):
-    def test_property_attr_types(self):
+    def test_property_attr_types(self) -> None:
         obj = Restriction()
         self.assertEqual([], list(obj.attr_types))
 
@@ -34,11 +34,11 @@ class RestrictionTests(TestCase):
 
         self.assertEqual(["bar"], list(obj.attr_types))
 
-    def test_property_real_name(self):
+    def test_property_real_name(self) -> None:
         obj = Restriction()
         self.assertEqual("value", obj.real_name)
 
-    def test_property_bases(self):
+    def test_property_bases(self) -> None:
         obj = Restriction()
         self.assertEqual([], list(obj.bases))
 
@@ -46,7 +46,7 @@ class RestrictionTests(TestCase):
         self.assertIsInstance(obj.bases, Iterator)
         self.assertEqual(["foo"], list(obj.bases))
 
-    def test_get_restrictions(self):
+    def test_get_restrictions(self) -> None:
         self.assertEqual({}, Restriction().get_restrictions())
 
         obj = Restriction(
@@ -79,7 +79,7 @@ class RestrictionTests(TestCase):
 
         self.assertEqual(expected, obj.get_restrictions())
 
-    def test_get_restrictions_with_nested_simple_type(self):
+    def test_get_restrictions_with_nested_simple_type(self) -> None:
         obj = Restriction(
             min_length=MinLength(value=2),
             simple_type=SimpleType(

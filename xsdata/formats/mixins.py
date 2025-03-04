@@ -36,6 +36,7 @@ class AbstractGenerator(abc.ABC):
     __slots__ = "config"
 
     def __init__(self, config: GeneratorConfig):
+        """Initialize the generator."""
         self.config = config
 
     def module_name(self, module: str) -> str:
@@ -73,7 +74,7 @@ class AbstractGenerator(abc.ABC):
             '"""\n'
         )
 
-    def normalize_packages(self, classes: list[Class]):
+    def normalize_packages(self, classes: list[Class]) -> None:
         """Normalize the classes module and package names.
 
         Args:

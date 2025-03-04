@@ -18,7 +18,7 @@ class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
 
     __slots__ = ()
 
-    def process(self, target: Class):
+    def process(self, target: Class) -> None:
         """Process entrypoint for classes.
 
         Inspect all attrs and attr choices.
@@ -32,7 +32,7 @@ class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
             for choice in attr.choices:
                 self.process_attribute(target, choice)
 
-    def process_attribute(self, target: Class, attr: Attr):
+    def process_attribute(self, target: Class, attr: Attr) -> None:
         """Process entrypoint for attrs.
 
         Cases:
@@ -58,7 +58,7 @@ class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
             # String text nodes get an empty string as default!
             attr.default = ""
 
-    def process_types(self, target: Class, attr: Attr):
+    def process_types(self, target: Class, attr: Attr) -> None:
         """Reset attr types if default value doesn't pass validation.
 
         Args:

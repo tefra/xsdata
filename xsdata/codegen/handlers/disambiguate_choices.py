@@ -27,10 +27,11 @@ class DisambiguateChoices(RelativeHandlerInterface):
     __slots__ = "unnest_classes"
 
     def __init__(self, container: ContainerInterface):
+        """Initialize the class."""
         super().__init__(container)
         self.unnest_classes = container.config.output.unnest_classes
 
-    def process(self, target: Class):
+    def process(self, target: Class) -> None:
         """Process the given class attrs if they contain choices.
 
         Args:
@@ -40,7 +41,7 @@ class DisambiguateChoices(RelativeHandlerInterface):
             if attr.choices:
                 self.process_compound_field(target, attr)
 
-    def process_compound_field(self, target: Class, attr: Attr):
+    def process_compound_field(self, target: Class, attr: Attr) -> None:
         """Process a compound field.
 
         A compound field can be created by a mixed wildcard with
@@ -133,7 +134,7 @@ class DisambiguateChoices(RelativeHandlerInterface):
             if not choice.is_wildcard:
                 yield choice
 
-    def disambiguate_choice(self, target: Class, choice: Attr):
+    def disambiguate_choice(self, target: Class, choice: Attr) -> None:
         """Create intermediate class for the given choice.
 
         Scenarios:

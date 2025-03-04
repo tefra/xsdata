@@ -8,7 +8,7 @@ class RenameDuplicateAttributes(HandlerInterface):
 
     __slots__ = ()
 
-    def process(self, target: Class):
+    def process(self, target: Class) -> None:
         """Detect and resolve naming conflicts.
 
         Args:

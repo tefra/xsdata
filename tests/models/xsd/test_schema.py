@@ -6,12 +6,12 @@ from xsdata.models.xsd import Import, Include, Override, Redefine, Schema
 
 
 class SchemaTests(TestCase):
-    def test_meta(self):
+    def test_meta(self) -> None:
         schema = Schema()
         self.assertEqual("schema", schema.Meta.name)
         self.assertEqual(Namespace.XS.uri, schema.Meta.namespace)
 
-    def test_sub_schemas(self):
+    def test_sub_schemas(self) -> None:
         imports = [
             Import(schema_location="../foo.xsd"),
             Import(schema_location="../bar.xsd"),

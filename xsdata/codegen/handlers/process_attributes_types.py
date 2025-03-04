@@ -21,10 +21,11 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
     __slots__ = "dependencies"
 
     def __init__(self, container: ContainerInterface):
+        """Initialize the class."""
         super().__init__(container)
         self.dependencies: dict = {}
 
-    def process(self, target: Class):
+    def process(self, target: Class) -> None:
         """Process the given class attrs and their types.
 
         Cascades class restrictions to class attrs.
@@ -36,7 +37,7 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
             self.process_types(target, attr)
             self.cascade_properties(target, attr)
 
-    def process_types(self, target: Class, attr: Attr):
+    def process_types(self, target: Class, attr: Attr) -> None:
         """Process every attr type and filter out duplicates.
 
         Args:
@@ -72,7 +73,7 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
             if target.nillable:
                 attr.restrictions.nillable = True
 
-    def process_type(self, target: Class, attr: Attr, attr_type: AttrType):
+    def process_type(self, target: Class, attr: Attr, attr_type: AttrType) -> None:
         """Process attr type.
 
         Cases:
@@ -148,7 +149,9 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
 
         return None
 
-    def process_inner_type(self, target: Class, attr: Attr, attr_type: AttrType):
+    def process_inner_type(
+        self, target: Class, attr: Attr, attr_type: AttrType
+    ) -> None:
         """Process an attr type that depends on a simple inner type.
 
         Skip If the source class is not simple type, or it's a circular reference.
@@ -175,7 +178,9 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
         else:
             attr_type.reference = inner.ref
 
-    def process_dependency_type(self, target: Class, attr: Attr, attr_type: AttrType):
+    def process_dependency_type(
+        self, target: Class, attr: Attr, attr_type: AttrType
+    ) -> None:
         """Process an attr type that depends on any global type.
 
         Strategies:

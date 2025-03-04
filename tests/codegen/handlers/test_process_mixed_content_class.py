@@ -7,11 +7,11 @@ from xsdata.utils.testing import AttrFactory, ClassFactory, FactoryTestCase
 
 
 class ProcessMixedContentClassTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.processor = ProcessMixedContentClass()
 
-    def test_process(self):
+    def test_process(self) -> None:
         res = Restrictions(min_occurs=1, max_occurs=1, sequence=1)
         attrs = [
             AttrFactory.attribute(),  # keep

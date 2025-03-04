@@ -28,7 +28,7 @@ from xsdata.utils.testing import ClassFactory, DtdFactory, FactoryTestCase
 
 
 class ResourceTransformerTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         config = GeneratorConfig()
         self.transformer = ResourceTransformer(config=config)
         super().setUp()
@@ -47,7 +47,7 @@ class ResourceTransformerTests(FactoryTestCase):
         mock_process_json_documents,
         mock_process_dtds,
         mock_process_classes,
-    ):
+    ) -> None:
         uris = [
             "a.wsdl",
             "b.wsdl",
@@ -73,7 +73,7 @@ class ResourceTransformerTests(FactoryTestCase):
     @mock.patch.object(ResourceTransformer, "get_cache_file")
     def test_process_from_cache(
         self, mock_get_cache_file, mock_process_sources, mock_process_classes
-    ):
+    ) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             cache = Path(tmpdir).joinpath("foo.cache")
             classes = ClassFactory.list(2)
@@ -93,7 +93,7 @@ class ResourceTransformerTests(FactoryTestCase):
     @mock.patch.object(ResourceTransformer, "get_cache_file")
     def test_process_with_cache(
         self, mock_get_cache_file, mock_process_sources, mock_process_classes
-    ):
+    ) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             cache = Path(tmpdir).joinpath("foo.cache")
             classes = ClassFactory.list(2)
@@ -108,7 +108,9 @@ class ResourceTransformerTests(FactoryTestCase):
             mock_process_classes.assert_called_once_with()
 
     @mock.patch.object(ResourceTransformer, "process_classes")
-    def test_process_with_circular_dependencies_error(self, mock_process_classes):
+    def test_process_with_circular_dependencies_error(
+        self, mock_process_classes
+    ) -> None:
         mock_process_classes.side_effect = CircularDependencyError({})
         with self.assertRaises(CodegenError):
             self.transformer.process([])
@@ -117,7 +119,7 @@ class ResourceTransformerTests(FactoryTestCase):
     @mock.patch.object(ResourceTransformer, "process_classes")
     def test_process_with_module_not_found_error(
         self, mock_process_classes, mock_warning
-    ):
+    ) -> None:
         mock_process_classes.side_effect = ModuleNotFoundError({})
         self.transformer.process([])
         mock_warning.assert_called_once_with(
@@ -132,7 +134,7 @@ class ResourceTransformerTests(FactoryTestCase):
         mock_parse_definitions,
         mock_convert_definitions,
         mock_convert_schema,
-    ):
+    ) -> None:
         uris = [
             "http://xsdata/services.wsdl",
             "http://xsdata/abstractServices.wsdl",
@@ -150,7 +152,7 @@ class ResourceTransformerTests(FactoryTestCase):
         mock_convert_definitions.assert_called_once_with(fist_def)
 
     @mock.patch.object(ResourceTransformer, "process_schema")
-    def test_process_schemas(self, mock_process_schema):
+    def test_process_schemas(self, mock_process_schema) -> None:
         uris = ["http://xsdata/foo.xsd", "http://xsdata/bar.xsd"]
 
         self.transformer.process_schemas(uris)
@@ -163,7 +165,7 @@ class ResourceTransformerTests(FactoryTestCase):
     @mock.patch.object(ResourceTransformer, "load_resource")
     def test_process_xml_documents(
         self, mock_load_resource, mock_from_bytes, mock_map, mock_reduce_classes
-    ):
+    ) -> None:
         uris = ["foo/a.xml", "foo/b.xml", "foo/c.xml"]
         resources = [b"a", None, b"c"]
         elements = [AnyElement(), AnyElement()]
@@ -192,7 +194,7 @@ class ResourceTransformerTests(FactoryTestCase):
     @mock.patch.object(ResourceTransformer, "load_resource")
     def test_process_json_documents(
         self, mock_load_resource, mock_map, mock_reduce_classes, mock_warning
-    ):
+    ) -> None:
         uris = ["foo/a.json", "foo/b.json", "foo/c.json", "bar.json"]
         resources = [b'{"foo": 1}', None, b'[{"foo": true}]', b"notjson"]
 
@@ -222,7 +224,7 @@ class ResourceTransformerTests(FactoryTestCase):
     @mock.patch.object(DtdMapper, "map")
     @mock.patch.object(DtdParser, "parse")
     @mock.patch.object(ResourceTransformer, "load_resource")
-    def test_process_dtds(self, mock_load_resource, mock_parse, mock_map):
+    def test_process_dtds(self, mock_load_resource, mock_parse, mock_map) -> None:
         uris = ["foo/a.dtd", "foo/b.dtd", "foo/c.dtd"]
         resources = [b"a", None, b"c"]
         dtds = DtdFactory.list(2)
@@ -259,7 +261,7 @@ class ResourceTransformerTests(FactoryTestCase):
         mock_analyze_classes,
         mock_writer_write,
         mock_logger_into,
-    ):
+    ) -> None:
         schema_classes = ClassFactory.list(3)
         analyzer_classes = ClassFactory.list(2)
         mock_analyze_classes.return_value = analyzer_classes
@@ -282,7 +284,7 @@ class ResourceTransformerTests(FactoryTestCase):
         self,
         mock_parse_schema,
         mock_convert_schema,
-    ):
+    ) -> None:
         schema = Schema()
         mock_parse_schema.return_value = schema
         uri = "http://xsdata/services.xsd"
@@ -298,7 +300,7 @@ class ResourceTransformerTests(FactoryTestCase):
         self,
         mock_parse_schema,
         mock_convert_schema,
-    ):
+    ) -> None:
         mock_parse_schema.return_value = None
         uri = "http://xsdata/services.xsd"
         namespace = "fooNS"
@@ -308,7 +310,7 @@ class ResourceTransformerTests(FactoryTestCase):
 
     @mock.patch.object(ResourceTransformer, "generate_classes")
     @mock.patch.object(ResourceTransformer, "process_schema")
-    def test_convert_schema(self, mock_process_schema, mock_generate_classes):
+    def test_convert_schema(self, mock_process_schema, mock_generate_classes) -> None:
         schema = Schema(target_namespace="thug", location="main")
         schema.includes.append(Include(location="foo"))
         schema.overrides.append(Override())
@@ -329,7 +331,7 @@ class ResourceTransformerTests(FactoryTestCase):
         )
 
     @mock.patch.object(DefinitionsMapper, "map")
-    def test_convert_definitions(self, mock_definitions_map):
+    def test_convert_definitions(self, mock_definitions_map) -> None:
         classes = ClassFactory.list(2)
         mock_definitions_map.return_value = classes
         definitions = Definitions(location="foo")
@@ -342,7 +344,7 @@ class ResourceTransformerTests(FactoryTestCase):
     @mock.patch.object(SchemaMapper, "map")
     def test_generate_classes(
         self, mock_mapper_map, mock_count_classes, mock_logger_info
-    ):
+    ) -> None:
         schema = Schema(location="edo.xsd")
         classes = ClassFactory.list(2)
 
@@ -358,7 +360,7 @@ class ResourceTransformerTests(FactoryTestCase):
             ]
         )
 
-    def test_parse_schema(self):
+    def test_parse_schema(self) -> None:
         uri = Path(__file__).parent.joinpath("../fixtures/books/schema.xsd").as_uri()
         schema = self.transformer.parse_schema(uri, "foo.bar")
         self.assertIsInstance(schema, Schema)
@@ -375,7 +377,7 @@ class ResourceTransformerTests(FactoryTestCase):
         mock_definitions_parser,
         mock_definitions_merge,
         mock_process_schema,
-    ):
+    ) -> None:
         def_one = Definitions(
             imports=[
                 Import(),
@@ -395,7 +397,7 @@ class ResourceTransformerTests(FactoryTestCase):
         mock_process_schema.assert_called_once_with("file://types.xsd")
 
     @mock.patch("xsdata.codegen.transformer.logger.debug")
-    def test_load_resource(self, mock_debug):
+    def test_load_resource(self, mock_debug) -> None:
         path = Path(__file__).as_uri()
 
         result = self.transformer.load_resource(path)
@@ -407,7 +409,7 @@ class ResourceTransformerTests(FactoryTestCase):
         self.assertIsNone(result)
         mock_debug.assert_called_once_with("Skipping already processed: %s", path)
 
-    def test_classify_resource(self):
+    def test_classify_resource(self) -> None:
         self.assertEqual(0, self.transformer.classify_resource("file://notexists"))
         self.assertEqual(1, self.transformer.classify_resource("a.xsd"))
         self.assertEqual(2, self.transformer.classify_resource("a.wsdl"))
@@ -443,14 +445,14 @@ class ResourceTransformerTests(FactoryTestCase):
         file_path.unlink()
 
     @mock.patch("xsdata.codegen.transformer.logger.warning")
-    def test_load_resource_missing(self, mock_warning):
+    def test_load_resource_missing(self, mock_warning) -> None:
         uri = Path.cwd().joinpath("foo/bar.xsd").as_uri()
         result = self.transformer.process([uri])
         self.assertIsNone(result)
 
         mock_warning.assert_called_once_with("Resource not found %s", uri)
 
-    def test_count_classes(self):
+    def test_count_classes(self) -> None:
         classes = ClassFactory.list(
             2, inner=ClassFactory.list(2, inner=ClassFactory.list(3))
         )
@@ -458,14 +460,14 @@ class ResourceTransformerTests(FactoryTestCase):
         self.assertEqual((2, 16), self.transformer.count_classes(classes))
 
     @mock.patch.object(ClassContainer, "process")
-    def test_analyze_classes(self, mock_process):
+    def test_analyze_classes(self, mock_process) -> None:
         classes = ClassFactory.list(2)
 
         result = self.transformer.analyze_classes(classes)
         self.assertEqual(2, len(result))
         mock_process.assert_called_once()
 
-    def test_get_cache_file(self):
+    def test_get_cache_file(self) -> None:
         uris = ["a.xml", "b.json"]
         actual = self.transformer.get_cache_file(uris)
         tempdir = Path(tempfile.gettempdir())

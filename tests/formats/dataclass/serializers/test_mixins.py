@@ -39,7 +39,7 @@ class XmlWriterTests(TestCase):
         config = SerializerConfig()
         self.writer = XmlWriterImpl(output=output, config=config, ns_map={})
 
-    def test_write(self):
+    def test_write(self) -> None:
         events = iter(
             [
                 ("start", "{http://www.w3.org/1999/xhtml}p"),
@@ -66,7 +66,7 @@ class XmlWriterTests(TestCase):
             lines[1],
         )
 
-    def test_convert_with_schema_location(self):
+    def test_convert_with_schema_location(self) -> None:
         self.writer.config.schema_location = "foo bar"
         events = iter(
             [
@@ -86,7 +86,7 @@ class XmlWriterTests(TestCase):
             lines[1],
         )
 
-    def test_convert_with_no_namespace_schema_location(self):
+    def test_convert_with_no_namespace_schema_location(self) -> None:
         self.writer.config.no_namespace_schema_location = "foo.xsd"
         events = iter(
             [
@@ -106,7 +106,7 @@ class XmlWriterTests(TestCase):
             lines[1],
         )
 
-    def test_convert_with_unhandled_event_raises_exception(self):
+    def test_convert_with_unhandled_event_raises_exception(self) -> None:
         events = iter([("reverse", "p")])
 
         with self.assertRaises(XmlWriterError) as cm:
@@ -114,7 +114,7 @@ class XmlWriterTests(TestCase):
 
         self.assertEqual("Unhandled event: `reverse`", str(cm.exception))
 
-    def test_convert_removes_xsi_nil_if_necessary(self):
+    def test_convert_removes_xsi_nil_if_necessary(self) -> None:
         events = iter(
             [
                 ("start", "root"),
@@ -160,7 +160,7 @@ class XmlWriterTests(TestCase):
 
         self.assertEqual(expected, lines[1])
 
-    def test_convert_resets_default_namespace_for_unqualified_elements(self):
+    def test_convert_resets_default_namespace_for_unqualified_elements(self) -> None:
         events = iter(
             [
                 ("start", "{a}a"),
@@ -176,7 +176,7 @@ class XmlWriterTests(TestCase):
         lines = self.writer.output.getvalue().splitlines()
         self.assertEqual('<a xmlns="a"><b xmlns="">foo<b/>', lines[1])
 
-    def test_add_attribute(self):
+    def test_add_attribute(self) -> None:
         with self.assertRaises(XmlWriterError) as cm:
             self.writer.add_attribute("foo", "bar")
 
@@ -199,7 +199,7 @@ class XmlWriterTests(TestCase):
 
         self.assertEqual(expected, self.writer.attrs)
 
-    def test_is_xsi_type(self):
+    def test_is_xsi_type(self) -> None:
         self.assertFalse(self.writer.is_xsi_type("key", 1))
         self.assertFalse(self.writer.is_xsi_type(QNames.XSI_TYPE, 1))
         self.assertFalse(self.writer.is_xsi_type(QNames.XSI_TYPE, "a"))
@@ -212,7 +212,7 @@ class EventGeneratorTests(TestCase):
     def setUp(self) -> None:
         self.generator = EventGenerator()
 
-    def test_with_primitive_wrapper(self):
+    def test_with_primitive_wrapper(self) -> None:
         @dataclass
         class PrimitiveWrapper:
             primitive_list: list[str] = field(
@@ -239,7 +239,7 @@ class EventGeneratorTests(TestCase):
         ]
         self.assertEqual(expected, list(events))
 
-    def test_with_wrapper_element(self):
+    def test_with_wrapper_element(self) -> None:
         @dataclass
         class ElementObject:
             content: str = field(metadata={"type": "Element"})
@@ -272,7 +272,7 @@ class EventGeneratorTests(TestCase):
         ]
         self.assertEqual(expected, list(events))
 
-    def test_with_wrapper_namespace(self):
+    def test_with_wrapper_namespace(self) -> None:
         @dataclass
         class NamespaceWrapper:
             items: list[str] = field(
@@ -301,7 +301,7 @@ class EventGeneratorTests(TestCase):
 
         self.assertEqual(expected, list(events))
 
-    def test_with_derived_element(self):
+    def test_with_derived_element(self) -> None:
         book = BookForm(id="123")
         obj = DerivedElement(qname="item", value=book)
 
@@ -327,7 +327,7 @@ class EventGeneratorTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
-    def test_with_dataclass(self):
+    def test_with_dataclass(self) -> None:
         book = BookForm(id="123", title="Misterioso: A Crime Novel", price=19.5)
         result = self.generator.generate(book)
         expected = [
@@ -345,7 +345,7 @@ class EventGeneratorTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
-    def test_convert_dataclass_can_overwrite_params(self):
+    def test_convert_dataclass_can_overwrite_params(self) -> None:
         book = BookForm(id="123", title="Misterioso: A Crime Novel", price=19.5)
         result = self.generator.convert_dataclass(
             book, "xsdata", "book", True, "foo:book"
@@ -367,12 +367,12 @@ class EventGeneratorTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
-    def test_convert_dataclass_with_no_dataclass(self):
+    def test_convert_dataclass_with_no_dataclass(self) -> None:
         with self.assertRaises(XmlContextError) as cm:
             next(self.generator.convert_dataclass(1))
         self.assertEqual("Type '<class 'int'>' is not a dataclass.", str(cm.exception))
 
-    def test_convert_mixed_content(self):
+    def test_convert_mixed_content(self) -> None:
         var = XmlVarFactory.create(xml_type=XmlType.WILDCARD, name="a", mixed=True)
         book = BookForm(id="123")
         ebook = DerivedElement("ebook", BookForm(id="123"))
@@ -398,7 +398,7 @@ class EventGeneratorTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
-    def test_convert_data(self):
+    def test_convert_data(self) -> None:
         var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="a")
         expected = [("data", "123")]
 
@@ -406,7 +406,7 @@ class EventGeneratorTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
-    def test_convert_tokens(self):
+    def test_convert_tokens(self) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT, local_name="a", tokens_factory=list
         )
@@ -462,7 +462,7 @@ class EventGeneratorTests(TestCase):
         result = self.generator.convert_value([], var, "xsdata")
         self.assertEqual(expected, list(result))
 
-    def test_convert_any_type_with_primitive(self):
+    def test_convert_any_type_with_primitive(self) -> None:
         var = XmlVarFactory.create(xml_type=XmlType.WILDCARD, name="a")
         expected = [("data", "str")]
 
@@ -470,7 +470,7 @@ class EventGeneratorTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
-    def test_convert_any_type_with_primitive_element(self):
+    def test_convert_any_type_with_primitive_element(self) -> None:
         var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, name="a", types=(object,))
         expected = [
             ("start", "a"),
@@ -482,7 +482,7 @@ class EventGeneratorTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
-    def test_convert_any_type_with_any_element(self):
+    def test_convert_any_type_with_any_element(self) -> None:
         var = XmlVarFactory.create(xml_type=XmlType.WILDCARD, name="a")
         value = AnyElement(
             qname="a",
@@ -506,7 +506,7 @@ class EventGeneratorTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
-    def test_convert_any_type_with_derived_element_primitive(self):
+    def test_convert_any_type_with_derived_element_primitive(self) -> None:
         var = XmlVarFactory.create(xml_type=XmlType.WILDCARD, name="a")
         value = DerivedElement(qname="a", value=1)
         expected = [
@@ -520,7 +520,7 @@ class EventGeneratorTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
-    def test_convert_any_type_with_derived_element_dataclass(self):
+    def test_convert_any_type_with_derived_element_dataclass(self) -> None:
         var = XmlVarFactory.create(xml_type=XmlType.WILDCARD, name="a")
         value = DerivedElement(
             qname="a", value=BookForm(title="def"), type="{urn:books}BookForm"
@@ -539,7 +539,7 @@ class EventGeneratorTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
-    def test_convert_xsi_type(self):
+    def test_convert_xsi_type(self) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT,
             name="a",
@@ -557,7 +557,7 @@ class EventGeneratorTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
-    def test_convert_xsi_type_with_derived_class(self):
+    def test_convert_xsi_type_with_derived_class(self) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT,
             name="a",
@@ -576,7 +576,7 @@ class EventGeneratorTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
-    def test_convert_xsi_type_with_illegal_derived_class(self):
+    def test_convert_xsi_type_with_illegal_derived_class(self) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT,
             name="a",
@@ -590,7 +590,7 @@ class EventGeneratorTests(TestCase):
 
         self.assertEqual("TypeA is not derived from BookForm", str(cm.exception))
 
-    def test_convert_element(self):
+    def test_convert_element(self) -> None:
         var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, name="a")
         expected = [
             ("start", "a"),
@@ -602,7 +602,7 @@ class EventGeneratorTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
-    def test_convert_element_with_nillable_true(self):
+    def test_convert_element_with_nillable_true(self) -> None:
         var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, name="a", nillable=True)
         expected = [
             ("start", "a"),
@@ -615,7 +615,7 @@ class EventGeneratorTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
-    def test_convert_element_with_any_type_var(self):
+    def test_convert_element_with_any_type_var(self) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT,
             name="a",
@@ -633,7 +633,7 @@ class EventGeneratorTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
-    def test_convert_element_with_any_type_var_ignore_xs_string(self):
+    def test_convert_element_with_any_type_var_ignore_xs_string(self) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENT,
             name="a",
@@ -658,7 +658,7 @@ class EventGeneratorTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
-    def test_convert_choice_with_derived_primitive_value(self):
+    def test_convert_choice_with_derived_primitive_value(self) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENTS,
             name="compound",
@@ -679,7 +679,7 @@ class EventGeneratorTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
-    def test_convert_choice_with_derived_dataclass(self):
+    def test_convert_choice_with_derived_dataclass(self) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENTS,
             name="compound",
@@ -704,7 +704,7 @@ class EventGeneratorTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
-    def test_convert_choice_with_generic_object(self):
+    def test_convert_choice_with_generic_object(self) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENTS,
             name="compound",
@@ -725,7 +725,7 @@ class EventGeneratorTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
-    def test_convert_choice_with_raw_value(self):
+    def test_convert_choice_with_raw_value(self) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENTS,
             name="compound",
@@ -754,7 +754,9 @@ class EventGeneratorTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
-    def test_convert_choice_when_no_matching_choice_exists_but_value_is_model(self):
+    def test_convert_choice_when_no_matching_choice_exists_but_value_is_model(
+        self,
+    ) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENTS,
             name="compound",
@@ -776,7 +778,7 @@ class EventGeneratorTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
-    def test_convert_choice_when_no_matching_choice_exists(self):
+    def test_convert_choice_when_no_matching_choice_exists(self) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.ELEMENTS,
             name="compound",
@@ -794,7 +796,7 @@ class EventGeneratorTests(TestCase):
         msg = "XmlElements undefined choice: `compound` for `<class 'int'>`"
         self.assertEqual(msg, str(cm.exception))
 
-    def test_convert_value_with_list_value(self):
+    def test_convert_value_with_list_value(self) -> None:
         var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, name="a", factory=list)
         value = [True, False]
         expected = [
@@ -810,7 +812,7 @@ class EventGeneratorTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
-    def test_next_value(self):
+    def test_next_value(self) -> None:
         obj = SequentialType(x0=1, x1=[2, 3, 4, None], x2=[6, 7], x3=[9], x4=10)
         meta = self.generator.context.build(SequentialType)
         x0 = meta.text
@@ -836,7 +838,7 @@ class EventGeneratorTests(TestCase):
         self.assertIsInstance(actual, Generator)
         self.assertEqual(expected, list(actual))
 
-    def test_next_attribute(self):
+    def test_next_attribute(self) -> None:
         obj = SequentialType(a0="foo", a1={"b": "c", "d": "e"})
         meta = self.generator.context.build(SequentialType)
 
@@ -870,7 +872,7 @@ class EventGeneratorTests(TestCase):
         self.assertIsInstance(actual, Generator)
         self.assertEqual(expected, list(actual))
 
-    def test_with_mixed_content(self):
+    def test_with_mixed_content(self) -> None:
         obj = Paragraph()
         obj.content.append(AnyElement(qname="b", text="Mr."))
         obj.content.append(Span("chris"))
@@ -910,7 +912,7 @@ class EventGeneratorTests(TestCase):
         ]
         self.assertEqual(expected, list(result))
 
-    def test_encode_primitive_with_namedtuple(self):
+    def test_encode_primitive_with_namedtuple(self) -> None:
         var = XmlVarFactory.create(types=(Telephone,))
         actual = XmlSerializer.encode_primitive(Telephone(30, 234, 56783), var)
         self.assertEqual("30-234-56783", actual)

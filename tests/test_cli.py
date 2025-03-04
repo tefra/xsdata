@@ -22,7 +22,7 @@ CodeWriter.register_generator("testing", DataclassGenerator)
 
 
 class CliTests(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.runner = CliRunner()
         super().setUp()
 
@@ -36,7 +36,7 @@ class CliTests(TestCase):
 
     @mock.patch.object(ResourceTransformer, "process")
     @mock.patch.object(ResourceTransformer, "__init__", return_value=None)
-    def test_generate(self, mock_init, mock_process):
+    def test_generate(self, mock_init, mock_process) -> None:
         source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
         result = self.runner.invoke(cli, [str(source), "--package", "foo"])
         config = mock_init.call_args[1]["config"]
@@ -49,18 +49,18 @@ class CliTests(TestCase):
         self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
 
     @mock.patch.object(ResourceTransformer, "process")
-    def test_generate_with_error(self, mock_process):
+    def test_generate_with_error(self, mock_process) -> None:
         mock_process.side_effect = CodegenError("Testing", foo="bar")
 
         source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
         result = self.runner.invoke(cli, ["generate", str(source), "--package", "foo"])
-        expected = "=========\n" "Error: Testing\n" "foo: bar\n"
+        expected = "=========\nError: Testing\nfoo: bar\n"
 
         self.assertIn(expected, result.output)
 
     @mock.patch.object(ResourceTransformer, "process")
     @mock.patch.object(ResourceTransformer, "__init__", return_value=None)
-    def test_generate_with_configuration_file(self, mock_init, mock_process):
+    def test_generate_with_configuration_file(self, mock_init, mock_process) -> None:
         file_path = Path(tempfile.mktemp())
         config = GeneratorConfig()
         config.output.package = "foo.bar"
@@ -86,12 +86,12 @@ class CliTests(TestCase):
 
     @mock.patch.object(ResourceTransformer, "process")
     @mock.patch.object(ResourceTransformer, "__init__", return_value=None)
-    def test_generate_with_debug_mode(self, *args):
+    def test_generate_with_debug_mode(self, *args) -> None:
         self.runner.invoke(cli, ["foo.xsd", "--package", "foo", "--debug"])
         self.assertEqual(logging.DEBUG, logger.level)
 
     @mock.patch("xsdata.cli.logger.info")
-    def test_init_config(self, mock_info):
+    def test_init_config(self, mock_info) -> None:
         output = tempfile.mktemp()
         output_path = Path(output)
         result = self.runner.invoke(cli, ["init-config", str(output_path)])
@@ -112,7 +112,7 @@ class CliTests(TestCase):
         output_path.unlink()
 
     @mock.patch("xsdata.cli.logger.info")
-    def test_init_config_when_file_exists(self, mock_info):
+    def test_init_config_when_file_exists(self, mock_info) -> None:
         output = tempfile.mktemp()
         output_path = Path(output).resolve()
 
@@ -141,7 +141,7 @@ class CliTests(TestCase):
 
     @mock.patch.object(Downloader, "wget")
     @mock.patch.object(Downloader, "__init__", return_value=None)
-    def test_download(self, mock_init, mock_wget):
+    def test_download(self, mock_init, mock_wget) -> None:
         uri = "http://www.w3.org/2009/01/xml.xsd"
         result = self.runner.invoke(cli, ["download", uri])
 
@@ -151,7 +151,7 @@ class CliTests(TestCase):
 
     @mock.patch.object(Downloader, "wget")
     @mock.patch.object(Downloader, "__init__", return_value=None)
-    def test_download_with_custom_output(self, mock_init, mock_wget):
+    def test_download_with_custom_output(self, mock_init, mock_wget) -> None:
         uri = "http://www.w3.org/2009/01/xml.xsd"
 
         result = self.runner.invoke(cli, ["download", uri, "--output", "here/schemas"])
@@ -160,7 +160,7 @@ class CliTests(TestCase):
         mock_init.assert_called_once_with(output=Path("here/schemas").resolve())
         mock_wget.assert_called_once_with(uri)
 
-    def test_resolve_source(self):
+    def test_resolve_source(self) -> None:
         hello_path = fixtures_dir.joinpath("hello")
 
         file = hello_path.joinpath("hello.xsd")

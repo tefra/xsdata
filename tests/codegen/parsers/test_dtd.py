@@ -21,14 +21,14 @@ class DtdParserTests(TestCase):
         return DtdParser.parse(file_path.read_bytes(), str(file_path.resolve()))
 
     @mock.patch("lxml.etree.DTD")
-    def test_parse_requires_lxml(self, mock_lxml):
+    def test_parse_requires_lxml(self, mock_lxml) -> None:
         mock_lxml.side_effect = ImportError()
         with self.assertRaises(ParserError) as cm:
             DtdParser.parse(b"", "/file/path/def.dtd")
 
         self.assertEqual("DtdParser requires lxml to run.", str(cm.exception))
 
-    def test_build_element(self):
+    def test_build_element(self) -> None:
         dtd = self.parse("dtd/complete_example.dtd")
         self.assertEqual(8, len(dtd.elements))
 
@@ -52,7 +52,7 @@ class DtdParserTests(TestCase):
 
         self.assertEqual(expected, asdict(dtd.elements[1]))
 
-    def test_build_content(self):
+    def test_build_content(self) -> None:
         dtd = self.parse("dtd/complete_example.dtd")
         post = next(el for el in dtd.elements if el.name == "Post")
 
@@ -114,7 +114,7 @@ class DtdParserTests(TestCase):
         }
         self.assertEqual(expected, actual)
 
-    def test_build_attribute(self):
+    def test_build_attribute(self) -> None:
         dtd = self.parse("dtd/complete_example.dtd")
         post = next(el for el in dtd.elements if el.name == "Post")
 
@@ -158,13 +158,13 @@ class DtdParserTests(TestCase):
         }
         self.assertEqual(expected, actual)
 
-    def test_build_ns_map(self):
+    def test_build_ns_map(self) -> None:
         dtd = self.parse("dtd/complete_example.dtd")
         expected = {ns.prefix: ns.uri for ns in Namespace.common()}
         for element in dtd.elements:
             self.assertEqual(expected, element.ns_map)
 
-    def test_with_prefix_namespace(self):
+    def test_with_prefix_namespace(self) -> None:
         dtd = self.parse("dtd/prefix_namespace.dtd")
 
         self.assertEqual(2, len(dtd.elements))
@@ -176,7 +176,7 @@ class DtdParserTests(TestCase):
         self.assertEqual("http://www.example.com/", dtd.elements[0].ns_map["ns"])
         self.assertNotIn("ns", dtd.elements[1].ns_map)
 
-    def test_with_default_namespace(self):
+    def test_with_default_namespace(self) -> None:
         dtd = self.parse("dtd/default_namespace.dtd")
 
         self.assertEqual(2, len(dtd.elements))

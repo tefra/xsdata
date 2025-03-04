@@ -13,7 +13,7 @@ from xsdata.utils.testing import (
 
 
 class ClassTests(FactoryTestCase):
-    def test_dependencies(self):
+    def test_dependencies(self) -> None:
         obj = ClassFactory.create(
             attrs=[
                 AttrFactory.create(types=[AttrTypeFactory.native(DataType.DECIMAL)]),
@@ -89,7 +89,7 @@ class ClassTests(FactoryTestCase):
         self.assertIn("circular", list(obj.dependencies(allow_circular=True)))
         self.assertIn("{xsdata}circular", list(obj.dependencies(allow_circular=True)))
 
-    def test_property_has_suffix_attr(self):
+    def test_property_has_suffix_attr(self) -> None:
         obj = ClassFactory.create()
 
         self.assertFalse(obj.has_suffix_attr)
@@ -101,14 +101,14 @@ class ClassTests(FactoryTestCase):
         obj.attrs[1].index = sys.maxsize
         self.assertTrue(obj.has_suffix_attr)
 
-    def test_property_is_element(self):
+    def test_property_is_element(self) -> None:
         obj = ClassFactory.create(tag=Tag.ELEMENT)
         self.assertTrue(obj.is_element)
 
         obj = ClassFactory.create(tag=Tag.SIMPLE_TYPE)
         self.assertFalse(obj.is_element)
 
-    def test_property_is_enumeration(self):
+    def test_property_is_enumeration(self) -> None:
         obj = ClassFactory.enumeration(2)
         self.assertTrue(obj.is_enumeration)
 
@@ -118,7 +118,7 @@ class ClassTests(FactoryTestCase):
         obj.attrs.clear()
         self.assertFalse(obj.is_enumeration)
 
-    def test_property_is_restricted(self):
+    def test_property_is_restricted(self) -> None:
         obj = ClassFactory.create()
         ext = ExtensionFactory.create(tag=Tag.EXTENSION)
         obj.extensions.append(ext)
@@ -128,16 +128,16 @@ class ClassTests(FactoryTestCase):
         ext.tag = Tag.RESTRICTION
         self.assertTrue(obj.is_restricted)
 
-    def test_property_is_group(self):
+    def test_property_is_group(self) -> None:
         self.assertTrue(ClassFactory.create(tag=Tag.GROUP).is_group)
         self.assertTrue(ClassFactory.create(tag=Tag.ATTRIBUTE_GROUP).is_group)
         self.assertFalse(ClassFactory.create(tag=Tag.ELEMENT).is_group)
 
-    def test_property_ref(self):
+    def test_property_ref(self) -> None:
         obj = ClassFactory.create()
         self.assertEqual(id(obj), obj.ref)
 
-    def test_property_references(self):
+    def test_property_references(self) -> None:
         ext_1 = ExtensionFactory.create(AttrTypeFactory.create(reference=1))
         ext_2 = ExtensionFactory.create(AttrTypeFactory.create(reference=2))
 
@@ -155,7 +155,7 @@ class ClassTests(FactoryTestCase):
 
         self.assertEqual(list(range(1, 7)), list(obj.references))
 
-    def test_property_target_module(self):
+    def test_property_target_module(self) -> None:
         obj = ClassFactory.create(module=None, package=None)
         with self.assertRaises(CodegenError):
             obj.target_module
@@ -166,7 +166,7 @@ class ClassTests(FactoryTestCase):
         obj.package = "foo"
         self.assertEqual("foo.bar", obj.target_module)
 
-    def test_property_is_mixed(self):
+    def test_property_is_mixed(self) -> None:
         obj = ClassFactory.create()
         self.assertFalse(obj.is_mixed)
 
@@ -176,7 +176,7 @@ class ClassTests(FactoryTestCase):
         obj = ClassFactory.create(mixed=True)
         self.assertTrue(obj.is_mixed)
 
-    def test_has_forward_ref(self):
+    def test_has_forward_ref(self) -> None:
         forward_type = AttrTypeFactory.create("foo", forward=True)
         circular_type = AttrTypeFactory.create("foo", circular=True)
 

@@ -173,7 +173,7 @@ class ClassContainer(ContainerInterface):
 
         return classes[0]
 
-    def process(self):
+    def process(self) -> None:
         """Run the processor and filter steps."""
         self.validate_classes()
         self.process_classes(Steps.UNGROUP)
@@ -186,12 +186,12 @@ class ClassContainer(ContainerInterface):
         self.process_classes(Steps.FINALIZE)
         self.designate_classes()
 
-    def validate_classes(self):
+    def validate_classes(self) -> None:
         """Merge redefined classes."""
         with stopwatch("ClassValidator"):
             ClassValidator(self).process()
 
-    def process_classes(self, step: int):
+    def process_classes(self, step: int) -> None:
         """Run the given step processors for all classes.
 
         Args:
@@ -202,7 +202,7 @@ class ClassContainer(ContainerInterface):
             if obj.status < step:
                 self.process_class(obj, step)
 
-    def process_class(self, target: Class, step: int):
+    def process_class(self, target: Class, step: int) -> None:
         """Run the step processors for the given class.
 
         Process recursively any inner classes as well.
@@ -222,7 +222,7 @@ class ClassContainer(ContainerInterface):
 
         target.status = Status(step + 1)
 
-    def designate_classes(self):
+    def designate_classes(self) -> None:
         """Designate the final class names, packages and modules."""
         designators = [
             RenameDuplicateClasses(self),
@@ -234,16 +234,16 @@ class ClassContainer(ContainerInterface):
             with stopwatch(designator.__class__.__name__):
                 designator.run()
 
-    def filter_classes(self):
+    def filter_classes(self) -> None:
         """Filter the classes to be generated."""
         with stopwatch(FilterClasses.__name__):
             FilterClasses(self).run()
 
-    def remove_groups(self):
+    def remove_groups(self) -> None:
         """Remove xs:groups and xs:attributeGroups from the container."""
         self.set([x for x in iter(self) if not x.is_group])
 
-    def add(self, item: Class):
+    def add(self, item: Class) -> None:
         """Add class item to the container.
 
         Args:
@@ -251,7 +251,7 @@ class ClassContainer(ContainerInterface):
         """
         self.data.setdefault(item.qname, []).append(item)
 
-    def remove(self, *items: Class):
+    def remove(self, *items: Class) -> None:
         """Safely remove classes from the container.
 
         Args:
@@ -262,7 +262,7 @@ class ClassContainer(ContainerInterface):
                 c for c in self.data[item.qname] if c.ref != item.ref
             ]
 
-    def reset(self, item: Class, qname: str):
+    def reset(self, item: Class, qname: str) -> None:
         """Update the given class qualified name.
 
         Args:
@@ -272,7 +272,7 @@ class ClassContainer(ContainerInterface):
         self.data[qname] = [c for c in self.data[qname] if c.ref != item.ref]
         self.add(item)
 
-    def set(self, items: list[Class]):
+    def set(self, items: list[Class]) -> None:
         """Set the list of classes to the container.
 
         Args:
@@ -281,7 +281,7 @@ class ClassContainer(ContainerInterface):
         self.data.clear()
         self.extend(items)
 
-    def extend(self, items: list[Class]):
+    def extend(self, items: list[Class]) -> None:
         """Add a list of classes to the container.
 
         Args:

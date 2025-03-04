@@ -56,7 +56,7 @@ def group_by(items: Iterable[T], key: Callable) -> dict[Any, list[T]]:
     return result
 
 
-def apply(items: Iterable, func: Callable):
+def apply(items: Iterable, func: Callable) -> None:
     """Apply the given function to each item of the iterable object."""
     for item in items:
         func(item)
@@ -83,7 +83,7 @@ def first(items: Iterator[T]) -> Optional[T]:
     return next(items, None)
 
 
-def prepend(target: list, *args: Any):
+def prepend(target: list, *args: Any) -> None:
     """Prepend items to the target list."""
     target[:0] = args
 
@@ -95,7 +95,7 @@ def connected_components(lists: list[list[Any]]) -> Iterator[list[Any]]:
         for item in each:
             neighbors[item].update(each)
 
-    def component(node: Any, neigh: dict[Any, set], see: set[Any]):
+    def component(node: Any, neigh: dict[Any, set], see: set[Any]) -> Iterator[Any]:
         nodes = {node}
         while nodes:
             next_node = nodes.pop()

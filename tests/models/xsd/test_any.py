@@ -6,7 +6,7 @@ from xsdata.models.xsd import Any
 
 
 class AnyTests(TestCase):
-    def test_normalize_max_occurs(self):
+    def test_normalize_max_occurs(self) -> None:
         obj = Any(min_occurs=3, max_occurs=2)
         self.assertEqual(3, obj.max_occurs)
         self.assertEqual(3, obj.min_occurs)
@@ -15,15 +15,15 @@ class AnyTests(TestCase):
         self.assertEqual(sys.maxsize, obj.max_occurs)
         self.assertEqual(3, obj.min_occurs)
 
-    def test_property_is_property(self):
+    def test_property_is_property(self) -> None:
         self.assertTrue(Any().is_property)
 
-    def test_property_attr_types(self):
+    def test_property_attr_types(self) -> None:
         obj = Any()
         obj.ns_map["xs"] = Namespace.XS.uri
         self.assertEqual(["xs:anyType"], list(obj.attr_types))
 
-    def test_property_raw_namespace(self):
+    def test_property_raw_namespace(self) -> None:
         obj = Any()
         self.assertEqual(NamespaceType.ANY_NS, obj.raw_namespace)
 
@@ -33,7 +33,7 @@ class AnyTests(TestCase):
         obj = Any(namespace="    foo  \n    \t  \r  bar foo ")
         self.assertEqual("foo bar", obj.raw_namespace)
 
-    def test_property_real_name(self):
+    def test_property_real_name(self) -> None:
         obj = Any()
         self.assertEqual("@any_element", obj.real_name)
 
@@ -46,7 +46,7 @@ class AnyTests(TestCase):
         obj.namespace = "http://foo http://bar"
         self.assertEqual("@foo_bar_element", obj.real_name)
 
-    def test_get_restrictions(self):
+    def test_get_restrictions(self) -> None:
         obj = Any(min_occurs=1, max_occurs=2)
         expected = {"max_occurs": 2, "min_occurs": 0, "process_contents": "strict"}
         self.assertEqual(expected, obj.get_restrictions())

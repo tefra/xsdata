@@ -10,11 +10,11 @@ from xsdata.utils.testing import (
 
 
 class MergeAttributesTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.processor = MergeAttributes
 
-    def test_process_with_enumeration(self):
+    def test_process_with_enumeration(self) -> None:
         target = ClassFactory.create()
         target.attrs = [
             AttrFactory.enumeration(default=1),
@@ -26,7 +26,7 @@ class MergeAttributesTests(FactoryTestCase):
         self.processor.process(target)
         self.assertEqual([1, 2], [x.default for x in target.attrs])
 
-    def test_process_with_non_enumeration(self):
+    def test_process_with_non_enumeration(self) -> None:
         one = AttrFactory.attribute(fixed=True)
         one_clone = one.clone()
         restrictions = Restrictions(min_occurs=10, max_occurs=15)

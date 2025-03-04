@@ -20,7 +20,7 @@ from xsdata.utils.text import (
 
 
 class TextTests(TestCase):
-    def test_original_case(self):
+    def test_original_case(self) -> None:
         self.assertEqual("p00p", original_case("p00p", foobar=True))
         self.assertEqual("p00p", original_case("p00p"))
         self.assertEqual("USERName", original_case("USERName"))
@@ -33,7 +33,7 @@ class TextTests(TestCase):
         self.assertEqual("user_name", original_case("user_name"))
         self.assertEqual("SUserNAME", original_case("SUserNAME"))
 
-    def test_snake_case(self):
+    def test_snake_case(self) -> None:
         self.assertEqual("p00p", snake_case("p00p", foobar=True))
         self.assertEqual("p00p", snake_case("p00p"))
         self.assertEqual("username", snake_case("USERName"))
@@ -44,7 +44,7 @@ class TextTests(TestCase):
         self.assertEqual("user_name", snake_case("user_name"))
         self.assertEqual("suser_name", snake_case("SUserNAME"))
 
-    def test_screaming_snake_case(self):
+    def test_screaming_snake_case(self) -> None:
         self.assertEqual("P00P", screaming_snake_case("p00p", foobar=True))
         self.assertEqual("P00P", screaming_snake_case("p00p"))
         self.assertEqual("USERNAME", screaming_snake_case("USERName"))
@@ -55,7 +55,7 @@ class TextTests(TestCase):
         self.assertEqual("USER_NAME", screaming_snake_case("user_name"))
         self.assertEqual("SUSER_NAME", screaming_snake_case("SUserNAME"))
 
-    def test_pascal_case(self):
+    def test_pascal_case(self) -> None:
         self.assertEqual("P00P", pascal_case("p00p", foobar=True))
         self.assertEqual("P00P", pascal_case("p00p"))
         self.assertEqual("Username", pascal_case("USERName"))
@@ -66,7 +66,7 @@ class TextTests(TestCase):
         self.assertEqual("UserName", pascal_case("user_name"))
         self.assertEqual("SuserName", pascal_case("SUserNAME"))
 
-    def test_camel_case(self):
+    def test_camel_case(self) -> None:
         self.assertEqual("p00P", camel_case("p00p", foobar=True))
         self.assertEqual("p00P", camel_case("p00p"))
         self.assertEqual("username", camel_case("USERName"))
@@ -77,7 +77,7 @@ class TextTests(TestCase):
         self.assertEqual("userName", camel_case("user_name"))
         self.assertEqual("suserName", camel_case("SUserNAME"))
 
-    def test_mixed_case(self):
+    def test_mixed_case(self) -> None:
         self.assertEqual("p00p", mixed_case("p00p", foobar=True))
         self.assertEqual("p00p", mixed_case("p00p"))
         self.assertEqual("USERName", mixed_case("USERName"))
@@ -88,7 +88,7 @@ class TextTests(TestCase):
         self.assertEqual("username", mixed_case("user_name"))
         self.assertEqual("SUserNAME", mixed_case("SUserNAME"))
 
-    def test_mixed_pascal_case(self):
+    def test_mixed_pascal_case(self) -> None:
         self.assertEqual("P00p", mixed_pascal_case("p00p", foobar=True))
         self.assertEqual("P00p", mixed_pascal_case("p00p"))
         self.assertEqual("USERName", mixed_pascal_case("USERName"))
@@ -99,7 +99,7 @@ class TextTests(TestCase):
         self.assertEqual("Username", mixed_pascal_case("user_name"))
         self.assertEqual("SUserNAME", mixed_pascal_case("SUserNAME"))
 
-    def test_mixed_snake_case(self):
+    def test_mixed_snake_case(self) -> None:
         self.assertEqual("p00p", mixed_snake_case("p00p", foobar=True))
         self.assertEqual("p00p", mixed_snake_case("p00p"))
         self.assertEqual("USERName", mixed_snake_case("USERName"))
@@ -110,7 +110,7 @@ class TextTests(TestCase):
         self.assertEqual("user_name", mixed_snake_case("user_name"))
         self.assertEqual("SUser_NAME", mixed_snake_case("SUserNAME"))
 
-    def test_kebab_case(self):
+    def test_kebab_case(self) -> None:
         self.assertEqual("p00p", kebab_case("p00p", foobar=True))
         self.assertEqual("p00p", kebab_case("p00p"))
         self.assertEqual("USERName", kebab_case("USERName"))
@@ -121,11 +121,11 @@ class TextTests(TestCase):
         self.assertEqual("user-name", kebab_case("user_name"))
         self.assertEqual("SUser-NAME", kebab_case("SUserNAME"))
 
-    def test_capitalize(self):
+    def test_capitalize(self) -> None:
         self.assertEqual("UserName", capitalize("userName"))
         self.assertEqual(".userName", capitalize(".userName"))
 
-    def test_split_words(self):
+    def test_split_words(self) -> None:
         self.assertEqual(["user", "Name"], split_words("userName"))
         self.assertEqual(["User", "Name"], split_words("User.Name"))
         self.assertEqual(["User", "Name"], split_words("UserName"))
@@ -140,14 +140,14 @@ class TextTests(TestCase):
         self.assertEqual(["GLOBAL", "REF"], split_words("GLOBAL-REF"))
         self.assertEqual(["book"], split_words("βιβλιο-book"))
 
-    def test_alnum(self):
+    def test_alnum(self) -> None:
         self.assertEqual("foo1", alnum("foo 1"))
         self.assertEqual("foo1", alnum(" foo_1 "))
         self.assertEqual("foo1", alnum("\tfoo*1"))
         self.assertEqual("foo1", alnum(" foo*1"))
         self.assertEqual("1", alnum(" βιβλίο*1"))
 
-    def test_classify(self):
+    def test_classify(self) -> None:
         for ltr in string.ascii_uppercase:
             self.assertEqual(CharType.UPPER, classify(ltr))
 

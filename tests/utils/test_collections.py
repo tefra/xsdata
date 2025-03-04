@@ -6,28 +6,28 @@ from xsdata.utils import collections
 
 
 class CollectionsTests(TestCase):
-    def test_find(self):
+    def test_find(self) -> None:
         self.assertEqual(-1, collections.find([0, 1], 2))
         self.assertEqual(1, collections.find([0, 1], 1))
 
-    def test_prepend(self):
+    def test_prepend(self) -> None:
         target = [1, 2, 3]
         prepend_values = [4, 5, 6]
         collections.prepend(target, *prepend_values)
 
         self.assertEqual([4, 5, 6, 1, 2, 3], target)
 
-    def test_remove(self):
+    def test_remove(self) -> None:
         self.assertEqual([1, 3], collections.remove([1, 2, 2, 3], lambda x: x == 2))
 
         self.assertEqual([2, 2, 3], collections.remove([1, 2, 2, 3], lambda x: x == 1))
 
         self.assertEqual([3], collections.remove([1, 2, 2, 3], lambda x: x < 3))
 
-    def test_is_array(self):
+    def test_is_array(self) -> None:
         fixture = namedtuple("fixture", ["a", "b"])
 
-        def foo():
+        def foo() -> Iterator[int]:
             yield 1
 
         self.assertFalse(collections.is_array(1))
@@ -37,14 +37,14 @@ class CollectionsTests(TestCase):
         self.assertTrue(collections.is_array(frozenset()))
         self.assertTrue(collections.is_array(foo()))
 
-    def test_connected_components(self):
+    def test_connected_components(self) -> None:
         lists = [[1, 2, 3], [4], [3, 4], [6]]
         actual = collections.connected_components(lists)
 
         self.assertIsInstance(actual, Iterator)
         self.assertEqual([[1, 2, 3, 4], [6]], list(actual))
 
-    def test_find_connected_component(self):
+    def test_find_connected_component(self) -> None:
         groups = [[1, 2, 3], [4, 5, 6]]
 
         actual = collections.find_connected_component(groups, 1)

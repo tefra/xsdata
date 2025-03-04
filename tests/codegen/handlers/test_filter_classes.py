@@ -10,13 +10,13 @@ from xsdata.utils.testing import ClassFactory, FactoryTestCase
 class FilterClassesTests(FactoryTestCase):
     maxDiff = None
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.container = ClassContainer(config=GeneratorConfig())
         self.handler = FilterClasses(self.container)
 
-    def test_filter_all_globals(self):
+    def test_filter_all_globals(self) -> None:
         complex_type = ClassFactory.elements(1)
         enum_1 = ClassFactory.enumeration(2)
         complex_type.attrs[0].types[0].reference = enum_1.ref
@@ -33,7 +33,7 @@ class FilterClassesTests(FactoryTestCase):
         self.assertEqual(expected, list(self.container))
 
     @mock.patch("xsdata.codegen.handlers.filter_classes.logger.warning")
-    def test_run_with_no_global_types(self, mock_warning):
+    def test_run_with_no_global_types(self, mock_warning) -> None:
         classes = [ClassFactory.enumeration(2), ClassFactory.simple_type()]
         self.container.extend(classes)
         self.handler.run()

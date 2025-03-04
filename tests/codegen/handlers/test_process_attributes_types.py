@@ -15,7 +15,7 @@ from xsdata.utils.testing import (
 
 
 class ProcessAttributeTypesTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         container = ClassContainer(config=GeneratorConfig())
@@ -23,7 +23,7 @@ class ProcessAttributeTypesTests(FactoryTestCase):
 
     @mock.patch.object(ProcessAttributeTypes, "cascade_properties")
     @mock.patch.object(ProcessAttributeTypes, "process_types")
-    def test_process(self, mock_process_types, mock_cascade_properties):
+    def test_process(self, mock_process_types, mock_cascade_properties) -> None:
         target = ClassFactory.elements(2)
 
         self.processor.process(target)
@@ -34,7 +34,7 @@ class ProcessAttributeTypesTests(FactoryTestCase):
         self.assertEqual(2, len(calls))
 
     @mock.patch.object(ProcessAttributeTypes, "process_type")
-    def test_process_types(self, mock_process_type):
+    def test_process_types(self, mock_process_type) -> None:
         target = ClassFactory.create()
         attr = AttrFactory.create()
         types = [
@@ -53,7 +53,7 @@ class ProcessAttributeTypesTests(FactoryTestCase):
 
         self.assertEqual(types[:-1], attr.types)
 
-    def test_process_types_with_ignore_patterns(self):
+    def test_process_types_with_ignore_patterns(self) -> None:
         target = ClassFactory.create()
         attr = AttrFactory.native(DataType.DECIMAL)
         attr.restrictions.pattern = r"\d{2}.\d{2}"
@@ -62,7 +62,7 @@ class ProcessAttributeTypesTests(FactoryTestCase):
         self.processor.process_types(target, attr)
         self.assertEqual(DataType.DECIMAL, attr.types[0].datatype)
 
-    def test_cascade_properties(self):
+    def test_cascade_properties(self) -> None:
         target = ClassFactory.create(default="2", fixed=True, nillable=True)
         attr = AttrFactory.native(DataType.STRING, tag=Tag.EXTENSION)
         self.processor.cascade_properties(target, attr)
@@ -89,7 +89,7 @@ class ProcessAttributeTypesTests(FactoryTestCase):
     @mock.patch.object(ProcessAttributeTypes, "process_native_type")
     def test_process_type_with_native_type(
         self, mock_process_native_type, mock_process_dependency_type
-    ):
+    ) -> None:
         attr = AttrFactory.create()
         target = ClassFactory.create()
         xs_int = AttrTypeFactory.native(DataType.INT)
@@ -102,7 +102,7 @@ class ProcessAttributeTypesTests(FactoryTestCase):
     @mock.patch.object(ProcessAttributeTypes, "process_native_type")
     def test_process_type_with_dependency_type(
         self, mock_process_native_type, mock_process_dependency_type
-    ):
+    ) -> None:
         attr = AttrFactory.create()
         target = ClassFactory.create()
         attr_type = AttrTypeFactory.create()
@@ -112,7 +112,7 @@ class ProcessAttributeTypesTests(FactoryTestCase):
         mock_process_dependency_type.assert_called_once_with(target, attr, attr_type)
 
     @mock.patch.object(ProcessAttributeTypes, "process_inner_type")
-    def test_process_type_with_forward_reference(self, mock_process_inner_type):
+    def test_process_type_with_forward_reference(self, mock_process_inner_type) -> None:
         attr = AttrFactory.create()
         target = ClassFactory.create()
         attr_type = AttrTypeFactory.create(forward=True)
@@ -120,7 +120,7 @@ class ProcessAttributeTypesTests(FactoryTestCase):
         self.processor.process_type(target, attr, attr_type)
         mock_process_inner_type.assert_called_once_with(target, attr, attr_type)
 
-    def test_process_native_type(self):
+    def test_process_native_type(self) -> None:
         attr = AttrFactory.native(DataType.INT)
         nm_tokens_type = AttrTypeFactory.native(DataType.NMTOKENS)
 
@@ -138,7 +138,7 @@ class ProcessAttributeTypesTests(FactoryTestCase):
     @mock.patch.object(ProcessAttributeTypes, "find_dependency")
     def test_process_dependency_type_with_absent_type(
         self, mock_find_dependency, mock_reset_attribute_type
-    ):
+    ) -> None:
         mock_find_dependency.return_value = None
         target = ClassFactory.create()
         attr = AttrFactory.create()
@@ -151,7 +151,7 @@ class ProcessAttributeTypesTests(FactoryTestCase):
     @mock.patch.object(ProcessAttributeTypes, "find_dependency")
     def test_process_dependency_type_with_simple_type(
         self, mock_find_dependency, mock_copy_attribute_properties
-    ):
+    ) -> None:
         simple = ClassFactory.simple_type()
         target = ClassFactory.create()
         attr = AttrFactory.create()
@@ -164,7 +164,9 @@ class ProcessAttributeTypesTests(FactoryTestCase):
         )
 
     @mock.patch.object(ProcessAttributeTypes, "find_dependency")
-    def test_process_dependency_type_with_enumeration_type(self, mock_find_dependency):
+    def test_process_dependency_type_with_enumeration_type(
+        self, mock_find_dependency
+    ) -> None:
         enumeration = ClassFactory.enumeration(2)
         enumeration.attrs[1].restrictions.format = "base16"
         mock_find_dependency.return_value = enumeration
@@ -181,7 +183,9 @@ class ProcessAttributeTypesTests(FactoryTestCase):
         self.assertIsNone(attr.restrictions.max_length)
 
     @mock.patch.object(ProcessAttributeTypes, "find_dependency")
-    def test_process_dependency_type_with_complex_type(self, mock_find_dependency):
+    def test_process_dependency_type_with_complex_type(
+        self, mock_find_dependency
+    ) -> None:
         complex_type = ClassFactory.elements(1)
         mock_find_dependency.return_value = complex_type
 
@@ -201,7 +205,7 @@ class ProcessAttributeTypesTests(FactoryTestCase):
     @mock.patch.object(ProcessAttributeTypes, "find_dependency")
     def test_process_dependency_type_with_abstract_type_type(
         self, mock_find_dependency
-    ):
+    ) -> None:
         complex_type = ClassFactory.create(tag=Tag.ELEMENT, abstract=True)
         mock_find_dependency.return_value = complex_type
 
@@ -218,7 +222,7 @@ class ProcessAttributeTypesTests(FactoryTestCase):
     @mock.patch.object(ProcessAttributeTypes, "copy_attribute_properties")
     def test_process_inner_type_with_simple_type(
         self, mock_copy_attribute_properties, mock_update_restrictions
-    ):
+    ) -> None:
         attr = AttrFactory.create(types=[AttrTypeFactory.create(qname="{bar}a")])
         inner = ClassFactory.simple_type(qname="{bar}a", status=Status.FLATTENED)
         target = ClassFactory.create(inner=[inner])
@@ -235,7 +239,7 @@ class ProcessAttributeTypesTests(FactoryTestCase):
     @mock.patch.object(ProcessAttributeTypes, "copy_attribute_properties")
     def test_process_inner_type_with_complex_type(
         self, mock_copy_attribute_properties, mock_update_restrictions
-    ):
+    ) -> None:
         target = ClassFactory.create()
         inner = ClassFactory.elements(2, qname="a", status=Status.FLATTENED)
         attr = AttrFactory.create(types=[AttrTypeFactory.create(qname="a")])
@@ -250,7 +254,7 @@ class ProcessAttributeTypesTests(FactoryTestCase):
     @mock.patch.object(ProcessAttributeTypes, "copy_attribute_properties")
     def test_process_inner_type_with_circular_reference(
         self, mock_copy_attribute_properties, mock_update_restrictions
-    ):
+    ) -> None:
         target = ClassFactory.create()
         attr = AttrFactory.create()
         attr_type = AttrTypeFactory.create(circular=True)
@@ -262,7 +266,7 @@ class ProcessAttributeTypesTests(FactoryTestCase):
         self.assertEqual(0, mock_update_restrictions.call_count)
 
     @mock.patch.object(ClassUtils, "copy_inner_class")
-    def test_copy_attribute_properties(self, mock_copy_inner_class):
+    def test_copy_attribute_properties(self, mock_copy_inner_class) -> None:
         source = ClassFactory.elements(1, qname="Foobar")
         source.attrs[0].restrictions.max_length = 100
         source.attrs[0].restrictions.min_length = 1
@@ -302,7 +306,7 @@ class ProcessAttributeTypesTests(FactoryTestCase):
     @mock.patch.object(ProcessAttributeTypes, "reset_attribute_type")
     def test_copy_attribute_properties_from_empty_source(
         self, mock_reset_attribute_type
-    ):
+    ) -> None:
         source = ClassFactory.create()
         target = ClassFactory.elements(1)
         attr = target.attrs[0]
@@ -311,7 +315,7 @@ class ProcessAttributeTypesTests(FactoryTestCase):
 
         mock_reset_attribute_type.assert_called_once_with(attr.types[0])
 
-    def test_copy_attribute_properties_from_nillable_source(self):
+    def test_copy_attribute_properties_from_nillable_source(self) -> None:
         source = ClassFactory.elements(1, nillable=True)
         target = ClassFactory.elements(1)
         attr = target.attrs[0]
@@ -319,7 +323,7 @@ class ProcessAttributeTypesTests(FactoryTestCase):
         self.processor.copy_attribute_properties(source, target, attr, attr.types[0])
         self.assertTrue(attr.restrictions.nillable)
 
-    def test_copy_attribute_properties_set_default_value_if_none(self):
+    def test_copy_attribute_properties_set_default_value_if_none(self) -> None:
         target = ClassFactory.create(attrs=AttrFactory.list(1, tag=Tag.ATTRIBUTE))
         attr = target.attrs[0]
 
@@ -337,7 +341,7 @@ class ProcessAttributeTypesTests(FactoryTestCase):
         self.assertEqual("foo", attr.default)
         self.assertTrue("foo", attr.fixed)
 
-    def test_find_dependency(self):
+    def test_find_dependency(self) -> None:
         attr_type = AttrTypeFactory.create(qname="a")
 
         element = ClassFactory.create(qname="a", tag=Tag.ELEMENT)
@@ -368,7 +372,7 @@ class ProcessAttributeTypesTests(FactoryTestCase):
         actual = self.processor.find_dependency(element, attr_type, Tag.EXTENSION)
         self.assertEqual(simple_type, actual)
 
-    def test_update_restrictions(self):
+    def test_update_restrictions(self) -> None:
         attr = AttrFactory.native(DataType.NMTOKENS)
         self.processor.update_restrictions(attr, attr.types[0].datatype)
         self.assertTrue(attr.restrictions.tokens)
@@ -385,7 +389,7 @@ class ProcessAttributeTypesTests(FactoryTestCase):
         self.processor.update_restrictions(attr, attr.types[0].datatype)
         self.assertEqual("base16", attr.restrictions.format)
 
-    def test_detect_lazy_namespace(self):
+    def test_detect_lazy_namespace(self) -> None:
         source = ClassFactory.create(namespace="foo", tag=Tag.ELEMENT)
         target = ClassFactory.create()
         attr = AttrFactory.create(namespace="##lazy")

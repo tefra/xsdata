@@ -12,11 +12,11 @@ from xsdata.utils.testing import (
 
 
 class VacuumInnerClassesTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.processor = VacuumInnerClasses()
 
-    def test_remove_duplicate_inners(self):
+    def test_remove_duplicate_inners(self) -> None:
         target = ClassFactory.elements(3)
 
         inner_1 = ClassFactory.elements(2)
@@ -36,7 +36,7 @@ class VacuumInnerClassesTests(FactoryTestCase):
         self.processor.process(target)
         self.assertEqual(1, len(target.inner))
 
-    def test_remove_inner(self):
+    def test_remove_inner(self) -> None:
         target = ClassFactory.elements(3)
 
         inner_1 = ClassFactory.elements(2)
@@ -83,7 +83,7 @@ class VacuumInnerClassesTests(FactoryTestCase):
         self.assertFalse(target.attrs[2].types[0].circular)
         self.assertFalse(target.attrs[2].types[0].native)
 
-    def test_rename_inner(self):
+    def test_rename_inner(self) -> None:
         outer = ClassFactory.create(qname="{xsdata}foo")
         inner = ClassFactory.elements(1, qname="{xsdata}foo")
         outer.attrs.append(AttrFactory.reference(inner.qname, forward=True))
@@ -97,7 +97,7 @@ class VacuumInnerClassesTests(FactoryTestCase):
         self.assertEqual("{xsdata}foo_Inner", outer.attrs[0].types[0].qname)
         self.assertEqual("{xsdata}foo_Inner", outer.inner[0].qname)
 
-    def test_find_attr_types_with_attr_choices(self):
+    def test_find_attr_types_with_attr_choices(self) -> None:
         choices = [
             AttrFactory.create(
                 types=[

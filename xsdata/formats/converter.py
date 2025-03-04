@@ -79,6 +79,7 @@ class ConverterFactory:
     __slots__ = "registry"
 
     def __init__(self):
+        """Initialize the registry."""
         self.registry: dict[type, Converter] = {}
 
     def deserialize(self, value: Any, types: Sequence[type], **kwargs: Any) -> Any:
@@ -162,7 +163,9 @@ class ConverterFactory:
 
         return True
 
-    def register_converter(self, data_type: type, func: Union[Callable, Converter]):
+    def register_converter(
+        self, data_type: type, func: Union[Callable, Converter]
+    ) -> None:
         """Register a callable or converter for the given data type.
 
         Args:
@@ -174,7 +177,7 @@ class ConverterFactory:
         else:
             self.registry[data_type] = ProxyConverter(func)
 
-    def unregister_converter(self, data_type: type):
+    def unregister_converter(self, data_type: type) -> None:
         """Unregister the converter for the given data type.
 
         Args:
@@ -827,6 +830,7 @@ class ProxyConverter(Converter):
     __slots__ = "factory"
 
     def __init__(self, factory: Callable):
+        """Initialize the proxy converter."""
         self.factory = factory
 
     def deserialize(self, value: Any, **kwargs: Any) -> Any:

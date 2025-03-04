@@ -22,7 +22,7 @@ os.chdir(root)
 
 
 class HelloRpcServiceTests(TestCase):
-    def test_wsdl_codegen(self):
+    def test_wsdl_codegen(self) -> None:
         schema = fixtures_dir.joinpath("hello/hello.wsdl")
         package = "tests.fixtures.hello"
         runner = CliRunner()
@@ -35,7 +35,7 @@ class HelloRpcServiceTests(TestCase):
         self.assertEqual("Envelope", clazz.Meta.name)
 
     @mock.patch.object(DefaultTransport, "post")
-    def test_client(self, mock_most):
+    def test_client(self, mock_most) -> None:
         url = "http://localhost:9999/ws/hello"
         request = fixtures_dir.joinpath("hello/HelloRQ.xml").read_text()
         response = fixtures_dir.joinpath("hello/HelloRS.xml").read_bytes()
@@ -59,7 +59,7 @@ class HelloRpcServiceTests(TestCase):
         mock_most.assert_called_once_with(url, data=request, headers=headers)
 
     @mock.patch.object(DefaultTransport, "post")
-    def test_client_with_soap_fault(self, mock_most):
+    def test_client_with_soap_fault(self, mock_most) -> None:
         url = "http://localhost:9999/ws/hello"
         request = fixtures_dir.joinpath("hello/HelloRQ.xml").read_text()
         response = fixtures_dir.joinpath("hello/HelloRS_SoapFault.xml").read_bytes()
@@ -85,7 +85,7 @@ class HelloRpcServiceTests(TestCase):
         mock_most.assert_called_once_with(url, data=request, headers=headers)
 
     @pytest.mark.skip
-    def test_live(self):
+    def test_live(self) -> None:
         config = Config.from_service(HelloGetHelloAsString)
         serializer = XmlSerializer(config=SerializerConfig(indent="  "))
         client = Client(config=config, serializer=serializer)

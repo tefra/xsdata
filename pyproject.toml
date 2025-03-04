@@ -111,11 +111,11 @@ select = [
     "RET",
     # Ruff rules
     "RUF",
+    # Flake Simplify
+    "SIM",
 ]
 
 ignore = [
-    "ANN201",
-    "ANN202",
     "ANN204",
     "ANN206",
     "ANN401",
@@ -124,9 +124,7 @@ ignore = [
     "B904",
     "D100",
     "D104",
-    "D107",
     "RUF009",
-    "RUF012",
 ]
 
 [tool.ruff.lint.per-file-ignores]

@@ -10,7 +10,7 @@ from xsdata.utils.testing import load_class
 os.chdir(root)
 
 
-def test_primer_schema():
+def test_primer_schema() -> None:
     schema = fixtures_dir.joinpath("primer/order.xsd")
     package = "tests.fixtures.primer"
     runner = CliRunner()

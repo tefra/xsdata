@@ -20,7 +20,7 @@ class GeneratorConfigTests(TestCase):
     def setUp(self) -> None:
         self.maxDiff = None
 
-    def test_create(self):
+    def test_create(self) -> None:
         file_path = Path(tempfile.mktemp())
         obj = GeneratorConfig.create()
         with file_path.open("w") as fp:
@@ -68,7 +68,7 @@ class GeneratorConfigTests(TestCase):
         self.assertEqual(expected, file_path.read_text())
         file_path.unlink()
 
-    def test_read(self):
+    def test_read(self) -> None:
         existing = (
             '<?xml version="1.0" encoding="UTF-8"?>\n'
             '<Config xmlns="http://pypi.org/project/xsdata" version="20.8">\n'
@@ -117,7 +117,7 @@ class GeneratorConfigTests(TestCase):
         )
         self.assertEqual(expected, file_path.read_text())
 
-    def test_read_with_wrong_value(self):
+    def test_read_with_wrong_value(self) -> None:
         existing = (
             '<?xml version="1.0" encoding="UTF-8"?>\n'
             '<Config xmlns="http://pypi.org/project/xsdata" version="21.7">\n'
@@ -131,13 +131,13 @@ class GeneratorConfigTests(TestCase):
         with self.assertRaises(ParserError):
             GeneratorConfig.read(file_path)
 
-    def test_format_with_invalid_eq_config(self):
+    def test_format_with_invalid_eq_config(self) -> None:
         with warnings.catch_warnings(record=True) as w:
             OutputFormat(eq=False, order=True)
 
         self.assertEqual("Enabling eq because order is true", str(w[-1].message))
 
-    def test_use_union_type_requires_310_and_postponed_annotations(self):
+    def test_use_union_type_requires_310_and_postponed_annotations(self) -> None:
         if sys.version_info < (3, 10):
             with warnings.catch_warnings(record=True) as w:
                 self.assertFalse(GeneratorOutput(union_type=True).union_type)
@@ -156,7 +156,7 @@ class GeneratorConfigTests(TestCase):
                     str(w[-1].message),
                 )
 
-    def test_generic_collections_requires_frozen_false(self):
+    def test_generic_collections_requires_frozen_false(self) -> None:
         with warnings.catch_warnings(record=True) as w:
             output = GeneratorOutput(
                 generic_collections=True, format=OutputFormat(frozen=True)
@@ -168,7 +168,7 @@ class GeneratorConfigTests(TestCase):
                 str(w[-1].message),
             )
 
-    def test_format_slots_requires_310(self):
+    def test_format_slots_requires_310(self) -> None:
         if sys.version_info < (3, 10):
             self.assertTrue(OutputFormat(slots=True, value="attrs").slots)
 
@@ -182,7 +182,7 @@ class GeneratorConfigTests(TestCase):
         else:
             self.assertIsNotNone(OutputFormat(slots=True))
 
-    def test_format_kw_only_requires_310(self):
+    def test_format_kw_only_requires_310(self) -> None:
         if sys.version_info < (3, 10):
             self.assertTrue(OutputFormat(kw_only=True, value="attrs").kw_only)
 
@@ -196,13 +196,13 @@ class GeneratorConfigTests(TestCase):
         else:
             self.assertIsNotNone(OutputFormat(kw_only=True))
 
-    def test_extension_with_invalid_import_string(self):
+    def test_extension_with_invalid_import_string(self) -> None:
         cases = [None, "", "bar"]
         for case in cases:
             with self.assertRaises(CodegenError):
                 GeneratorExtension(type=ExtensionType.DECORATOR, import_string=case)
 
-    def test_extension_with_invalid_class_name_pattern(self):
+    def test_extension_with_invalid_class_name_pattern(self) -> None:
         with self.assertRaises(CodegenError):
             GeneratorExtension(
                 type=ExtensionType.DECORATOR, import_string="a.b", class_name="*Foo"

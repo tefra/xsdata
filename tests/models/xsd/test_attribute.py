@@ -6,11 +6,11 @@ from xsdata.models.xsd import Attribute, Length, Restriction, SimpleType
 
 
 class AttributeTests(TestCase):
-    def test_property_is_property(self):
+    def test_property_is_property(self) -> None:
         obj = Attribute()
         self.assertTrue(obj)
 
-    def test_property_attr_types(self):
+    def test_property_attr_types(self) -> None:
         obj = Attribute()
         self.assertEqual([], list(obj.attr_types))
 
@@ -26,7 +26,7 @@ class AttributeTests(TestCase):
         obj.simple_type.restriction = Restriction(base="thug")
         self.assertEqual([obj.simple_type.restriction.base], list(obj.attr_types))
 
-    def test_property_real_name(self):
+    def test_property_real_name(self) -> None:
         obj = Attribute(ref="bar")
         self.assertEqual("bar", obj.real_name)
 
@@ -36,7 +36,7 @@ class AttributeTests(TestCase):
         with self.assertRaises(CodegenError):
             Attribute().real_name
 
-    def test_get_restrictions(self):
+    def test_get_restrictions(self) -> None:
         obj = Attribute()
         self.assertEqual({"max_occurs": 1, "min_occurs": 0}, obj.get_restrictions())
 
@@ -52,7 +52,7 @@ class AttributeTests(TestCase):
         expected["length"] = 1
         self.assertEqual(expected, obj.get_restrictions())
 
-    def test_property_bases(self):
+    def test_property_bases(self) -> None:
         obj = Attribute()
         obj.ns_map["xs"] = Namespace.XS.uri
         self.assertEqual(["xs:string"], list(obj.bases))
@@ -64,7 +64,7 @@ class AttributeTests(TestCase):
         obj.simple_type = None
         self.assertEqual(["foo"], list(obj.bases))
 
-    def test_property_default_type(self):
+    def test_property_default_type(self) -> None:
         obj = Attribute()
         self.assertEqual("anySimpleType", obj.default_type)
 

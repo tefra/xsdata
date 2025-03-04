@@ -11,13 +11,13 @@ from xsdata.utils.testing import (
 
 
 class DetectCircularReferencesTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         config = GeneratorConfig()
         self.container = ClassContainer(config=config)
         self.processor = DetectCircularReferences(self.container)
 
-    def test_process(self):
+    def test_process(self) -> None:
         first = ClassFactory.create(qname="first")
         second = ClassFactory.create(qname="second")
         third = ClassFactory.create(qname="third")
@@ -52,7 +52,7 @@ class DetectCircularReferencesTests(FactoryTestCase):
         third_flags = [tp.circular for tp in third.types()]
         self.assertEqual([False], third_flags)
 
-    def test_build_reference_types(self):
+    def test_build_reference_types(self) -> None:
         target = ClassFactory.create()
         inner = ClassFactory.create()
 

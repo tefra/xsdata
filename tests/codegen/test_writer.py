@@ -18,7 +18,7 @@ class NoneGenerator(AbstractGenerator):
 
 
 class CodeWriterTests(FactoryTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         config = GeneratorConfig()
         generator = NoneGenerator(config)
         self.writer = CodeWriter(generator)
@@ -26,7 +26,9 @@ class CodeWriterTests(FactoryTestCase):
     @mock.patch.object(NoneGenerator, "render_header")
     @mock.patch.object(NoneGenerator, "render")
     @mock.patch.object(NoneGenerator, "normalize_packages")
-    def test_write(self, mock_normalize_packages, mock_render, mock_render_header):
+    def test_write(
+        self, mock_normalize_packages, mock_render, mock_render_header
+    ) -> None:
         classes = ClassFactory.list(2)
         with TemporaryDirectory() as tmpdir:
             mock_render.return_value = [
@@ -42,7 +44,7 @@ class CodeWriterTests(FactoryTestCase):
             self.assertFalse(Path(f"{tmpdir}/c.py").exists())
             mock_normalize_packages.assert_called_once_with(classes)
 
-    def test_from_config(self):
+    def test_from_config(self) -> None:
         CodeWriter.unregister_generator("dataclasses")
         config = GeneratorConfig()
 

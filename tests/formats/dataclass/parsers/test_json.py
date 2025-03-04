@@ -10,7 +10,7 @@ class JsonParserTests(FactoryTestCase):
 
         self.parser = JsonParser()
 
-    def test_parser_entry_points(self):
+    def test_parser_entry_points(self) -> None:
         path = fixtures_dir.joinpath("books/books.json")
 
         books = self.parser.from_path(path)

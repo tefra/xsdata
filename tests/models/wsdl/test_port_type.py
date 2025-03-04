@@ -5,7 +5,7 @@ from xsdata.models.wsdl import PortType, PortTypeOperation
 
 
 class PortTypeTests(TestCase):
-    def test_find_operating(self):
+    def test_find_operating(self) -> None:
         res = PortTypeOperation(name="foo")
         obj = PortType(operations=[res])
 

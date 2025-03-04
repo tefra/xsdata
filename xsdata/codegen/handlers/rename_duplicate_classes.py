@@ -28,6 +28,7 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
     __slots__ = ("merges", "renames", "reserved", "use_names")
 
     def __init__(self, container: ContainerInterface):
+        """Initialize the rename duplicate class handler."""
         super().__init__(container)
 
         self.use_names = self.should_use_names()
@@ -35,7 +36,7 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
         self.merges: dict[int, int] = {}
         self.reserved: set[str] = set()
 
-    def run(self):
+    def run(self) -> None:
         """Detect and resolve class name conflicts."""
         getter = get_name if self.use_names else get_qname
         groups = collections.group_by(self.container, lambda x: text.alnum(getter(x)))
@@ -66,7 +67,7 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
             or len(set(map(get_location, self.container))) == 1
         )
 
-    def merge_classes(self, classes: list[Class]):
+    def merge_classes(self, classes: list[Class]) -> None:
         """Remove the duplicate classes and update all references.
 
         Args:
@@ -79,7 +80,7 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
         for item in classes:
             self.merges[item.ref] = replace
 
-    def rename_classes(self, classes: list[Class]):
+    def rename_classes(self, classes: list[Class]) -> None:
         """Rename the classes in the list.
 
         Cases:
@@ -99,12 +100,12 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
                 if not target.is_element or total_elements > 1:
                     self.add_numeric_suffix(target)
 
-    def add_abstract_suffix(self, target: Class):
+    def add_abstract_suffix(self, target: Class) -> None:
         """Add the abstract suffix to class name."""
         new_qname = f"{target.qname}_abstract"
         self.rename_class(target, new_qname)
 
-    def add_numeric_suffix(self, target: Class):
+    def add_numeric_suffix(self, target: Class) -> None:
         """Find the next available class name.
 
         Save the original name in the class metadata and update
@@ -118,7 +119,7 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
         new_qname = self.next_qname(namespace, name)
         self.rename_class(target, new_qname)
 
-    def rename_class(self, target: Class, new_qname: str):
+    def rename_class(self, target: Class, new_qname: str) -> None:
         """Update the class qualified name and update references.
 
         Args:
@@ -160,7 +161,7 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
 
         return self.reserved
 
-    def update_references(self, target: Class):
+    def update_references(self, target: Class) -> None:
         """Search and update the target class for renamed and merged references.
 
         Args:

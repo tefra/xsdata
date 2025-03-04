@@ -15,7 +15,7 @@ class DownloaderTests(TestCase):
         self.downloader = Downloader(Path.cwd())
 
     @mock.patch.object(Downloader, "write_file")
-    def test_wget_with_schema(self, mock_write_file):
+    def test_wget_with_schema(self, mock_write_file) -> None:
         path = fixtures_dir.joinpath("books/schema.xsd")
         content = path.read_bytes()
         uri = path.as_uri()
@@ -25,7 +25,7 @@ class DownloaderTests(TestCase):
         mock_write_file.assert_called_once_with(uri, None, content.decode())
 
     @mock.patch.object(Downloader, "write_file")
-    def test_wget_with_definitions(self, mock_write_file):
+    def test_wget_with_definitions(self, mock_write_file) -> None:
         wsdl = fixtures_dir.joinpath("hello/hello.wsdl").as_uri()
         xsd = fixtures_dir.joinpath("hello/hello.xsd").as_uri()
 
@@ -38,7 +38,7 @@ class DownloaderTests(TestCase):
         )
 
     @mock.patch.object(Downloader, "wget")
-    def test_wget_included(self, mock_wget):
+    def test_wget_included(self, mock_wget) -> None:
         schema = Schema(
             imports=[
                 Import(location="foo.xsd"),
@@ -57,7 +57,7 @@ class DownloaderTests(TestCase):
             ]
         )
 
-    def test_adjust_base_path(self):
+    def test_adjust_base_path(self) -> None:
         first = "file:///schemas/air_v48_0/Air.wsdl"
         second = "file:///schemas/air_v48_0/AirAbstract.wsdl"
         third = "file:///schemas/common_v48_0/CommonReqRsp.xsd"
@@ -76,7 +76,7 @@ class DownloaderTests(TestCase):
         self.downloader.adjust_base_path(fourth)
         self.assertEqual(path.parent.parent, self.downloader.base_path)
 
-    def test_adjust_imports(self):
+    def test_adjust_imports(self) -> None:
         content = (
             '<hypothetical location="http://foo.com/bar.xsd" />\n'
             '<hypothetical schemaLocation="http://foo.com/bar/bar.xsd" />\n'
@@ -114,7 +114,7 @@ class DownloaderTests(TestCase):
             )
             self.assertEqual(expected, result)
 
-    def test_write_external_file(self):
+    def test_write_external_file(self) -> None:
         uri = "http://www.w3.org/2001/xml.xsd"
         content = "foo"
 
@@ -128,7 +128,7 @@ class DownloaderTests(TestCase):
             self.assertEqual(file_path, self.downloader.downloaded[uri])
             self.assertEqual(file_path, self.downloader.downloaded["foo"])
 
-    def test_write_relative_file(self):
+    def test_write_relative_file(self) -> None:
         uri = "http://www.w3.org/2001/xml.xsd"
         content = "foo"
         self.downloader.base_path = "http://www.w3.org"

@@ -9,7 +9,7 @@ from xsdata.utils.testing import load_class
 os.chdir(root)
 
 
-def test_dtd_documents():
+def test_dtd_documents() -> None:
     runner = CliRunner()
     result = runner.invoke(
         cli,

@@ -10,7 +10,7 @@ class ProcessMixedContentClass(HandlerInterface):
 
     __slots__ = ()
 
-    def process(self, target: Class):
+    def process(self, target: Class) -> None:
         """Add a wildcard attr if the class supports mixed content.
 
         All other elements will be moved as the wildcard attr choices.

@@ -1,10 +1,11 @@
 from collections import defaultdict
+from collections.abc import Iterator
 from contextlib import contextmanager
 from time import perf_counter_ns
 
 
 @contextmanager
-def stopwatch(name: str):
+def stopwatch(name: str) -> Iterator[None]:
     """Simple context manager that logs elapsed times."""
     start_time = perf_counter_ns()
     yield

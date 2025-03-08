@@ -108,39 +108,39 @@ class XmlVar(MetaMixin):
     """
 
     __slots__ = (
-        "index",
-        "name",
-        "local_name",
-        "wrapper",
-        "types",
-        "clazz",
-        "init",
-        "mixed",
-        "factory",
-        "tokens_factory",
-        "format",
         "any_type",
-        "process_contents",
-        "required",
-        "nillable",
-        "sequence",
+        "clazz",
         "default",
-        "namespaces",
         "elements",
-        "wildcards",
-        # Calculated
-        "qname",
-        "wrapper_qname",
-        "tokens",
-        "list_element",
-        "is_text",
-        "is_element",
-        "is_elements",
-        "is_wildcard",
+        "factory",
+        "format",
+        "index",
+        "init",
         "is_attribute",
         "is_attributes",
-        "namespace_matches",
         "is_clazz_union",
+        "is_element",
+        "is_elements",
+        "is_text",
+        "is_wildcard",
+        "list_element",
+        "local_name",
+        "mixed",
+        "name",
+        "namespace_matches",
+        "namespaces",
+        "nillable",
+        "process_contents",
+        # Calculated
+        "qname",
+        "required",
+        "sequence",
+        "tokens",
+        "tokens_factory",
+        "types",
+        "wildcards",
+        "wrapper",
+        "wrapper_qname",
     )
 
     def __init__(
@@ -168,6 +168,7 @@ class XmlVar(MetaMixin):
         wildcards: Sequence["XmlVar"],
         **kwargs: Any,
     ):
+        """Initialize the xml var."""
         self.index = index
         self.name = name
         self.local_name = local_name
@@ -406,20 +407,20 @@ class XmlMeta(MetaMixin):
     """
 
     __slots__ = (
-        "clazz",
-        "qname",
-        "target_qname",
-        "nillable",
-        "text",
-        "choices",
-        "elements",
-        "wildcards",
-        "attributes",
         "any_attributes",
-        "wrappers",
+        "attributes",
+        "choices",
+        "clazz",
+        "elements",
+        "mixed_content",
         # Calculated
         "namespace",
-        "mixed_content",
+        "nillable",
+        "qname",
+        "target_qname",
+        "text",
+        "wildcards",
+        "wrappers",
     )
 
     def __init__(
@@ -437,6 +438,7 @@ class XmlMeta(MetaMixin):
         wrappers: Mapping[str, str],
         **kwargs: Any,
     ):
+        """Initialize the xml meta."""
         self.clazz = clazz
         self.qname = qname
         self.namespace = target_uri(qname)

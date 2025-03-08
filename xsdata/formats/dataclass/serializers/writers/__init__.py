@@ -12,7 +12,7 @@ except ImportError:  # pragma: no cover
 
 
 __all__ = [
+    "DEFAULT_XML_WRITER",
     "LxmlEventWriter",
     "XmlEventWriter",
-    "DEFAULT_XML_WRITER",
 ]

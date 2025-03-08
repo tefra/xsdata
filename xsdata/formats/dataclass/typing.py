@@ -64,6 +64,8 @@ def evaluate(tp: Any, globalns: Any, localns: Any = None) -> Any:
 
 
 class Result(NamedTuple):
+    """Analyze Result Object."""
+
     types: tuple[type[Any], ...]
     factory: Optional[Callable] = None
     tokens_factory: Optional[Callable] = None
@@ -74,7 +76,7 @@ def analyze_token_args(origin: Any, args: tuple[Any, ...]) -> tuple[Any]:
 
     Ensure it only has one argument, filter out ellipsis.
 
-    Args
+    Args:
         origin: The annotation origin
         args: The annotation arguments
 
@@ -101,7 +103,7 @@ def analyze_optional_origin(
 
     Remove the NoneType, adjust and return the origin, args and types.
 
-    Args
+    Args:
         origin: The annotation origin
         args: The annotation arguments
         types: The annotation types
@@ -118,10 +120,12 @@ def analyze_optional_origin(
 
 
 def filter_none_type(args: tuple[Any, ...]) -> tuple[Any, ...]:
+    """Filter out none types from args."""
     return tuple(arg for arg in args if arg is not NONE_TYPE)
 
 
 def filter_ellipsis(args: tuple[Any, ...]) -> tuple[Any]:
+    """Filter out ellipsis from args."""
     return tuple(arg for arg in args if arg is not Ellipsis)
 
 
@@ -184,7 +188,6 @@ def evaluate_attributes(annotation: Any, **_: Any) -> Result:
 
 def evaluate_element(annotation: Any, tokens: bool = False) -> Result:
     """Validate annotations for a xml element."""
-
     # Only the derived element value field is allowed a typevar
     if isinstance(annotation, TypeVar) and annotation.__bound__ is object:
         annotation = object

@@ -63,18 +63,19 @@ class EventHandler(abc.ABC):
     """
 
     __slots__ = (
+        "attrs",
         "config",
-        "ns_map",
         # Instance attributes
         "in_tail",
-        "tail",
-        "attrs",
         "ns_context",
-        "pending_tag",
+        "ns_map",
         "pending_prefixes",
+        "pending_tag",
+        "tail",
     )
 
     def __init__(self, config: SerializerConfig, ns_map: dict):
+        """Initialize the event handler."""
         self.config = config
         self.ns_map = ns_map
 
@@ -85,7 +86,7 @@ class EventHandler(abc.ABC):
         self.pending_tag: Optional[tuple] = None
         self.pending_prefixes: list[list] = []
 
-    def write(self, events: EventIterator):
+    def write(self, events: EventIterator) -> None:
         """Feed the sax content handler with events.
 
         The receiver will also add additional root attributes
@@ -127,7 +128,7 @@ class EventHandler(abc.ABC):
 
         self.end_document()
 
-    def start_tag(self, qname: str):
+    def start_tag(self, qname: str) -> None:
         """Start tag notification receiver.
 
         The receiver will flush the start of any pending element, create
@@ -144,7 +145,7 @@ class EventHandler(abc.ABC):
         self.pending_tag = split_qname(qname)
         self.add_namespace(self.pending_tag[0])
 
-    def add_attribute(self, qname: str, value: Any, root: bool = False):
+    def add_attribute(self, qname: str, value: Any, root: bool = False) -> None:
         """Add attribute notification receiver.
 
         The receiver will convert the key to a namespace, name tuple and
@@ -169,7 +170,7 @@ class EventHandler(abc.ABC):
         name_tuple = split_qname(qname)
         self.attrs[name_tuple] = self.encode_data(value)
 
-    def add_namespace(self, uri: Optional[str]):
+    def add_namespace(self, uri: Optional[str]) -> None:
         """Add the given uri to the current namespace context.
 
          If the uri empty or a prefix already exists, skip silently.
@@ -180,7 +181,7 @@ class EventHandler(abc.ABC):
         if uri and not prefix_exists(uri, self.ns_map):
             generate_prefix(uri, self.ns_map)
 
-    def set_data(self, data: Any):
+    def set_data(self, data: Any) -> None:
         """Set data notification receiver.
 
         The receiver will convert the data to string, flush any previous
@@ -204,7 +205,7 @@ class EventHandler(abc.ABC):
 
         self.in_tail = True
 
-    def end_tag(self, qname: str):
+    def end_tag(self, qname: str) -> None:
         """End tag notification receiver.
 
         The receiver will flush if pending the start of the element, end
@@ -229,7 +230,7 @@ class EventHandler(abc.ABC):
         for prefix in self.pending_prefixes.pop():
             self.end_prefix_mapping(prefix)
 
-    def flush_start(self, is_nil: bool = True):
+    def flush_start(self, is_nil: bool = True) -> None:
         """Flush start notification receiver.
 
         The receiver will pop the xsi:nil attribute if the element is
@@ -258,7 +259,7 @@ class EventHandler(abc.ABC):
         self.in_tail = False
         self.pending_tag = None
 
-    def start_namespaces(self):
+    def start_namespaces(self) -> None:
         """Send the current namespace prefix-URI map to the content handler.
 
         Save the list of prefixes to be removed at the end of the
@@ -277,7 +278,7 @@ class EventHandler(abc.ABC):
                 prefixes.append(prefix)
                 self.start_prefix_mapping(prefix, uri)
 
-    def reset_default_namespace(self):
+    def reset_default_namespace(self) -> None:
         """Reset the default namespace if the pending element is not qualified."""
         if self.pending_tag and not self.pending_tag[0] and None in self.ns_map:
             self.ns_map[None] = ""
@@ -316,15 +317,15 @@ class EventHandler(abc.ABC):
         return converter.serialize(data, ns_map=self.ns_map)
 
     @abc.abstractmethod
-    def start_document(self):
+    def start_document(self) -> None:
         """Start document notification receiver."""
 
     @abc.abstractmethod
-    def end_document(self):
+    def end_document(self) -> None:
         """End document notification receiver."""
 
     @abc.abstractmethod
-    def start_element(self, name: tuple[str, str], qname: str, attrs: dict):
+    def start_element(self, name: tuple[str, str], qname: str, attrs: dict) -> None:
         """Start element notification receiver.
 
         Args:
@@ -334,7 +335,7 @@ class EventHandler(abc.ABC):
         """
 
     @abc.abstractmethod
-    def end_element(self, name: tuple[str, str], qname: str):
+    def end_element(self, name: tuple[str, str], qname: str) -> None:
         """End element notification receiver.
 
         Args:
@@ -343,7 +344,7 @@ class EventHandler(abc.ABC):
         """
 
     @abc.abstractmethod
-    def set_characters(self, data: str):
+    def set_characters(self, data: str) -> None:
         """Characters notification receiver.
 
         Args:
@@ -351,7 +352,7 @@ class EventHandler(abc.ABC):
         """
 
     @abc.abstractmethod
-    def start_prefix_mapping(self, prefix: Optional[str], uri: str):
+    def start_prefix_mapping(self, prefix: Optional[str], uri: str) -> None:
         """Start namespace prefix notification receiver.
 
         Args:
@@ -360,7 +361,7 @@ class EventHandler(abc.ABC):
         """
 
     @abc.abstractmethod
-    def end_prefix_mapping(self, prefix: str):
+    def end_prefix_mapping(self, prefix: str) -> None:
         """End namespace prefix notification receiver.
 
         Args:
@@ -386,6 +387,7 @@ class EventContentHandler(EventHandler):
     """
 
     def __init__(self, config: SerializerConfig, ns_map: dict):
+        """Initialize the content handler."""
         super().__init__(config, ns_map)
         self.handler = self.build_handler()
 
@@ -397,7 +399,7 @@ class EventContentHandler(EventHandler):
             A content handler instance.
         """
 
-    def start_document(self):
+    def start_document(self) -> None:
         """Start document notification receiver.
 
         Write the xml version and encoding, if the
@@ -405,11 +407,11 @@ class EventContentHandler(EventHandler):
         """
         self.handler.startDocument()
 
-    def end_document(self):
+    def end_document(self) -> None:
         """End document entrypoint."""
         self.handler.endDocument()
 
-    def end_element(self, name: tuple[str, str], qname: str):
+    def end_element(self, name: tuple[str, str], qname: str) -> None:
         """End element notification receiver.
 
         Args:
@@ -418,7 +420,7 @@ class EventContentHandler(EventHandler):
         """
         self.handler.endElementNS(name, qname)
 
-    def set_characters(self, data: str):
+    def set_characters(self, data: str) -> None:
         """Characters notification receiver.
 
         Args:
@@ -426,7 +428,7 @@ class EventContentHandler(EventHandler):
         """
         self.handler.characters(data)
 
-    def end_prefix_mapping(self, prefix: str):
+    def end_prefix_mapping(self, prefix: str) -> None:
         """End namespace prefix notification receiver.
 
         Args:
@@ -434,7 +436,7 @@ class EventContentHandler(EventHandler):
         """
         self.handler.endPrefixMapping(prefix)
 
-    def start_element(self, name: tuple[str, str], qname: str, attrs: dict):
+    def start_element(self, name: tuple[str, str], qname: str, attrs: dict) -> None:
         """Start element notification receiver.
 
         Args:
@@ -444,7 +446,7 @@ class EventContentHandler(EventHandler):
         """
         self.handler.startElementNS(name, qname, attrs)  # type: ignore
 
-    def start_prefix_mapping(self, prefix: Optional[str], uri: str):
+    def start_prefix_mapping(self, prefix: Optional[str], uri: str) -> None:
         """Start namespace prefix notification receiver.
 
         Args:
@@ -473,10 +475,11 @@ class XmlWriter(EventContentHandler, ABC):
     """
 
     def __init__(self, config: SerializerConfig, output: TextIO, ns_map: dict):
+        """Initialize the writer."""
         self.output = output
         super().__init__(config, ns_map)
 
-    def start_document(self):
+    def start_document(self) -> None:
         """Start document notification receiver.
 
         Write the xml version and encoding, if the
@@ -489,6 +492,8 @@ class XmlWriter(EventContentHandler, ABC):
 
 @dataclass
 class EventGenerator:
+    """Event generator class."""
+
     context: XmlContext = field(default_factory=XmlContext)
     config: SerializerConfig = field(default_factory=SerializerConfig)
 

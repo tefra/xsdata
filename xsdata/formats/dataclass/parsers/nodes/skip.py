@@ -9,6 +9,7 @@ class SkipNode(XmlNode):
     __slots__ = "ns_map"
 
     def __init__(self):
+        """Initialize the xml node."""
         self.ns_map = {}
 
     def child(self, qname: str, attrs: dict, ns_map: dict, position: int) -> XmlNode:

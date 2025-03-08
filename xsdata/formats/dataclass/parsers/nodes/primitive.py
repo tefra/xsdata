@@ -17,9 +17,10 @@ class PrimitiveNode(XmlNode):
         config: The parser config instance
     """
 
-    __slots__ = "meta", "var", "ns_map", "config"
+    __slots__ = "config", "meta", "ns_map", "var"
 
     def __init__(self, meta: XmlMeta, var: XmlVar, ns_map: dict, config: ParserConfig):
+        """Initialize the xml node."""
         self.meta = meta
         self.var = var
         self.ns_map = ns_map

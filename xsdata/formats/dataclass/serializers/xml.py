@@ -40,7 +40,7 @@ class XmlSerializer(EventGenerator):
         self.write(output, obj, ns_map)
         return output.getvalue()
 
-    def write(self, out: TextIO, obj: Any, ns_map: Optional[dict] = None):
+    def write(self, out: TextIO, obj: Any, ns_map: Optional[dict] = None) -> None:
         """Serialize the given object to the output text stream.
 
         Args:

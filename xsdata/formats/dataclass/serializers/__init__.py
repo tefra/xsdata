@@ -9,11 +9,11 @@ __all__ = [
     "DictEncoder",
     "DictFactory",
     "JsonSerializer",
-    "XmlSerializer",
     "PycodeSerializer",
+    "XmlSerializer",
 ]
 
 with suppress(ImportError):
-    from xsdata.formats.dataclass.serializers.tree import TreeSerializer
+    from xsdata.formats.dataclass.serializers.tree import TreeSerializer  # noqa: F401
 
     __all__.append("TreeSerializer")

@@ -32,16 +32,16 @@ class UnionNode(XmlNode):
     """
 
     __slots__ = (
-        "meta",
-        "var",
         "attrs",
-        "ns_map",
-        "position",
+        "candidates",
         "config",
         "context",
-        "level",
         "events",
-        "candidates",
+        "level",
+        "meta",
+        "ns_map",
+        "position",
+        "var",
     )
 
     def __init__(
@@ -54,6 +54,7 @@ class UnionNode(XmlNode):
         config: ParserConfig,
         context: XmlContext,
     ):
+        """Initialize the xml node."""
         self.meta = meta
         self.var = var
         self.attrs = attrs

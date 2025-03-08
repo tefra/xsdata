@@ -40,7 +40,7 @@ class PycodeSerializer:
         self.write(output, obj, var_name)
         return output.getvalue()
 
-    def write(self, out: TextIO, obj: Any, var_name: str):
+    def write(self, out: TextIO, obj: Any, var_name: str) -> None:
         """Write the given object to the output text stream.
 
         Args:

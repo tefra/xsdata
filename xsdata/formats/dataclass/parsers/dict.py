@@ -71,11 +71,11 @@ class DictDecoder:
                 args = get_args(clazz)
 
                 if len(args) != 1 or not self.context.class_type.is_model(args[0]):
-                    raise TypeError()
+                    raise TypeError
 
                 clazz = args[0]
             elif origin is not None:
-                raise TypeError()
+                raise TypeError
         except TypeError:
             raise ParserError(f"Invalid clazz argument: {clazz}")
 
@@ -129,8 +129,7 @@ class DictDecoder:
             if var is None:
                 if self.config.fail_on_unknown_properties:
                     raise ParserError(f"Unknown property {clazz.__qualname__}.{key}")
-                else:
-                    continue
+                continue
 
             if var.wrapper:
                 value = value[var.local_name]

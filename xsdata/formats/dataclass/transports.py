@@ -25,9 +25,10 @@ class DefaultTransport(Transport):
         timeout: Read timeout in seconds
     """
 
-    __slots__ = "timeout", "session"
+    __slots__ = "session", "timeout"
 
     def __init__(self, timeout: float = 2.0, session: Optional[Session] = None):
+        """Initialize the transport."""
         self.timeout = timeout
         self.session = session or Session()
 

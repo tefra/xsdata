@@ -22,6 +22,7 @@ class WrapperNode(XmlNode):
     """
 
     def __init__(self, parent: ElementNode):
+        """Initialize the xml node."""
         self.parent = parent
         self.ns_map = parent.ns_map
 

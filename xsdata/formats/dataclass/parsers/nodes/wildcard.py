@@ -21,7 +21,7 @@ class WildcardNode(XmlNode):
         factory: The generic element factory
     """
 
-    __slots__ = "var", "attrs", "ns_map", "position", "factory"
+    __slots__ = "attrs", "factory", "ns_map", "position", "var"
 
     def __init__(
         self,
@@ -31,6 +31,7 @@ class WildcardNode(XmlNode):
         position: int,
         factory: type,
     ):
+        """Initialize the xml node."""
         self.var = var
         self.attrs = attrs
         self.ns_map = ns_map

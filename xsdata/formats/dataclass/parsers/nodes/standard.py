@@ -22,13 +22,13 @@ class StandardNode(XmlNode):
     """
 
     __slots__ = (
-        "meta",
-        "var",
-        "datatype",
-        "ns_map",
         "config",
-        "nillable",
+        "datatype",
         "derived_factory",
+        "meta",
+        "nillable",
+        "ns_map",
+        "var",
     )
 
     def __init__(
@@ -41,6 +41,7 @@ class StandardNode(XmlNode):
         nillable: bool,
         derived_factory: Optional[type],
     ):
+        """Initialize the xml node."""
         self.meta = meta
         self.var = var
         self.datatype = datatype

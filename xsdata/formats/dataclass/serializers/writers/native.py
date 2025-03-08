@@ -29,6 +29,7 @@ class XmlEventWriter(XmlWriter):
     __slots__ = ("current_level", "pending_end_element")
 
     def __init__(self, config: SerializerConfig, output: TextIO, ns_map: dict):
+        """Initialize the writer."""
         super().__init__(config, output, ns_map)
 
         self.current_level = 0
@@ -46,7 +47,7 @@ class XmlEventWriter(XmlWriter):
             short_empty_elements=True,
         )
 
-    def start_tag(self, qname: str):
+    def start_tag(self, qname: str) -> None:
         """Start tag notification receiver.
 
         The receiver will flush the start of any pending element, create
@@ -70,7 +71,7 @@ class XmlEventWriter(XmlWriter):
             self.current_level += 1
             self.pending_end_element = False
 
-    def end_tag(self, qname: str):
+    def end_tag(self, qname: str) -> None:
         """End tag notification receiver.
 
         The receiver will flush if pending the start of the element, end

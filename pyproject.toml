@@ -51,7 +51,7 @@ cli = [
     "docformatter>=1.7.2",
     "jinja2>=2.10",
     "toposort>=1.5",
-    "ruff>=0.3.0"
+    "ruff>=0.9.8"
 ]
 docs = [
     "mkdocs",
@@ -126,6 +126,8 @@ ignore = [
     "D104",
     "RUF009",
 ]
+
+exclude = ["tests/fixtures"]
 
 [tool.ruff.lint.per-file-ignores]
 "**/{tests}/*" = ["ANN001", "ANN002", "ANN003", "E501", "B018", "D"]

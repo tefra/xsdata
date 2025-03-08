@@ -32,13 +32,13 @@ class XmlContext:
     """
 
     __slots__ = (
-        "element_name_generator",
         "attribute_name_generator",
-        "class_type",
-        "models_package",
         "cache",
-        "xsi_cache",
+        "class_type",
+        "element_name_generator",
+        "models_package",
         "sys_modules",
+        "xsi_cache",
     )
 
     def __init__(
@@ -48,6 +48,7 @@ class XmlContext:
         class_type: str = "dataclasses",
         models_package: Optional[str] = None,
     ):
+        """Initialize the context."""
         self.element_name_generator = element_name_generator
         self.attribute_name_generator = attribute_name_generator
         self.class_type = class_types.get_type(class_type)
@@ -57,7 +58,7 @@ class XmlContext:
         self.models_package = models_package
         self.sys_modules = 0
 
-    def reset(self):
+    def reset(self) -> None:
         """Reset all internal caches."""
         self.cache.clear()
         self.xsi_cache.clear()
@@ -100,7 +101,7 @@ class XmlContext:
 
         return self.build(subclass, parent_ns) if subclass else meta
 
-    def build_xsi_cache(self):
+    def build_xsi_cache(self) -> None:
         """Index all imported data classes by their xsi:type qualified name."""
         if len(sys.modules) == self.sys_modules:
             return
@@ -245,7 +246,7 @@ class XmlContext:
             self.cache[clazz] = builder.build(clazz, parent_ns)
         return self.cache[clazz]
 
-    def build_recursive(self, clazz: type, parent_ns: Optional[str] = None):
+    def build_recursive(self, clazz: type, parent_ns: Optional[str] = None) -> None:
         """Build the binding metadata for the given class and all of its dependencies.
 
         This method is used in benchmarks!

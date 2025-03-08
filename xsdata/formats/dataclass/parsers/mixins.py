@@ -117,7 +117,7 @@ class PushParser:
         qname: str,
         attrs: dict[str, str],
         ns_map: dict[Optional[str], str],
-    ):
+    ) -> None:
         """Build and queue the XmlNode for the starting element.
 
         Args:
@@ -153,7 +153,7 @@ class PushParser:
 
     def register_namespace(
         self, ns_map: dict[Optional[str], str], prefix: Optional[str], uri: str
-    ):
+    ) -> None:
         """Register the uri prefix in the namespace prefix-URI map.
 
         Args:
@@ -231,9 +231,10 @@ class XmlHandler:
         objects: The list of intermediate parsed objects
     """
 
-    __slots__ = ("parser", "clazz", "queue", "objects")
+    __slots__ = ("clazz", "objects", "parser", "queue")
 
     def __init__(self, parser: PushParser, clazz: Optional[type]):
+        """Initialize the handler."""
         self.parser = parser
         self.clazz = clazz
         self.queue: list = []
@@ -260,6 +261,7 @@ class EventsHandler(XmlHandler):
 
         Args:
             source: A list of event data
+            ns_map: A namespace prefix-URI map
 
         Returns:
             An instance of the class type representing the parsed content.

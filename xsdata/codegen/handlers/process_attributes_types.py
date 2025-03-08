@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Callable, Optional
 
 from xsdata.codegen.mixins import ContainerInterface, RelativeHandlerInterface
 from xsdata.codegen.models import Attr, AttrType, Class
@@ -120,10 +120,11 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
         """Find the source type from the attr type and tag.
 
         Avoid conflicts by selecting any matching type by qname and preferably:
-            1. Match element again complexType with no self reference
-            2. Match the candidate object tag
-            3. Match non element and complexType
-            4. Anything
+            1. Match the attr type reference, if it's already set
+            2. Match element again complexType with no self reference
+            3. Match the candidate object tag
+            4. Match non element and complexType
+            5. Anything
 
         Args:
             target: The target class instance
@@ -133,14 +134,19 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
         Returns:
             The source class or None if no match is found
         """
-        conditions = (
-            lambda obj: tag == Tag.ELEMENT
-            and obj.tag == Tag.COMPLEX_TYPE
-            and obj is not target,
-            lambda obj: obj.tag == tag,
-            lambda obj: not obj.is_complex_type,
-            lambda x: True,
-        )
+        conditions: tuple[Callable[[Class], bool], ...]
+
+        if attr_type.reference:
+            conditions = (lambda obj: obj.ref == attr_type.reference,)
+        else:
+            conditions = (
+                lambda obj: tag == Tag.ELEMENT
+                and obj.tag == Tag.COMPLEX_TYPE
+                and obj is not target,
+                lambda obj: obj.tag == tag,
+                lambda obj: not obj.is_complex_type,
+                lambda x: True,
+            )
 
         for condition in conditions:
             result = self.container.find(attr_type.qname, condition=condition)

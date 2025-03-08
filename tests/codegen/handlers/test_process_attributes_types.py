@@ -372,6 +372,13 @@ class ProcessAttributeTypesTests(FactoryTestCase):
         actual = self.processor.find_dependency(element, attr_type, Tag.EXTENSION)
         self.assertEqual(simple_type, actual)
 
+        referenced = ClassFactory.create()
+        self.processor.container.add(referenced)
+        attr_type.reference = referenced.ref
+        attr_type.qname = referenced.qname
+        actual = self.processor.find_dependency(element, attr_type, Tag.EXTENSION)
+        self.assertEqual(referenced, actual)
+
     def test_update_restrictions(self) -> None:
         attr = AttrFactory.native(DataType.NMTOKENS)
         self.processor.update_restrictions(attr, attr.types[0].datatype)

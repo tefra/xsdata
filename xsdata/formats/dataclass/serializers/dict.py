@@ -43,18 +43,21 @@ class DictEncoder:
     dict_factory: Callable = field(default=dict)
 
     def encode(
-        self, value: Any, var: Optional[XmlVar] = None, wrapped: bool = False
+        self,
+        value: Any,
+        var: Optional[XmlVar] = None,
+        wrapped: bool = False,
     ) -> Any:
         """Convert a value to a dictionary object.
 
         Args:
             value: The input value
             var: The xml var instance
+            wrapped: Whether this is a wrapped value
 
         Returns:
             The converted json serializable value.
         """
-
         if value is None:
             return None
 

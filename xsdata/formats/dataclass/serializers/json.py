@@ -32,7 +32,7 @@ class JsonSerializer(DictEncoder):
         self.write(output, obj)
         return output.getvalue()
 
-    def write(self, out: TextIO, obj: Any):
+    def write(self, out: TextIO, obj: Any) -> None:
         """Serialize the given object to the output text stream.
 
         Args:

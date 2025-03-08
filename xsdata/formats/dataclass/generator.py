@@ -28,7 +28,7 @@ class DataclassGenerator(AbstractGenerator):
         filters: The template filters instance
     """
 
-    __slots__ = ("env", "filters", "ruff_config")
+    __slots__ = ("env", "filters")
 
     package_template = "package.jinja2"
     module_template = "module.jinja2"
@@ -37,13 +37,13 @@ class DataclassGenerator(AbstractGenerator):
     class_template = "class.jinja2"
 
     def __init__(self, config: GeneratorConfig):
+        """Initialize the generator."""
         super().__init__(config)
         template_paths = self.get_template_paths()
         loader = FileSystemLoader(template_paths)
         self.env = Environment(loader=loader, autoescape=False)
         self.filters = self.init_filters(config)
         self.filters.register(self.env)
-        self.ruff_config = Path(__file__).parent / "ruff.toml"
 
     @classmethod
     def get_template_paths(cls) -> list[str]:
@@ -90,14 +90,14 @@ class DataclassGenerator(AbstractGenerator):
         self.ruff_code(list(package_dirs))
         self.validate_imports()
 
-    def validate_imports(self):
+    def validate_imports(self) -> None:
         """Recursively import all generated packages.
 
         Raises:
             ImportError: On circular imports
         """
 
-        def import_package(package_name):
+        def import_package(package_name: str) -> None:
             logger.debug(f"Importing: {package_name}")
             module = importlib.import_module(package_name)
             if hasattr(module, "__path__"):
@@ -232,7 +232,7 @@ class DataclassGenerator(AbstractGenerator):
         """Initialize the filters instance by the generator configuration."""
         return Filters(config)
 
-    def ruff_code(self, file_paths: list[str]):
+    def ruff_code(self, file_paths: list[str]) -> None:
         """Run ruff lint and format on a list of file names.
 
         Args:
@@ -242,17 +242,19 @@ class DataclassGenerator(AbstractGenerator):
             [
                 "ruff",
                 "format",
-                "--line-length",
-                str(self.config.output.max_line_length),
+                "--config",
+                f"line-length={self.config.output.max_line_length}",
                 *file_paths,
             ],
             [
                 "ruff",
                 "check",
-                "--line-length",
-                str(self.config.output.max_line_length),
                 "--config",
-                str(self.ruff_config),
+                f"line-length={self.config.output.max_line_length}",
+                "--config",
+                "lint.select = ['I']",
+                "--config",
+                "fixable = ['ALL']",
                 "--fix",
                 "--unsafe-fixes",
                 "--exit-zero",

@@ -70,7 +70,7 @@ class Client:
         serializer: The xml serializer instance
     """
 
-    __slots__ = "config", "transport", "parser", "serializer"
+    __slots__ = "config", "parser", "serializer", "transport"
 
     def __init__(
         self,
@@ -79,6 +79,7 @@ class Client:
         parser: Optional[XmlParser] = None,
         serializer: Optional[XmlSerializer] = None,
     ):
+        """Initialize the client."""
         self.config = config
         self.transport = transport or DefaultTransport()
 

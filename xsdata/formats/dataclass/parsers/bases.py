@@ -73,7 +73,7 @@ class NodeParser(PushParser):
         qname: str,
         attrs: dict,
         ns_map: dict,
-    ):
+    ) -> None:
         """Build and queue the XmlNode for the starting element.
 
         Args:
@@ -159,8 +159,7 @@ class NodeParser(PushParser):
         ns_map: dict,
         xsi_type: Optional[str],
     ) -> Optional[type]:
-        """
-        Obtain the root clazz, maybe from the provided clazz.
+        """Obtain the root clazz, maybe from the provided clazz.
 
         Args:
             clazz: The root class type, auto locate if omitted
@@ -200,7 +199,7 @@ class RecordParser(NodeParser):
         qname: str,
         attrs: dict,
         ns_map: dict,
-    ):
+    ) -> None:
         """Build and queue the XmlNode for the starting element.
 
         Record the start event for later processing.
@@ -243,7 +242,7 @@ class RecordParser(NodeParser):
 
     def register_namespace(
         self, ns_map: dict[Optional[str], str], prefix: Optional[str], uri: str
-    ):
+    ) -> None:
         """Register the uri prefix in the namespace prefix-URI map.
 
         Record the start-ns event for later processing.

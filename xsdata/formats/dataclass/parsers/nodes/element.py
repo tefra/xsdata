@@ -36,18 +36,18 @@ class ElementNode(XmlNode):
     """
 
     __slots__ = (
-        "meta",
+        "assigned",
         "attrs",
-        "ns_map",
         "config",
         "context",
-        "position",
-        "mixed",
         "derived_factory",
-        "xsi_type",
-        "xsi_nil",
-        "assigned",
+        "meta",
+        "mixed",
+        "ns_map",
+        "position",
         "tail_processed",
+        "xsi_nil",
+        "xsi_type",
     )
 
     def __init__(
@@ -63,6 +63,7 @@ class ElementNode(XmlNode):
         xsi_type: Optional[str] = None,
         xsi_nil: Optional[bool] = None,
     ):
+        """Initialize the xml node."""
         self.meta = meta
         self.attrs = attrs
         self.ns_map = ns_map
@@ -123,7 +124,7 @@ class ElementNode(XmlNode):
         text: Optional[str],
         tail: Optional[str],
         objects: list[Any],
-    ):
+    ) -> None:
         """Parse the text and tail content.
 
         Args:
@@ -148,7 +149,7 @@ class ElementNode(XmlNode):
             if isinstance(params[key], PendingCollection):
                 params[key] = params[key].evaluate()
 
-    def bind_attrs(self, params: dict[str, Any]):
+    def bind_attrs(self, params: dict[str, Any]) -> None:
         """Parse the element attributes.
 
         Scenarios:
@@ -182,7 +183,7 @@ class ElementNode(XmlNode):
                             f"Unknown attribute {self.meta.qname}:{qname}"
                         )
 
-    def bind_attr(self, params: dict, var: XmlVar, value: Any):
+    def bind_attr(self, params: dict, var: XmlVar, value: Any) -> None:
         """Parse an element attribute.
 
         Ignores fields with init==false!
@@ -205,7 +206,7 @@ class ElementNode(XmlNode):
         else:
             ParserUtils.validate_fixed_value(self.meta, var, value)
 
-    def bind_any_attr(self, params: dict, var: XmlVar, qname: str, value: Any):
+    def bind_any_attr(self, params: dict, var: XmlVar, qname: str, value: Any) -> None:
         """Parse an element attribute to a wildcard field.
 
         Args:
@@ -219,7 +220,7 @@ class ElementNode(XmlNode):
 
         params[var.name][qname] = ParserUtils.parse_any_attribute(value, self.ns_map)
 
-    def bind_objects(self, params: dict, objects: list):
+    def bind_objects(self, params: dict, objects: list) -> None:
         """Bind children objects.
 
         Emit a warning if an object doesn't fit in any
@@ -321,7 +322,7 @@ class ElementNode(XmlNode):
 
         return True
 
-    def bind_mixed_objects(self, params: dict, var: XmlVar, objects: list):
+    def bind_mixed_objects(self, params: dict, var: XmlVar, objects: list) -> None:
         """Bind children objects to a mixed content wildcard field.
 
         Args:

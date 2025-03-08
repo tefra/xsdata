@@ -36,30 +36,31 @@ class Filters:
     FACTORY_KEY = "default_factory"
 
     __slots__ = (
-        "substitutions",
-        "extensions",
         "class_case",
-        "field_case",
-        "constant_case",
-        "package_case",
-        "module_case",
         "class_safe_prefix",
-        "field_safe_prefix",
+        "constant_case",
         "constant_safe_prefix",
-        "package_safe_prefix",
-        "module_safe_prefix",
-        "docstring_style",
-        "max_line_length",
-        "union_type",
-        "generic_collections",
-        "relative_imports",
-        "postponed_annotations",
-        "format",
-        "import_patterns",
         "default_class_annotation",
+        "docstring_style",
+        "extensions",
+        "field_case",
+        "field_safe_prefix",
+        "format",
+        "generic_collections",
+        "import_patterns",
+        "max_line_length",
+        "module_case",
+        "module_safe_prefix",
+        "package_case",
+        "package_safe_prefix",
+        "postponed_annotations",
+        "relative_imports",
+        "substitutions",
+        "union_type",
     )
 
     def __init__(self, config: GeneratorConfig):
+        """Initialize the filters."""
         self.substitutions: dict[ObjectType, dict[str, str]] = defaultdict(dict)
         for sub in config.substitutions.substitution:
             self.substitutions[sub.type][sub.search] = sub.replace
@@ -111,7 +112,7 @@ class Filters:
 
         self.default_class_annotation = self.build_class_annotation(self.format)
 
-    def register(self, env: Environment):
+    def register(self, env: Environment) -> None:
         """Register the template filters to the jinja environment."""
         env.globals.update(
             {
@@ -565,7 +566,7 @@ class Filters:
             return data
 
         if key == "pattern":
-            return f"r{repr(data)}".replace("\\\\", "\\")
+            return f"r{data!r}".replace("\\\\", "\\")
 
         if data == "":
             return '""'

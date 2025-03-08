@@ -34,6 +34,7 @@ class PendingCollection(UserList):
     """
 
     def __init__(self, initlist: Optional[Iterable], factory: Optional[Callable]):
+        """Initialize the pending collection."""
         super().__init__(initlist)
         self.factory = factory or list
 
@@ -119,7 +120,10 @@ class ParserUtils:
                 format=format or var.format,
             )
         except ConverterError as ex:
-            message = f"Failed to convert value for `{meta.clazz.__qualname__}.{var.name}`\n  {ex}"
+            message = (
+                "Failed to convert value for "
+                f"`{meta.clazz.__qualname__}.{var.name}`\n  {ex}"
+            )
             if config.fail_on_converter_warnings:
                 raise ParserError(message)
 
@@ -231,7 +235,6 @@ class ParserUtils:
             - strings with whitespaces, need trimming
             - comparing raw str values
         """
-
         default_value = var.default() if callable(var.default) else var.default
         if (
             isinstance(default_value, float)
@@ -250,5 +253,6 @@ class ParserUtils:
 
         if default_value != value:
             raise ParserError(
-                f"Fixed value mismatch {meta.qname}:{var.qname}, `{default_value} != {value}`"
+                f"Fixed value mismatch {meta.qname}:{var.qname}, "
+                f"`{default_value} != {value}`"
             )

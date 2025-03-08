@@ -6,7 +6,7 @@ from xsdata.formats.dataclass.parsers.xml import UserXmlParser, XmlParser
 __all__ = [
     "DictDecoder",
     "JsonParser",
-    "XmlParser",
-    "UserXmlParser",
     "TreeParser",
+    "UserXmlParser",
+    "XmlParser",
 ]

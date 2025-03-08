@@ -51,12 +51,12 @@ class ClassMeta:
     """
 
     __slots__ = (
-        "element_name_generator",
         "attribute_name_generator",
-        "qname",
+        "element_name_generator",
         "local_name",
-        "nillable",
         "namespace",
+        "nillable",
+        "qname",
         "target_qname",
     )
 
@@ -70,6 +70,7 @@ class ClassMeta:
         namespace: Optional[str],
         target_qname: Optional[str],
     ):
+        """Initialize class meta."""
         self.element_name_generator = element_name_generator
         self.attribute_name_generator = attribute_name_generator
         self.qname = qname
@@ -90,9 +91,9 @@ class XmlMetaBuilder:
     """
 
     __slots__ = (
+        "attribute_name_generator",
         "class_type",
         "element_name_generator",
-        "attribute_name_generator",
         "globalns",
     )
 
@@ -103,6 +104,7 @@ class XmlMetaBuilder:
         attribute_name_generator: Callable,
         globalns: Optional[dict[str, Callable]] = None,
     ):
+        """Initialize the builder."""
         self.class_type = class_type
         self.element_name_generator = element_name_generator
         self.attribute_name_generator = attribute_name_generator
@@ -329,11 +331,11 @@ class XmlVarBuilder:
     """
 
     __slots__ = (
-        "index",
+        "attribute_name_generator",
         "class_type",
         "default_xml_type",
         "element_name_generator",
-        "attribute_name_generator",
+        "index",
     )
 
     def __init__(
@@ -343,6 +345,7 @@ class XmlVarBuilder:
         element_name_generator: Callable = return_input,
         attribute_name_generator: Callable = return_input,
     ):
+        """Initialize the builder."""
         self.index = 0
         self.class_type = class_type
         self.default_xml_type = default_xml_type

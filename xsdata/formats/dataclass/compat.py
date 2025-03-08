@@ -49,7 +49,7 @@ class ClassType(abc.ABC):
         """Return whether the given value is binding model."""
 
     @abc.abstractmethod
-    def verify_model(self, obj: Any):
+    def verify_model(self, obj: Any) -> None:
         """Verify the given value is a binding model.
 
         Args:
@@ -115,9 +115,10 @@ class ClassTypes:
     __slots__ = "types"
 
     def __init__(self):
+        """Initialize the registry."""
         self.types: dict[str, ClassType] = {}
 
-    def register(self, name: str, fmt: ClassType, **_: Any):
+    def register(self, name: str, fmt: ClassType, **_: Any) -> None:
         """Register a class type instance by name.
 
         Args:
@@ -161,7 +162,7 @@ class Dataclasses(ClassType):
         """Return whether the obj is a dataclass model."""
         return is_dataclass(obj)
 
-    def verify_model(self, obj: Any):
+    def verify_model(self, obj: Any) -> None:
         """Validate whether the obj is a dataclass model.
 
         Args:

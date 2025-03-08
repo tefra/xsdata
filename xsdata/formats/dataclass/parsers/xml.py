@@ -55,7 +55,7 @@ class UserXmlParser(NodeParser):
         qname: str,
         attrs: dict,
         ns_map: dict,
-    ):
+    ) -> None:
         """Build and queue the XmlNode for the starting element.
 
         Override to emit the start element event.
@@ -99,7 +99,7 @@ class UserXmlParser(NodeParser):
             self.emit_event(EventType.END, qname, obj=objects[-1][1])
         return result
 
-    def emit_event(self, event: str, name: str, **kwargs: Any):
+    def emit_event(self, event: str, name: str, **kwargs: Any) -> None:
         """Propagate event to subclasses.
 
         Match event and name to a subclass method and trigger it with

@@ -35,7 +35,7 @@ class LxmlEventWriter(XmlWriter):
         """
         return ElementTreeContentHandler()
 
-    def write(self, events: Iterator):
+    def write(self, events: Iterator) -> None:
         """Feed the sax content handler with events.
 
         The receiver will also add additional root attributes
@@ -68,6 +68,8 @@ class LxmlEventWriter(XmlWriter):
 
 
 class LxmlTreeBuilder(EventContentHandler):
+    """Tree builder based on `lxml.sax.ElementTreeContentHandler`."""
+
     def build_handler(self) -> ElementTreeContentHandler:
         """Build the content handler instance.
 

@@ -34,7 +34,7 @@ class UnnestInnerClasses(RelativeHandlerInterface):
             references = inner_references[ref]
 
             self.update_inner_class(inner)
-            self.update_types(references, inner.qname)
+            self.update_types(references, inner)
             self.container.add(inner)
 
         self.remove_orphan_inner_classes(target, promote_all)
@@ -89,15 +89,16 @@ class UnnestInnerClasses(RelativeHandlerInterface):
         target.local_type = True
 
     @classmethod
-    def update_types(cls, types: list[AttrType], qname: str):
+    def update_types(cls, types: list[AttrType], inner: Class):
         """Search and replace forward references.
 
         Return the number changes.
 
         Args:
             types: The types to search and replace
-            qname: The updated qname
+            inner: The updated inner class
         """
         for tp in types:
-            tp.qname = qname
+            tp.qname = inner.qname
             tp.forward = False
+            tp.reference = inner.ref

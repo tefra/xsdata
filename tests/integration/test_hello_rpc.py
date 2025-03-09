@@ -26,7 +26,7 @@ class HelloRpcServiceTests(TestCase):
         schema = fixtures_dir.joinpath("hello/hello.wsdl")
         package = "tests.fixtures.hello"
         runner = CliRunner()
-        result = runner.invoke(cli, [str(schema), "--package", package])
+        result = runner.invoke(cli, ["generate", str(schema), "--package", package])
 
         if result.exception:
             raise result.exception

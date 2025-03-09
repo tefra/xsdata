@@ -17,7 +17,7 @@ def test_annotations() -> None:
     schema = filepath.joinpath("model.xsd")
     runner = CliRunner()
     result = runner.invoke(
-        cli, [str(schema), f"--config={filepath.joinpath('xsdata.xml')!s}"]
+        cli, ["generate", str(schema), f"--config={filepath.joinpath('xsdata.xml')!s}"]
     )
 
     if result.exception:

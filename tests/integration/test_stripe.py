@@ -19,6 +19,7 @@ def test_json_documents() -> None:
     result = runner.invoke(
         cli,
         [
+            "generate",
             str(filepath.joinpath("samples")),
             f"--config={filepath.joinpath('.xsdata.xml')!s}",
         ],

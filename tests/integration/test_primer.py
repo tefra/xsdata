@@ -15,7 +15,8 @@ def test_primer_schema() -> None:
     package = "tests.fixtures.primer"
     runner = CliRunner()
     result = runner.invoke(
-        cli, [str(schema), "--package", package, "--docstring-style", "NumPy"]
+        cli,
+        ["generate", str(schema), "--package", package, "--docstring-style", "NumPy"],
     )
 
     if result.exception:

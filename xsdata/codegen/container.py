@@ -13,6 +13,7 @@ from xsdata.codegen.handlers import (
     FlattenAttributeGroups,
     FlattenClassExtensions,
     MergeAttributes,
+    MergeDuplicateClasses,
     ProcessAttributeTypes,
     ProcessMixedContentClass,
     RenameDuplicateAttributes,
@@ -225,6 +226,7 @@ class ClassContainer(ContainerInterface):
     def designate_classes(self) -> None:
         """Designate the final class names, packages and modules."""
         designators = [
+            MergeDuplicateClasses(self),
             RenameDuplicateClasses(self),
             ValidateReferences(self),
             DesignateClassPackages(self),

@@ -20,8 +20,7 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
 
     Attributes:
         use_names: Whether names or qualified names should be used to group classes
-        merges: The renamed instructions applied at the end
-        merges: The merge instructions applied at the end
+        renames: The renamed instructions applied at the end
         reserved: The reserved class names or qualified names
     """
 
@@ -42,12 +41,7 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
         groups = collections.group_by(self.container, lambda x: text.alnum(getter(x)))
 
         for classes in groups.values():
-            if len(classes) < 2:
-                continue
-
-            if all(x == classes[0] for x in classes):
-                self.merge_classes(classes)
-            else:
+            if len(classes) > 1:
                 self.rename_classes(classes)
 
         if self.renames or self.merges:
@@ -120,7 +114,7 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
         self.rename_class(target, new_qname)
 
     def rename_class(self, target: Class, new_qname: str) -> None:
-        """Update the class qualified name and update references.
+        """Update the class qualified name and schedule updates.
 
         Args:
             target: The target class to update
@@ -162,7 +156,7 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
         return self.reserved
 
     def update_references(self, target: Class) -> None:
-        """Search and update the target class for renamed and merged references.
+        """Search and update the target class for renamed references.
 
         Args:
             target: The target class instance to inspect and update
@@ -178,6 +172,3 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
                 ):
                     members = text.suffix(parent.default, "::")
                     parent.default = f"@enum@{tp.qname}::{members}"
-
-            elif tp.reference in self.merges:
-                tp.reference = self.merges[tp.reference]

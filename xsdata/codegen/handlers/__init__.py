@@ -9,6 +9,7 @@ from .filter_classes import FilterClasses
 from .flatten_attribute_groups import FlattenAttributeGroups
 from .flatten_class_extensions import FlattenClassExtensions
 from .merge_attributes import MergeAttributes
+from .merge_duplicate_classes import MergeDuplicateClasses
 from .process_attributes_types import ProcessAttributeTypes
 from .process_mixed_content_class import ProcessMixedContentClass
 from .rename_duplicate_attributes import RenameDuplicateAttributes
@@ -35,6 +36,7 @@ __all__ = [
     "FlattenAttributeGroups",
     "FlattenClassExtensions",
     "MergeAttributes",
+    "MergeDuplicateClasses",
     "ProcessAttributeTypes",
     "ProcessMixedContentClass",
     "RenameDuplicateAttributes",

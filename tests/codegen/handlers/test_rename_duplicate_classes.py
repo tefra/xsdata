@@ -3,7 +3,7 @@ from unittest import mock
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import RenameDuplicateClasses
 from xsdata.models.config import GeneratorConfig
-from xsdata.models.enums import DataType, Tag
+from xsdata.models.enums import Tag
 from xsdata.utils.testing import (
     AttrFactory,
     ClassFactory,
@@ -40,21 +40,6 @@ class RenameDuplicateClassesTests(FactoryTestCase):
         self.assertEqual("{foo}a_2", classes[1].qname)
         self.assertEqual("_b_1", classes[3].qname)
         self.assertEqual("b_2", classes[4].qname)
-
-    def test_run_merges_same_classes(self) -> None:
-        first = ClassFactory.create()
-        second = first.clone()
-        third = first.clone()
-        fourth = ClassFactory.create()
-        fifth = ClassFactory.create()
-
-        self.container.extend([first, second, third, fourth, fifth])
-        self.processor.run()
-
-        self.assertEqual([first, fourth, fifth], list(self.container))
-        self.assertEqual(
-            {first.ref: third.ref, second.ref: third.ref}, self.processor.merges
-        )
 
     @mock.patch.object(RenameDuplicateClasses, "add_numeric_suffix")
     def test_rename_classes(self, mock_add_numeric_suffix) -> None:
@@ -155,15 +140,11 @@ class RenameDuplicateClassesTests(FactoryTestCase):
                 reference=3,
             )
         )
-        target.attrs.append(AttrFactory.native(DataType.STRING))
 
         self.processor.renames = {1: "bar", 2: "foo"}
-        self.processor.merges = {3: 4}
         self.processor.update_references(target)
 
         self.assertEqual("bar", target.attrs[0].types[0].qname)
         self.assertEqual("foo", target.attrs[1].types[0].qname)
         self.assertEqual("@enum@foo::member", target.attrs[1].default)
         self.assertEqual("thug", target.attrs[2].types[0].qname)
-        self.assertEqual(4, target.attrs[2].types[0].reference)
-        self.assertEqual(0, target.attrs[3].types[0].reference)

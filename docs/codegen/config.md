@@ -345,6 +345,7 @@ classes.
 - `prepend` Specify if you want the base class or decorator to added before all other
 - `apply_if_derived` Specify if you want to add the extension if the class already
   extends another class.
+- `module` Optional pattern to match against the fully-qualified parent element's name
 
 !!! Warning
 
@@ -357,7 +358,7 @@ classes.
 ```xml
 <Extensions>
     <Extension type="class" class=".*" import="dataclasses_jsonschema.JsonSchemaMixin" prepend="false" applyIfDerived="false"/>
-    <Extension type="decorator" class=".*" import="typed_dataclass.typed_dataclass" prepend="false" applyIfDerived="false"/>
+    <Extension type="decorator" class=".*" module="Ancestor\..*\.Papa$" import="typed_dataclass.typed_dataclass" prepend="false" applyIfDerived="false"/>
 </Extensions>
 ```
 

@@ -210,6 +210,13 @@ class Filters:
 
         return collections.unique_sequence(bases)
 
+    @classmethod
+    def _parent_match(clazz, ext: GeneratorExtension, obj: Class) -> bool:
+        if not ext.parent_pattern:
+            return True
+        parent_path = ".".join(obj.parent_names())
+        return bool(ext.parent_pattern.match(parent_path))
+
     def class_annotations(self, obj: Class, class_name: str) -> list[str]:
         """Return a list of decorator names."""
         annotations = []
@@ -219,7 +226,11 @@ class Filters:
         derived = len(obj.extensions) > 0
         for ext in self.extensions[ExtensionType.DECORATOR]:
             is_valid = not derived or ext.apply_if_derived
-            if is_valid and ext.pattern.match(class_name):
+            if (
+                is_valid
+                and ext.pattern.match(class_name)
+                and self._parent_match(ext, obj)
+            ):
                 if ext.prepend:
                     annotations.insert(0, f"@{ext.func_name}")
                 else:

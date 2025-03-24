@@ -147,6 +147,14 @@ class FiltersTests(FactoryTestCase):
             ),
             GeneratorExtension(
                 type=etp,
+                class_name="Foo.*",
+                parent_path=r"Grandpa\.Papa$",
+                import_string="a.d",
+                apply_if_derived=False,
+                prepend=False,
+            ),
+            GeneratorExtension(
+                type=etp,
                 class_name="Nope.*",
                 import_string="a.e",
                 apply_if_derived=True,
@@ -161,6 +169,10 @@ class FiltersTests(FactoryTestCase):
         target.extensions.clear()
         expected = self.filters.class_annotations(target, "FooBar")
         self.assertEqual(["@c", "@b", "@dataclass", "@d"], expected)
+
+        self.filters.default_class_annotation = None
+        expected = self.filters.class_annotations(target, "FooBar")
+        self.assertEqual(["@c", "@b", "@d"], expected)
 
         self.filters.default_class_annotation = None
         expected = self.filters.class_annotations(target, "FooBar")

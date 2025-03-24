@@ -207,3 +207,20 @@ class GeneratorConfigTests(TestCase):
             GeneratorExtension(
                 type=ExtensionType.DECORATOR, import_string="a.b", class_name="*Foo"
             )
+
+    def test_extension_with_parent_path(self) -> None:
+        GeneratorExtension(
+            type=ExtensionType.DECORATOR,
+            import_string="a.b",
+            class_name="Foo",
+            parent_path=r"Grandpa\.Papa$",
+        )
+
+    def test_extension_with_invalid_parent_path(self) -> None:
+        with self.assertRaises(CodegenError):
+            GeneratorExtension(
+                type=ExtensionType.DECORATOR,
+                import_string="a.b",
+                class_name="Foo",
+                parent_path=r"*Grandpa\.Papa$",
+            )

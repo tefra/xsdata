@@ -1,3 +1,17 @@
+## 25.4 (2025-04-13)
+
+**Features**
+
+- Allow extensions to match module paths
+  ([#1132](https://github.com/tefra/xsdata/pull/1132))
+
+- Improve duplicate class names detection and resolution
+  ([#1127](https://github.com/tefra/xsdata/pull/1127))
+
+**Fixes**
+
+- Resolve Code Quality Issue
+
 ## 24.12 (2024-12-22)
 
 **Fixes**

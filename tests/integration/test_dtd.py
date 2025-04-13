@@ -14,6 +14,7 @@ def test_dtd_documents() -> None:
     result = runner.invoke(
         cli,
         [
+            "generate",
             str(fixtures_dir.joinpath("dtd/complete_example.dtd")),
             "--package",
             "tests.fixtures.dtd.models",

@@ -16,6 +16,7 @@ def test_books_schema() -> None:
     result = runner.invoke(
         cli,
         [
+            "generate",
             str(schema),
             "--package",
             package,

@@ -244,7 +244,11 @@ class XmlMetaBuilder:
         namespace = getattr(meta, "namespace", parent_namespace)
         qname = build_qname(namespace, local_name)
 
-        if self.is_inner_class(clazz) or not global_type:
+        if (
+            self.is_inner_class(clazz)
+            or not global_type
+            or clazz.__module__ not in sys.modules
+        ):
             target_qname = None
         else:
             module = sys.modules[clazz.__module__]

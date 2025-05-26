@@ -136,6 +136,7 @@ class XmlContext:
             hasattr(clazz, "__module__")
             and isinstance(clazz.__module__, str)
             and clazz.__module__.startswith(self.models_package)
+            and clazz.__module__ in sys.modules
         )
 
     def find_types(self, qname: str) -> list[type[T]]:

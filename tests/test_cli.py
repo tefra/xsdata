@@ -38,7 +38,7 @@ class CliTests(TestCase):
     @mock.patch.object(ResourceTransformer, "__init__", return_value=None)
     def test_generate(self, mock_init, mock_process) -> None:
         source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
-        result = self.runner.invoke(cli, [str(source), "--package", "foo"])
+        result = self.runner.invoke(cli, ["generate", str(source), "--package", "foo"])
         config = mock_init.call_args[1]["config"]
 
         self.assertIsNone(result.exception)
@@ -71,7 +71,7 @@ class CliTests(TestCase):
         source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
         result = self.runner.invoke(
             cli,
-            [str(source), "--config", str(file_path), "--no-eq"],
+            ["generate", str(source), "--config", str(file_path), "--no-eq"],
             catch_exceptions=False,
         )
         config = mock_init.call_args[1]["config"]
@@ -87,7 +87,7 @@ class CliTests(TestCase):
     @mock.patch.object(ResourceTransformer, "process")
     @mock.patch.object(ResourceTransformer, "__init__", return_value=None)
     def test_generate_with_debug_mode(self, *args) -> None:
-        self.runner.invoke(cli, ["foo.xsd", "--package", "foo", "--debug"])
+        self.runner.invoke(cli, ["generate", "foo.xsd", "--package", "foo", "--debug"])
         self.assertEqual(logging.DEBUG, logger.level)
 
     @mock.patch("xsdata.cli.logger.info")

@@ -138,11 +138,10 @@ class ElementNodeTests(FactoryTestCase):
         self.node.ns_map = {"ns0": "xsdata"}
 
         objects = [("a", 1)]
-        expected = Paragraph(content=["text", AnyElement(qname="a", text="1"), "tail"])
+        expected = Paragraph(content=["text", AnyElement(qname="a", text="1")])
 
         self.assertTrue(self.node.bind("foo", "text", "tail", objects))
-        self.assertEqual("foo", objects[-1][0])
-        self.assertEqual(expected, objects[-1][1])
+        self.assertListEqual([("foo", expected), (None, "tail")], objects)
 
     def test_bind_wild_text(self) -> None:
         self.node.meta = self.context.build(ExtendedType)
@@ -170,13 +169,13 @@ class ElementNodeTests(FactoryTestCase):
 
         params = {}
         self.node.bind_wild_text(params, var, "txt", "tail")
-        self.assertEqual({"wildcard": ["txt", "tail"]}, params)
+        self.assertEqual({"wildcard": ["txt"]}, params)
 
         self.node.bind_wild_text(params, var, None, "tail")
-        self.assertEqual({"wildcard": [None, "txt", "tail", "tail"]}, params)
+        self.assertEqual({"wildcard": [None, "txt"]}, params)
 
         self.node.bind_wild_text(params, var, "first", None)
-        self.assertEqual({"wildcard": ["first", None, "txt", "tail", "tail"]}, params)
+        self.assertEqual({"wildcard": ["first", None, "txt"]}, params)
 
     def test_bind_attrs(self) -> None:
         self.node.meta = self.context.build(AttrsType)
@@ -344,22 +343,21 @@ class ElementNodeTests(FactoryTestCase):
 
     def test_bind_tail_of_wildcard_attaches_to_wildcard_parent(self) -> None:
         self.node.meta = self.context.build(Paragraph)
-        note = AnyElement(
-            qname="note",
-            children=[AnyElement(text="This is a note inside the paragraph.")],
+        subparagraph = Paragraph(
+            content=["This is a subparagraph inside the paragraph."],
         )
         objects = [
-            (None, "This is before the note."),
-            (None, note),
-            (None, "This is after the note."),
+            (None, "This is before the subparagraph."),
+            ("p", subparagraph),
+            (None, "This is after the subparagraph."),
         ]
         self.assertTrue(self.node.bind("foo", None, None, objects))
         result = objects[-1][1]
         expected = Paragraph(
             content=[
-                "This is before the note.",
-                note,
-                "This is after the note.",
+                "This is before the subparagraph.",
+                subparagraph,
+                "This is after the subparagraph.",
             ]
         )
         self.assertEqual(result, expected)

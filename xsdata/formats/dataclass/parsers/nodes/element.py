@@ -137,13 +137,16 @@ class ElementNode(XmlNode):
         if wild_var and wild_var.mixed:
             self.bind_mixed_objects(params, wild_var, objects)
             bind_text = False
+            child_tail = None
         else:
-            self.bind_objects(params, objects)
+            child_tail = self.bind_objects(params, objects)
             bind_text = self.bind_text(params, text)
 
         if not bind_text and wild_var:
             self.bind_wild_text(params, wild_var, text, tail)
-            self.tail_processed = True
+
+        if child_tail and wild_var:
+            self.bind_wild_text(params, wild_var, None, child_tail[-1][-1])
 
         for key in params:
             if isinstance(params[key], PendingCollection):
@@ -220,7 +223,7 @@ class ElementNode(XmlNode):
 
         params[var.name][qname] = ParserUtils.parse_any_attribute(value, self.ns_map)
 
-    def bind_objects(self, params: dict, objects: list) -> None:
+    def bind_objects(self, params: dict, objects: list) -> Optional[str]:
         """Bind children objects.
 
         Emit a warning if an object doesn't fit in any
@@ -231,11 +234,17 @@ class ElementNode(XmlNode):
             objects: The list of intermediate parsed objects
         """
         position = self.position
-        for qname, obj in objects[position:]:
+        no_qname = None
+        segment = objects[position:]
+        for i, (qname, obj) in enumerate(segment):
+            if qname is None and i == len(segment) - 1:
+                no_qname = obj
+                continue
             if not self.bind_object(params, qname, obj):
                 logger.warning("Unassigned parsed object %s", qname)
 
         del objects[position:]
+        return no_qname
 
     def bind_object(self, params: dict, qname: str, value: Any) -> bool:
         """Bind a child object.
@@ -394,7 +403,7 @@ class ElementNode(XmlNode):
     ) -> bool:
         """Bind the element text and tail content to a wildcard field.
 
-        If the field is a list, prepend the text and append the tail content.
+        If the field is a list, prepend the text.
         Otherwise, build a generic element with the text/tail content
         and any attributes. If the field is already occupied, then this
         means the current node is a child, and we need to nested them.
@@ -420,8 +429,6 @@ class ElementNode(XmlNode):
                 params[var.name] = items = PendingCollection(None, var.factory)
 
             items.insert(0, text)
-            if tail:
-                items.append(tail)
 
         else:
             previous = params.get(var.name, None)
@@ -435,6 +442,7 @@ class ElementNode(XmlNode):
                 generic.children.append(previous)
 
             params[var.name] = generic
+            self.tail_processed = True
 
         return True
 

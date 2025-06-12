@@ -11,6 +11,7 @@ from tests.fixtures.models import (
     NillableType,
     Paragraph,
     SequentialType,
+    Span,
     TypeA,
     TypeB,
     TypeC,
@@ -61,8 +62,7 @@ class ElementNodeTests(FactoryTestCase):
         expected = SequentialType(a0="0", a1={"a": "b"}, x0=1, x1=[1], x2=[2, 3])
 
         self.assertTrue(node.bind("foo", "1", "tail", objects))
-        self.assertEqual("foo", objects[-1][0])
-        self.assertEqual(expected, objects[-1][1])
+        self.assertListEqual(objects, [("foo", expected), (None, "tail")])
 
     def test_bind_nil_value(self) -> None:
         self.node.xsi_nil = True
@@ -138,11 +138,10 @@ class ElementNodeTests(FactoryTestCase):
         self.node.ns_map = {"ns0": "xsdata"}
 
         objects = [("a", 1)]
-        expected = Paragraph(content=["text", AnyElement(qname="a", text="1"), "tail"])
+        expected = Paragraph(content=["text", AnyElement(qname="a", text="1")])
 
         self.assertTrue(self.node.bind("foo", "text", "tail", objects))
-        self.assertEqual("foo", objects[-1][0])
-        self.assertEqual(expected, objects[-1][1])
+        self.assertListEqual([("foo", expected), (None, "tail")], objects)
 
     def test_bind_wild_text(self) -> None:
         self.node.meta = self.context.build(ExtendedType)
@@ -170,13 +169,13 @@ class ElementNodeTests(FactoryTestCase):
 
         params = {}
         self.node.bind_wild_text(params, var, "txt", "tail")
-        self.assertEqual({"wildcard": ["txt", "tail"]}, params)
+        self.assertEqual({"wildcard": ["txt"]}, params)
 
         self.node.bind_wild_text(params, var, None, "tail")
-        self.assertEqual({"wildcard": [None, "txt", "tail", "tail"]}, params)
+        self.assertEqual({"wildcard": [None, "txt"]}, params)
 
         self.node.bind_wild_text(params, var, "first", None)
-        self.assertEqual({"wildcard": ["first", None, "txt", "tail", "tail"]}, params)
+        self.assertEqual({"wildcard": ["first", None, "txt"]}, params)
 
     def test_bind_attrs(self) -> None:
         self.node.meta = self.context.build(AttrsType)
@@ -289,6 +288,78 @@ class ElementNodeTests(FactoryTestCase):
         fixture = make_dataclass("Fixture", [("content", str)])
         actual = self.node.prepare_generic_value("a", fixture("foo"))
         self.assertEqual(fixture("foo"), actual)
+
+    def test_bind_tail_of_non_wildcard_attaches_to_wildcard_parent(self) -> None:
+        self.node.meta = self.context.build(Paragraph)
+        expected_inner_node = Span(content="This is a note inside the paragraph.")
+        expected_first_text = "This is before the note."
+        expected_tail = "This is after the note."
+        expected_outer_node = Paragraph(
+            content=[expected_first_text, expected_inner_node, expected_tail]
+        )
+        objects = []
+
+        inner_node = ElementNode(
+            position=0,
+            meta=self.context.build(Span),
+            context=self.context,
+            config=ParserConfig(),
+            attrs={},
+            ns_map={},
+        )
+
+        self.assertTrue(
+            inner_node.bind(
+                qname="span",
+                text=expected_inner_node.content,
+                tail=expected_tail,
+                objects=objects,
+            )
+        )
+
+        self.assertListEqual(
+            objects, [("span", expected_inner_node), (None, expected_tail)]
+        )
+
+        outer_node = ElementNode(
+            position=0,
+            meta=self.context.build(Paragraph),
+            context=self.context,
+            config=ParserConfig(),
+            attrs={},
+            ns_map={},
+        )
+        self.assertTrue(
+            outer_node.bind(
+                qname="p",
+                text=expected_first_text,
+                tail=None,
+                objects=objects,
+            )
+        )
+
+        self.assertListEqual(objects, [("p", expected_outer_node)])
+
+    def test_bind_tail_of_wildcard_attaches_to_wildcard_parent(self) -> None:
+        self.node.meta = self.context.build(Paragraph)
+        subparagraph = Paragraph(
+            content=["This is a subparagraph inside the paragraph."],
+        )
+        objects = [
+            (None, "This is before the subparagraph."),
+            ("p", subparagraph),
+            (None, "This is after the subparagraph."),
+        ]
+        self.assertTrue(self.node.bind("foo", None, None, objects))
+        result = objects[-1][1]
+        expected = Paragraph(
+            content=[
+                "This is before the subparagraph.",
+                subparagraph,
+                "This is after the subparagraph.",
+            ]
+        )
+        self.assertEqual(result, expected)
 
     def test_child(self) -> None:
         var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, name="a", types=(TypeC,))

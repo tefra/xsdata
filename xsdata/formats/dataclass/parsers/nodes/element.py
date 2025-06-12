@@ -111,7 +111,7 @@ class ElementNode(XmlNode):
 
         objects.append((qname, obj))
 
-        if self.mixed and not self.tail_processed:
+        if not self.tail_processed:
             tail = ParserUtils.normalize_content(tail)
             if tail:
                 objects.append((None, tail))

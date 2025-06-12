@@ -137,16 +137,12 @@ class ElementNode(XmlNode):
         if wild_var and wild_var.mixed:
             self.bind_mixed_objects(params, wild_var, objects)
             bind_text = False
-            child_tail = None
         else:
-            child_tail = self.bind_objects(params, objects)
+            self.bind_objects(params, objects)
             bind_text = self.bind_text(params, text)
 
         if not bind_text and wild_var:
             self.bind_wild_text(params, wild_var, text, tail)
-
-        if child_tail and wild_var:
-            self.bind_wild_text(params, wild_var, None, child_tail[-1][-1])
 
         for key in params:
             if isinstance(params[key], PendingCollection):
@@ -223,7 +219,7 @@ class ElementNode(XmlNode):
 
         params[var.name][qname] = ParserUtils.parse_any_attribute(value, self.ns_map)
 
-    def bind_objects(self, params: dict, objects: list) -> Optional[str]:
+    def bind_objects(self, params: dict, objects: list) -> None:
         """Bind children objects.
 
         Emit a warning if an object doesn't fit in any
@@ -234,17 +230,11 @@ class ElementNode(XmlNode):
             objects: The list of intermediate parsed objects
         """
         position = self.position
-        no_qname = None
-        segment = objects[position:]
-        for i, (qname, obj) in enumerate(segment):
-            if qname is None and i == len(segment) - 1:
-                no_qname = obj
-                continue
+        for qname, obj in objects[position:]:
             if not self.bind_object(params, qname, obj):
                 logger.warning("Unassigned parsed object %s", qname)
 
         del objects[position:]
-        return no_qname
 
     def bind_object(self, params: dict, qname: str, value: Any) -> bool:
         """Bind a child object.

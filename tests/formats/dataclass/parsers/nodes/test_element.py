@@ -321,7 +321,6 @@ class ElementNodeTests(FactoryTestCase):
             objects, [("span", expected_inner_node), (None, expected_tail)]
         )
 
-        # TODO: Finish outer node
         outer_node = ElementNode(
             position=0,
             meta=self.context.build(Paragraph),

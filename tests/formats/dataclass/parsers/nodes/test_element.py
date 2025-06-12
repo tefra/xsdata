@@ -342,23 +342,6 @@ class ElementNodeTests(FactoryTestCase):
 
         self.assertListEqual(objects, [("p", expected_outer_node)])
 
-        # objects = [
-        #     (None, "This is before the note."),
-        #     (None, AnyElement(qname="note", text="This is a note inside the paragraph.")),
-        #     (None, "This is after the note."),
-        # ]
-
-        # self.assertTrue(self.node.bind("foo", None, None, objects))
-        # result = objects[-1][1]
-        # expected = Paragraph(
-        #     content=[
-        #         "This is before the note.",
-        #         AnyElement(qname="note", text="This is a note inside the paragraph."),
-        #         "This is after the note."
-        #     ]
-        # )
-        # self.assertEqual(result, expected)
-
     def test_bind_tail_of_wildcard_attaches_to_wildcard_parent(self) -> None:
         self.node.meta = self.context.build(Paragraph)
         note = AnyElement(

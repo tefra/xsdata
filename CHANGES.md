@@ -447,7 +447,6 @@ In the next release we will drop python 3.6 support!!!
 ## 21.9 (2021-09-04)
 
 - Automate cli generate options [#578](https://github.com/tefra/xsdata/pull/578)
-
   - Generate cli options by the config model
   - Allow to enable/disable any flag
   - Allow to bypass any value from the config
@@ -492,11 +491,9 @@ In the next release we will drop python 3.6 support!!!
 - Updated DictMapper to generate list of xs:anySimpleType for empty list nodes
 - Updated the compatibility layer for dataclass style plugins
 - Updated namespaces structure style to convert namespaces similar to jaxb
-
   - `http://www.w3.org/XML/1998/namespace` to `org.w3.XML.1998.namespace`
 
 - Update binding process for nillable types and fields
-
   - nillable types can be initialized
   - nillable fields are initialized with None values
 
@@ -552,13 +549,11 @@ In the next release we will drop python 3.6 support!!!
   [#504](https://github.com/tefra/xsdata/issues/504)
 - Updated generic model DerivedElement.substituted flag with xsi:type
 - Updated core components to improve binding performance
-
   - Converted almost all internal dataclasses to simple objects with **slots**
   - Converted the internal xml date/time types to named tuples
   - Reduced models metadata lookup times and memory footprint
 
 - Updated JSON parser [#495](https://github.com/tefra/xsdata/issues/495)
-
   - Support failing on unknown properties
   - Support required properties
   - Support parser config

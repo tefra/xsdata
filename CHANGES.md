@@ -1,3 +1,12 @@
+## 25.7 (2025-07-06)
+
+**Fixes**
+
+- Ignore dynamic classes in auto-discovery mode.
+  ([#1144](https://github.com/tefra/xsdata/pull/1144))
+- Parsing tail content with nested mixed classes
+  ([#1151](https://github.com/tefra/xsdata/pull/1151))
+
 ## 25.4 (2025-04-13)
 
 **Features**

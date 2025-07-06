@@ -111,7 +111,7 @@ class ElementNode(XmlNode):
 
         objects.append((qname, obj))
 
-        if self.mixed and not self.tail_processed:
+        if not self.tail_processed:
             tail = ParserUtils.normalize_content(tail)
             if tail:
                 objects.append((None, tail))
@@ -143,7 +143,6 @@ class ElementNode(XmlNode):
 
         if not bind_text and wild_var:
             self.bind_wild_text(params, wild_var, text, tail)
-            self.tail_processed = True
 
         for key in params:
             if isinstance(params[key], PendingCollection):
@@ -394,7 +393,7 @@ class ElementNode(XmlNode):
     ) -> bool:
         """Bind the element text and tail content to a wildcard field.
 
-        If the field is a list, prepend the text and append the tail content.
+        If the field is a list, prepend the text.
         Otherwise, build a generic element with the text/tail content
         and any attributes. If the field is already occupied, then this
         means the current node is a child, and we need to nested them.
@@ -420,8 +419,6 @@ class ElementNode(XmlNode):
                 params[var.name] = items = PendingCollection(None, var.factory)
 
             items.insert(0, text)
-            if tail:
-                items.append(tail)
 
         else:
             previous = params.get(var.name, None)
@@ -435,6 +432,7 @@ class ElementNode(XmlNode):
                 generic.children.append(previous)
 
             params[var.name] = generic
+            self.tail_processed = True
 
         return True
 

@@ -1,6 +1,6 @@
 import functools
 from collections.abc import Iterable, Iterator
-from typing import Any, Optional
+from typing import Any, Literal, Optional
 from urllib.parse import urljoin
 from xml.etree import ElementInclude as xinclude
 from xml.etree import ElementTree as etree
@@ -160,7 +160,7 @@ def get_base_url(base_url: Optional[str], source: Any) -> Optional[str]:
 
 def xinclude_loader(
     href: str,
-    parse: str,
+    parse: Literal["xml"],
     encoding: Optional[str] = None,
     base_url: Optional[str] = None,
 ) -> Any:

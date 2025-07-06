@@ -74,16 +74,11 @@ Check the [documentation](https://xsdata.readthedocs.io) for more ✨✨✨
 - Support xinclude statements and unknown properties
 - Customize behaviour through config
 
-## Changelog: 25.4 (2025-04-13)
-
-**Features**
-
-- Allow extensions to match module paths
-  ([#1132](https://github.com/tefra/xsdata/pull/1132))
-
-- Improve duplicate class names detection and resolution
-  ([#1127](https://github.com/tefra/xsdata/pull/1127))
+## Changelog: 25.7 (2025-07-06)
 
 **Fixes**
 
-- Resolve Code Quality Issue
+- Ignore dynamic classes in auto-discovery mode.
+  ([#1144](https://github.com/tefra/xsdata/pull/1144))
+- Parsing tail content with nested mixed classes
+  ([#1151](https://github.com/tefra/xsdata/pull/1151))

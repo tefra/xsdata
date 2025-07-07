@@ -17,6 +17,7 @@ def test_xml_documents() -> None:
     result = runner.invoke(
         cli,
         [
+            "generate",
             str(schema),
             "-p",
             package,

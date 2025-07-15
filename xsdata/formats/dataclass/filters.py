@@ -83,6 +83,7 @@ class Filters:
                 patterns.update(
                     [
                         f"({ext.func_name}",
+                        f", {ext.func_name}",
                         f" {ext.func_name})",
                     ]
                 )

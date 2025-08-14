@@ -198,7 +198,7 @@ class EventHandler(abc.ABC):
         value = self.encode_data(data)
         self.flush_start(is_nil=value is None)
 
-        if value:
+        if value is not None:
             if not self.in_tail:
                 self.set_characters(value)
             else:

@@ -11,7 +11,7 @@ from typing import (
     TextIO,
     Union,
 )
-from xml.etree.ElementTree import QName
+from xml.etree.ElementTree import QName, Element, tostring as ETtostring
 from xml.sax.handler import ContentHandler
 
 from typing_extensions import TypeAlias
@@ -344,7 +344,7 @@ class EventHandler(abc.ABC):
         """
 
     @abc.abstractmethod
-    def set_characters(self, data: str) -> None:
+    def set_characters(self, data: Any) -> None:
         """Characters notification receiver.
 
         Args:
@@ -420,13 +420,21 @@ class EventContentHandler(EventHandler):
         """
         self.handler.endElementNS(name, qname)
 
-    def set_characters(self, data: str) -> None:
+    def set_characters(self, data: Any) -> None:
         """Characters notification receiver.
 
         Args:
             data: The characters data to write
         """
-        self.handler.characters(data)
+        if isinstance(data, Element):
+            # This is basically the implementation of self.handler.ignorableWhitespace(ETtostring(data))
+            # but that does not sound correct, so I have copied the code from saxutils and have remove
+            # the now superfluous type checks
+            self.handler._finish_pending_start_element()
+            data = ETtostring(data, 'unicode')
+            self.handler._write(data)
+        else:
+            self.handler.characters(data)
 
     def end_prefix_mapping(self, prefix: str) -> None:
         """End namespace prefix notification receiver.

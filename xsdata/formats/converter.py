@@ -15,7 +15,7 @@ from typing import (
     Union,
     cast,
 )
-from xml.etree.ElementTree import QName
+from xml.etree.ElementTree import QName, Element
 
 from xsdata.exceptions import ConverterError
 from xsdata.models.datatype import (
@@ -820,6 +820,18 @@ class DateTimeConverter(DateTimeBase):
         return self.parse(value, **kwargs)
 
 
+class ElementConverter(Converter):
+    """A ElementTree.Element converter."""
+
+    def deserialize(self, value: Any, **kwargs: Any) -> Any:
+        """Not implemented."""
+        raise Exception("not implemented")
+
+    def serialize(self, value: Element, **kwargs: Any) -> Any:
+        """Return the ElementTree.Element, as it is, since it is handles downstream."""
+        return value if isinstance(value, Element) else str(value)
+
+
 class ProxyConverter(Converter):
     """Proxy wrapper to treat callables as converters.
 
@@ -874,3 +886,4 @@ converter.register_converter(XmlPeriod, ProxyConverter(XmlPeriod))
 converter.register_converter(QName, QNameConverter())
 converter.register_converter(Decimal, DecimalConverter())
 converter.register_converter(Enum, EnumConverter())
+converter.register_converter(Element, ElementConverter())

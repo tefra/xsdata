@@ -11,7 +11,7 @@ from typing import (
     TextIO,
     Union,
 )
-from xml.etree.ElementTree import QName, Element, tostring as ETtostring
+from xml.etree.ElementTree import QName
 from xml.sax.handler import ContentHandler
 
 from typing_extensions import TypeAlias
@@ -21,6 +21,7 @@ from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlMeta, XmlVar
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
+from xsdata.formats.dataclass.etree import etree_type, etree, Element
 from xsdata.models.enums import DataType, Namespace, QNames
 from xsdata.utils import collections, namespaces
 from xsdata.utils.constants import EMPTY_MAP
@@ -427,12 +428,15 @@ class EventContentHandler(EventHandler):
             data: The characters data to write
         """
         if isinstance(data, Element):
-            # This is basically the implementation of self.handler.ignorableWhitespace(ETtostring(data))
-            # but that does not sound correct, so I have copied the code from saxutils and have remove
-            # the now superfluous type checks
-            self.handler._finish_pending_start_element()
-            data = ETtostring(data, 'unicode')
-            self.handler._write(data)
+            if etree_type == "native":
+                # This is basically the implementation of self.handler.ignorableWhitespace(ETtostring(data))
+                # but that does not sound correct, so I have copied the code from saxutils and have remove
+                # the now superfluous type checks
+                self.handler._finish_pending_start_element()
+                data = etree.tostring(data, 'unicode')
+                self.handler._write(data)
+            elif etree_type == "lxml":
+                self.handler._element_stack[-1].append(data)
         else:
             self.handler.characters(data)
 

@@ -15,8 +15,8 @@ from typing import (
     Union,
     cast,
 )
-from xml.etree.ElementTree import QName, Element
-
+from xml.etree.ElementTree import QName
+from xsdata.formats.dataclass.etree import Element
 from xsdata.exceptions import ConverterError
 from xsdata.models.datatype import (
     XmlBase64Binary,
@@ -829,7 +829,7 @@ class ElementConverter(Converter):
 
     def serialize(self, value: Element, **kwargs: Any) -> Any:
         """Return the ElementTree.Element, as it is, since it is handles downstream."""
-        return value if isinstance(value, Element) else str(value)
+        return value
 
 
 class ProxyConverter(Converter):

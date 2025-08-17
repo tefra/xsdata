@@ -1072,7 +1072,7 @@ class FiltersTests(FactoryTestCase):
         expected_imports = {
             "b": {"@b"},
             "c": {"@c"},
-            "d": {"(d", " d)"},
-            "e": {"(e", " e)"},
+            "d": {"(d", ", d", " d)"},
+            "e": {"(e", ", e", " e)"},
         }
         self.assertEqual(expected_imports, filters.import_patterns["a"])

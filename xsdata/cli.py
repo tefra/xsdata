@@ -164,7 +164,7 @@ def generate(**kwargs: Any) -> None:
 
 
 def resolve_source(
-    source: str, recursive: bool, extensions: tuple[str, ...]
+    source: str, recursive: bool, extensions: tuple[str, ...] = _SUPPORTED_EXTENSIONS
 ) -> Iterator[str]:
     """Yields all supported resource URIs."""
     if source.find("://") > -1 and not source.startswith("file://"):

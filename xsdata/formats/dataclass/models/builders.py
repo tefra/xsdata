@@ -1,3 +1,4 @@
+import inspect
 import sys
 from collections import defaultdict
 from collections.abc import Iterator, Mapping, Sequence
@@ -268,7 +269,11 @@ class XmlMetaBuilder:
         Todo: Honestly I have no idea why we needed this.
         """
         for base in clazz.__mro__:
-            ann = base.__dict__.get("__annotations__")
+            if sys.version_info < (3, 10):
+                ann = base.__dict__.get("__annotations__")
+            else:
+                ann = inspect.get_annotations(base)
+
             if ann and name in ann:
                 return base
 

@@ -112,6 +112,9 @@ def download(source: str, output: str) -> None:
     handler.emit_warnings()
 
 
+_SUPPORTED_EXTENSIONS = ("wsdl", "xsd", "dtd", "xml", "json")
+
+
 @cli.command("generate")
 @click.argument("source", required=True)
 @click.option(
@@ -124,6 +127,11 @@ def download(source: str, output: str) -> None:
 @click.option("-c", "--config", default=".xsdata.xml", help="Project configuration")
 @click.option("--cache", is_flag=True, default=False, help="Cache sources loading")
 @click.option("--debug", is_flag=True, default=False, help="Show debug messages")
+@click.option(
+    "--extensions",
+    default=",".join(_SUPPORTED_EXTENSIONS),
+    help="Comma-separated list of extensions to filter",
+)
 @model_options(GeneratorOutput)
 def generate(**kwargs: Any) -> None:
     """Generate code from xsd, dtd, wsdl, xml and json files.
@@ -140,21 +148,24 @@ def generate(**kwargs: Any) -> None:
     recursive = kwargs.pop("recursive")
     config_file = Path(kwargs.pop("config")).resolve()
 
+    # Parse the comma-separated extensions string into a tuple
+    extensions_str = kwargs.pop("extensions")
+    extensions = tuple(ext.strip() for ext in extensions_str.split(",") if ext.strip())
+
     params = {k.replace("__", "."): v for k, v in kwargs.items() if v is not None}
     config = GeneratorConfig.read(config_file)
     config.output.update(**params)
 
     transformer = ResourceTransformer(config=config)
-    uris = sorted(resolve_source(source, recursive=recursive))
+    uris = sorted(resolve_source(source, recursive=recursive, extensions=extensions))
     transformer.process(uris, cache=cache)
 
     handler.emit_warnings()
 
 
-_SUPPORTED_EXTENSIONS = ("wsdl", "xsd", "dtd", "xml", "json")
-
-
-def resolve_source(source: str, recursive: bool) -> Iterator[str]:
+def resolve_source(
+    source: str, recursive: bool, extensions: tuple[str, ...] = _SUPPORTED_EXTENSIONS
+) -> Iterator[str]:
     """Yields all supported resource URIs."""
     if source.find("://") > -1 and not source.startswith("file://"):
         yield source
@@ -162,7 +173,7 @@ def resolve_source(source: str, recursive: bool) -> Iterator[str]:
         path = Path(source).resolve()
         match = "**/*" if recursive else "*"
         if path.is_dir():
-            for ext in _SUPPORTED_EXTENSIONS:
+            for ext in extensions:
                 yield from (x.as_uri() for x in path.glob(f"{match}.{ext}"))
         else:  # is a file
             yield path.as_uri()

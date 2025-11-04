@@ -7,7 +7,6 @@
 
 >>> config = SerializerConfig(indent="  ")
 >>> context = XmlContext()
->>> serializer = XmlSerializer()
 >>> serializer = XmlSerializer(context=context, config=config)
 
 ```

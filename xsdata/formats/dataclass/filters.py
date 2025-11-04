@@ -681,7 +681,7 @@ class Filters:
 
         if params:
             # Remove trailing triple quotes
-            content = content[:-3].strip()
+            content = content.strip()[:-3].strip()
             new_lines = "\n" if content.endswith('"""') else "\n\n"
             content += f'{new_lines}{params}\n"""'
 

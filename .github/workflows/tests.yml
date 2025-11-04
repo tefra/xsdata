@@ -19,6 +19,7 @@ jobs:
           - {name: Python 3.11, python: '3.11'}
           - {name: Python 3.12, python: '3.12'}
           - {name: Python 3.13, python: '3.13'}
+          - {name: Python 3.14, python: '3.14'}
     steps:
       - uses: actions/checkout@v5
       - name: Set up Python ${{ matrix.python }}

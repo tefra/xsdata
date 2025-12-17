@@ -127,15 +127,17 @@ class UpdateAttributesEffectiveChoice(RelativeHandlerInterface):
                 assert existing.restrictions.max_occurs is not None
 
                 existing.restrictions.min_occurs += attr.restrictions.min_occurs or 0
-                
+
                 # Apply the configured choice max occurs strategy
                 if self.config == ChoiceMaxOccursStrategy.MAX:
                     existing.restrictions.max_occurs = max(
-                        existing.restrictions.max_occurs, 
-                        attr.restrictions.max_occurs or 0
+                        existing.restrictions.max_occurs,
+                        attr.restrictions.max_occurs or 0,
                     )
                 else:  # SUM strategy (default)
-                    existing.restrictions.max_occurs += attr.restrictions.max_occurs or 0
+                    existing.restrictions.max_occurs += (
+                        attr.restrictions.max_occurs or 0
+                    )
 
         return attrs
 

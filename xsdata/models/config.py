@@ -139,7 +139,8 @@ class ChoiceMaxOccursStrategy(Enum):
 
     Attributes:
         SUM: sum the max occurs from all choice branches (current behavior)
-        MAX: take the maximum max occurs from all choice branches (exclusive choice behavior)
+        MAX: take the maximum max occurs from all choice branches (exclusive choice
+             behavior)
     """
 
     SUM = "sum"
@@ -216,7 +217,7 @@ class CompoundFields:
             the default name.
         choice_max_occurs_strategy: Strategy for calculating max_occurs
             when the same element appears in multiple choice branches.
-            Options: 'sum' (sum all branch max_occurs) or 'max' 
+            Options: 'sum' (sum all branch max_occurs) or 'max'
             (take maximum branch max_occurs).
     """
 

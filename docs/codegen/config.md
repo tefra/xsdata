@@ -168,8 +168,8 @@ grouped into a single field.
 - `maxNameParts`: The maximum length of elements names allowed before using the default
   name, default: `3`
 - `choiceMaxOccursStrategy`: Strategy for calculating `max_occurs` when the same element
-  appears in multiple choice branches. Use `max` for exclusive choices (e.g., max(1,1)=1)
-  or `sum` for union choices (e.g., 1+1=2), default: `sum`
+  appears in multiple choice branches. Use `max` for exclusive choices (e.g.,
+  max(1,1)=1) or `sum` for union choices (e.g., 1+1=2), default: `sum`
 
 **Default Value:** `sum`
 
@@ -190,7 +190,10 @@ product: list[Shoe | Shirt | Hat] = field(...)
 
 **Choice Max Occurs Strategy Examples:**
 
-When the same element appears in multiple `xs:choice` branches, this option controls how the `max_occurs` is calculated. The SUM strategy (default) adds occurrences from all branches for union behavior, while the MAX strategy takes the maximum for exclusive choices.
+When the same element appears in multiple `xs:choice` branches, this option controls how
+the `max_occurs` is calculated. The SUM strategy (default) adds occurrences from all
+branches for union behavior, while the MAX strategy takes the maximum for exclusive
+choices.
 
 **Python Code Examples:**
 
@@ -200,7 +203,7 @@ config_option: list[ConfigOption] = field(
     default_factory=list,
     metadata={
         "name": "configOption",
-        "type": "Element", 
+        "type": "Element",
         "max_occurs": 2,
     }
 )

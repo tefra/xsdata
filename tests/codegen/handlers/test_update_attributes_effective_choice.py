@@ -1,6 +1,10 @@
 from xsdata.codegen.handlers import UpdateAttributesEffectiveChoice
 from xsdata.codegen.models import Restrictions
-from xsdata.models.config import ChoiceMaxOccursStrategy, CompoundFields, GeneratorOutput
+from xsdata.models.config import (
+    ChoiceMaxOccursStrategy,
+    CompoundFields,
+    GeneratorOutput,
+)
 from xsdata.utils.testing import AttrFactory, ClassFactory, FactoryTestCase
 
 
@@ -10,10 +14,8 @@ class UpdateAttributesEffectiveChoiceTests(FactoryTestCase):
         # Create a mock container for the processor
         from xsdata.codegen.container import ClassContainer
         from xsdata.models.config import GeneratorConfig, GeneratorOutput
-        
-        config = GeneratorConfig(
-            output=GeneratorOutput()
-        )
+
+        config = GeneratorConfig(output=GeneratorOutput())
         container = ClassContainer(config)
         self.processor = UpdateAttributesEffectiveChoice(container)
 
@@ -144,11 +146,11 @@ class UpdateAttributesEffectiveChoiceTests(FactoryTestCase):
         # Create processor with SUM strategy (default)
         from xsdata.codegen.container import ClassContainer
         from xsdata.models.config import GeneratorConfig
-        
+
         config = GeneratorConfig()
         container = ClassContainer(config)
         processor = UpdateAttributesEffectiveChoice(container)
-        
+
         target = ClassFactory.create(
             attrs=[
                 AttrFactory.element(
@@ -177,7 +179,7 @@ class UpdateAttributesEffectiveChoiceTests(FactoryTestCase):
         # Create a mock container with MAX strategy config
         from xsdata.codegen.container import ClassContainer
         from xsdata.models.config import GeneratorConfig
-        
+
         config = GeneratorConfig(
             output=GeneratorOutput(
                 compound_fields=CompoundFields(
@@ -186,10 +188,10 @@ class UpdateAttributesEffectiveChoiceTests(FactoryTestCase):
             )
         )
         container = ClassContainer(config)
-        
+
         # Create processor with MAX strategy
         processor = UpdateAttributesEffectiveChoice(container)
-        
+
         target = ClassFactory.create(
             attrs=[
                 AttrFactory.element(
@@ -218,7 +220,7 @@ class UpdateAttributesEffectiveChoiceTests(FactoryTestCase):
         # Create a mock container with MAX strategy config
         from xsdata.codegen.container import ClassContainer
         from xsdata.models.config import GeneratorConfig
-        
+
         config = GeneratorConfig(
             output=GeneratorOutput(
                 compound_fields=CompoundFields(
@@ -227,10 +229,10 @@ class UpdateAttributesEffectiveChoiceTests(FactoryTestCase):
             )
         )
         container = ClassContainer(config)
-        
+
         # Create processor with MAX strategy
         processor = UpdateAttributesEffectiveChoice(container)
-        
+
         target = ClassFactory.create(
             attrs=[
                 AttrFactory.element(

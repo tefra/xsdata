@@ -167,6 +167,13 @@ grouped into a single field.
   name as the field name, default: `False`
 - `maxNameParts`: The maximum length of elements names allowed before using the default
   name, default: `3`
+- `choiceMaxOccursStrategy`: Strategy for calculating `max_occurs` when the same element
+  appears in multiple choice branches. Use `max` for exclusive choices (e.g., max(1,1)=1)
+  or `sum` for union choices (e.g., 1+1=2), default: `sum`
+
+**Default Value:** `sum`
+
+**CLI Option:** `-cmos, --choice-max-occurs-strategy [sum|max]`
 
 **Examples:**
 
@@ -179,6 +186,62 @@ hat_or_bat_cat: list[str | int | float] = field(...)
 
 # All types belong to the same substitution group `product`
 product: list[Shoe | Shirt | Hat] = field(...)
+```
+
+**Choice Max Occurs Strategy Examples:**
+
+When the same element appears in multiple `xs:choice` branches, this option controls how the `max_occurs` is calculated. The SUM strategy (default) adds occurrences from all branches for union behavior, while the MAX strategy takes the maximum for exclusive choices.
+
+**Python Code Examples:**
+
+```python
+# Default SUM strategy: max_occurs = 1 + 1 = 2 (union behavior)
+config_option: list[ConfigOption] = field(
+    default_factory=list,
+    metadata={
+        "name": "configOption",
+        "type": "Element", 
+        "max_occurs": 2,
+    }
+)
+
+# MAX strategy: max_occurs = max(1, 1) = 1 (exclusive choice behavior)
+config_option: Optional[ConfigOption] = field(
+    metadata={
+        "name": "configOption",
+        "type": "Element",
+    }
+)
+```
+
+**XSD Example:**
+
+```xml
+<xs:complexType name="Configuration">
+    <xs:sequence>
+        <xs:choice>
+            <xs:element name="configOption" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="optionA" minOccurs="0" maxOccurs="1"/>
+        </xs:choice>
+        <xs:choice>
+            <xs:element name="configOption" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="optionB" minOccurs="0" maxOccurs="1"/>
+        </xs:choice>
+    </xs:sequence>
+</xs:complexType>
+```
+
+**Command Line Usage:**
+
+```bash
+# Use MAX strategy for exclusive choices
+xsdata generate --choice-max-occurs-strategy max schema.xsd
+
+# Use SUM strategy (default, backward compatible)
+xsdata generate --choice-max-occurs-strategy sum schema.xsd
+
+# Short form
+xsdata generate -cmos max schema.xsd
 ```
 
 ### WrapperFields

@@ -82,7 +82,7 @@ class ClassContainer(ContainerInterface):
                 CalculateAttributePaths(),
                 FlattenClassExtensions(self),
                 SanitizeEnumerationClass(self),
-                UpdateAttributesEffectiveChoice(),
+                UpdateAttributesEffectiveChoice(self),
                 UnnestInnerClasses(self),
                 AddAttributeSubstitutions(self),
                 ProcessAttributeTypes(self),

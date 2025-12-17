@@ -1,18 +1,30 @@
 from collections import defaultdict
 
-from xsdata.codegen.mixins import HandlerInterface
+from xsdata.codegen.mixins import ContainerInterface, RelativeHandlerInterface
 from xsdata.codegen.models import Attr, Class, get_restriction_choice
+from xsdata.models.config import ChoiceMaxOccursStrategy
 from xsdata.utils import collections
 
 
-class UpdateAttributesEffectiveChoice(HandlerInterface):
+class UpdateAttributesEffectiveChoice(RelativeHandlerInterface):
     """Detect implied repeated choices and update them.
 
     valid eg: <a/><b/><a/><c/>
     symmetrical sequence: <a/><b/><a/><b/>
+
+    Args:
+        container: The class container instance
+
+    Attributes:
+        config: The choice max occurs strategy configuration
     """
 
-    __slots__ = ()
+    __slots__ = "config"
+
+    def __init__(self, container: ContainerInterface):
+        """Initialize the class."""
+        super().__init__(container)
+        self.config = container.config.output.compound_fields.choice_max_occurs_strategy
 
     def process(self, target: Class) -> None:
         """Process entrypoint for classes.
@@ -86,8 +98,7 @@ class UpdateAttributesEffectiveChoice(HandlerInterface):
                 paths[i] = new_path
                 break
 
-    @classmethod
-    def merge_attrs(cls, target: Class, groups: list[list[int]]) -> list[Attr]:
+    def merge_attrs(self, target: Class, groups: list[list[int]]) -> list[Attr]:
         """Merge same name/tag/namespace attrs.
 
         Args:
@@ -116,7 +127,15 @@ class UpdateAttributesEffectiveChoice(HandlerInterface):
                 assert existing.restrictions.max_occurs is not None
 
                 existing.restrictions.min_occurs += attr.restrictions.min_occurs or 0
-                existing.restrictions.max_occurs += attr.restrictions.max_occurs or 0
+                
+                # Apply the configured choice max occurs strategy
+                if self.config == ChoiceMaxOccursStrategy.MAX:
+                    existing.restrictions.max_occurs = max(
+                        existing.restrictions.max_occurs, 
+                        attr.restrictions.max_occurs or 0
+                    )
+                else:  # SUM strategy (default)
+                    existing.restrictions.max_occurs += attr.restrictions.max_occurs or 0
 
         return attrs
 

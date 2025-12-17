@@ -134,6 +134,18 @@ class ExtensionType(Enum):
     DECORATOR = "decorator"
 
 
+class ChoiceMaxOccursStrategy(Enum):
+    """Choice max occurs calculation strategy enumeration.
+
+    Attributes:
+        SUM: sum the max occurs from all choice branches (current behavior)
+        MAX: take the maximum max occurs from all choice branches (exclusive choice behavior)
+    """
+
+    SUM = "sum"
+    MAX = "max"
+
+
 @dataclass
 class OutputFormat:
     """Output format model representation.
@@ -202,6 +214,10 @@ class CompoundFields:
             hat_or_dress_or_something.
         max_name_parts: Maximum number of element names before using
             the default name.
+        choice_max_occurs_strategy: Strategy for calculating max_occurs
+            when the same element appears in multiple choice branches.
+            Options: 'sum' (sum all branch max_occurs) or 'max' 
+            (take maximum branch max_occurs).
     """
 
     enabled: bool = text_node(default=False, cli="compound-fields")
@@ -209,6 +225,9 @@ class CompoundFields:
     use_substitution_groups: bool = attribute(default=False, cli=False)
     force_default_name: bool = attribute(default=False, cli=False)
     max_name_parts: int = attribute(default=3, cli=False)
+    choice_max_occurs_strategy: ChoiceMaxOccursStrategy = attribute(
+        default=ChoiceMaxOccursStrategy.SUM, cli="choice-max-occurs-strategy"
+    )
 
 
 @dataclass

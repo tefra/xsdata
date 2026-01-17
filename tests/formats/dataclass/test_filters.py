@@ -928,6 +928,127 @@ class FiltersTests(FactoryTestCase):
         expected = "from __future__ import annotations"
         self.assertEqual(expected, self.filters.default_imports(""))
 
+    def test_format_docstring_simple(self) -> None:
+        """Test simple single-line docstring."""
+        result = self.filters.format_docstring('"""Short doc."""', level=1)
+        self.assertEqual('"""\nShort doc.\n"""', result)
+
+    def test_format_docstring_adds_period(self) -> None:
+        """Test that period is added if missing."""
+        result = self.filters.format_docstring('"""No period"""', level=1)
+        self.assertEqual('"""\nNo period.\n"""', result)
+
+        # Should not add period if already has punctuation
+        result = self.filters.format_docstring('"""Has period."""', level=1)
+        self.assertEqual('"""\nHas period.\n"""', result)
+
+        result = self.filters.format_docstring('"""Has question?"""', level=1)
+        self.assertEqual('"""\nHas question?\n"""', result)
+
+        result = self.filters.format_docstring('"""Has exclamation!"""', level=1)
+        self.assertEqual('"""\nHas exclamation!\n"""', result)
+
+        result = self.filters.format_docstring('"""Has colon:"""', level=1)
+        self.assertEqual('"""\nHas colon:\n"""', result)
+
+    def test_format_docstring_with_params(self) -> None:
+        """Test docstring with RST-style params."""
+        doc = '"""Class description."""\n:ivar foo: Foo desc.\n:ivar bar: Bar desc.'
+        result = self.filters.format_docstring(doc, level=1)
+        expected = (
+            '"""\nClass description.\n\n:ivar foo: Foo desc.\n:ivar bar: Bar desc.\n"""'
+        )
+        self.assertEqual(expected, result)
+
+    def test_format_docstring_empty_with_params(self) -> None:
+        """Test docstring with only params, no description."""
+        doc = '""""""\n:ivar foo: Foo description.'
+        result = self.filters.format_docstring(doc, level=1)
+        expected = '"""\n:ivar foo: Foo description.\n"""'
+        self.assertEqual(expected, result)
+
+    def test_format_docstring_empty(self) -> None:
+        """Test completely empty docstring returns empty string."""
+        result = self.filters.format_docstring('""""""', level=1)
+        self.assertEqual("", result)
+
+    def test_format_docstring_wraps_long_lines(self) -> None:
+        """Test that long lines are wrapped."""
+        self.filters.max_line_length = 79
+        long_text = "A " * 50  # Much longer than 79 chars
+        doc = f'"""{long_text.strip()}"""'
+        result = self.filters.format_docstring(doc, level=1)
+
+        # Result should be multi-line
+        lines = result.split("\n")
+        self.assertGreater(len(lines), 3)  # Opening, at least 2 content lines, closing
+
+        # Each content line should respect max_line_length minus indentation
+        for line in lines[1:-1]:  # Skip opening and closing quotes
+            # level=1 means 4 spaces indent, plus some margin
+            self.assertLessEqual(len(line), self.filters.max_line_length - 4)
+
+    def test_format_docstring_nested_level(self) -> None:
+        """Test that nested classes get different wrapping width."""
+        self.filters.max_line_length = 79
+        long_text = "A " * 40
+        doc = f'"""{long_text.strip()}"""'
+
+        result_level1 = self.filters.format_docstring(doc, level=1)
+        result_level2 = self.filters.format_docstring(doc, level=2)
+
+        # Level 2 should wrap earlier (more indent = less space)
+        lines_level1 = result_level1.split("\n")
+        lines_level2 = result_level2.split("\n")
+
+        # Level 2 should have more lines due to narrower width
+        self.assertGreaterEqual(len(lines_level2), len(lines_level1))
+
+    def test_format_docstring_no_separator(self) -> None:
+        """Test that missing closing quotes returns empty string."""
+        result = self.filters.format_docstring("no quotes here", level=1)
+        self.assertEqual("", result)
+
+    def test_format_docstring_splits_summary_description(self) -> None:
+        """Test that first sentence becomes summary, rest becomes description."""
+        doc = '"""First sentence here. Second sentence follows. Third one too."""'
+        result = self.filters.format_docstring(doc, level=1)
+        expected = (
+            '"""\nFirst sentence here.\n\nSecond sentence follows. Third one too.\n"""'
+        )
+        self.assertEqual(expected, result)
+
+        # With params
+        doc = '"""Summary sentence. Description here."""\n:ivar x: X desc.'
+        result = self.filters.format_docstring(doc, level=1)
+        expected = (
+            '"""\nSummary sentence.\n\nDescription here.\n\n:ivar x: X desc.\n"""'
+        )
+        self.assertEqual(expected, result)
+
+        # Single sentence - no split
+        doc = '"""Just one sentence here."""'
+        result = self.filters.format_docstring(doc, level=1)
+        expected = '"""\nJust one sentence here.\n"""'
+        self.assertEqual(expected, result)
+
+    def test_format_docstring_normalizes_whitespace(self) -> None:
+        """Test that internal whitespace is normalized."""
+        doc = '"""Text  with   multiple    spaces."""'
+        result = self.filters.format_docstring(doc, level=1)
+        self.assertEqual('"""\nText with multiple spaces.\n"""', result)
+
+        # Multi-line input gets joined and sentences are split
+        doc = '"""Line one.\nLine two."""'
+        result = self.filters.format_docstring(doc, level=1)
+        # "Line one." becomes summary, "Line two." becomes description
+        self.assertEqual('"""\nLine one.\n\nLine two.\n"""', result)
+
+        # Single sentence stays together
+        doc = '"""Line one and\nline two."""'
+        result = self.filters.format_docstring(doc, level=1)
+        self.assertEqual('"""\nLine one and line two.\n"""', result)
+
     def test_format_metadata(self) -> None:
         data = {
             "num": 1,

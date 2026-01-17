@@ -3,9 +3,10 @@ import sys
 import warnings
 from dataclasses import dataclass, field
 from enum import Enum
+from io import TextIOBase
 from pathlib import Path
 from re import Pattern
-from typing import Any, Callable, Optional, TextIO
+from typing import Any, Callable, Optional
 
 from xsdata import __version__
 from xsdata.codegen.exceptions import CodegenError, CodegenWarning
@@ -565,8 +566,8 @@ class GeneratorConfig:
         return cfg
 
     @classmethod
-    def write(cls, output: TextIO, obj: "GeneratorConfig"):
-        """Write the configuration to the output stream as xml."""
+    def write(cls, output: TextIOBase, obj: "GeneratorConfig"):
+        """Write the configuration to the output stream as XML."""
         ctx = XmlContext(
             element_name_generator=text.pascal_case,
             attribute_name_generator=text.camel_case,

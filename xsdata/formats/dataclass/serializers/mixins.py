@@ -3,12 +3,12 @@ from abc import ABC
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
 from enum import Enum
+from io import TextIOBase
 from typing import (
     Any,
     Final,
     Literal,
     Optional,
-    TextIO,
     Union,
 )
 from xml.etree.ElementTree import QName
@@ -474,7 +474,7 @@ class XmlWriter(EventContentHandler, ABC):
         pending_prefixes: The pending element namespace prefixes
     """
 
-    def __init__(self, config: SerializerConfig, output: TextIO, ns_map: dict):
+    def __init__(self, config: SerializerConfig, output: TextIOBase, ns_map: dict):
         """Initialize the writer."""
         self.output = output
         super().__init__(config, ns_map)
@@ -547,7 +547,7 @@ class EventGenerator:
         )
         qname = qname or meta.qname
         nillable = nillable or meta.nillable
-        namespace, tag = namespaces.split_qname(qname)
+        namespace, _tag = namespaces.split_qname(qname)
 
         yield XmlWriterEvent.START, qname
 
@@ -758,7 +758,7 @@ class EventGenerator:
             An iterator of sax events.
         """
         if value.qname:
-            namespace, tag = namespaces.split_qname(value.qname)
+            namespace, _tag = namespaces.split_qname(value.qname)
             yield XmlWriterEvent.START, value.qname
 
         for key, val in value.attributes.items():

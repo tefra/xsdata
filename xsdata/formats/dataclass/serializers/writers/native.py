@@ -1,4 +1,4 @@
-from typing import TextIO
+from io import TextIOBase
 from xml.sax.saxutils import XMLGenerator
 
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
@@ -28,7 +28,7 @@ class XmlEventWriter(XmlWriter):
 
     __slots__ = ("current_level", "pending_end_element")
 
-    def __init__(self, config: SerializerConfig, output: TextIO, ns_map: dict):
+    def __init__(self, config: SerializerConfig, output: TextIOBase, ns_map: dict):
         """Initialize the writer."""
         super().__init__(config, output, ns_map)
 

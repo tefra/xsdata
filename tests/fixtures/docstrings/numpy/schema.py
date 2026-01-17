@@ -7,9 +7,10 @@ __NAMESPACE__ = "urn:docs"
 
 @dataclass
 class DoubleQuotesDescription:
-    """Let's trip.
+    """
+    Let's trip.
 
-    Dont trip on quotes: "A", "B", "C", "D" My\\Ipsum
+    Dont trip on quotes: "A", "B", "C", "D" My\\Ipsum.
     """
 
     class Meta:
@@ -63,12 +64,13 @@ class RootD(Enum):
 
 @dataclass
 class Root:
-    """This is the root type documentation.
+    """
+    This is the root type documentation. '''Lorem ipsum''' dolor sit amet,
+    consectetur adipiscing elit.
 
-    '''Lorem ipsum''' dolor sit amet, consectetur adipiscing elit. Morbi
-    dapibus. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+    Morbi dapibus. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
     Donec imperdiet lacus sed sagittis scelerisque. Ut sodales metus:
-    "sit", "amet", "lectus" My\\Ipsum
+    "sit", "amet", "lectus" My\\Ipsum.
 
     Parameters
     ----------

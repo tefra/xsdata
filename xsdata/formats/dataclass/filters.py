@@ -1,5 +1,4 @@
 import re
-import sys
 import textwrap
 from collections import defaultdict
 from collections.abc import Iterable, Iterator
@@ -9,7 +8,6 @@ from typing import (
     Optional,
 )
 
-from docformatter import configuration, format
 from jinja2 import Environment
 
 from xsdata.codegen.models import Attr, AttrType, Class
@@ -647,7 +645,18 @@ class Filters:
         return "\n".join(_clean(line) for line in string.splitlines() if line.strip())
 
     def format_docstring(self, doc_string: str, level: int) -> str:
-        """Format doc strings."""
+        """Format docstrings with proper wrapping.
+
+        Splits text into summary (first sentence) and description (rest),
+        then wraps each appropriately.
+
+        Args:
+            doc_string: The raw docstring from the template
+            level: The indentation level (1 for top-level class, 2+ for nested)
+
+        Returns:
+            The formatted docstring with proper line wrapping.
+        """
         sep_pos = doc_string.rfind('"""')
         if sep_pos == -1:
             return ""
@@ -655,37 +664,81 @@ class Filters:
         content = doc_string[:sep_pos]
         params = doc_string[sep_pos + 3 :].strip()
 
-        if content.strip() == '"""' and not params:
+        # Extract the text (between opening """ and closing """)
+        text = content[3:].strip() if content.startswith('"""') else content.strip()
+
+        # Empty docstring with no params
+        if not text and not params:
             return ""
 
-        content += ' """' if content.endswith('"') else '"""'
+        # Calculate available width for text (accounting for indentation and quotes)
+        indent_width = level * 4
+        wrap_width = self.max_line_length - indent_width - 4
 
-        max_length = self.max_line_length - level * 4
-        configurator = configuration.Configurater(
-            [
-                "--wrap-summaries",
-                str(max_length - 3),
-                "--wrap-descriptions",
-                str(max_length - 7),
-                "--make-summary-multi-line",
-            ]
-        )
-        configurator.do_parse_arguments()
-        formatter = format.Formatter(
-            configurator.args,
-            sys.stderr,
-            sys.stdin,
-            sys.stdout,
-        )
-        content = formatter._do_format_code(content)
+        # Process the text: split into summary and description
+        if text:
+            # Normalize whitespace
+            text = " ".join(text.split())
 
+            # Add period if text doesn't end with punctuation
+            if text and text[-1] not in ".!?:":
+                text += "."
+
+            # Split into summary (first sentence) and description (rest)
+            summary, description = self._split_docstring(text)
+
+            # Wrap summary and description separately
+            wrapped_summary = "\n".join(
+                textwrap.wrap(
+                    summary,
+                    width=wrap_width,
+                    break_long_words=False,
+                    break_on_hyphens=False,
+                )
+            )
+
+            if description:
+                wrapped_description = "\n".join(
+                    textwrap.wrap(
+                        description,
+                        width=wrap_width,
+                        break_long_words=False,
+                        break_on_hyphens=False,
+                    )
+                )
+                wrapped_text = f"{wrapped_summary}\n\n{wrapped_description}"
+            else:
+                wrapped_text = wrapped_summary
+        else:
+            wrapped_text = ""
+
+        # Build the final docstring
         if params:
-            # Remove trailing triple quotes
-            content = content.strip()[:-3].strip()
-            new_lines = "\n" if content.endswith('"""') else "\n\n"
-            content += f'{new_lines}{params}\n"""'
+            if wrapped_text:
+                return f'"""\n{wrapped_text}\n\n{params}\n"""'
+            return f'"""\n{params}\n"""'
+        return f'"""\n{wrapped_text}\n"""'
 
-        return content
+    @staticmethod
+    def _split_docstring(text: str) -> tuple[str, str]:
+        """Split docstring text into summary and description.
+
+        The summary is the first sentence (ending with '. ' followed by
+        a capital letter). The description is everything after.
+
+        Args:
+            text: The normalized docstring text
+
+        Returns:
+            A tuple of (summary, description)
+        """
+        # Look for sentence end: period/exclamation/question followed by
+        # space and a capital letter (start of new sentence)
+        match = re.search(r"[.!?] (?=[A-Z])", text)
+        if match:
+            split_pos = match.start() + 1  # Include the punctuation
+            return text[:split_pos], text[split_pos:].strip()
+        return text, ""
 
     def field_default_value(self, attr: Attr, ns_map: Optional[dict] = None) -> Any:
         """Generate the field default value/factory for the given attribute."""

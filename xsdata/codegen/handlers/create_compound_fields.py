@@ -63,7 +63,7 @@ class CreateCompoundFields(RelativeHandlerInterface):
         """
         for attr in attrs:
             for path in attr.restrictions.path:
-                name, index, mi, ma = path
+                name, _index, mi, _ma = path
                 if name == CHOICE and mi <= 1:
                     attr.restrictions.min_occurs = 0
 
@@ -91,7 +91,7 @@ class CreateCompoundFields(RelativeHandlerInterface):
         started = False
         choice = attr.restrictions.choice
         for path in attr.restrictions.path:
-            name, index, mi, ma = path
+            name, index, mi, _ma = path
             if not started and name != CHOICE and index != choice:
                 continue
 

@@ -40,7 +40,7 @@ class XmlEventWriterTests(TestCase):
         self.serializer.config.xml_declaration = False
         actual = self.serializer.render(books, {None: "urn:books"})
         expected = fixtures_dir.joinpath("books/books_default_ns.xml").read_text()
-        xml_declaration, expected = expected.split("\n", 1)
+        _xml_declaration, expected = expected.split("\n", 1)
 
         self.assertEqual(expected, actual)
 

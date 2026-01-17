@@ -534,7 +534,7 @@ class ElementNode(XmlNode):
             )
 
         node = None
-        clazz = None
+        clazz: Optional[type] = None
         if xsi_type:
             clazz = self.context.find_type(xsi_type)
 
@@ -589,7 +589,7 @@ class ElementNode(XmlNode):
         attrs: dict,
         ns_map: dict,
         position: int,
-        derived_factory: type,
+        derived_factory: Optional[type],
         xsi_type: Optional[str] = None,
         xsi_nil: Optional[bool] = None,
     ) -> Optional["ElementNode"]:

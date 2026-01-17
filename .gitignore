@@ -112,3 +112,6 @@ docs/api/*
 
 # idea runs
 .run/
+
+.DS_STORE
+mise.toml

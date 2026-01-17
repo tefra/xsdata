@@ -157,7 +157,7 @@ class UnionNode(XmlNode):
         config = replace(self.config, fail_on_converter_warnings=True)
 
         for candidate in self.candidates:
-            result = None
+            result: Any = None
             with suppress(Exception):
                 if self.context.class_type.is_model(candidate):
                     self.context.build(candidate, parent_ns=parent_namespace)

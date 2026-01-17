@@ -151,7 +151,8 @@ class Items:
 
 @dataclass
 class PurchaseOrderType:
-    """Purchase order schema for Example.com.
+    """
+    Purchase order schema for Example.com.
 
     Copyright 2000 Example.com. All rights reserved.
 

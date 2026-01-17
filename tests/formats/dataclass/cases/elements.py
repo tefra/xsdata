@@ -1,7 +1,5 @@
 from typing import Dict, List, Optional, Tuple, Union
 
-from tests.formats.dataclass.cases import PY310
-
 cases = [
     (Dict, False),
     (str, ((object,), None, None)),
@@ -13,13 +11,6 @@ cases = [
     (list[str], ((object,), list, None)),
     (tuple[str, ...], ((object,), tuple, None)),
     (list[Union[list[str], tuple[str, ...]]], ((object,), list, None)),
+    (str | int | None, ((object,), None, None)),
+    (list[list[str] | tuple[str, ...]], ((object,), list, None)),
 ]
-
-
-if PY310:
-    cases.extend(
-        [
-            (str | int | None, ((object,), None, None)),
-            (list[list[str] | tuple[str, ...]], ((object,), list, None)),
-        ]
-    )

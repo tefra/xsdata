@@ -1,5 +1,4 @@
 import re
-import sys
 import warnings
 from dataclasses import dataclass, field
 from enum import Enum
@@ -172,21 +171,6 @@ class OutputFormat:
                 CodegenWarning,
             )
 
-        if self.value == "dataclasses" and sys.version_info < (3, 10):
-            if self.slots:
-                self.slots = False
-                warnings.warn(
-                    "slots requires python >= 3.10, reverting...",
-                    CodegenWarning,
-                )
-
-            if self.kw_only:
-                self.kw_only = False
-                warnings.warn(
-                    "kw_only requires python >= 3.10, reverting...",
-                    CodegenWarning,
-                )
-
 
 @dataclass
 class CompoundFields:
@@ -256,13 +240,6 @@ class GeneratorOutput:
 
     def validate(self) -> None:
         """Reset configuration conflicts."""
-        if self.union_type and sys.version_info < (3, 10):
-            self.union_type = False
-            warnings.warn(
-                "UnionType PEP 604 requires python >= 3.10, reverting...",
-                CodegenWarning,
-            )
-
         if self.union_type and not self.postponed_annotations:
             self.postponed_annotations = True
             warnings.warn(

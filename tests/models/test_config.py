@@ -1,4 +1,3 @@
-import sys
 import tempfile
 import warnings
 from pathlib import Path
@@ -137,24 +136,15 @@ class GeneratorConfigTests(TestCase):
 
         self.assertEqual("Enabling eq because order is true", str(w[-1].message))
 
-    def test_use_union_type_requires_310_and_postponed_annotations(self) -> None:
-        if sys.version_info < (3, 10):
-            with warnings.catch_warnings(record=True) as w:
-                self.assertFalse(GeneratorOutput(union_type=True).union_type)
+    def test_use_union_type_and_postponed_annotations(self) -> None:
+        with warnings.catch_warnings(record=True) as w:
+            output = GeneratorOutput(union_type=True)
+            self.assertTrue(output.postponed_annotations)
 
             self.assertEqual(
-                "UnionType PEP 604 requires python >= 3.10, reverting...",
+                "Enabling postponed annotations, because `union_type==True`",
                 str(w[-1].message),
             )
-        else:
-            with warnings.catch_warnings(record=True) as w:
-                output = GeneratorOutput(union_type=True)
-                self.assertTrue(output.postponed_annotations)
-
-                self.assertEqual(
-                    "Enabling postponed annotations, because `union_type==True`",
-                    str(w[-1].message),
-                )
 
     def test_generic_collections_requires_frozen_false(self) -> None:
         with warnings.catch_warnings(record=True) as w:
@@ -167,34 +157,6 @@ class GeneratorConfigTests(TestCase):
                 "Generic Collections, requires frozen=False, reverting...",
                 str(w[-1].message),
             )
-
-    def test_format_slots_requires_310(self) -> None:
-        if sys.version_info < (3, 10):
-            self.assertTrue(OutputFormat(slots=True, value="attrs").slots)
-
-            with warnings.catch_warnings(record=True) as w:
-                self.assertFalse(OutputFormat(slots=True).slots)
-
-            self.assertEqual(
-                "slots requires python >= 3.10, reverting...", str(w[-1].message)
-            )
-
-        else:
-            self.assertIsNotNone(OutputFormat(slots=True))
-
-    def test_format_kw_only_requires_310(self) -> None:
-        if sys.version_info < (3, 10):
-            self.assertTrue(OutputFormat(kw_only=True, value="attrs").kw_only)
-
-            with warnings.catch_warnings(record=True) as w:
-                self.assertFalse(OutputFormat(kw_only=True).kw_only)
-
-            self.assertEqual(
-                "kw_only requires python >= 3.10, reverting...", str(w[-1].message)
-            )
-
-        else:
-            self.assertIsNotNone(OutputFormat(kw_only=True))
 
     def test_extension_with_invalid_import_string(self) -> None:
         cases = [None, "", "bar"]

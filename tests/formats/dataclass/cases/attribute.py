@@ -1,7 +1,6 @@
 from collections.abc import Iterable
 from typing import Dict, List, Literal, Optional, Set, Tuple, Union
 
-from tests.formats.dataclass.cases import PY310
 from xsdata.models.enums import Mode
 
 tokens = [
@@ -24,6 +23,7 @@ tokens = [
     (tuple[int, ...], ((int,), None, tuple)),
     (list[int], ((int,), None, list)),
     (list[Union[str, int]], ((str, int), None, list)),
+    (tuple[int | str], ((int, str), None, tuple)),
 ]
 
 not_tokens = [
@@ -32,17 +32,5 @@ not_tokens = [
     (int, ((int,), None, None)),
     (str, ((str,), None, None)),
     (Union[str, Mode], ((str, Mode), None, None)),
+    (int | str, ((int, str), None, None)),
 ]
-
-if PY310:
-    tokens.extend(
-        [
-            (tuple[int | str], ((int, str), None, tuple)),
-        ]
-    )
-
-    not_tokens.extend(
-        [
-            (int | str, ((int, str), None, None)),
-        ]
-    )

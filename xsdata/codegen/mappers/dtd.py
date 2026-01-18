@@ -1,6 +1,6 @@
 import sys
 from collections.abc import Iterator
-from typing import Any, Optional
+from typing import Any
 
 from xsdata.codegen.models import Attr, AttrType, Class, Extension, Restrictions
 from xsdata.models.dtd import (
@@ -96,7 +96,7 @@ class DtdMapper:
         cls,
         attr: Attr,
         default: DtdAttributeDefault,
-        default_value: Optional[str],
+        default_value: str | None,
     ):
         """Build attribute restrictions based on DtdAttributeDefault.
 

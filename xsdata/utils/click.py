@@ -1,14 +1,12 @@
 import enum
 import inspect
 import logging
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from dataclasses import fields, is_dataclass
 from typing import (
     Any,
-    Callable,
     ClassVar,
     TypeVar,
-    Union,
     get_type_hints,
 )
 
@@ -144,7 +142,7 @@ class LogFormatter(logging.Formatter):
 class LogHandler(logging.Handler):
     """Custom click log handler to record warnings."""
 
-    def __init__(self, level: Union[int, str] = logging.NOTSET):
+    def __init__(self, level: int | str = logging.NOTSET):
         """Initialize the log handler."""
         super().__init__(level)
         self.warnings: list[str] = []

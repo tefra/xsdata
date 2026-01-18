@@ -1,7 +1,6 @@
 import os
 import re
 from pathlib import Path
-from typing import Optional, Union
 
 from xsdata.codegen import opener
 from xsdata.codegen.parsers import DefinitionsParser, SchemaParser
@@ -29,10 +28,10 @@ class Downloader:
     def __init__(self, output: Path):
         """Initialize the downloader."""
         self.output = output
-        self.base_path: Optional[Path] = None
+        self.base_path: Path | None = None
         self.downloaded: dict = {}
 
-    def wget(self, uri: str, location: Optional[str] = None) -> None:
+    def wget(self, uri: str, location: str | None = None) -> None:
         """Download handler for any uri input with circular protection."""
         if not (uri in self.downloaded or (location and location in self.downloaded)):
             self.downloaded[uri] = None
@@ -64,7 +63,7 @@ class Downloader:
         for schema in definitions.schemas:
             self.wget_included(schema)
 
-    def wget_included(self, definition: Union[Schema, Definitions]) -> None:
+    def wget_included(self, definition: Schema | Definitions) -> None:
         """Download the definitions included resources."""
         for included in definition.included():
             if included.location:
@@ -104,7 +103,7 @@ class Downloader:
 
         return content
 
-    def write_file(self, uri: str, location: Optional[str], content: str) -> None:
+    def write_file(self, uri: str, location: str | None, content: str) -> None:
         """Write the downloaded uri to a local file.
 
         Keep track of all the written file paths, in case we have to

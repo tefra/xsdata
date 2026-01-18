@@ -1,6 +1,6 @@
 import sys
 from dataclasses import dataclass, field
-from typing import Any, Optional, Union
+from typing import Any
 from urllib.parse import urljoin
 
 from xsdata.formats.dataclass.parsers.bases import Parsed
@@ -11,7 +11,7 @@ from xsdata.models import xsd
 from xsdata.models.enums import FormType, Mode, Namespace
 from xsdata.models.mixins import ElementBase
 
-OPEN_CONTENT_ELEMENT = Union[xsd.ComplexType, xsd.Restriction, xsd.Extension]
+OPEN_CONTENT_ELEMENT = xsd.ComplexType | xsd.Restriction | xsd.Extension
 
 
 @dataclass
@@ -34,20 +34,20 @@ class SchemaParser(UserXmlParser):
         default_open_content: The schema default open content
     """
 
-    location: Optional[str] = field(default=None)
-    target_namespace: Optional[str] = field(default=None)
+    location: str | None = field(default=None)
+    target_namespace: str | None = field(default=None)
     index: int = field(default_factory=int, init=False)
     indices: list[int] = field(default_factory=list, init=False)
-    element_form: Optional[str] = field(default=None, init=False)
-    attribute_form: Optional[str] = field(default=None, init=False)
-    default_attributes: Optional[str] = field(default=None, init=False)
-    default_open_content: Optional[xsd.DefaultOpenContent] = field(
+    element_form: str | None = field(default=None, init=False)
+    attribute_form: str | None = field(default=None, init=False)
+    default_attributes: str | None = field(default=None, init=False)
+    default_open_content: xsd.DefaultOpenContent | None = field(
         default=None, init=False
     )
 
     def start(
         self,
-        clazz: Optional[type[T]],
+        clazz: type[T] | None,
         queue: list[XmlNode],
         objects: list[Parsed],
         qname: str,
@@ -76,8 +76,8 @@ class SchemaParser(UserXmlParser):
         queue: list[XmlNode],
         objects: list[Parsed],
         qname: str,
-        text: Optional[str],
-        tail: Optional[str],
+        text: str | None,
+        tail: str | None,
     ) -> Any:
         """Parse the last xml node and bind any intermediate objects.
 
@@ -303,7 +303,7 @@ class SchemaParser(UserXmlParser):
         for imp in obj.imports:
             imp.location = self.resolve_local_path(imp.schema_location, imp.namespace)
 
-    def resolve_path(self, location: Optional[str]) -> Optional[str]:
+    def resolve_path(self, location: str | None) -> str | None:
         """Resolve the given location string.
 
         Use the parser location attribute as the base uri.
@@ -318,9 +318,9 @@ class SchemaParser(UserXmlParser):
 
     def resolve_local_path(
         self,
-        location: Optional[str],
-        namespace: Optional[str],
-    ) -> Optional[str]:
+        location: str | None,
+        namespace: str | None,
+    ) -> str | None:
         """Resolve the given namespace to one of the local standard schemas.
 
         w3.org protects against fetching common schemas not from a browser,
@@ -361,7 +361,7 @@ class SchemaParser(UserXmlParser):
         )
 
     @classmethod
-    def set_namespace_map(cls, obj: Any, ns_map: Optional[dict]):
+    def set_namespace_map(cls, obj: Any, ns_map: dict | None):
         """Add common namespaces like xml, xsi, xlink if they are missing.
 
         These prefixes are implied and we need to support them.

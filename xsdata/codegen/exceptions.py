@@ -1,4 +1,4 @@
-from typing import IO, Any, Optional
+from typing import IO, Any
 
 from click import ClickException, echo
 
@@ -15,7 +15,7 @@ class CodegenError(ClickException):
         super().__init__(message)
         self.meta = kwargs
 
-    def show(self, file: Optional[IO[Any]] = None) -> None:
+    def show(self, file: IO[Any] | None = None) -> None:
         """Echo codegen error message and details."""
         echo("=========")
         super().show(file)

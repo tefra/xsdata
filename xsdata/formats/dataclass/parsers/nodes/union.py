@@ -75,7 +75,7 @@ class UnionNode(XmlNode):
 
         return list(filter(fixed_attribute, candidates))
 
-    def filter_fixed_attrs(self, candidate: type, parent_ns: Optional[str]) -> bool:
+    def filter_fixed_attrs(self, candidate: type, parent_ns: str | None) -> bool:
         """Return whether the node attrs are incompatible with fixed attrs.
 
         Args:
@@ -119,8 +119,8 @@ class UnionNode(XmlNode):
     def bind(
         self,
         qname: str,
-        text: Optional[str],
-        tail: Optional[str],
+        text: str | None,
+        tail: str | None,
         objects: list,
     ) -> bool:
         """Bind the parsed data into an object for the ending element.

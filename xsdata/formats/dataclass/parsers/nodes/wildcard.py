@@ -39,7 +39,7 @@ class WildcardNode(XmlNode):
         self.factory = factory
 
     def bind(
-        self, qname: str, text: Optional[str], tail: Optional[str], objects: list
+        self, qname: str, text: str | None, tail: str | None, objects: list
     ) -> bool:
         """Bind the parsed data into a generic element.
 

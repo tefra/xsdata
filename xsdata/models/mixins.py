@@ -1,6 +1,6 @@
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from dataclasses import dataclass, field, fields
-from typing import Any, Callable, Optional
+from typing import Any
 
 from xsdata.codegen.exceptions import CodegenError
 from xsdata.formats.dataclass.models.elements import XmlType
@@ -49,7 +49,7 @@ class ElementBase:
         return default
 
     @property
-    def display_help(self) -> Optional[str]:
+    def display_help(self) -> str | None:
         """Return the display help for this element."""
         return None
 
@@ -116,13 +116,13 @@ class ElementBase:
         return False
 
     @property
-    def prefix(self) -> Optional[str]:
+    def prefix(self) -> str | None:
         """Return the namespace prefix for this element's type."""
         ref = getattr(self, "ref", None)
         return None if ref is None else text.prefix(ref)
 
     @property
-    def raw_namespace(self) -> Optional[str]:
+    def raw_namespace(self) -> str | None:
         """Return if present the target namespace attribute value."""
         return getattr(self, "target_namespace", None)
 
@@ -148,7 +148,7 @@ class ElementBase:
         return []
 
     @property
-    def xs_prefix(self) -> Optional[str]:
+    def xs_prefix(self) -> str | None:
         """Return the xml schema URI prefix."""
         for prefix, uri in self.ns_map.items():
             if uri == Namespace.XS.uri:

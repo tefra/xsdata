@@ -1,5 +1,4 @@
 from collections.abc import Iterator
-from typing import Optional
 
 from xsdata.codegen.models import Attr, AttrType, Class, Extension, Restrictions
 from xsdata.models.enums import DataType, Tag
@@ -84,7 +83,7 @@ class SchemaMapper:
         obj: ElementBase,
         container: str,
         location: str,
-        target_namespace: Optional[str],
+        target_namespace: str | None,
     ) -> Class:
         """Build and return a class instance.
 
@@ -121,7 +120,7 @@ class SchemaMapper:
     def build_substitutions(
         cls,
         obj: ElementBase,
-        target_namespace: Optional[str],
+        target_namespace: str | None,
     ) -> list[str]:
         """Builds a list of qualified substitution group names.
 
@@ -222,8 +221,8 @@ class SchemaMapper:
     def element_namespace(
         cls,
         obj: ElementBase,
-        target_namespace: Optional[str],
-    ) -> Optional[str]:
+        target_namespace: str | None,
+    ) -> str | None:
         """Return the target namespace for the given schema element.
 
         Rules:
@@ -375,7 +374,7 @@ class SchemaMapper:
         cls,
         obj: ElementBase,
         location: str,
-        namespace: Optional[str],
+        namespace: str | None,
     ) -> Iterator[Class]:
         """Find and convert anonymous types to a class instances.
 

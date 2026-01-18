@@ -1,5 +1,6 @@
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 
 from xsdata.formats.types import T
 
@@ -36,7 +37,7 @@ class ParserConfig:
         fail_on_converter_warnings: Turn converter warnings to exceptions
     """
 
-    base_url: Optional[str] = None
+    base_url: str | None = None
     load_dtd: bool = False
     process_xinclude: bool = False
     class_factory: Callable[[type[T], dict[str, Any]], T] = field(

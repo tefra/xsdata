@@ -17,7 +17,7 @@ class TreeSerializer(EventGenerator):
         context: The models context instance
     """
 
-    def render(self, obj: Any, ns_map: Optional[dict] = None) -> ElementTree:
+    def render(self, obj: Any, ns_map: dict | None = None) -> ElementTree:
         """Serialize the input model instance to a lxml etree instance.
 
         Args:

@@ -1,10 +1,9 @@
 import re
 import textwrap
 from collections import defaultdict
-from collections.abc import Iterable, Iterator
+from collections.abc import Callable, Iterable, Iterator
 from typing import (
     Any,
-    Callable,
     Optional,
 )
 
@@ -248,7 +247,7 @@ class Filters:
         self,
         obj: Class,
         attr: Attr,
-        parent_namespace: Optional[str],
+        parent_namespace: str | None,
     ) -> str:
         """Return the field definition with any extra metadata."""
         ns_map = obj.ns_map
@@ -414,14 +413,14 @@ class Filters:
 
         return module
 
-    def import_class(self, name: str, alias: Optional[str]) -> str:
+    def import_class(self, name: str, alias: str | None) -> str:
         """Convert import class name with alias support."""
         if alias:
             return f"{self.class_name(name)} as {self.class_name(alias)}"
 
         return self.class_name(name)
 
-    def post_meta_hook(self, obj: Class) -> Optional[str]:
+    def post_meta_hook(self, obj: Class) -> str | None:
         """Plugin hook to render additional information after the xsdata meta class."""
         return None
 
@@ -429,7 +428,7 @@ class Filters:
         self,
         obj: Class,
         attr: Attr,
-        parent_namespace: Optional[str],
+        parent_namespace: str | None,
     ) -> dict:
         """Return a metadata dictionary for the given attribute."""
         if attr.is_prohibited:
@@ -466,8 +465,8 @@ class Filters:
         self,
         obj: Class,
         attr: Attr,
-        parent_namespace: Optional[str],
-    ) -> Optional[tuple]:
+        parent_namespace: str | None,
+    ) -> tuple | None:
         """Return a tuple of field metadata if the attr has choices."""
         if not attr.choices:
             return None
@@ -618,7 +617,7 @@ class Filters:
         )
 
     @classmethod
-    def clean_docstring(cls, string: Optional[str], escape: bool = True) -> str:
+    def clean_docstring(cls, string: str | None, escape: bool = True) -> str:
         """Prepare string for docstring generation.
 
         - Strip whitespace from each line
@@ -740,7 +739,7 @@ class Filters:
             return text[:split_pos], text[split_pos:].strip()
         return text, ""
 
-    def field_default_value(self, attr: Attr, ns_map: Optional[dict] = None) -> Any:
+    def field_default_value(self, attr: Attr, ns_map: dict | None = None) -> Any:
         """Generate the field default value/factory for the given attribute."""
         if attr.is_list or (attr.is_tokens and not attr.default):
             return "tuple" if self.format.frozen else "list"
@@ -783,7 +782,7 @@ class Filters:
         return f"{class_name}.{self.constant_name(reference, name)}"
 
     def field_default_tokens(
-        self, attr: Attr, types: list[type], ns_map: Optional[dict]
+        self, attr: Attr, types: list[type], ns_map: dict | None
     ) -> str:
         """Generate the default value for tokens fields."""
         assert isinstance(attr.default, str)

@@ -78,27 +78,27 @@ class Restrictions(CodegenModel):
         path: The coded attr path in the source document
     """
 
-    min_occurs: Optional[int] = field(default=None)
-    max_occurs: Optional[int] = field(default=None)
-    min_exclusive: Optional[str] = field(default=None)
-    min_inclusive: Optional[str] = field(default=None)
-    min_length: Optional[int] = field(default=None)
-    max_exclusive: Optional[str] = field(default=None)
-    max_inclusive: Optional[str] = field(default=None)
-    max_length: Optional[int] = field(default=None)
-    total_digits: Optional[int] = field(default=None)
-    fraction_digits: Optional[int] = field(default=None)
-    length: Optional[int] = field(default=None)
-    white_space: Optional[str] = field(default=None)
-    pattern: Optional[str] = field(default=None)
-    explicit_timezone: Optional[str] = field(default=None)
-    nillable: Optional[bool] = field(default=None)
-    sequence: Optional[int] = field(default=None, compare=False)
-    tokens: Optional[bool] = field(default=None)
-    format: Optional[str] = field(default=None)
-    choice: Optional[int] = field(default=None, compare=False)
-    group: Optional[int] = field(default=None)
-    process_contents: Optional[str] = field(default=None)
+    min_occurs: int | None = field(default=None)
+    max_occurs: int | None = field(default=None)
+    min_exclusive: str | None = field(default=None)
+    min_inclusive: str | None = field(default=None)
+    min_length: int | None = field(default=None)
+    max_exclusive: str | None = field(default=None)
+    max_inclusive: str | None = field(default=None)
+    max_length: int | None = field(default=None)
+    total_digits: int | None = field(default=None)
+    fraction_digits: int | None = field(default=None)
+    length: int | None = field(default=None)
+    white_space: str | None = field(default=None)
+    pattern: str | None = field(default=None)
+    explicit_timezone: str | None = field(default=None)
+    nillable: bool | None = field(default=None)
+    sequence: int | None = field(default=None, compare=False)
+    tokens: bool | None = field(default=None)
+    format: str | None = field(default=None)
+    choice: int | None = field(default=None, compare=False)
+    group: int | None = field(default=None)
+    process_contents: str | None = field(default=None)
     path: list[tuple[str, int, int, int]] = field(default_factory=list)
 
     @property
@@ -156,7 +156,7 @@ class Restrictions(CodegenModel):
         if self.max_occurs is None and source.max_occurs is not None:
             self.max_occurs = source.max_occurs
 
-    def asdict(self, types: Optional[list[type]] = None) -> dict:
+    def asdict(self, types: list[type] | None = None) -> dict:
         """Return the initialized only properties as a dictionary.
 
         Skip None or implied values, and optionally use the
@@ -231,7 +231,7 @@ class AttrType(CodegenModel):
     """
 
     qname: str
-    alias: Optional[str] = field(default=None, compare=False)
+    alias: str | None = field(default=None, compare=False)
     reference: int = field(default=0, compare=False)
     native: bool = field(default=False)
     forward: bool = field(default=False)
@@ -239,7 +239,7 @@ class AttrType(CodegenModel):
     substituted: bool = field(default=False, compare=False)
 
     @property
-    def datatype(self) -> Optional[DataType]:
+    def datatype(self) -> DataType | None:
         """Return the datatype instance if native, none otherwise."""
         return DataType.from_qname(self.qname) if self.native else None
 
@@ -290,18 +290,18 @@ class Attr(CodegenModel):
     tag: str
     name: str = field(compare=False)
     local_name: str = field(default="")
-    wrapper: Optional[str] = field(default=None)
+    wrapper: str | None = field(default=None)
     index: int = field(compare=False, default_factory=int)
-    default: Optional[str] = field(default=None, compare=False)
+    default: str | None = field(default=None, compare=False)
     fixed: bool = field(default=False, compare=False)
     mixed: bool = field(default=False, compare=False)
     types: list[AttrType] = field(default_factory=list, compare=False)
     choices: list["Attr"] = field(default_factory=list, compare=False)
-    namespace: Optional[str] = field(default=None)
-    help: Optional[str] = field(default=None, compare=False)
+    namespace: str | None = field(default=None)
+    help: str | None = field(default=None, compare=False)
     restrictions: Restrictions = field(default_factory=Restrictions, compare=False)
-    parent: Optional[str] = field(default=None, compare=False)
-    substitution: Optional[str] = field(default=None, compare=False)
+    parent: str | None = field(default=None, compare=False)
+    substitution: str | None = field(default=None, compare=False)
 
     def __post_init__(self):
         """Post init processing."""
@@ -438,7 +438,7 @@ class Attr(CodegenModel):
         return text.alnum(self.name)
 
     @property
-    def xml_type(self) -> Optional[str]:
+    def xml_type(self) -> str | None:
         """Return the xml type this attribute is mapped to."""
         return xml_type_map.get(self.tag)
 
@@ -524,12 +524,12 @@ class Class(CodegenModel):
     nillable: bool = field(default=False)
     local_type: bool = field(default=False)
     status: Status = field(default=Status.RAW)
-    container: Optional[str] = field(default=None)
-    package: Optional[str] = field(default=None)
-    module: Optional[str] = field(default=None)
-    namespace: Optional[str] = field(default=None)
-    help: Optional[str] = field(default=None)
-    meta_name: Optional[str] = field(default=None)
+    container: str | None = field(default=None)
+    package: str | None = field(default=None)
+    module: str | None = field(default=None)
+    namespace: str | None = field(default=None)
+    help: str | None = field(default=None)
+    meta_name: str | None = field(default=None)
     default: Any = field(default=None, compare=False)
     fixed: bool = field(default=False, compare=False)
     substitutions: list[str] = field(default_factory=list)
@@ -555,7 +555,7 @@ class Class(CodegenModel):
         return id(self)
 
     @property
-    def target_namespace(self) -> Optional[str]:
+    def target_namespace(self) -> str | None:
         """Return the class target namespace."""
         return namespaces.target_uri(self.qname)
 
@@ -736,7 +736,7 @@ class Import:
 
     qname: str
     source: str
-    alias: Optional[str] = field(default=None)
+    alias: str | None = field(default=None)
 
     @property
     def name(self) -> str:

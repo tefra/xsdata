@@ -72,10 +72,10 @@ class DtdAttribute:
     """
 
     name: str
-    prefix: Optional[str]
+    prefix: str | None
     type: DtdAttributeType
     default: DtdAttributeDefault
-    default_value: Optional[str]
+    default_value: str | None
     values: list[str]
 
     @property
@@ -118,8 +118,8 @@ class DtdElement:
 
     name: str
     type: DtdElementType
-    prefix: Optional[str]
-    content: Optional[DtdContent]
+    prefix: str | None
+    content: DtdContent | None
     attributes: list[DtdAttribute]
     ns_map: dict
 

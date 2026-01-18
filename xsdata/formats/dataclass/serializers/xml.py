@@ -25,7 +25,7 @@ class XmlSerializer(EventGenerator):
 
     writer: type[XmlWriter] = field(default=DEFAULT_XML_WRITER)
 
-    def render(self, obj: Any, ns_map: Optional[dict] = None) -> str:
+    def render(self, obj: Any, ns_map: dict | None = None) -> str:
         """Serialize the input model instance to xml string.
 
         Args:
@@ -39,7 +39,7 @@ class XmlSerializer(EventGenerator):
         self.write(output, obj, ns_map)
         return output.getvalue()
 
-    def write(self, out: TextIOBase, obj: Any, ns_map: Optional[dict] = None) -> None:
+    def write(self, out: TextIOBase, obj: Any, ns_map: dict | None = None) -> None:
         """Serialize the given object to the output text stream.
 
         Args:

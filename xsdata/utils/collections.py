@@ -1,9 +1,7 @@
 from collections import defaultdict
-from collections.abc import Generator, Iterable, Iterator, Sequence
+from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
 from typing import (
     Any,
-    Callable,
-    Optional,
     TypeVar,
 )
 
@@ -18,7 +16,7 @@ def is_array(value: Any) -> bool:
     return isinstance(value, (list, set, frozenset, Generator))
 
 
-def unique_sequence(items: Iterable[T], key: Optional[str] = None) -> list[T]:
+def unique_sequence(items: Iterable[T], key: str | None = None) -> list[T]:
     """Return a new unique list, preserving the original order.
 
     Args:
@@ -78,7 +76,7 @@ def find(items: Sequence, value: Any) -> int:
         return -1
 
 
-def first(items: Iterator[T]) -> Optional[T]:
+def first(items: Iterator[T]) -> T | None:
     """Return the first item of the iterator."""
     return next(items, None)
 

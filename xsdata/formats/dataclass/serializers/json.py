@@ -1,7 +1,8 @@
 import json
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from io import StringIO
-from typing import Any, Callable, TextIO
+from typing import Any, TextIO
 
 from xsdata.formats.dataclass.serializers import DictEncoder
 

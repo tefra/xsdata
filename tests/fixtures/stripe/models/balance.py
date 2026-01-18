@@ -7,14 +7,14 @@ class ConnectReserved:
     class Meta:
         name = "connect_reserved"
 
-    amount: Optional[int] = field(
+    amount: int | None = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    currency: Optional[str] = field(
+    currency: str | None = field(
         default=None,
         metadata={
             "type": "Element",
@@ -28,14 +28,14 @@ class SourceTypes:
     class Meta:
         name = "source_types"
 
-    bank_account: Optional[int] = field(
+    bank_account: int | None = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    card: Optional[int] = field(
+    card: int | None = field(
         default=None,
         metadata={
             "type": "Element",
@@ -49,21 +49,21 @@ class Available:
     class Meta:
         name = "available"
 
-    amount: Optional[int] = field(
+    amount: int | None = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    currency: Optional[str] = field(
+    currency: str | None = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    source_types: Optional[SourceTypes] = field(
+    source_types: SourceTypes | None = field(
         default=None,
         metadata={
             "type": "Element",
@@ -77,21 +77,21 @@ class Pending:
     class Meta:
         name = "pending"
 
-    amount: Optional[int] = field(
+    amount: int | None = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    currency: Optional[str] = field(
+    currency: str | None = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    source_types: Optional[SourceTypes] = field(
+    source_types: SourceTypes | None = field(
         default=None,
         metadata={
             "type": "Element",
@@ -105,7 +105,7 @@ class Balance:
     class Meta:
         name = "balance"
 
-    object_value: Optional[str] = field(
+    object_value: str | None = field(
         default=None,
         metadata={
             "name": "object",
@@ -127,7 +127,7 @@ class Balance:
             "min_occurs": 1,
         },
     )
-    livemode: Optional[bool] = field(
+    livemode: bool | None = field(
         default=None,
         metadata={
             "type": "Element",

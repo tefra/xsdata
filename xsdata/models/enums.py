@@ -1,8 +1,9 @@
 import sys
+from collections.abc import Callable
 from decimal import Decimal
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 from xml.etree.ElementTree import QName
 
 from xsdata.models.datatype import (
@@ -38,13 +39,13 @@ class Namespace(Enum):
         self.prefix = prefix
 
     @property
-    def location(self) -> Optional[str]:
+    def location(self) -> str | None:
         """The location of the local file."""
         local_path = COMMON_SCHEMA_DIR.joinpath(f"{self.prefix}.xsd")
         return local_path.as_uri() if local_path.exists() else None
 
     @classmethod
-    def get_enum(cls, uri: Optional[str]) -> Optional["Namespace"]:
+    def get_enum(cls, uri: str | None) -> Optional["Namespace"]:
         """Get the enum member instance from the uri."""
         return __STANDARD_NAMESPACES__.get(uri) if uri else None
 
@@ -167,8 +168,8 @@ class DataType(Enum):
         self,
         code: str,
         python_type: type,
-        fmt: Optional[str] = None,
-        wrapper: Optional[type] = None,
+        fmt: str | None = None,
+        wrapper: type | None = None,
     ):
         """Initialize DataType."""
         self.code = code
@@ -180,7 +181,7 @@ class DataType(Enum):
         """Return the qualified string representation of the datatype."""
         return f"{{{Namespace.XS.uri}}}{self.code}"
 
-    def prefixed(self, prefix: Optional[str] = Namespace.XS.prefix) -> str:
+    def prefixed(self, prefix: str | None = Namespace.XS.prefix) -> str:
         """Return the prefixed string representation of the datatype."""
         return f"{prefix}:{self.code}" if prefix else self.code
 

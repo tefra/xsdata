@@ -1,5 +1,4 @@
 import sys
-from typing import Optional
 
 from xsdata.codegen.mixins import RelativeHandlerInterface
 from xsdata.codegen.models import Attr, Class, get_slug
@@ -199,5 +198,5 @@ class ValidateAttributesOverrides(RelativeHandlerInterface):
         ClassUtils.rename_attribute_by_preference(child_attr, parent_attr)
 
 
-def _bool_eq(a: Optional[bool], b: Optional[bool]) -> bool:
+def _bool_eq(a: bool | None, b: bool | None) -> bool:
     return bool(a) is bool(b)

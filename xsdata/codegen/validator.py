@@ -1,5 +1,3 @@
-from typing import Optional
-
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.models import Attr, Class, Extension, get_tag
 from xsdata.codegen.utils import ClassUtils
@@ -135,7 +133,7 @@ class ClassValidator:
         return -1
 
     @classmethod
-    def find_circular_extension(cls, target: Class) -> Optional[Extension]:
+    def find_circular_extension(cls, target: Class) -> Extension | None:
         """Find the first circular reference extension.
 
         Redefined classes usually have references to the original
@@ -155,7 +153,7 @@ class ClassValidator:
         return None
 
     @classmethod
-    def find_circular_group(cls, target: Class) -> Optional[Attr]:
+    def find_circular_group(cls, target: Class) -> Attr | None:
         """Find an attr with the same name as the target class name.
 
         Redefined classes usually have references to the original

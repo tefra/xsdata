@@ -17,7 +17,7 @@ class SkipNode(XmlNode):
         return self
 
     def bind(
-        self, qname: str, text: Optional[str], tail: Optional[str], objects: list
+        self, qname: str, text: str | None, tail: str | None, objects: list
     ) -> bool:
         """Skip nodes are not building any objects."""
         return False

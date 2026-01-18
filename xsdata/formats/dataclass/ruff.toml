@@ -1,0 +1,9 @@
+target-version = "py310"
+
+[format]
+docstring-code-format = true
+
+[lint]
+select = ["I", "UP"]
+future-annotations = true
+fixable = ["ALL"]

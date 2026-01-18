@@ -1,8 +1,8 @@
 import math
 import warnings
 from collections import UserList
-from collections.abc import Iterable, Sequence
-from typing import Any, Callable, Optional
+from collections.abc import Callable, Iterable, Sequence
+from typing import Any, Optional
 
 from xsdata.exceptions import ConverterError, ConverterWarning, ParserError
 from xsdata.formats.converter import QNameConverter, converter
@@ -33,7 +33,7 @@ class PendingCollection(UserList):
 
     """
 
-    def __init__(self, initlist: Optional[Iterable], factory: Optional[Callable]):
+    def __init__(self, initlist: Iterable | None, factory: Callable | None):
         """Initialize the pending collection."""
         super().__init__(initlist)
         self.factory = factory or list
@@ -51,7 +51,7 @@ class ParserUtils:
     """Random parser util functions."""
 
     @classmethod
-    def xsi_type(cls, attrs: dict, ns_map: dict) -> Optional[str]:
+    def xsi_type(cls, attrs: dict, ns_map: dict) -> str | None:
         """Parse the xsi:type attribute value if present.
 
         Args:
@@ -69,7 +69,7 @@ class ParserUtils:
         return build_qname(namespace, name)
 
     @classmethod
-    def xsi_nil(cls, attrs: dict) -> Optional[bool]:
+    def xsi_nil(cls, attrs: dict) -> bool | None:
         """Return whether xsi:nil attribute value.
 
         Args:
@@ -88,11 +88,11 @@ class ParserUtils:
         var: XmlVar,
         config: ParserConfig,
         value: Any,
-        ns_map: Optional[dict] = None,
+        ns_map: dict | None = None,
         default: Any = None,
-        types: Optional[Sequence[type]] = None,
-        tokens_factory: Optional[Callable] = None,
-        format: Optional[str] = None,
+        types: Sequence[type] | None = None,
+        tokens_factory: Callable | None = None,
+        format: str | None = None,
     ) -> Any:
         """Convert a value to a python primitive type.
 
@@ -136,10 +136,10 @@ class ParserUtils:
         cls,
         value: Any,
         types: Sequence[type],
-        default: Optional[Any] = None,
-        ns_map: Optional[dict] = None,
-        tokens_factory: Optional[Callable] = None,
-        format: Optional[str] = None,
+        default: Any | None = None,
+        ns_map: dict | None = None,
+        tokens_factory: Callable | None = None,
+        format: str | None = None,
     ) -> Any:
         """Convert a value to a python primitive type.
 
@@ -171,7 +171,7 @@ class ParserUtils:
         return converter.deserialize(value, types, ns_map=ns_map, format=format)
 
     @classmethod
-    def normalize_content(cls, value: Optional[str]) -> Optional[str]:
+    def normalize_content(cls, value: str | None) -> str | None:
         """Normalize element text or tail content.
 
         If content is just whitespace return None, otherwise preserve
@@ -190,7 +190,7 @@ class ParserUtils:
 
     @classmethod
     def parse_any_attributes(
-        cls, attrs: dict[str, str], ns_map: dict[Optional[str], str]
+        cls, attrs: dict[str, str], ns_map: dict[str | None, str]
     ) -> dict[str, str]:
         """Parse attributes with qname support.
 

@@ -27,7 +27,7 @@ class WrapperNode(XmlNode):
         self.ns_map = parent.ns_map
 
     def bind(
-        self, qname: str, text: Optional[str], tail: Optional[str], objects: list
+        self, qname: str, text: str | None, tail: str | None, objects: list
     ) -> bool:
         """This node will never appear in the xml, so it never binds any data.
 

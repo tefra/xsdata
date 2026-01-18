@@ -1,10 +1,10 @@
 import datetime
 from calendar import isleap
 from collections.abc import Iterator
-from typing import Any, Optional, Union
+from typing import Any
 
 
-def parse_date_args(value: Any, fmt: str) -> Iterator[Optional[int]]:
+def parse_date_args(value: Any, fmt: str) -> Iterator[int | None]:
     """Parse the fmt args from the value."""
     if not isinstance(value, str):
         raise ValueError("")
@@ -13,7 +13,7 @@ def parse_date_args(value: Any, fmt: str) -> Iterator[Optional[int]]:
     return parser.parse()
 
 
-def calculate_timezone(offset: Optional[int]) -> Optional[datetime.timezone]:
+def calculate_timezone(offset: int | None) -> datetime.timezone | None:
     """Return a timezone instance by the given hours offset."""
     if offset is None:
         return None
@@ -24,7 +24,7 @@ def calculate_timezone(offset: Optional[int]) -> Optional[datetime.timezone]:
     return datetime.timezone(datetime.timedelta(minutes=offset))
 
 
-def calculate_offset(obj: Union[datetime.time, datetime.datetime]) -> Optional[int]:
+def calculate_offset(obj: datetime.time | datetime.datetime) -> int | None:
     """Convert the datetime offset to signed minutes."""
     offset = obj.utcoffset()
     if offset is None:
@@ -60,7 +60,7 @@ def format_time(hour: int, minute: int, second: int, fractional_second: int) -> 
     return f"{hour:02d}:{minute:02d}:{second:02d}.{milli:03d}"
 
 
-def format_offset(offset: Optional[int]) -> str:
+def format_offset(offset: int | None) -> str:
     """Return a xml formatted time offset."""
     if offset is None:
         return ""
@@ -142,7 +142,7 @@ class DateTimeParser:
         self.vidx = 0
         self.fidx = 0
 
-    def parse(self) -> Iterator[Optional[int]]:
+    def parse(self) -> Iterator[int | None]:
         """Yield the parsed datetime string arguments."""
         try:
             while self.fidx < self.flen:
@@ -183,7 +183,7 @@ class DateTimeParser:
 
         self.vidx += 1
 
-    def parse_var(self, var: str) -> Iterator[Optional[int]]:
+    def parse_var(self, var: str) -> Iterator[int | None]:
         """Parse the given var from the datetime string."""
         if var in SIMPLE_TWO_DIGITS_FORMATS:
             yield self.parse_digits(2)
@@ -259,7 +259,7 @@ class DateTimeParser:
 
         return int(self.value[start : self.vidx].ljust(just, "0"))
 
-    def parse_offset(self) -> Optional[int]:
+    def parse_offset(self) -> int | None:
         """Parse the xml timezone offset as minutes."""
         if not self.has_more():
             return None

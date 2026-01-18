@@ -86,14 +86,14 @@ class Post:
             "required": True,
         },
     )
-    created_at: Optional[str] = field(
+    created_at: str | None = field(
         default=None,
         metadata={
             "type": "Attribute",
             "required": True,
         },
     )
-    author: Optional[str] = field(
+    author: str | None = field(
         default=None,
         metadata={
             "type": "Attribute",
@@ -114,7 +114,7 @@ class Post:
             "type": "Element",
         },
     )
-    title: Optional[Title] = field(
+    title: Title | None = field(
         default=None,
         metadata={
             "name": "Title",
@@ -122,7 +122,7 @@ class Post:
             "required": True,
         },
     )
-    body: Optional[Body] = field(
+    body: Body | None = field(
         default=None,
         metadata={
             "name": "Body",
@@ -130,7 +130,7 @@ class Post:
             "required": True,
         },
     )
-    tags: Optional[Tags] = field(
+    tags: Tags | None = field(
         default=None,
         metadata={
             "name": "Tags",

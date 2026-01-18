@@ -1,15 +1,14 @@
 import sys
-from collections.abc import Iterable, Mapping
+from collections.abc import Callable, Iterable, Mapping
 from typing import (
     Any,
-    Callable,
     NamedTuple,
     Optional,
     TypeVar,
     Union,
+    get_args,
+    get_origin,
 )
-
-from typing_extensions import get_args, get_origin
 
 try:
     from types import UnionType  # type: ignore
@@ -67,8 +66,8 @@ class Result(NamedTuple):
     """Analyze Result Object."""
 
     types: tuple[type[Any], ...]
-    factory: Optional[Callable] = None
-    tokens_factory: Optional[Callable] = None
+    factory: Callable | None = None
+    tokens_factory: Callable | None = None
 
 
 def analyze_token_args(origin: Any, args: tuple[Any, ...]) -> tuple[Any]:

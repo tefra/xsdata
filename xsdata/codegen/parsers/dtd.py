@@ -1,5 +1,5 @@
 import io
-from typing import Any, Optional
+from typing import Any
 
 from xsdata.exceptions import ParserError
 from xsdata.models.dtd import (
@@ -66,7 +66,7 @@ class DtdParser:
         )
 
     @classmethod
-    def build_content(cls, content: Any) -> Optional[DtdContent]:
+    def build_content(cls, content: Any) -> DtdContent | None:
         """Build a dtd content instance from the lxml content.
 
         Args:

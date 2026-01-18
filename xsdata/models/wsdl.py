@@ -1,6 +1,6 @@
 from collections.abc import Iterator
 from dataclasses import dataclass, field
-from typing import Optional, TypeVar
+from typing import TypeVar
 
 from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.models import get_name
@@ -34,8 +34,8 @@ class WsdlElement:
     """
 
     name: str = attribute()
-    documentation: Optional[Documentation] = element()
-    location: Optional[str] = field(default=None, metadata={"type": "Ignore"})
+    documentation: Documentation | None = element()
+    location: str | None = field(default=None, metadata={"type": "Ignore"})
     ns_map: dict[str, str] = field(
         default_factory=dict, init=False, metadata={"type": "Ignore"}
     )
@@ -71,7 +71,7 @@ class Types:
     """
 
     schemas: list[Schema] = array_element(name="schema", namespace=Namespace.XS.uri)
-    documentation: Optional[Documentation] = element()
+    documentation: Documentation | None = element()
 
 
 @dataclass
@@ -83,8 +83,8 @@ class Import:
         namespace: The namespace URI
     """
 
-    location: Optional[str] = attribute()
-    namespace: Optional[str] = attribute()
+    location: str | None = attribute()
+    namespace: str | None = attribute()
 
 
 @dataclass
@@ -100,8 +100,8 @@ class Part(WsdlElement):
         element: The part element
     """
 
-    type: Optional[str] = attribute()
-    element: Optional[str] = attribute()
+    type: str | None = attribute()
+    element: str | None = attribute()
 
 
 @dataclass
@@ -284,8 +284,8 @@ class Definitions(ExtensibleElement):
         name = "definitions"
         namespace = "http://schemas.xmlsoap.org/wsdl/"
 
-    target_namespace: Optional[str] = attribute(name="targetNamespace")
-    types: Optional[Types] = element()
+    target_namespace: str | None = attribute(name="targetNamespace")
+    types: Types | None = element()
     imports: list[Import] = array_element(name="import")
     messages: list[Message] = array_element(name="message")
     port_types: list[PortType] = array_element(name="portType")

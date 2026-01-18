@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 from xsdata.codegen.parsers.schema import SchemaParser
 from xsdata.formats.dataclass.parsers.bases import Parsed
@@ -17,8 +17,8 @@ class DefinitionsParser(SchemaParser):
         queue: list[XmlNode],
         objects: list[Parsed],
         qname: str,
-        text: Optional[str],
-        tail: Optional[str],
+        text: str | None,
+        tail: str | None,
     ) -> Any:
         """Parse the last xml node and bind any intermediate objects.
 

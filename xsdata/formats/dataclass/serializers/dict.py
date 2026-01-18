@@ -1,7 +1,7 @@
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.context import XmlContext
@@ -45,7 +45,7 @@ class DictEncoder:
     def encode(
         self,
         value: Any,
-        var: Optional[XmlVar] = None,
+        var: XmlVar | None = None,
         wrapped: bool = False,
     ) -> Any:
         """Convert a value to a dictionary object.

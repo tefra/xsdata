@@ -4,7 +4,6 @@ from collections.abc import Iterator
 from dataclasses import dataclass, field
 from typing import Any as Anything
 from typing import Optional
-from typing import Union as UnionType
 
 from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
@@ -33,7 +32,7 @@ docstring_serializer = XmlSerializer(
 )
 
 
-def validate_max_occurs(min_occurs: int, max_occurs: UnionType[str, int]) -> int:
+def validate_max_occurs(min_occurs: int, max_occurs: str | int) -> int:
     """Validate max occurs."""
     if max_occurs == "unbounded":
         max_occurs = sys.maxsize
@@ -63,12 +62,12 @@ class Docstring:
 class Documentation(ElementBase):
     """XSD MinLength model representation."""
 
-    lang: Optional[str] = attribute()
-    source: Optional[str] = attribute()
+    lang: str | None = attribute()
+    source: str | None = attribute()
     attributes: Optional["AnyAttribute"] = element()
     content: list[object] = array_any_element(mixed=True)
 
-    def tostring(self) -> Optional[str]:
+    def tostring(self) -> str | None:
         """Convert the content to a help string."""
         obj = Docstring(self.content)
         ns_map = {None: "http://www.w3.org/1999/xhtml"}
@@ -87,7 +86,7 @@ class Appinfo(ElementBase):
 
         mixed = True
 
-    source: Optional[str] = attribute()
+    source: str | None = attribute()
     any_attribute: Optional["AnyAttribute"] = element(name="anyAttribute")
     content: list[object] = array_any_element(mixed=True)
 
@@ -105,12 +104,12 @@ class Annotation(ElementBase):
 class AnnotationBase(ElementBase):
     """XSD AnnotationBase model representation."""
 
-    id: Optional[str] = attribute()
+    id: str | None = attribute()
     annotations: list[Annotation] = array_element(name="annotation")
     any_attribute: Optional["AnyAttribute"] = element(name="anyAttribute")
 
     @property
-    def display_help(self) -> Optional[str]:
+    def display_help(self) -> str | None:
         """Return all annotation documentations concatenated."""
         help_str = "\n".join(
             documentation.tostring() or ""
@@ -126,7 +125,7 @@ class AnyAttribute(AnnotationBase):
     """XSD AnyAttribute model representation."""
 
     namespace: str = attribute(default="##any")
-    process_contents: Optional[ProcessType] = attribute(
+    process_contents: ProcessType | None = attribute(
         name="processContents", default="strict"
     )
 
@@ -140,7 +139,7 @@ class AnyAttribute(AnnotationBase):
         return True
 
     @property
-    def raw_namespace(self) -> Optional[str]:
+    def raw_namespace(self) -> str | None:
         """The element explicit namespace."""
         return self.namespace
 
@@ -160,14 +159,14 @@ class AnyAttribute(AnnotationBase):
 class Assertion(AnnotationBase):
     """XSD Assertion model representation."""
 
-    test: Optional[str] = attribute()
+    test: str | None = attribute()
 
 
 @dataclass
 class SimpleType(AnnotationBase):
     """XSD SimpleType model representation."""
 
-    name: Optional[str] = attribute()
+    name: str | None = attribute()
     restriction: Optional["Restriction"] = element()
     list: Optional["List"] = element()
     union: Optional["Union"] = element()
@@ -212,7 +211,7 @@ class SimpleType(AnnotationBase):
 class List(AnnotationBase):
     """XSD List model representation."""
 
-    simple_type: Optional[SimpleType] = element(name="simpleType")
+    simple_type: SimpleType | None = element(name="simpleType")
     item_type: str = attribute(name="itemType", default="")
 
     @property
@@ -240,7 +239,7 @@ class List(AnnotationBase):
 class Union(AnnotationBase):
     """XSD Union model representation."""
 
-    member_types: Optional[str] = attribute(name="memberTypes")
+    member_types: str | None = attribute(name="memberTypes")
     simple_types: list[SimpleType] = array_element(name="simpleType")
 
     @property
@@ -280,15 +279,15 @@ class Union(AnnotationBase):
 class Attribute(AnnotationBase):
     """XSD Attribute model representation."""
 
-    default: Optional[str] = attribute()
-    fixed: Optional[str] = attribute()
-    form: Optional[FormType] = attribute()
-    name: Optional[str] = attribute()
-    ref: Optional[str] = attribute()
-    type: Optional[str] = attribute()
-    target_namespace: Optional[str] = attribute(name="targetNamespace")
-    simple_type: Optional[SimpleType] = element(name="simpleType")
-    use: Optional[UseType] = attribute(default=UseType.OPTIONAL)
+    default: str | None = attribute()
+    fixed: str | None = attribute()
+    form: FormType | None = attribute()
+    name: str | None = attribute()
+    ref: str | None = attribute()
+    type: str | None = attribute()
+    target_namespace: str | None = attribute(name="targetNamespace")
+    simple_type: SimpleType | None = element(name="simpleType")
+    use: UseType | None = attribute(default=UseType.OPTIONAL)
 
     @property
     def bases(self) -> Iterator[str]:
@@ -339,7 +338,7 @@ class AttributeGroup(AnnotationBase):
     """XSD AttributeGroup model representation."""
 
     ref: str = attribute(default="")
-    name: Optional[str] = attribute()
+    name: str | None = attribute()
     attributes: list[Attribute] = array_element(name="attribute")
     attribute_groups: list["AttributeGroup"] = array_element(name="attributeGroup")
 
@@ -361,7 +360,7 @@ class Any(AnnotationBase):
 
     namespace: str = attribute(default="##any")
     min_occurs: int = attribute(default=1, name="minOccurs")
-    max_occurs: UnionType[str, int] = attribute(default=1, name="maxOccurs")
+    max_occurs: str | int = attribute(default=1, name="maxOccurs")
     process_contents: ProcessType = attribute(
         default=ProcessType.STRICT, name="processContents"
     )
@@ -383,7 +382,7 @@ class Any(AnnotationBase):
         return f"@{clean_ns}_element"
 
     @property
-    def raw_namespace(self) -> Optional[str]:
+    def raw_namespace(self) -> str | None:
         """The element explicit namespace."""
         return self.namespace
 
@@ -408,7 +407,7 @@ class All(AnnotationBase):
     """XSD All model representation."""
 
     min_occurs: int = attribute(default=1, name="minOccurs")
-    max_occurs: UnionType[str, int] = attribute(default=1, name="maxOccurs")
+    max_occurs: str | int = attribute(default=1, name="maxOccurs")
     any: list[Any] = array_element(name="any")
     elements: list["Element"] = array_element(name="element")
     groups: list["Group"] = array_element(name="group")
@@ -429,7 +428,7 @@ class Sequence(AnnotationBase):
     """XSD Sequence model representation."""
 
     min_occurs: int = attribute(default=1, name="minOccurs")
-    max_occurs: UnionType[str, int] = attribute(default=1, name="maxOccurs")
+    max_occurs: str | int = attribute(default=1, name="maxOccurs")
     elements: list["Element"] = array_element(name="element")
     groups: list["Group"] = array_element(name="group")
     choices: list["Choice"] = array_element(name="choice")
@@ -452,7 +451,7 @@ class Choice(AnnotationBase):
     """XSD Choice model representation."""
 
     min_occurs: int = attribute(default=1, name="minOccurs")
-    max_occurs: UnionType[str, int] = attribute(default=1, name="maxOccurs")
+    max_occurs: str | int = attribute(default=1, name="maxOccurs")
     elements: list["Element"] = array_element(name="element")
     groups: list["Group"] = array_element(name="group")
     choices: list["Choice"] = array_element(name="choice")
@@ -474,13 +473,13 @@ class Choice(AnnotationBase):
 class Group(AnnotationBase):
     """XSD Group model representation."""
 
-    name: Optional[str] = attribute()
+    name: str | None = attribute()
     ref: str = attribute(default="")
     min_occurs: int = attribute(default=1, name="minOccurs")
-    max_occurs: UnionType[str, int] = attribute(default=1, name="maxOccurs")
-    all: Optional[All] = element()
-    choice: Optional[Choice] = element()
-    sequence: Optional[Sequence] = element()
+    max_occurs: str | int = attribute(default=1, name="maxOccurs")
+    all: All | None = element()
+    choice: Choice | None = element()
+    sequence: Sequence | None = element()
 
     def __post_init__(self):
         """Post initialization validations."""
@@ -522,13 +521,13 @@ class DefaultOpenContent(OpenContent):
 class Extension(AnnotationBase):
     """XSD Extension model representation."""
 
-    base: Optional[str] = attribute()
-    group: Optional[Group] = element()
-    all: Optional[All] = element()
-    choice: Optional[Choice] = element()
-    sequence: Optional[Sequence] = element()
-    any_attribute: Optional[AnyAttribute] = element(name="anyAttribute")
-    open_content: Optional[OpenContent] = element(name="openContent")
+    base: str | None = attribute()
+    group: Group | None = element()
+    all: All | None = element()
+    choice: Choice | None = element()
+    sequence: Sequence | None = element()
+    any_attribute: AnyAttribute | None = element(name="anyAttribute")
+    open_content: OpenContent | None = element(name="openContent")
     attributes: list[Attribute] = array_element(name="attribute")
     attribute_groups: list[AttributeGroup] = array_element(name="attributeGroup")
     assertions: list[Assertion] = array_element(name="assert")
@@ -656,31 +655,31 @@ class ExplicitTimezone(AnnotationBase):
 class Restriction(AnnotationBase):
     """XSD Restriction model representation."""
 
-    base: Optional[str] = attribute()
-    group: Optional[Group] = element()
-    all: Optional[All] = element()
-    choice: Optional[Choice] = element()
-    sequence: Optional[Sequence] = element()
-    open_content: Optional[OpenContent] = element(name="openContent")
+    base: str | None = attribute()
+    group: Group | None = element()
+    all: All | None = element()
+    choice: Choice | None = element()
+    sequence: Sequence | None = element()
+    open_content: OpenContent | None = element(name="openContent")
     attributes: list[Attribute] = array_element(name="attribute")
     attribute_groups: list[AttributeGroup] = array_element(name="attributeGroup")
     enumerations: list[Enumeration] = array_element(name="enumeration")
     asserts: list[Assertion] = array_element(name="assert")
     assertions: list[Assertion] = array_element(name="assertion")
     any_element: list[object] = array_any_element()
-    min_exclusive: Optional[MinExclusive] = element(name="minExclusive")
-    min_inclusive: Optional[MinInclusive] = element(name="minInclusive")
-    min_length: Optional[MinLength] = element(name="minLength")
-    max_exclusive: Optional[MaxExclusive] = element(name="maxExclusive")
-    max_inclusive: Optional[MaxInclusive] = element(name="maxInclusive")
-    max_length: Optional[MaxLength] = element(name="maxLength")
-    total_digits: Optional[TotalDigits] = element(name="totalDigits")
-    fraction_digits: Optional[FractionDigits] = element(name="fractionDigits")
-    length: Optional[Length] = element()
-    white_space: Optional[WhiteSpace] = element(name="whiteSpace")
+    min_exclusive: MinExclusive | None = element(name="minExclusive")
+    min_inclusive: MinInclusive | None = element(name="minInclusive")
+    min_length: MinLength | None = element(name="minLength")
+    max_exclusive: MaxExclusive | None = element(name="maxExclusive")
+    max_inclusive: MaxInclusive | None = element(name="maxInclusive")
+    max_length: MaxLength | None = element(name="maxLength")
+    total_digits: TotalDigits | None = element(name="totalDigits")
+    fraction_digits: FractionDigits | None = element(name="fractionDigits")
+    length: Length | None = element()
+    white_space: WhiteSpace | None = element(name="whiteSpace")
     patterns: list[Pattern] = array_element(name="pattern")
-    explicit_timezone: Optional[ExplicitTimezone] = element(name="explicitTimezone")
-    simple_type: Optional[SimpleType] = element(name="simpleType")
+    explicit_timezone: ExplicitTimezone | None = element(name="explicitTimezone")
+    simple_type: SimpleType | None = element(name="simpleType")
 
     @property
     def attr_types(self) -> Iterator[str]:
@@ -740,8 +739,8 @@ class Restriction(AnnotationBase):
 class SimpleContent(AnnotationBase):
     """XSD SimpleContent model representation."""
 
-    restriction: Optional[Restriction] = element()
-    extension: Optional[Extension] = element()
+    restriction: Restriction | None = element()
+    extension: Extension | None = element()
 
 
 @dataclass
@@ -755,17 +754,17 @@ class ComplexContent(SimpleContent):
 class ComplexType(AnnotationBase):
     """XSD ComplexType model representation."""
 
-    name: Optional[str] = attribute()
-    block: Optional[str] = attribute()
-    final: Optional[str] = attribute()
-    simple_content: Optional[SimpleContent] = element(name="simpleContent")
-    complex_content: Optional[ComplexContent] = element(name="complexContent")
-    group: Optional[Group] = element()
-    all: Optional[All] = element()
-    choice: Optional[Choice] = element()
-    sequence: Optional[Sequence] = element()
-    any_attribute: Optional[AnyAttribute] = element(name="anyAttribute")
-    open_content: Optional[OpenContent] = element(name="openContent")
+    name: str | None = attribute()
+    block: str | None = attribute()
+    final: str | None = attribute()
+    simple_content: SimpleContent | None = element(name="simpleContent")
+    complex_content: ComplexContent | None = element(name="complexContent")
+    group: Group | None = element()
+    all: All | None = element()
+    choice: Choice | None = element()
+    sequence: Sequence | None = element()
+    any_attribute: AnyAttribute | None = element(name="anyAttribute")
+    open_content: OpenContent | None = element(name="openContent")
     attributes: list[Attribute] = array_element(name="attribute")
     attribute_groups: list[AttributeGroup] = array_element(name="attributeGroup")
     assertion: list[Assertion] = array_element(name="assert")
@@ -791,7 +790,7 @@ class ComplexType(AnnotationBase):
 class Field(AnnotationBase):
     """XSD Field model representation."""
 
-    xpath: Optional[str] = attribute()
+    xpath: str | None = attribute()
 
 
 @dataclass
@@ -803,9 +802,9 @@ class Selector(Field):
 class Unique(AnnotationBase):
     """XSD Unique model representation."""
 
-    name: Optional[str] = attribute()
-    ref: Optional[str] = attribute()
-    selector: Optional[Selector] = element()
+    name: str | None = attribute()
+    ref: str | None = attribute()
+    selector: Selector | None = element()
     fields: list[Field] = array_element(name="field")
 
 
@@ -813,9 +812,9 @@ class Unique(AnnotationBase):
 class Key(AnnotationBase):
     """XSD Key model representation."""
 
-    name: Optional[str] = attribute()
-    ref: Optional[str] = attribute()
-    selector: Optional[Selector] = element()
+    name: str | None = attribute()
+    ref: str | None = attribute()
+    selector: Selector | None = element()
     fields: list[Selector] = array_element(name="field")
 
 
@@ -823,10 +822,10 @@ class Key(AnnotationBase):
 class Keyref(AnnotationBase):
     """XSD Keyref model representation."""
 
-    name: Optional[str] = attribute()
-    ref: Optional[str] = attribute()
-    refer: Optional[str] = attribute()
-    selector: Optional[Selector] = element()
+    name: str | None = attribute()
+    ref: str | None = attribute()
+    refer: str | None = attribute()
+    selector: Selector | None = element()
     fields: list[Selector] = array_element(name="field")
 
 
@@ -834,10 +833,10 @@ class Keyref(AnnotationBase):
 class Alternative(AnnotationBase):
     """XSD Alternative model representation."""
 
-    type: Optional[str] = attribute()
-    test: Optional[str] = attribute()
-    simple_type: Optional[SimpleType] = element(name="simpleType")
-    complex_type: Optional[ComplexType] = element(name="complexType")
+    type: str | None = attribute()
+    test: str | None = attribute()
+    simple_type: SimpleType | None = element(name="simpleType")
+    complex_type: ComplexType | None = element(name="complexType")
 
     @property
     def real_name(self) -> str:
@@ -865,24 +864,24 @@ class Alternative(AnnotationBase):
 class Element(AnnotationBase):
     """XSD Element model representation."""
 
-    name: Optional[str] = attribute()
-    ref: Optional[str] = attribute()
-    type: Optional[str] = attribute()
-    substitution_group: Optional[str] = attribute(name="substitutionGroup")
-    default: Optional[str] = attribute()
-    fixed: Optional[str] = attribute()
-    form: Optional[FormType] = attribute()
-    block: Optional[str] = attribute()
-    final: Optional[str] = attribute()
-    target_namespace: Optional[str] = attribute(name="targetNamespace")
-    simple_type: Optional[SimpleType] = element(name="simpleType")
-    complex_type: Optional[ComplexType] = element(name="complexType")
+    name: str | None = attribute()
+    ref: str | None = attribute()
+    type: str | None = attribute()
+    substitution_group: str | None = attribute(name="substitutionGroup")
+    default: str | None = attribute()
+    fixed: str | None = attribute()
+    form: FormType | None = attribute()
+    block: str | None = attribute()
+    final: str | None = attribute()
+    target_namespace: str | None = attribute(name="targetNamespace")
+    simple_type: SimpleType | None = element(name="simpleType")
+    complex_type: ComplexType | None = element(name="complexType")
     alternatives: list[Alternative] = array_element(name="alternative")
     uniques: list[Unique] = array_element(name="unique")
     keys: list[Key] = array_element(name="key")
     keyrefs: list[Keyref] = array_element(name="keyref")
     min_occurs: int = attribute(default=1, name="minOccurs")
-    max_occurs: UnionType[str, int] = attribute(default=1, name="maxOccurs")
+    max_occurs: str | int = attribute(default=1, name="maxOccurs")
     nillable: bool = attribute(default=False)
     abstract: bool = attribute(default=False)
 
@@ -951,45 +950,45 @@ class Element(AnnotationBase):
 class Notation(AnnotationBase):
     """XSD Notation model representation."""
 
-    name: Optional[str] = attribute()
-    public: Optional[str] = attribute()
-    system: Optional[str] = attribute()
+    name: str | None = attribute()
+    public: str | None = attribute()
+    system: str | None = attribute()
 
 
 @dataclass
 class Import(AnnotationBase):
     """XSD Import model representation."""
 
-    namespace: Optional[str] = attribute()
-    schema_location: Optional[str] = attribute(name="schemaLocation")
-    location: Optional[str] = field(default=None, metadata={"type": "Ignore"})
+    namespace: str | None = attribute()
+    schema_location: str | None = attribute(name="schemaLocation")
+    location: str | None = field(default=None, metadata={"type": "Ignore"})
 
 
 @dataclass
 class Include(AnnotationBase):
     """XSD Include model representation."""
 
-    schema_location: Optional[str] = attribute(name="schemaLocation")
-    location: Optional[str] = field(default=None, metadata={"type": "Ignore"})
+    schema_location: str | None = attribute(name="schemaLocation")
+    location: str | None = field(default=None, metadata={"type": "Ignore"})
 
 
 @dataclass
 class Redefine(AnnotationBase):
     """XSD Redefine model representation."""
 
-    schema_location: Optional[str] = attribute(name="schemaLocation")
+    schema_location: str | None = attribute(name="schemaLocation")
     simple_types: list[SimpleType] = array_element(name="simpleType")
     complex_types: list[ComplexType] = array_element(name="complexType")
     groups: list[Group] = array_element(name="group")
     attribute_groups: list[AttributeGroup] = array_element(name="attributeGroup")
-    location: Optional[str] = field(default=None, metadata={"type": "Ignore"})
+    location: str | None = field(default=None, metadata={"type": "Ignore"})
 
 
 @dataclass
 class Override(AnnotationBase):
     """XSD Override model representation."""
 
-    schema_location: Optional[str] = attribute(name="schemaLocation")
+    schema_location: str | None = attribute(name="schemaLocation")
     simple_types: list[SimpleType] = array_element(name="simpleType")
     complex_types: list[ComplexType] = array_element(name="complexType")
     groups: list[Group] = array_element(name="group")
@@ -997,7 +996,7 @@ class Override(AnnotationBase):
     elements: list[Element] = array_element(name="element")
     attributes: list[Attribute] = array_element(name="attribute")
     notations: list[Notation] = array_element(name="notation")
-    location: Optional[str] = field(default=None, metadata={"type": "Ignore"})
+    location: str | None = field(default=None, metadata={"type": "Ignore"})
 
 
 @dataclass
@@ -1010,13 +1009,13 @@ class Schema(AnnotationBase):
         name = "schema"
         namespace = Namespace.XS.uri
 
-    target: Optional[str] = attribute()
-    block_default: Optional[str] = attribute(name="blockDefault")
-    default_attributes: Optional[str] = attribute(name="defaultAttributes")
-    final_default: Optional[str] = attribute(name="finalDefault")
-    target_namespace: Optional[str] = attribute(name="targetNamespace")
-    version: Optional[str] = attribute()
-    xmlns: Optional[str] = attribute()
+    target: str | None = attribute()
+    block_default: str | None = attribute(name="blockDefault")
+    default_attributes: str | None = attribute(name="defaultAttributes")
+    final_default: str | None = attribute(name="finalDefault")
+    target_namespace: str | None = attribute(name="targetNamespace")
+    version: str | None = attribute()
+    xmlns: str | None = attribute()
     element_form_default: FormType = attribute(
         default=FormType.UNQUALIFIED,
         name="elementFormDefault",
@@ -1025,9 +1024,7 @@ class Schema(AnnotationBase):
         default=FormType.UNQUALIFIED,
         name="attributeFormDefault",
     )
-    default_open_content: Optional[DefaultOpenContent] = element(
-        name="defaultOpenContent"
-    )
+    default_open_content: DefaultOpenContent | None = element(name="defaultOpenContent")
     includes: list[Include] = array_element(name="include")
     imports: list[Import] = array_element(name="import")
     redefines: list[Redefine] = array_element(name="redefine")
@@ -1040,9 +1037,9 @@ class Schema(AnnotationBase):
     elements: list[Element] = array_element(name="element")
     attributes: list[Attribute] = array_element(name="attribute")
     notations: list[Notation] = array_element(name="notation")
-    location: Optional[str] = field(default=None, metadata={"type": "Ignore"})
+    location: str | None = field(default=None, metadata={"type": "Ignore"})
 
-    def included(self) -> Iterator[UnionType[Import, Include, Redefine, Override]]:
+    def included(self) -> Iterator[Import | Include | Redefine | Override]:
         """Yields an iterator of included resources."""
         yield from self.imports
 

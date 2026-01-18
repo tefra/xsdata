@@ -2,7 +2,8 @@ import datetime
 import operator
 import re
 from collections import UserString
-from typing import Any, Callable, NamedTuple, Optional, Union
+from collections.abc import Callable
+from typing import Any, NamedTuple
 
 from xsdata.utils.dates import (
     calculate_offset,
@@ -59,14 +60,14 @@ class XmlDate(NamedTuple):
     year: int
     month: int
     day: int
-    offset: Optional[int] = None
+    offset: int | None = None
 
     def replace(
         self,
-        year: Optional[int] = None,
-        month: Optional[int] = None,
-        day: Optional[int] = None,
-        offset: Optional[int] = True,
+        year: int | None = None,
+        month: int | None = None,
+        day: int | None = None,
+        offset: int | None = True,
     ) -> "XmlDate":
         """Return a new instance replacing the specified fields with new values."""
         if year is None:
@@ -159,7 +160,7 @@ class XmlDateTime(NamedTuple):
     minute: int
     second: int
     fractional_second: int = 0
-    offset: Optional[int] = None
+    offset: int | None = None
 
     @property
     def microsecond(self) -> int:
@@ -230,7 +231,7 @@ class XmlDateTime(NamedTuple):
         )
 
     @classmethod
-    def now(cls, tz: Optional[datetime.timezone] = None) -> "XmlDateTime":
+    def now(cls, tz: datetime.timezone | None = None) -> "XmlDateTime":
         """Initialize with the current datetime and the given timezone."""
         return cls.from_datetime(datetime.datetime.now(tz=tz))
 
@@ -254,14 +255,14 @@ class XmlDateTime(NamedTuple):
 
     def replace(
         self,
-        year: Optional[int] = None,
-        month: Optional[int] = None,
-        day: Optional[int] = None,
-        hour: Optional[int] = None,
-        minute: Optional[int] = None,
-        second: Optional[int] = None,
-        fractional_second: Optional[int] = None,
-        offset: Optional[int] = True,
+        year: int | None = None,
+        month: int | None = None,
+        day: int | None = None,
+        hour: int | None = None,
+        minute: int | None = None,
+        second: int | None = None,
+        fractional_second: int | None = None,
+        offset: int | None = True,
     ) -> "XmlDateTime":
         """Return a new instance replacing the specified fields with new values."""
         if year is None:
@@ -354,7 +355,7 @@ class XmlTime(NamedTuple):
     minute: int
     second: int
     fractional_second: int = 0
-    offset: Optional[int] = None
+    offset: int | None = None
 
     @property
     def microsecond(self) -> int:
@@ -374,11 +375,11 @@ class XmlTime(NamedTuple):
 
     def replace(
         self,
-        hour: Optional[int] = None,
-        minute: Optional[int] = None,
-        second: Optional[int] = None,
-        fractional_second: Optional[int] = None,
-        offset: Optional[int] = True,
+        hour: int | None = None,
+        minute: int | None = None,
+        second: int | None = None,
+        fractional_second: int | None = None,
+        offset: int | None = True,
     ) -> "XmlTime":
         """Return a new instance replacing the specified fields with new values."""
         if hour is None:
@@ -421,7 +422,7 @@ class XmlTime(NamedTuple):
         )
 
     @classmethod
-    def now(cls, tz: Optional[datetime.timezone] = None) -> "XmlTime":
+    def now(cls, tz: datetime.timezone | None = None) -> "XmlTime":
         """Initialize with the current time and the given timezone."""
         return cls.from_time(datetime.datetime.now(tz=tz).time())
 
@@ -486,7 +487,7 @@ class XmlTime(NamedTuple):
         return _cmp(self, other, operator.ge)
 
 
-DurationType = Union[XmlTime, XmlDateTime]
+DurationType = XmlTime | XmlDateTime
 
 
 def _cmp(a: DurationType, b: DurationType, op: Callable) -> bool:
@@ -500,12 +501,12 @@ class TimeInterval(NamedTuple):
     """Time interval model representation."""
 
     negative: bool
-    years: Optional[int]
-    months: Optional[int]
-    days: Optional[int]
-    hours: Optional[int]
-    minutes: Optional[int]
-    seconds: Optional[float]
+    years: int | None
+    months: int | None
+    days: int | None
+    hours: int | None
+    minutes: int | None
+    seconds: float | None
 
 
 class XmlDuration(UserString):
@@ -534,32 +535,32 @@ class XmlDuration(UserString):
         self._interval = self._parse_interval(value)
 
     @property
-    def years(self) -> Optional[int]:
+    def years(self) -> int | None:
         """Number of years in the interval."""
         return self._interval.years
 
     @property
-    def months(self) -> Optional[int]:
+    def months(self) -> int | None:
         """Number of months in the interval."""
         return self._interval.months
 
     @property
-    def days(self) -> Optional[int]:
+    def days(self) -> int | None:
         """Number of days in the interval."""
         return self._interval.days
 
     @property
-    def hours(self) -> Optional[int]:
+    def hours(self) -> int | None:
         """Number of hours in the interval."""
         return self._interval.hours
 
     @property
-    def minutes(self) -> Optional[int]:
+    def minutes(self) -> int | None:
         """Number of minutes in the interval."""
         return self._interval.minutes
 
     @property
-    def seconds(self) -> Optional[float]:
+    def seconds(self) -> float | None:
         """Number of seconds in the interval."""
         return self._interval.seconds
 
@@ -603,10 +604,10 @@ class XmlDuration(UserString):
 class TimePeriod(NamedTuple):
     """Time period model representation."""
 
-    year: Optional[int]
-    month: Optional[int]
-    day: Optional[int]
-    offset: Optional[int]
+    year: int | None
+    month: int | None
+    day: int | None
+    offset: int | None
 
 
 class XmlPeriod(UserString):
@@ -632,22 +633,22 @@ class XmlPeriod(UserString):
         self._period = self._parse_period(value)
 
     @property
-    def year(self) -> Optional[int]:
+    def year(self) -> int | None:
         """Period year."""
         return self._period.year
 
     @property
-    def month(self) -> Optional[int]:
+    def month(self) -> int | None:
         """Period month."""
         return self._period.month
 
     @property
-    def day(self) -> Optional[int]:
+    def day(self) -> int | None:
         """Period day."""
         return self._period.day
 
     @property
-    def offset(self) -> Optional[int]:
+    def offset(self) -> int | None:
         """Period timezone offset in minutes."""
         return self._period.offset
 

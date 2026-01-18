@@ -213,7 +213,7 @@ class DisambiguateChoicesTest(FactoryTestCase):
         self.assertEqual(Tag.ANY, last.tag)
         self.assertEqual(source.namespace, last.namespace)
         self.assertEqual([AttrTypeFactory.native(DataType.ANY_TYPE)], last.types)
-        self.assertFalse(last.restrictions.is_optional)
+        self.assertTrue(last.restrictions.is_optional)  # anyType elements can be empty
         self.assertFalse(last.restrictions.is_list)
 
     def test_add_simply_type_value(self) -> None:

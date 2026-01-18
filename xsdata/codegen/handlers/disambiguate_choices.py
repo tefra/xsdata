@@ -244,7 +244,7 @@ class DisambiguateChoices(RelativeHandlerInterface):
             types=[AttrType(qname=str(DataType.ANY_TYPE), native=True)],
             tag=Tag.ANY,
             namespace=choice.namespace,
-            restrictions=Restrictions(min_occurs=1, max_occurs=1),
+            restrictions=Restrictions(min_occurs=0, max_occurs=1),
         )
         reference.attrs.append(attr)
 

@@ -152,8 +152,8 @@ class Filters:
             args.append("frozen=True")
         if fmt.slots:
             args.append("slots=True")
-        if fmt.kw_only:
-            args.append("kw_only=True")
+
+        args.append("kw_only=True")
 
         return f"@dataclass({', '.join(args)})" if args else "@dataclass"
 
@@ -739,7 +739,7 @@ class Filters:
         if attr.is_dict:
             return "dict"
         if attr.default is None:
-            return False if self.format.kw_only and not attr.is_optional else None
+            return None if attr.is_optional else False
         if not isinstance(attr.default, str):
             return literal_value(attr.default)
         if attr.default.startswith("@enum@"):
@@ -818,9 +818,7 @@ class Filters:
 
             return "dict[str, str]"
 
-        if attr.is_nillable or (
-            attr.default is None and (attr.is_optional or not self.format.kw_only)
-        ):
+        if attr.is_nillable or (attr.default is None and attr.is_optional):
             return f"None | {result}"
 
         return result
@@ -848,7 +846,7 @@ class Filters:
         if attr.is_list:
             return iterable_fmt.format(result)
 
-        if attr.is_optional or not self.format.kw_only:
+        if attr.is_optional:
             return f"None | {result}"
 
         return result

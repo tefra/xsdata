@@ -5,22 +5,21 @@ from dataclasses import dataclass, field
 __NAMESPACE__ = "xsdata"
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Alphas:
     class Meta:
         name = "alphas"
         namespace = "xsdata"
 
-    alpha: None | str = field(
-        default=None,
+    alpha: str = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Bravos:
     class Meta:
         name = "bravos"
@@ -35,7 +34,7 @@ class Bravos:
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Charlie:
     class Meta:
         name = "charlie"
@@ -55,7 +54,7 @@ class Charlie:
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Charlies:
     class Meta:
         name = "charlies"
@@ -70,19 +69,18 @@ class Charlies:
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Wrapper:
     class Meta:
         name = "wrapper"
         namespace = "xsdata"
 
-    alpha: None | str = field(
-        default=None,
+    alpha: str = field(
         metadata={
             "wrapper": "alphas",
             "type": "Element",
             "required": True,
-        },
+        }
     )
     bravo: list[int] = field(
         default_factory=list,

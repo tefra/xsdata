@@ -118,9 +118,9 @@ class DataclassGeneratorTests(FactoryTestCase):
             "    :cvar ATTR_B: I am a member\n"
             "    :cvar ATTR_C:\n"
             '    """\n'
-            "    ATTR_B = None\n"
-            "    ATTR_C = None\n"
-            "@dataclass\n"
+            "    ATTR_B = False\n"
+            "    ATTR_C = False\n"
+            "@dataclass(kw_only=True)\n"
             "class ClassC:\n"
             '    """\n'
             "    :ivar attr_d: I am a field\n"
@@ -129,15 +129,13 @@ class DataclassGeneratorTests(FactoryTestCase):
             "    class Meta:\n"
             '        name = "class_C"\n'
             "\n"
-            "    attr_d: None | str = field(\n"
-            "        default=None,\n"
+            "    attr_d: str = field(\n"
             "        metadata={\n"
             '            "name": "attr_D",\n'
             '            "type": "Element",\n'
             "        }\n"
             "    )\n"
-            "    attr_e: None | str = field(\n"
-            "        default=None,\n"
+            "    attr_e: str = field(\n"
             "        metadata={\n"
             '            "name": "attr_E",\n'
             '            "type": "Element",\n'
@@ -163,27 +161,25 @@ class DataclassGeneratorTests(FactoryTestCase):
             "from dataclasses import dataclass, field\n"
             "\n"
             "\n"
-            "@dataclass\n"
+            "@dataclass(kw_only=True)\n"
             "class Foo:\n"
             "    class Meta:\n"
             '        name = "foo"\n'
             '        target_namespace = "bar"\n'
             "\n"
-            "    attr_c: None | str = field(\n"
-            "        default=None,\n"
+            "    attr_c: str = field(\n"
             "        metadata={\n"
             '            "name": "attr_C",\n'
             '            "type": "Element",\n'
             "        }\n"
             "    )\n"
-            "@dataclass\n"
+            "@dataclass(kw_only=True)\n"
             "class Bar:\n"
             "    class Meta:\n"
             '        name = "bar"\n'
             '        target_namespace = "foo"\n'
             "\n"
-            "    attr_b: None | str = field(\n"
-            "        default=None,\n"
+            "    attr_b: str = field(\n"
             "        metadata={\n"
             '            "name": "attr_B",\n'
             '            "type": "Element",\n'

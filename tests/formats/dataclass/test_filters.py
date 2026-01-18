@@ -164,11 +164,11 @@ class FiltersTests(FactoryTestCase):
         target = ClassFactory.create(extensions=ExtensionFactory.list(1))
 
         expected = self.filters.class_annotations(target, "FooBar")
-        self.assertEqual(["@c", "@b", "@dataclass"], expected)
+        self.assertEqual(["@c", "@b", "@dataclass(kw_only=True)"], expected)
 
         target.extensions.clear()
         expected = self.filters.class_annotations(target, "FooBar")
-        self.assertEqual(["@c", "@b", "@dataclass", "@d"], expected)
+        self.assertEqual(["@c", "@b", "@dataclass(kw_only=True)", "@d"], expected)
 
         self.filters.default_class_annotation = None
         expected = self.filters.class_annotations(target, "FooBar")
@@ -328,14 +328,11 @@ class FiltersTests(FactoryTestCase):
         mock_field_metadata.return_value = {}
         str_attr = AttrFactory.create(types=[type_str], tag=Tag.RESTRICTION)
         result = self.filters.field_definition(self.obj, str_attr, None)
-        expected = "field(\n        default=None\n    )"
+        expected = "field()"
         self.assertEqual(expected, result)
 
     def test_field_default_value_with_value_none(self) -> None:
         attr = AttrFactory.create(types=[type_str])
-        self.assertEqual(None, self.filters.field_default_value(attr))
-
-        self.filters.format.kw_only = True
         self.assertEqual(False, self.filters.field_default_value(attr))
 
         attr.restrictions.min_occurs = 0
@@ -599,9 +596,6 @@ class FiltersTests(FactoryTestCase):
 
     def test_field_type_with_optional_value(self) -> None:
         attr = AttrFactory.create(types=AttrTypeFactory.list(1, qname="foo_bar"))
-        self.assertEqual("None | FooBar", self.filters.field_type(self.obj, attr))
-
-        self.filters.format.kw_only = True
         self.assertEqual("FooBar", self.filters.field_type(self.obj, attr))
 
         attr.restrictions.min_occurs = 0
@@ -613,7 +607,7 @@ class FiltersTests(FactoryTestCase):
         )
 
         self.assertEqual(
-            "None | C",
+            "C",
             self.filters.field_type(self.obj_nested_nested_nested, attr),
         )
 
@@ -621,9 +615,7 @@ class FiltersTests(FactoryTestCase):
         attr = AttrFactory.create(
             types=AttrTypeFactory.list(1, qname="b", forward=True)
         )
-        self.assertEqual(
-            "None | A.B", self.filters.field_type(self.obj_nested_nested, attr)
-        )
+        self.assertEqual("A.B", self.filters.field_type(self.obj_nested_nested, attr))
 
     def test_field_type_with_array_type(self) -> None:
         attr = AttrFactory.create(
@@ -702,7 +694,7 @@ class FiltersTests(FactoryTestCase):
                 AttrTypeFactory.native(DataType.STRING),
             ]
         )
-        self.assertEqual("None | int | str", self.filters.field_type(self.obj, attr))
+        self.assertEqual("int | str", self.filters.field_type(self.obj, attr))
 
     def test_field_type_with_prohibited_attr(self) -> None:
         attr = AttrFactory.create(restrictions=Restrictions(max_occurs=0))
@@ -1075,18 +1067,17 @@ class FiltersTests(FactoryTestCase):
         format = config.output.format
 
         actual = self.filters.build_class_annotation(format)
-        self.assertEqual("@dataclass", actual)
+        self.assertEqual("@dataclass(kw_only=True)", actual)
 
         format.frozen = True
         actual = self.filters.build_class_annotation(format)
-        self.assertEqual("@dataclass(frozen=True)", actual)
+        self.assertEqual("@dataclass(frozen=True, kw_only=True)", actual)
 
         format.repr = False
         format.eq = False
         format.order = True
         format.unsafe_hash = True
         format.slots = True
-        format.kw_only = True
         actual = self.filters.build_class_annotation(format)
         expected = (
             "@dataclass(repr=False, eq=False, order=True,"

@@ -52,21 +52,6 @@ Use `collections.abc.Iterable` and `collections.abc.Mapping` instead of `List|Tu
 
 **CLI Option:** `--generic-collections / --no-generic-collections`
 
-### `unionType`
-
-Use [PEP-604](https://peps.python.org/pep-0585/), allow writing union types as X | Y.
-
-```
-str | None # Optional[str]
-str | int # Union[str, int]
-```
-
-**Default Value:** `False`
-
-**CLI Option:** `--union-type / --no-union-type`
-
-**Requirements:** `python>=3.10`
-
 ### Package
 
 The output package for the generated code, e.g. `code.models`
@@ -102,7 +87,6 @@ The [dataclass][dataclasses.dataclass] parameters.
 - `unsafeHash`: Generates a [**hash**][object.__hash__] method according to how `eq` and
   `frozen` are set.
 - `slots`: Generates the class [**slots**][object.__slots__] attribute. `python >= 3.10`
-- `kwOnly`: All fields will be marked as keyword-only. `python >= 3.10`
 
 !!! Warning
 
@@ -221,17 +205,6 @@ charlie: List[Charlie] = field(
     },
 )
 ```
-
-### PostponedAnnotations
-
-Use [PEP-563](https://peps.python.org/pep-0563/), postponed evaluation of annotations.
-
-This will add this import `from __future__ import annotations` in all generated files,
-in order to avoid forward references.
-
-**Default Value:** `False`
-
-**CLI Option:** `--postponed-annotations / --no-postponed-annotations`
 
 ### UnnestClasses
 

@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 __NAMESPACE__ = "http://hello/"
 
 
-@dataclass
+@dataclass(kw_only=True)
 class HelloByeError:
     class Meta:
         namespace = "http://hello/"
@@ -19,7 +19,7 @@ class HelloByeError:
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class HelloError:
     class Meta:
         namespace = "http://hello/"
@@ -33,78 +33,73 @@ class HelloError:
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class GetHelloAsString:
     class Meta:
         name = "getHelloAsString"
         namespace = "http://hello/"
 
-    arg0: None | str = field(
-        default=None,
+    arg0: str = field(
         metadata={
             "type": "Element",
             "namespace": "",
-        },
+        }
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class GetHelloAsStringResponse:
     class Meta:
         name = "getHelloAsStringResponse"
         namespace = "http://hello/"
 
-    return_value: None | str = field(
-        default=None,
+    return_value: str = field(
         metadata={
             "name": "return",
             "type": "Element",
             "namespace": "",
-        },
+        }
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class HelloGetHelloAsStringInput:
     class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
-    body: None | HelloGetHelloAsStringInput.Body = field(
-        default=None,
+    body: HelloGetHelloAsStringInput.Body = field(
         metadata={
             "name": "Body",
             "type": "Element",
-        },
+        }
     )
 
-    @dataclass
+    @dataclass(kw_only=True)
     class Body:
-        get_hello_as_string: None | GetHelloAsString = field(
-            default=None,
+        get_hello_as_string: GetHelloAsString = field(
             metadata={
                 "name": "getHelloAsString",
                 "type": "Element",
                 "namespace": "http://hello/",
-            },
+            }
         )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class HelloGetHelloAsStringOutput:
     class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
-    body: None | HelloGetHelloAsStringOutput.Body = field(
-        default=None,
+    body: HelloGetHelloAsStringOutput.Body = field(
         metadata={
             "name": "Body",
             "type": "Element",
-        },
+        }
     )
 
-    @dataclass
+    @dataclass(kw_only=True)
     class Body:
         get_hello_as_string_response: None | GetHelloAsStringResponse = field(
             default=None,
@@ -122,21 +117,19 @@ class HelloGetHelloAsStringOutput:
             },
         )
 
-        @dataclass
+        @dataclass(kw_only=True)
         class Fault:
-            faultcode: None | str = field(
-                default=None,
+            faultcode: str = field(
                 metadata={
                     "type": "Element",
                     "namespace": "",
-                },
+                }
             )
-            faultstring: None | str = field(
-                default=None,
+            faultstring: str = field(
                 metadata={
                     "type": "Element",
                     "namespace": "",
-                },
+                }
             )
             faultactor: None | str = field(
                 default=None,
@@ -155,7 +148,7 @@ class HelloGetHelloAsStringOutput:
                 )
             )
 
-            @dataclass
+            @dataclass(kw_only=True)
             class Detail:
                 hello_error: None | HelloError = field(
                     default=None,

@@ -244,18 +244,36 @@ class DefinitionsMapper:
             message = definitions.find_message(text.suffix(fault.message))
             detail_attrs.extend(cls.build_parts_attributes(message.parts, ns_map))
 
-        default_fields = ["faultcode", "faultstring", "faultactor"]
+        # faultcode and faultstring are required, faultactor and detail are optional
+        required_fields = ["faultcode", "faultstring"]
+        optional_fields = ["faultactor"]
         if detail_attrs:
             detail = cls.build_inner_class(fault_class, "detail", namespace="")
             detail.attrs.extend(detail_attrs)
+            # Make detail attr optional
+            detail_attr = fault_class.attrs[
+                -1
+            ]  # Last added attr is the detail forward ref
+            detail_attr.restrictions.min_occurs = 0
+            # Make detail attributes optional since SOAP faults contain one fault type
+            for attr in detail_attrs:
+                attr.restrictions.min_occurs = 0
         else:
-            default_fields.append("detail")
+            optional_fields.append("detail")
 
+        optional_attrs = [
+            cls.build_attr(f, str(DataType.STRING), native=True, namespace="")
+            for f in optional_fields
+        ]
+        for attr in optional_attrs:
+            attr.restrictions.min_occurs = 0
+
+        collections.prepend(fault_class.attrs, *optional_attrs)
         collections.prepend(
             fault_class.attrs,
             *(
                 cls.build_attr(f, str(DataType.STRING), native=True, namespace="")
-                for f in default_fields
+                for f in required_fields
             ),
         )
 

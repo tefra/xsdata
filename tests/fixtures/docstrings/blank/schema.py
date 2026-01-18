@@ -6,13 +6,13 @@ from enum import Enum
 __NAMESPACE__ = "urn:docs"
 
 
-@dataclass
+@dataclass(kw_only=True)
 class DoubleQuotesDescription:
     class Meta:
         namespace = "urn:docs"
 
 
-@dataclass
+@dataclass(kw_only=True)
 class DoubleQuotesSummary:
     class Meta:
         namespace = "urn:docs"
@@ -33,51 +33,46 @@ class RootD(Enum):
     FALSE = "false"
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Root:
     class Meta:
         namespace = "urn:docs"
 
-    a: None | Root.A = field(
-        default=None,
+    a: Root.A = field(
         metadata={
             "type": "Element",
             "namespace": "",
             "required": True,
-        },
+        }
     )
-    b: None | RootB = field(
-        default=None,
+    b: RootB = field(
         metadata={
             "type": "Element",
             "namespace": "",
             "required": True,
-        },
+        }
     )
-    c: None | RootEnum = field(
-        default=None,
+    c: RootEnum = field(
         metadata={
             "type": "Element",
             "namespace": "",
             "required": True,
-        },
+        }
     )
-    d: None | RootD = field(
-        default=None,
+    d: RootD = field(
         metadata={
             "type": "Element",
             "namespace": "",
             "required": True,
-        },
+        }
     )
 
-    @dataclass
+    @dataclass(kw_only=True)
     class A:
-        sub_a: None | str = field(
-            default=None,
+        sub_a: str = field(
             metadata={
                 "type": "Element",
                 "namespace": "",
                 "required": True,
-            },
+            }
         )

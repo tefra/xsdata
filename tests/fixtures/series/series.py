@@ -5,24 +5,22 @@ from dataclasses import dataclass, field
 from xsdata.models.datatype import XmlDate
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Country:
     class Meta:
         name = "country"
 
-    name: None | str = field(
-        default=None,
+    name: str = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
-    code: None | str = field(
-        default=None,
+    code: str = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
     timezone: None | str = field(
         default=None,
@@ -32,17 +30,16 @@ class Country:
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Externals:
     class Meta:
         name = "externals"
 
-    tvrage: None | int = field(
-        default=None,
+    tvrage: int = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
     thetvdb: None | int = field(
         default=None,
@@ -50,75 +47,69 @@ class Externals:
             "type": "Element",
         },
     )
-    imdb: None | str = field(
-        default=None,
+    imdb: str = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Image:
     class Meta:
         name = "image"
 
-    medium: None | str = field(
-        default=None,
+    medium: str = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
-    original: None | str = field(
-        default=None,
+    original: str = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Previousepisode:
     class Meta:
         name = "previousepisode"
 
-    href: None | str = field(
-        default=None,
+    href: str = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Rating:
     class Meta:
         name = "rating"
 
-    average: None | float = field(
-        default=None,
+    average: float = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Schedule:
     class Meta:
         name = "schedule"
 
-    time: None | str = field(
-        default=None,
+    time: str = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
     days: list[str] = field(
         default_factory=list,
@@ -129,43 +120,40 @@ class Schedule:
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Self:
     class Meta:
         name = "self"
 
-    href: None | str = field(
-        default=None,
+    href: str = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Links:
     class Meta:
         name = "_links"
 
-    self_value: None | Self = field(
-        default=None,
+    self_value: Self = field(
         metadata={
             "name": "self",
             "type": "Element",
             "required": True,
-        },
+        }
     )
-    previousepisode: None | Previousepisode = field(
-        default=None,
+    previousepisode: Previousepisode = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Network:
     class Meta:
         name = "network"
@@ -176,33 +164,30 @@ class Network:
             "type": "Element",
         },
     )
-    name: None | str = field(
-        default=None,
+    name: str = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
-    country: None | Country = field(
-        default=None,
+    country: Country = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Series:
     class Meta:
         name = "series"
 
-    id: None | int = field(
-        default=None,
+    id: int = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
     url: None | str = field(
         default=None,
@@ -210,27 +195,24 @@ class Series:
             "type": "Element",
         },
     )
-    name: None | str = field(
-        default=None,
+    name: str = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
-    type_value: None | str = field(
-        default=None,
+    type_value: str = field(
         metadata={
             "name": "type",
             "type": "Element",
             "required": True,
-        },
+        }
     )
-    language: None | str = field(
-        default=None,
+    language: str = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
     genres: list[str] = field(
         default_factory=list,
@@ -239,48 +221,42 @@ class Series:
             "min_occurs": 1,
         },
     )
-    status: None | str = field(
-        default=None,
+    status: str = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
-    runtime: None | int = field(
-        default=None,
+    runtime: int = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
-    premiered: None | XmlDate = field(
-        default=None,
+    premiered: XmlDate = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
-    official_site: None | str = field(
-        default=None,
+    official_site: str = field(
         metadata={
             "name": "officialSite",
             "type": "Element",
             "required": True,
-        },
+        }
     )
-    schedule: None | Schedule = field(
-        default=None,
+    schedule: Schedule = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
-    rating: None | Rating = field(
-        default=None,
+    rating: Rating = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
     weight: None | int = field(
         default=None,
@@ -288,12 +264,11 @@ class Series:
             "type": "Element",
         },
     )
-    network: None | Network = field(
-        default=None,
+    network: Network = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
     web_channel: None | object = field(
         default=None,
@@ -302,12 +277,11 @@ class Series:
             "type": "Element",
         },
     )
-    externals: None | Externals = field(
-        default=None,
+    externals: Externals = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
     image: None | Image = field(
         default=None,
@@ -315,19 +289,17 @@ class Series:
             "type": "Element",
         },
     )
-    summary: None | str = field(
-        default=None,
+    summary: str = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
-    updated: None | int = field(
-        default=None,
+    updated: int = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
     links: None | Links = field(
         default=None,

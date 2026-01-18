@@ -6,7 +6,7 @@ from enum import Enum
 __NAMESPACE__ = "urn:docs"
 
 
-@dataclass
+@dataclass(kw_only=True)
 class DoubleQuotesDescription:
     """
     Let's trip.
@@ -18,7 +18,7 @@ class DoubleQuotesDescription:
         namespace = "urn:docs"
 
 
-@dataclass
+@dataclass(kw_only=True)
 class DoubleQuotesSummary:
     """
     Dont trip on quotes: "A", "B", "C", "D" My\\Ipsum.
@@ -57,7 +57,7 @@ class RootD(Enum):
     FALSE = "false"
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Root:
     """
     This is the root type documentation. '''Lorem ipsum''' dolor sit amet,
@@ -71,8 +71,7 @@ class Root:
     class Meta:
         namespace = "urn:docs"
 
-    a: None | Root.A = field(
-        default=None,
+    a: Root.A = field(
         metadata={
             "type": "Element",
             "namespace": "",
@@ -82,42 +81,38 @@ class Root:
                 " dolor sit amet, consectetur adipiscing elit. Aliquam "
                 "nec.\nMy\\Ipsum"
             ),
-        },
+        }
     )
-    b: None | RootB = field(
-        default=None,
+    b: RootB = field(
         metadata={
             "type": "Element",
             "namespace": "",
             "required": True,
             "doc": "This is a second root type field documentation.",
-        },
+        }
     )
-    c: None | RootEnum = field(
-        default=None,
+    c: RootEnum = field(
         metadata={
             "type": "Element",
             "namespace": "",
             "required": True,
-        },
+        }
     )
-    d: None | RootD = field(
-        default=None,
+    d: RootD = field(
         metadata={
             "type": "Element",
             "namespace": "",
             "required": True,
-        },
+        }
     )
 
-    @dataclass
+    @dataclass(kw_only=True)
     class A:
         """
         This is an inner type documentation.
         """
 
-        sub_a: None | str = field(
-            default=None,
+        sub_a: str = field(
             metadata={
                 "type": "Element",
                 "namespace": "",
@@ -127,5 +122,5 @@ class Root:
                     " dolor sit amet, consectetur adipiscing elit. Vivamus "
                     "efficitur.\nMy\\Ipsum"
                 ),
-            },
+            }
         )

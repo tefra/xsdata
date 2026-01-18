@@ -7,7 +7,7 @@ from xsdata.models.datatype import XmlDate, XmlPeriod
 __NAMESPACE__ = "http://musicbrainz.org/ns/mmd-2.0#"
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Alias:
     class Meta:
         name = "alias"
@@ -19,13 +19,12 @@ class Alias:
             "type": "Attribute",
         },
     )
-    sort_name: None | str = field(
-        default=None,
+    sort_name: str = field(
         metadata={
             "name": "sort-name",
             "type": "Attribute",
             "required": True,
-        },
+        }
     )
     type_value: None | str = field(
         default=None,
@@ -55,48 +54,44 @@ class Alias:
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class BeginArea:
     class Meta:
         name = "begin-area"
         namespace = "http://musicbrainz.org/ns/mmd-2.0#"
 
-    id: None | str = field(
-        default=None,
+    id: str = field(
         metadata={
             "type": "Attribute",
             "required": True,
-        },
+        }
     )
-    name: None | str = field(
-        default=None,
+    name: str = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
-    sort_name: None | str = field(
-        default=None,
+    sort_name: str = field(
         metadata={
             "name": "sort-name",
             "type": "Element",
             "required": True,
-        },
+        }
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Gender:
     class Meta:
         name = "gender"
         namespace = "http://musicbrainz.org/ns/mmd-2.0#"
 
-    id: None | str = field(
-        default=None,
+    id: str = field(
         metadata={
             "type": "Attribute",
             "required": True,
-        },
+        }
     )
     value: str = field(
         default="",
@@ -106,7 +101,7 @@ class Gender:
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class IpiList:
     class Meta:
         name = "ipi-list"
@@ -121,7 +116,7 @@ class IpiList:
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class IsniList:
     class Meta:
         name = "isni-list"
@@ -136,50 +131,47 @@ class IsniList:
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Iso31661CodeList:
     class Meta:
         name = "iso-3166-1-code-list"
         namespace = "http://musicbrainz.org/ns/mmd-2.0#"
 
-    iso_3166_1_code: None | str = field(
-        default=None,
+    iso_3166_1_code: str = field(
         metadata={
             "name": "iso-3166-1-code",
             "type": "Element",
             "required": True,
-        },
+        }
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Iso31662CodeList:
     class Meta:
         name = "iso-3166-2-code-list"
         namespace = "http://musicbrainz.org/ns/mmd-2.0#"
 
-    iso_3166_2_code: None | str = field(
-        default=None,
+    iso_3166_2_code: str = field(
         metadata={
             "name": "iso-3166-2-code",
             "type": "Element",
             "required": True,
-        },
+        }
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class LifeSpan:
     class Meta:
         name = "life-span"
         namespace = "http://musicbrainz.org/ns/mmd-2.0#"
 
-    begin: None | XmlDate | XmlPeriod = field(
-        default=None,
+    begin: XmlDate | XmlPeriod = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
     end: None | XmlDate = field(
         default=None,
@@ -195,18 +187,17 @@ class LifeSpan:
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class AliasList:
     class Meta:
         name = "alias-list"
         namespace = "http://musicbrainz.org/ns/mmd-2.0#"
 
-    count: None | int = field(
-        default=None,
+    count: int = field(
         metadata={
             "type": "Attribute",
             "required": True,
-        },
+        }
     )
     alias: list[Alias] = field(
         default_factory=list,
@@ -217,125 +208,112 @@ class AliasList:
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Area:
     class Meta:
         name = "area"
         namespace = "http://musicbrainz.org/ns/mmd-2.0#"
 
-    id: None | str = field(
-        default=None,
+    id: str = field(
         metadata={
             "type": "Attribute",
             "required": True,
-        },
+        }
     )
-    name: None | str = field(
-        default=None,
+    name: str = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
-    sort_name: None | str = field(
-        default=None,
+    sort_name: str = field(
         metadata={
             "name": "sort-name",
             "type": "Element",
             "required": True,
-        },
+        }
     )
-    iso_3166_1_code_list: None | Iso31661CodeList = field(
-        default=None,
+    iso_3166_1_code_list: Iso31661CodeList = field(
         metadata={
             "name": "iso-3166-1-code-list",
             "type": "Element",
             "required": True,
-        },
+        }
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class EndArea:
     class Meta:
         name = "end-area"
         namespace = "http://musicbrainz.org/ns/mmd-2.0#"
 
-    id: None | str = field(
-        default=None,
+    id: str = field(
         metadata={
             "type": "Attribute",
             "required": True,
-        },
+        }
     )
-    name: None | str = field(
-        default=None,
+    name: str = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
-    sort_name: None | str = field(
-        default=None,
+    sort_name: str = field(
         metadata={
             "name": "sort-name",
             "type": "Element",
             "required": True,
-        },
+        }
     )
-    iso_3166_2_code_list: None | Iso31662CodeList = field(
-        default=None,
+    iso_3166_2_code_list: Iso31662CodeList = field(
         metadata={
             "name": "iso-3166-2-code-list",
             "type": "Element",
             "required": True,
-        },
+        }
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Artist:
     class Meta:
         name = "artist"
         namespace = "http://musicbrainz.org/ns/mmd-2.0#"
 
-    id: None | str = field(
-        default=None,
+    id: str = field(
         metadata={
             "type": "Attribute",
             "required": True,
-        },
+        }
     )
-    type_value: None | str = field(
-        default=None,
+    type_value: str = field(
         metadata={
             "name": "type",
             "type": "Attribute",
             "required": True,
-        },
+        }
     )
-    type_id: None | str = field(
-        default=None,
+    type_id: str = field(
         metadata={
             "name": "type-id",
             "type": "Attribute",
             "required": True,
-        },
+        }
     )
-    name: None | str = field(
-        default=None,
+    name: str = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
-    sort_name: None | str = field(
-        default=None,
+    sort_name: str = field(
         metadata={
             "name": "sort-name",
             "type": "Element",
             "required": True,
-        },
+        }
     )
     disambiguation: None | str = field(
         default=None,
@@ -356,13 +334,12 @@ class Artist:
             "type": "Element",
         },
     )
-    isni_list: None | IsniList = field(
-        default=None,
+    isni_list: IsniList = field(
         metadata={
             "name": "isni-list",
             "type": "Element",
             "required": True,
-        },
+        }
     )
     gender: None | Gender = field(
         default=None,
@@ -370,27 +347,24 @@ class Artist:
             "type": "Element",
         },
     )
-    country: None | str = field(
-        default=None,
+    country: str = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
-    area: None | Area = field(
-        default=None,
+    area: Area = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )
-    begin_area: None | BeginArea = field(
-        default=None,
+    begin_area: BeginArea = field(
         metadata={
             "name": "begin-area",
             "type": "Element",
             "required": True,
-        },
+        }
     )
     end_area: None | EndArea = field(
         default=None,
@@ -399,34 +373,31 @@ class Artist:
             "type": "Element",
         },
     )
-    life_span: None | LifeSpan = field(
-        default=None,
+    life_span: LifeSpan = field(
         metadata={
             "name": "life-span",
             "type": "Element",
             "required": True,
-        },
+        }
     )
-    alias_list: None | AliasList = field(
-        default=None,
+    alias_list: AliasList = field(
         metadata={
             "name": "alias-list",
             "type": "Element",
             "required": True,
-        },
+        }
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Metadata:
     class Meta:
         name = "metadata"
         namespace = "http://musicbrainz.org/ns/mmd-2.0#"
 
-    artist: None | Artist = field(
-        default=None,
+    artist: Artist = field(
         metadata={
             "type": "Element",
             "required": True,
-        },
+        }
     )

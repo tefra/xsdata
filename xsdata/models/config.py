@@ -147,7 +147,6 @@ class OutputFormat:
         unsafe_hash: Generate __hash__ method
         frozen: Enable read only properties
         slots: Enable __slots__, python>=3.10 Only
-        kw_only: Enable keyword only arguments, python>=3.10 Only
     """
 
     value: str = text_node(default="dataclasses", cli="output")
@@ -157,7 +156,6 @@ class OutputFormat:
     unsafe_hash: bool = attribute(default=False)
     frozen: bool = attribute(default=False)
     slots: bool = attribute(default=False)
-    kw_only: bool = attribute(default=False)
 
     def __post_init__(self):
         """Post initialization method."""

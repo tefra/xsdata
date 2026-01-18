@@ -30,7 +30,7 @@ class GeneratorConfigTests(TestCase):
             f'<Config xmlns="http://pypi.org/project/xsdata" version="{__version__}">\n'
             '  <Output maxLineLength="79" genericCollections="false">\n'
             "    <Package>generated</Package>\n"
-            '    <Format repr="true" eq="true" order="false" unsafeHash="false" frozen="false" slots="false" kwOnly="false">dataclasses</Format>\n'
+            '    <Format repr="true" eq="true" order="false" unsafeHash="false" frozen="false" slots="false">dataclasses</Format>\n'
             "    <Structure>filenames</Structure>\n"
             "    <DocstringStyle>reStructuredText</DocstringStyle>\n"
             "    <RelativeImports>false</RelativeImports>\n"
@@ -91,7 +91,7 @@ class GeneratorConfigTests(TestCase):
             '  <Output maxLineLength="79" genericCollections="false">\n'
             "    <Package>foo.bar</Package>\n"
             '    <Format repr="true" eq="true" order="false" unsafeHash="false"'
-            ' frozen="false" slots="false" kwOnly="false">dataclasses</Format>\n'
+            ' frozen="false" slots="false">dataclasses</Format>\n'
             "    <Structure>filenames</Structure>\n"
             "    <DocstringStyle>reStructuredText</DocstringStyle>\n"
             "    <RelativeImports>false</RelativeImports>\n"

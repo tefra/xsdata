@@ -69,7 +69,9 @@ class ClientTests(TestCase):
         self.assertIsInstance(result, CalculatorSoapAddOutput)
         self.assertEqual(7, result.body.add_response.add_result)
 
-        obj = CalculatorSoapAddInput(body=CalculatorSoapAddInput.Body(add=Add(3, 4)))
+        obj = CalculatorSoapAddInput(
+            body=CalculatorSoapAddInput.Body(add=Add(int_a=3, int_b=4))
+        )
         request = client.serializer.render(obj)
 
         mock_post.assert_called_once_with(
@@ -87,7 +89,9 @@ class ClientTests(TestCase):
         mock_post.return_value = response.encode()
 
         client = Client.from_service(CalculatorSoapAdd)
-        obj = CalculatorSoapAddInput(body=CalculatorSoapAddInput.Body(add=Add(3, 4)))
+        obj = CalculatorSoapAddInput(
+            body=CalculatorSoapAddInput.Body(add=Add(int_a=3, int_b=4))
+        )
         result = client.send(obj)
 
         self.assertIsInstance(result, CalculatorSoapAddOutput)
@@ -115,7 +119,9 @@ class ClientTests(TestCase):
         client = Client.from_service(CalculatorSoapAdd)
 
         with self.assertRaises(ClientValueError) as cm:
-            client.prepare_payload(CalculatorSoapAddOutput())
+            client.prepare_payload(
+                CalculatorSoapAddOutput(body=CalculatorSoapAddOutput.Body())
+            )
 
         self.assertEqual(
             "Invalid input service type, expected "

@@ -6,50 +6,45 @@ from decimal import Decimal
 from xsdata.models.datatype import XmlDate
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Usaddress:
     class Meta:
         name = "USAddress"
 
-    name: None | str = field(
-        default=None,
+    name: str = field(
         metadata={
             "type": "Element",
             "namespace": "",
             "required": True,
-        },
+        }
     )
-    street: None | str = field(
-        default=None,
+    street: str = field(
         metadata={
             "type": "Element",
             "namespace": "",
             "required": True,
-        },
+        }
     )
-    city: None | str = field(
-        default=None,
+    city: str = field(
         metadata={
             "type": "Element",
             "namespace": "",
             "required": True,
-        },
+        }
     )
-    state: None | str = field(
-        default=None,
+    state: str = field(
         metadata={
             "type": "Element",
             "namespace": "",
             "required": True,
-        },
+        }
     )
-    zip: None | Decimal = field(
-        default=None,
+    zip: Decimal = field(
         metadata={
             "type": "Element",
             "namespace": "",
             "required": True,
-        },
+        }
     )
     country: str = field(
         init=False,
@@ -60,7 +55,7 @@ class Usaddress:
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Comment:
     class Meta:
         name = "comment"
@@ -73,7 +68,7 @@ class Comment:
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Items:
     item: list[Items.Item] = field(
         default_factory=list,
@@ -83,7 +78,7 @@ class Items:
         },
     )
 
-    @dataclass
+    @dataclass(kw_only=True)
     class Item:
         """
         Parameters
@@ -98,32 +93,29 @@ class Items:
             Stock Keeping Unit
         """
 
-        product_name: None | str = field(
-            default=None,
+        product_name: str = field(
             metadata={
                 "name": "productName",
                 "type": "Element",
                 "namespace": "",
                 "required": True,
-            },
+            }
         )
-        quantity: None | int = field(
-            default=None,
+        quantity: int = field(
             metadata={
                 "type": "Element",
                 "namespace": "",
                 "required": True,
                 "max_exclusive": 100,
-            },
+            }
         )
-        usprice: None | Decimal = field(
-            default=None,
+        usprice: Decimal = field(
             metadata={
                 "name": "USPrice",
                 "type": "Element",
                 "namespace": "",
                 "required": True,
-            },
+            }
         )
         comment: None | Comment = field(
             default=None,
@@ -139,18 +131,17 @@ class Items:
                 "namespace": "",
             },
         )
-        part_num: None | str = field(
-            default=None,
+        part_num: str = field(
             metadata={
                 "name": "partNum",
                 "type": "Attribute",
                 "required": True,
                 "pattern": r"\d{3}-[A-Z]{2}",
-            },
+            }
         )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class PurchaseOrderType:
     """
     Purchase order schema for Example.com.
@@ -168,23 +159,21 @@ class PurchaseOrderType:
     order_date
     """
 
-    ship_to: None | Usaddress = field(
-        default=None,
+    ship_to: Usaddress = field(
         metadata={
             "name": "shipTo",
             "type": "Element",
             "namespace": "",
             "required": True,
-        },
+        }
     )
-    bill_to: None | Usaddress = field(
-        default=None,
+    bill_to: Usaddress = field(
         metadata={
             "name": "billTo",
             "type": "Element",
             "namespace": "",
             "required": True,
-        },
+        }
     )
     comment: None | Comment = field(
         default=None,
@@ -192,13 +181,12 @@ class PurchaseOrderType:
             "type": "Element",
         },
     )
-    items: None | Items = field(
-        default=None,
+    items: Items = field(
         metadata={
             "type": "Element",
             "namespace": "",
             "required": True,
-        },
+        }
     )
     order_date: None | XmlDate = field(
         default=None,
@@ -209,7 +197,7 @@ class PurchaseOrderType:
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class PurchaseOrder(PurchaseOrderType):
     class Meta:
         name = "purchaseOrder"

@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Body:
     value: str = field(
         default="",
@@ -14,7 +14,7 @@ class Body:
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Origin:
     value: str = field(
         default="",
@@ -29,7 +29,7 @@ class PostStatus(Enum):
     PUBLISHED = "published"
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Source:
     value: str = field(
         default="",
@@ -39,7 +39,7 @@ class Source:
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Tag:
     value: str = field(
         default="",
@@ -49,7 +49,7 @@ class Tag:
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Title:
     value: str = field(
         default="",
@@ -59,7 +59,7 @@ class Title:
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Tags:
     tag: list[Tag] = field(
         default_factory=list,
@@ -70,7 +70,7 @@ class Tags:
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Post:
     status: PostStatus = field(
         default=PostStatus.DRAFT,
@@ -87,19 +87,17 @@ class Post:
             "required": True,
         },
     )
-    created_at: None | str = field(
-        default=None,
+    created_at: str = field(
         metadata={
             "type": "Attribute",
             "required": True,
-        },
+        }
     )
-    author: None | str = field(
-        default=None,
+    author: str = field(
         metadata={
             "type": "Attribute",
             "required": True,
-        },
+        }
     )
     origin: list[Origin] = field(
         default_factory=list,
@@ -115,33 +113,30 @@ class Post:
             "type": "Element",
         },
     )
-    title: None | Title = field(
-        default=None,
+    title: Title = field(
         metadata={
             "name": "Title",
             "type": "Element",
             "required": True,
-        },
+        }
     )
-    body: None | Body = field(
-        default=None,
+    body: Body = field(
         metadata={
             "name": "Body",
             "type": "Element",
             "required": True,
-        },
+        }
     )
-    tags: None | Tags = field(
-        default=None,
+    tags: Tags = field(
         metadata={
             "name": "Tags",
             "type": "Element",
             "required": True,
-        },
+        }
     )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Blog:
     post: list[Post] = field(
         default_factory=list,

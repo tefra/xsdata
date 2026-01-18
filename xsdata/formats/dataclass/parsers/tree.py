@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from typing import Optional
 
 from xsdata.formats.dataclass.models.elements import XmlType, XmlVar
 from xsdata.formats.dataclass.parsers.bases import NodeParser, Parsed

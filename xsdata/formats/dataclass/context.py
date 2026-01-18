@@ -2,7 +2,7 @@ import sys
 from collections import defaultdict
 from collections.abc import Callable, Iterator
 from contextlib import suppress
-from typing import Any, Optional
+from typing import Any
 
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.compat import class_types

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from itertools import starmap
-from typing import Any, Optional
+from typing import Any
 
 from xsdata.exceptions import ParserError
 from xsdata.formats.converter import converter

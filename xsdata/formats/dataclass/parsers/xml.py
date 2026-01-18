@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
 
 from xsdata.formats.dataclass.parsers.bases import NodeParser, Parsed
 from xsdata.formats.dataclass.parsers.handlers import default_handler

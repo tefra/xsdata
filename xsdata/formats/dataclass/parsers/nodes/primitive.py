@@ -1,5 +1,3 @@
-from typing import Optional
-
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.models.elements import XmlMeta, XmlVar
 from xsdata.formats.dataclass.parsers.config import ParserConfig

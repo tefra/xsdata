@@ -1,6 +1,6 @@
 import copy
 from dataclasses import dataclass, field
-from typing import Any, Optional, cast
+from typing import Any, cast
 
 from xsdata.exceptions import ParserError
 from xsdata.formats.dataclass.context import XmlContext

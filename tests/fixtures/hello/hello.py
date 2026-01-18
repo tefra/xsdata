@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Optional
 
 __NAMESPACE__ = "http://hello/"
 
@@ -107,15 +106,13 @@ class HelloGetHelloAsStringOutput:
 
     @dataclass
     class Body:
-        get_hello_as_string_response: GetHelloAsStringResponse | None = (
-            field(
-                default=None,
-                metadata={
-                    "name": "getHelloAsStringResponse",
-                    "type": "Element",
-                    "namespace": "http://hello/",
-                },
-            )
+        get_hello_as_string_response: GetHelloAsStringResponse | None = field(
+            default=None,
+            metadata={
+                "name": "getHelloAsStringResponse",
+                "type": "Element",
+                "namespace": "http://hello/",
+            },
         )
         fault: HelloGetHelloAsStringOutput.Body.Fault | None = field(
             default=None,
@@ -148,12 +145,14 @@ class HelloGetHelloAsStringOutput:
                     "namespace": "",
                 },
             )
-            detail: HelloGetHelloAsStringOutput.Body.Fault.Detail | None = field(
-                default=None,
-                metadata={
-                    "type": "Element",
-                    "namespace": "",
-                },
+            detail: HelloGetHelloAsStringOutput.Body.Fault.Detail | None = (
+                field(
+                    default=None,
+                    metadata={
+                        "type": "Element",
+                        "namespace": "",
+                    },
+                )
             )
 
             @dataclass

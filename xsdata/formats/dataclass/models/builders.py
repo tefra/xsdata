@@ -5,7 +5,6 @@ from collections.abc import Callable, Iterator, Mapping, Sequence
 from enum import Enum
 from typing import (
     Any,
-    Optional,
     get_type_hints,
 )
 

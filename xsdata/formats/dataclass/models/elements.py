@@ -4,10 +4,7 @@ import itertools
 import operator
 import sys
 from collections.abc import Callable, Iterator, Mapping, Sequence
-from typing import (
-    Any,
-    Optional,
-)
+from typing import Any
 
 from xsdata.formats.converter import converter
 from xsdata.models.enums import NamespaceType

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, fields
-from typing import Any, Optional, Union
+from typing import Any
 
 from xsdata.exceptions import ClientValueError
 from xsdata.formats.dataclass.context import XmlContext

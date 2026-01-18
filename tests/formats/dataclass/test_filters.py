@@ -620,7 +620,7 @@ class FiltersTests(FactoryTestCase):
         )
 
         self.assertEqual(
-            'Optional["C"]',
+            "Optional[C]",
             self.filters.field_type(self.obj_nested_nested_nested, attr),
         )
 
@@ -629,11 +629,10 @@ class FiltersTests(FactoryTestCase):
             types=AttrTypeFactory.list(1, qname="b", forward=True)
         )
         self.assertEqual(
-            'Optional["A.B"]',
+            "Optional[A.B]",
             self.filters.field_type(self.obj_nested_nested, attr),
         )
 
-        self.filters.postponed_annotations = True
         self.filters.union_type = True
         self.assertEqual(
             "None | A.B", self.filters.field_type(self.obj_nested_nested, attr)
@@ -645,18 +644,18 @@ class FiltersTests(FactoryTestCase):
         )
         attr.restrictions.max_occurs = 2
         self.assertEqual(
-            'list["A.B.C"]',
+            "list[A.B.C]",
             self.filters.field_type(self.obj, attr),
         )
 
         self.filters.format.frozen = True
-        self.assertEqual('tuple["A.B.C", ...]', self.filters.field_type(self.obj, attr))
+        self.assertEqual("tuple[A.B.C, ...]", self.filters.field_type(self.obj, attr))
 
         self.filters.format.frozen = False
-        self.assertEqual('list["A.B.C"]', self.filters.field_type(self.obj, attr))
+        self.assertEqual("list[A.B.C]", self.filters.field_type(self.obj, attr))
 
         self.filters.generic_collections = True
-        self.assertEqual('Iterable["A.B.C"]', self.filters.field_type(self.obj, attr))
+        self.assertEqual("Iterable[A.B.C]", self.filters.field_type(self.obj, attr))
 
     def test_field_type_with_token_attr(self) -> None:
         attr = AttrFactory.create(
@@ -683,7 +682,7 @@ class FiltersTests(FactoryTestCase):
         )
         attr.restrictions.max_occurs = 2
         self.assertEqual(
-            'list["A.BossLife"]',
+            "list[A.BossLife]",
             self.filters.field_type(self.obj_nested_nested_nested, attr),
         )
 
@@ -697,13 +696,13 @@ class FiltersTests(FactoryTestCase):
         attr.restrictions.max_occurs = 2
 
         self.assertEqual(
-            'list[Union["A.B.BossLife", int]]',
+            "list[Union[A.B.BossLife, int]]",
             self.filters.field_type(self.obj_nested_nested_nested, attr),
         )
 
         self.filters.union_type = True
         self.assertEqual(
-            'list["A.B.BossLife" | int]',
+            "list[A.B.BossLife | int]",
             self.filters.field_type(self.obj_nested_nested_nested, attr),
         )
 
@@ -786,10 +785,6 @@ class FiltersTests(FactoryTestCase):
 
     def test_choice_type_with_circular_reference(self) -> None:
         choice = AttrFactory.create(types=[AttrTypeFactory.create("c", circular=True)])
-        actual = self.filters.choice_type(self.obj_nested_nested_nested, choice)
-        self.assertEqual('ForwardRef("C")', actual)
-
-        self.filters.postponed_annotations = True
         actual = self.filters.choice_type(self.obj_nested_nested_nested, choice)
         self.assertEqual('ForwardRef("C")', actual)
 
@@ -909,7 +904,9 @@ class FiltersTests(FactoryTestCase):
         )
 
         expected = (
-            "from dataclasses import dataclass, field\nfrom typing import Optional"
+            "from __future__ import annotations\n"
+            "from dataclasses import dataclass, field\n"
+            "from typing import Optional"
         )
 
         self.assertEqual(expected, self.filters.default_imports(output))
@@ -919,14 +916,8 @@ class FiltersTests(FactoryTestCase):
 
         self.filters.import_patterns["attrs"] = {"__module__": ["@attrs.s"]}
 
-        expected = "import attrs"
+        expected = "from __future__ import annotations\nimport attrs"
         self.assertEqual(expected, self.filters.default_imports(output))
-
-    def test_default_imports_with_annotations(self) -> None:
-        self.filters.postponed_annotations = True
-
-        expected = "from __future__ import annotations"
-        self.assertEqual(expected, self.filters.default_imports(""))
 
     def test_format_docstring_simple(self) -> None:
         """Test simple single-line docstring."""

@@ -104,6 +104,7 @@ class DataclassGeneratorTests(FactoryTestCase):
 
         actual = self.generator.render_module(resolver, classes)
         expected = (
+            "from __future__ import annotations\n"
             "from dataclasses import dataclass, field\n"
             "from enum import Enum\n"
             "from typing import Optional\n"
@@ -159,6 +160,7 @@ class DataclassGeneratorTests(FactoryTestCase):
 
         actual = self.generator.render_module(resolver, classes)
         expected = (
+            "from __future__ import annotations\n"
             "from dataclasses import dataclass, field\n"
             "from typing import Optional\n"
             "\n"

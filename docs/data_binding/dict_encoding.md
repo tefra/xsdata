@@ -20,6 +20,7 @@ serialization.
 
 ```python
 >>> import pprint
+>>> from xsdata.models.datatype import XmlDate
 >>> from tests.fixtures.books import BookForm
 >>>
 >>> book = BookForm(
@@ -28,6 +29,7 @@ serialization.
 ...     title="The First Book",
 ...     genre="Fiction",
 ...     price=44.95,
+...     pub_date=XmlDate(2000, 10, 1),
 ...     review="An amazing story of nothing.",
 ... )
 >>> pprint.pprint(encoder.encode(book))
@@ -36,7 +38,7 @@ serialization.
  'id': 'bk001',
  'lang': 'en',
  'price': 44.95,
- 'pub_date': None,
+ 'pub_date': '2000-10-01',
  'review': 'An amazing story of nothing.',
  'title': 'The First Book'}
 
@@ -60,6 +62,7 @@ By using a custom dict factory you can change the output behaviour, like filter 
  'id': 'bk001',
  'lang': 'en',
  'price': 44.95,
+ 'pub_date': '2000-10-01',
  'review': 'An amazing story of nothing.',
  'title': 'The First Book'}
 

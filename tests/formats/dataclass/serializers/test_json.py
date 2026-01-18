@@ -27,6 +27,8 @@ class JsonSerializerTests(TestCase):
                     author="Nagata, Suanne",
                     title="Becoming Somebody",
                     genre="Biography",
+                    price=29.95,
+                    pub_date=XmlDate.from_string("2001-05-15"),
                     review="A masterpiece of the fine art of gossiping.",
                 ),
             ]
@@ -49,6 +51,8 @@ class JsonSerializerTests(TestCase):
                     "genre": "Biography",
                     "id": "bk002",
                     "lang": "en",
+                    "price": 29.95,
+                    "pub_date": "2001-05-15",
                     "review": "A masterpiece of the fine art of gossiping.",
                     "title": "Becoming Somebody",
                 },
@@ -82,8 +86,8 @@ class JsonSerializerTests(TestCase):
             "author": "{self.expected["book"][1]["author"]}",
             "title": "{self.expected["book"][1]["title"]}",
             "genre": "{self.expected["book"][1]["genre"]}",
-            "price": null,
-            "pub_date": null,
+            "price": {self.expected["book"][1]["price"]},
+            "pub_date": "{self.expected["book"][1]["pub_date"]}",
             "review": "{self.expected["book"][1]["review"]}",
             "id": "{self.expected["book"][1]["id"]}",
             "lang": "en"

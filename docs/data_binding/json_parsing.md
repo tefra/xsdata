@@ -131,11 +131,16 @@ through configuration.
 ... )
 >>> json_string = """{
 ...   "author": "Hightower, Kim",
-...   "unknown_property": "I will fail"
+...   "title": "The First Book",
+...   "genre": "Fiction",
+...   "price": 44.95,
+...   "pub_date": "2000-10-01",
+...   "review": "An amazing story.",
+...   "unknown_property": "I will be ignored"
 ... }"""
 >>> parser = JsonParser(config=config)
 >>> parser.from_string(json_string, BookForm)
-BookForm(author='Hightower, Kim', title=None, genre=None, price=None, pub_date=None, review=None, id=None, lang='en')
+BookForm(author='Hightower, Kim', title='The First Book', genre='Fiction', price=44.95, pub_date=XmlDate(2000, 10, 1), review='An amazing story.', id=None, lang='en')
 
 ```
 

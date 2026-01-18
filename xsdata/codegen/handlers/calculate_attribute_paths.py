@@ -46,12 +46,15 @@ class CalculateAttributePaths(HandlerInterface):
             - Every attr starts with a min/max occurs equal to one.
             - For every parent container multiply the min/max occurs
             - Set the sequence/choice/group reference ids as you go along
+            - Elements within a choice with minOccurs <= 1 are effectively
+              optional since only one branch of the choice is selected
 
         Args:
             attr: The attr of the class to check and process
         """
         min_occurs = 1
         max_occurs = 1
+        choice_min_occurs = None
         for path in attr.restrictions.path:
             name, index, mi, ma = path
 
@@ -61,6 +64,9 @@ class CalculateAttributePaths(HandlerInterface):
             elif name == CHOICE:
                 if not attr.restrictions.choice:
                     attr.restrictions.choice = index
+                # Track the minimum minOccurs of any choice in the path
+                if choice_min_occurs is None or mi < choice_min_occurs:
+                    choice_min_occurs = mi
             elif name == GROUP:
                 attr.restrictions.group = index
             else:
@@ -74,3 +80,8 @@ class CalculateAttributePaths(HandlerInterface):
 
         attr.restrictions.min_occurs *= min_occurs
         attr.restrictions.max_occurs *= max_occurs
+
+        # Elements within a choice with minOccurs <= 1 are effectively optional
+        # because only one branch of the choice is ever selected at runtime
+        if choice_min_occurs is not None and choice_min_occurs <= 1:
+            attr.restrictions.min_occurs = 0

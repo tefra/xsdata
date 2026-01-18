@@ -3,16 +3,13 @@ import base64
 import binascii
 import math
 import re
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from contextlib import suppress
 from datetime import date, datetime, time
 from decimal import Decimal, InvalidOperation
 from enum import Enum, EnumMeta
 from typing import (
     Any,
-    Callable,
-    Optional,
-    Union,
     cast,
 )
 from xml.etree.ElementTree import QName
@@ -128,7 +125,7 @@ class ConverterFactory:
 
     def test(
         self,
-        value: Optional[str],
+        value: str | None,
         types: Sequence[type],
         strict: bool = False,
         **kwargs: Any,
@@ -163,9 +160,7 @@ class ConverterFactory:
 
         return True
 
-    def register_converter(
-        self, data_type: type, func: Union[Callable, Converter]
-    ) -> None:
+    def register_converter(self, data_type: type, func: Callable | Converter) -> None:
         """Register a callable or converter for the given data type.
 
         Args:
@@ -502,7 +497,7 @@ class QNameConverter(Converter):
     def deserialize(
         self,
         value: str,
-        ns_map: Optional[dict] = None,
+        ns_map: dict | None = None,
         **kwargs: Any,
     ) -> QName:
         """Convert a string value to QName instance.
@@ -533,7 +528,7 @@ class QNameConverter(Converter):
     def serialize(
         self,
         value: QName,
-        ns_map: Optional[dict] = None,
+        ns_map: dict | None = None,
         **kwargs: Any,
     ) -> str:
         """Convert a QName instance value sto string.
@@ -567,7 +562,7 @@ class QNameConverter(Converter):
         return f"{prefix}:{tag}" if prefix else tag
 
     @staticmethod
-    def resolve(value: str, ns_map: Optional[dict] = None) -> tuple[str, str]:
+    def resolve(value: str, ns_map: dict | None = None) -> tuple[str, str]:
         """Split a qname or ns prefixed string value or a uri, name pair.
 
         Args:
@@ -614,7 +609,7 @@ class EnumConverter(Converter):
     def deserialize(
         self,
         value: Any,
-        data_type: Optional[EnumMeta] = None,
+        data_type: EnumMeta | None = None,
         **kwargs: Any,
     ) -> Enum:
         """Convert a value to an enum member.
@@ -730,7 +725,7 @@ class DateTimeBase(Converter, abc.ABC):
         except Exception as e:
             raise ConverterError(e)
 
-    def serialize(self, value: Union[date, time], **kwargs: Any) -> str:
+    def serialize(self, value: date | time, **kwargs: Any) -> str:
         """Convert a datetime instance to string.
 
         Args:

@@ -108,7 +108,7 @@ class PycodeSerializer:
 
     def repr_array(
         self,
-        obj: Union[list, set, tuple],
+        obj: list | set | tuple,
         level: int,
         types: set[type],
     ) -> Iterator[str]:

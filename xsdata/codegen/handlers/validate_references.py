@@ -1,5 +1,4 @@
 from collections.abc import Iterator
-from typing import Optional
 
 from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.mixins import ContainerHandlerInterface
@@ -77,7 +76,7 @@ class ValidateReferences(ContainerHandlerInterface):
     def validate_parent_references(self) -> None:
         """Validate inner to outer classes is accurate."""
 
-        def _validate(target: Class, parent: Optional[Class] = None) -> None:
+        def _validate(target: Class, parent: Class | None = None) -> None:
             actual_qname = actual_ref = expected_qname = expected_ref = None
             if target.parent:
                 actual_qname = target.parent.qname

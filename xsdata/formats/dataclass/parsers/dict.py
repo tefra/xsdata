@@ -1,9 +1,7 @@
 from collections.abc import Iterable
 from contextlib import suppress
 from dataclasses import dataclass, field, replace
-from typing import Any, Optional, Union
-
-from typing_extensions import get_args, get_origin
+from typing import Any, Optional, Union, get_args, get_origin
 
 from xsdata.exceptions import ParserError
 from xsdata.formats.converter import converter
@@ -28,7 +26,7 @@ class DictDecoder:
     config: ParserConfig = field(default_factory=ParserConfig)
     context: XmlContext = field(default_factory=XmlContext)
 
-    def decode(self, data: Union[list, dict], clazz: Optional[type[T]] = None) -> T:
+    def decode(self, data: list | dict, clazz: type[T] | None = None) -> T:
         """Parse the input stream into the target class type.
 
         If no clazz is provided, the binding context will try
@@ -47,7 +45,7 @@ class DictDecoder:
 
         return [self.bind_dataclass(obj, tp) for obj in data]  # type: ignore
 
-    def verify_type(self, clazz: Optional[type[T]], data: Union[dict, list]) -> type[T]:
+    def verify_type(self, clazz: type[T] | None, data: dict | list) -> type[T]:
         """Verify the given data matches the given clazz.
 
         If no clazz is provided, the binding context will try
@@ -86,7 +84,7 @@ class DictDecoder:
 
         return clazz  # type: ignore
 
-    def detect_type(self, data: Union[dict, list]) -> type[T]:
+    def detect_type(self, data: dict | list) -> type[T]:
         """Locate the target clazz type from the data keys.
 
         Args:
@@ -99,7 +97,7 @@ class DictDecoder:
             raise ParserError("Document is empty, can not detect type")
 
         keys = data[0].keys() if isinstance(data, list) else data.keys()
-        clazz: Optional[type[T]] = self.context.find_type_by_fields(set(keys))
+        clazz: type[T] | None = self.context.find_type_by_fields(set(keys))
 
         if clazz:
             return clazz
@@ -169,7 +167,7 @@ class DictDecoder:
         generic = self.context.class_type.derived_element
 
         if clazz is generic:
-            real_clazz: Optional[type[T]] = None
+            real_clazz: type[T] | None = None
             if xsi_type:
                 real_clazz = self.context.find_type(xsi_type)
 
@@ -376,7 +374,7 @@ class DictDecoder:
             # Is this scenario still possible???
             value = self.bind_text(meta, var, params)
         elif xsi_type:
-            clazz: Optional[type] = self.context.find_type(xsi_type)
+            clazz: type | None = self.context.find_type(xsi_type)
 
             if clazz is None:
                 raise ParserError(f"Unable to locate xsi:type `{xsi_type}`")
@@ -396,7 +394,7 @@ class DictDecoder:
         xml_vars: list[XmlVar],
         key: str,
         value: Any,
-    ) -> Optional[XmlVar]:
+    ) -> XmlVar | None:
         """Match the name to a xml variable.
 
         Args:

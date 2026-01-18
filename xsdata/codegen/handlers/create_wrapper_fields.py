@@ -1,5 +1,3 @@
-from typing import Optional
-
 from xsdata.codegen.mixins import RelativeHandlerInterface
 from xsdata.codegen.models import Attr, Class
 from xsdata.codegen.utils import ClassUtils
@@ -59,9 +57,7 @@ class CreateWrapperFields(RelativeHandlerInterface):
         attr.wrapper = wrapper
         attr.types[0].forward = False
 
-    def find_source_attr(
-        self, parent: Class, attr: Attr
-    ) -> tuple[bool, Optional[Attr]]:
+    def find_source_attr(self, parent: Class, attr: Attr) -> tuple[bool, Attr | None]:
         """Find the source type for the given attr type instance.
 
         If it's a forward reference, look up the source in
@@ -112,7 +108,7 @@ class CreateWrapperFields(RelativeHandlerInterface):
         )
 
     @classmethod
-    def validate_source(cls, source: Class, namespace: Optional[str]) -> bool:
+    def validate_source(cls, source: Class, namespace: str | None) -> bool:
         """Validate if the source class can be converted to a wrapper field.
 
         Rules:
@@ -131,7 +127,7 @@ class CreateWrapperFields(RelativeHandlerInterface):
             Whether the source class can be converted to a wrapper.
         """
 
-        def ns_equal(a: Optional[str], b: Optional[str]) -> bool:
+        def ns_equal(a: str | None, b: str | None) -> bool:
             return (a or "") == (b or "")
 
         return (

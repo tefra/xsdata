@@ -22,7 +22,7 @@ class BookForm:
         lang: Language ISO Code
     """
 
-    author: Optional[str] = field(
+    author: str | None = field(
         default=None,
         metadata={
             "type": "Element",
@@ -30,7 +30,7 @@ class BookForm:
             "required": True,
         },
     )
-    title: Optional[str] = field(
+    title: str | None = field(
         default=None,
         metadata={
             "type": "Element",
@@ -38,7 +38,7 @@ class BookForm:
             "required": True,
         },
     )
-    genre: Optional[str] = field(
+    genre: str | None = field(
         default=None,
         metadata={
             "type": "Element",
@@ -46,7 +46,7 @@ class BookForm:
             "required": True,
         },
     )
-    price: Optional[float] = field(
+    price: float | None = field(
         default=None,
         metadata={
             "type": "Element",
@@ -54,7 +54,7 @@ class BookForm:
             "required": True,
         },
     )
-    pub_date: Optional[XmlDate] = field(
+    pub_date: XmlDate | None = field(
         default=None,
         metadata={
             "type": "Element",
@@ -62,7 +62,7 @@ class BookForm:
             "required": True,
         },
     )
-    review: Optional[str] = field(
+    review: str | None = field(
         default=None,
         metadata={
             "type": "Element",
@@ -70,7 +70,7 @@ class BookForm:
             "required": True,
         },
     )
-    id: Optional[str] = field(
+    id: str | None = field(
         default=None,
         metadata={
             "type": "Attribute",

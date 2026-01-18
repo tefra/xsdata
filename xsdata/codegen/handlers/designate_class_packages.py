@@ -3,7 +3,6 @@ import re
 from collections import defaultdict
 from collections.abc import Iterable, Iterator
 from pathlib import Path
-from typing import Optional
 from urllib.parse import urlparse
 
 from toposort import toposort_flatten
@@ -199,7 +198,7 @@ class DesignateClassPackages(ContainerHandlerInterface):
 
         return list(groups.values())
 
-    def combine_ns_package(self, namespace: Optional[str]) -> list[str]:
+    def combine_ns_package(self, namespace: str | None) -> list[str]:
         """Combine the output package with a namespace.
 
         You can add aliases to namespace uri with the

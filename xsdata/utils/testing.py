@@ -3,10 +3,10 @@ import copy
 import importlib
 import random
 import unittest
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from contextlib import suppress
 from dataclasses import is_dataclass
-from typing import Any, Callable, Optional, TypeVar
+from typing import Any, TypeVar
 
 from xsdata.codegen.models import (
     Attr,
@@ -111,25 +111,25 @@ class ClassFactory(Factory):
     @classmethod
     def create(
         cls,
-        qname: Optional[str] = None,
-        meta_name: Optional[str] = None,
-        namespace: Optional[str] = None,
-        target_namespace: Optional[str] = None,
-        tag: Optional[str] = None,
+        qname: str | None = None,
+        meta_name: str | None = None,
+        namespace: str | None = None,
+        target_namespace: str | None = None,
+        tag: str | None = None,
         abstract: bool = False,
         mixed: bool = False,
         nillable: bool = False,
-        extensions: Optional[list[Extension]] = None,
-        substitutions: Optional[list[str]] = None,
-        attrs: Optional[list[Attr]] = None,
-        inner: Optional[list[Class]] = None,
-        ns_map: Optional[dict] = None,
+        extensions: list[Extension] | None = None,
+        substitutions: list[str] | None = None,
+        attrs: list[Attr] | None = None,
+        inner: list[Class] | None = None,
+        ns_map: dict | None = None,
         location: str = "tests.xsd",
-        package: Optional[str] = None,
-        module: Optional[str] = "tests",
+        package: str | None = None,
+        module: str | None = "tests",
         status: Status = Status.RAW,
-        container: Optional[str] = None,
-        default: Optional[Any] = None,
+        container: str | None = None,
+        default: Any | None = None,
         fixed: bool = False,
         prefix: str = "class_",
         **kwargs: Any,
@@ -203,9 +203,9 @@ class ExtensionFactory(Factory):
     @classmethod
     def create(
         cls,
-        attr_type: Optional[AttrType] = None,
-        restrictions: Optional[Restrictions] = None,
-        tag: Optional[str] = None,
+        attr_type: AttrType | None = None,
+        restrictions: Restrictions | None = None,
+        tag: str | None = None,
         **kwargs: Any,
     ) -> Extension:
         return Extension(
@@ -235,8 +235,8 @@ class AttrTypeFactory(Factory):
     @classmethod
     def create(
         cls,
-        qname: Optional[str] = None,
-        alias: Optional[str] = None,
+        qname: str | None = None,
+        alias: str | None = None,
         native: bool = False,
         forward: bool = False,
         circular: bool = False,
@@ -268,17 +268,17 @@ class AttrFactory(Factory):
     @classmethod
     def create(
         cls,
-        name: Optional[str] = None,
-        index: Optional[int] = None,
-        types: Optional[list[AttrType]] = None,
-        choices: Optional[list[Attr]] = None,
-        tag: Optional[str] = None,
-        namespace: Optional[str] = None,
-        wrapper: Optional[str] = None,
-        default: Optional[Any] = None,
+        name: str | None = None,
+        index: int | None = None,
+        types: list[AttrType] | None = None,
+        choices: list[Attr] | None = None,
+        tag: str | None = None,
+        namespace: str | None = None,
+        wrapper: str | None = None,
+        default: Any | None = None,
         fixed: bool = False,
         mixed: bool = False,
-        restrictions: Optional[Restrictions] = None,
+        restrictions: Restrictions | None = None,
         prefix: str = "attr_",
         **kwargs: Any,
     ) -> Attr:
@@ -303,7 +303,7 @@ class AttrFactory(Factory):
         cls,
         qname: str,
         tag: str = Tag.ELEMENT,
-        name: Optional[str] = None,
+        name: str | None = None,
         **kwargs: Any,
     ) -> Attr:
         return cls.create(
@@ -315,7 +315,7 @@ class AttrFactory(Factory):
         cls,
         datatype: DataType,
         tag: str = Tag.ELEMENT,
-        name: Optional[str] = None,
+        name: str | None = None,
         **kwargs: Any,
     ) -> Attr:
         return cls.create(
@@ -373,7 +373,7 @@ class PackageFactory(Factory):
         cls,
         qname: str = "{xsdata}Root",
         source: str = "generated.models",
-        alias: Optional[str] = None,
+        alias: str | None = None,
         **kwargs: Any,
     ) -> Import:
         return Import(qname=qname, source=source, alias=alias)
@@ -385,27 +385,27 @@ class XmlVarFactory(Factory):
     @classmethod
     def create(
         cls,
-        name: Optional[str] = None,
-        local_name: Optional[str] = None,
-        wrapper: Optional[str] = None,
+        name: str | None = None,
+        local_name: str | None = None,
+        wrapper: str | None = None,
         index: int = 0,
-        types: Optional[Sequence[type]] = None,
-        clazz: Optional[type] = None,
+        types: Sequence[type] | None = None,
+        clazz: type | None = None,
         init: bool = True,
         mixed: bool = False,
-        factory: Optional[Callable] = None,
-        tokens_factory: Optional[Callable] = None,
-        format: Optional[str] = None,
+        factory: Callable | None = None,
+        tokens_factory: Callable | None = None,
+        format: str | None = None,
         any_type: bool = False,
         required: bool = False,
         nillable: bool = False,
-        sequence: Optional[int] = None,
+        sequence: int | None = None,
         list_element: bool = False,
-        default: Optional[Any] = None,
+        default: Any | None = None,
         xml_type: str = XmlType.ELEMENT,
-        namespaces: Optional[Sequence[str]] = None,
-        elements: Optional[dict[str, XmlVar]] = None,
-        wildcards: Optional[Sequence[XmlVar]] = None,
+        namespaces: Sequence[str] | None = None,
+        elements: dict[str, XmlVar] | None = None,
+        wildcards: Sequence[XmlVar] | None = None,
         prefix: str = "field_",
         **kwargs: Any,
     ) -> XmlVar:
@@ -456,15 +456,15 @@ class XmlMetaFactory(Factory):
     def create(  # type: ignore
         cls,
         clazz: type,
-        qname: Optional[str] = None,
-        target_qname: Optional[str] = None,
+        qname: str | None = None,
+        target_qname: str | None = None,
         nillable: bool = False,
-        text: Optional[XmlVar] = None,
-        choices: Optional[Sequence[XmlVar]] = None,
-        elements: Optional[dict[str, Sequence[XmlVar]]] = None,
-        wildcards: Optional[Sequence[XmlVar]] = None,
-        attributes: Optional[dict[str, XmlVar]] = None,
-        any_attributes: Optional[Sequence[XmlVar]] = None,
+        text: XmlVar | None = None,
+        choices: Sequence[XmlVar] | None = None,
+        elements: dict[str, Sequence[XmlVar]] | None = None,
+        wildcards: Sequence[XmlVar] | None = None,
+        attributes: dict[str, XmlVar] | None = None,
+        any_attributes: Sequence[XmlVar] | None = None,
         **kwargs: Any,
     ) -> XmlMeta:
         if qname is None:
@@ -509,12 +509,12 @@ class DtdAttributeFactory(Factory):
     @classmethod
     def create(
         cls,
-        name: Optional[str] = None,
-        prefix: Optional[str] = None,
-        type: Optional[DtdAttributeType] = None,
-        default: Optional[DtdAttributeDefault] = None,
-        default_value: Optional[str] = None,
-        values: Optional[list[str]] = None,
+        name: str | None = None,
+        prefix: str | None = None,
+        type: DtdAttributeType | None = None,
+        default: DtdAttributeDefault | None = None,
+        default_value: str | None = None,
+        values: list[str] | None = None,
         **kwargs: Any,
     ) -> DtdAttribute:
         if name is None:
@@ -545,11 +545,11 @@ class DtdContentFactory(Factory):
     @classmethod
     def create(
         cls,
-        name: Optional[str] = None,
-        type: Optional[DtdContentType] = None,
-        occur: Optional[DtdContentOccur] = None,
-        left: Optional[DtdContent] = None,
-        right: Optional[DtdContent] = None,
+        name: str | None = None,
+        type: DtdContentType | None = None,
+        occur: DtdContentOccur | None = None,
+        left: DtdContent | None = None,
+        right: DtdContent | None = None,
         **kwargs: Any,
     ) -> DtdContent:
         if name is None:
@@ -576,12 +576,12 @@ class DtdElementFactory(Factory):
     @classmethod
     def create(
         cls,
-        name: Optional[str] = None,
-        prefix: Optional[str] = None,
-        type: Optional[DtdElementType] = None,
-        content: Optional[DtdContent] = None,
-        attributes: Optional[list[DtdAttribute]] = None,
-        ns_map: Optional[dict] = None,
+        name: str | None = None,
+        prefix: str | None = None,
+        type: DtdElementType | None = None,
+        content: DtdContent | None = None,
+        attributes: list[DtdAttribute] | None = None,
+        ns_map: dict | None = None,
         **kwargs: Any,
     ) -> DtdElement:
         if name is None:
@@ -610,8 +610,8 @@ class DtdFactory(Factory):
     @classmethod
     def create(
         cls,
-        elements: Optional[list[DtdElement]] = None,
-        location: Optional[str] = None,
+        elements: list[DtdElement] | None = None,
+        location: str | None = None,
         **kwargs: Any,
     ) -> Dtd:
         if elements is None:

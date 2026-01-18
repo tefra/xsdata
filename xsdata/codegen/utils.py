@@ -1,7 +1,6 @@
 import sys
 from collections import deque
 from collections.abc import Iterator
-from typing import Optional
 
 from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.models import (
@@ -217,7 +216,7 @@ class ClassUtils:
             target.inner.append(clone)
 
     @classmethod
-    def find_attr(cls, source: Class, name: str) -> Optional[Attr]:
+    def find_attr(cls, source: Class, name: str) -> Attr | None:
         """Find an attr in the source class by its name.
 
         Args:

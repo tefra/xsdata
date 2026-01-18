@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from itertools import starmap
 from typing import Any, Optional
 
@@ -59,9 +61,9 @@ class ElementNode(XmlNode):
         context: XmlContext,
         position: int,
         mixed: bool = False,
-        derived_factory: Optional[type] = None,
-        xsi_type: Optional[str] = None,
-        xsi_nil: Optional[bool] = None,
+        derived_factory: type | None = None,
+        xsi_type: str | None = None,
+        xsi_nil: bool | None = None,
     ):
         """Initialize the xml node."""
         self.meta = meta
@@ -80,8 +82,8 @@ class ElementNode(XmlNode):
     def bind(
         self,
         qname: str,
-        text: Optional[str],
-        tail: Optional[str],
+        text: str | None,
+        tail: str | None,
         objects: list[Any],
     ) -> bool:
         """Bind the parsed data into an object for the ending element.
@@ -121,8 +123,8 @@ class ElementNode(XmlNode):
     def bind_content(
         self,
         params: dict,
-        text: Optional[str],
-        tail: Optional[str],
+        text: str | None,
+        tail: str | None,
         objects: list[Any],
     ) -> None:
         """Parse the text and tail content.
@@ -333,7 +335,7 @@ class ElementNode(XmlNode):
         params[var.name] = list(starmap(self.prepare_generic_value, objects[pos:]))
         del objects[pos:]
 
-    def prepare_generic_value(self, qname: Optional[str], value: Any) -> Any:
+    def prepare_generic_value(self, qname: str | None, value: Any) -> Any:
         """Wrap primitive text nodes in a generic element.
 
         Args:
@@ -350,7 +352,7 @@ class ElementNode(XmlNode):
 
         return value
 
-    def bind_text(self, params: dict, text: Optional[str]) -> bool:
+    def bind_text(self, params: dict, text: str | None) -> bool:
         """Bind the element text content.
 
         Args:
@@ -388,8 +390,8 @@ class ElementNode(XmlNode):
         self,
         params: dict,
         var: XmlVar,
-        text: Optional[str],
-        tail: Optional[str],
+        text: str | None,
+        tail: str | None,
     ) -> bool:
         """Bind the element text and tail content to a wildcard field.
 
@@ -475,7 +477,7 @@ class ElementNode(XmlNode):
         attrs: dict,
         ns_map: dict,
         position: int,
-    ) -> Optional[XmlNode]:
+    ) -> XmlNode | None:
         """Build the next child node based on the xml var instance.
 
         Args:
@@ -534,7 +536,7 @@ class ElementNode(XmlNode):
             )
 
         node = None
-        clazz: Optional[type] = None
+        clazz: type | None = None
         if xsi_type:
             clazz = self.context.find_type(xsi_type)
 
@@ -589,10 +591,10 @@ class ElementNode(XmlNode):
         attrs: dict,
         ns_map: dict,
         position: int,
-        derived_factory: Optional[type],
-        xsi_type: Optional[str] = None,
-        xsi_nil: Optional[bool] = None,
-    ) -> Optional["ElementNode"]:
+        derived_factory: type | None,
+        xsi_type: str | None = None,
+        xsi_nil: bool | None = None,
+    ) -> ElementNode | None:
         """Build the next element child node.
 
         Args:

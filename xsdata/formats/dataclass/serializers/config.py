@@ -1,6 +1,7 @@
 import warnings
+from collections.abc import Callable
 from dataclasses import InitVar, dataclass
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 
 
 @dataclass
@@ -24,17 +25,17 @@ class SerializerConfig:
     encoding: str = "UTF-8"
     xml_version: str = "1.0"
     xml_declaration: bool = True
-    indent: Optional[str] = None
+    indent: str | None = None
     ignore_default_attributes: bool = False
-    schema_location: Optional[str] = None
-    no_namespace_schema_location: Optional[str] = None
-    globalns: Optional[dict[str, Callable]] = None
+    schema_location: str | None = None
+    no_namespace_schema_location: str | None = None
+    globalns: dict[str, Callable] | None = None
 
     # Deprecated
     pretty_print: InitVar[bool] = False
-    pretty_print_indent: InitVar[Optional[str]] = None
+    pretty_print_indent: InitVar[str | None] = None
 
-    def __post_init__(self, pretty_print: bool, pretty_print_indent: Optional[str]):
+    def __post_init__(self, pretty_print: bool, pretty_print_indent: str | None):
         """Handle deprecated pretty print/indent behaviour."""
         if pretty_print:
             self.__setattr__("pretty_print", pretty_print)

@@ -1,4 +1,4 @@
-from typing import Callable, Optional
+from collections.abc import Callable
 
 from xsdata.codegen.mixins import ContainerInterface, RelativeHandlerInterface
 from xsdata.codegen.models import Attr, AttrType, Class
@@ -116,7 +116,7 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
 
     def find_dependency(
         self, target: Class, attr_type: AttrType, tag: str
-    ) -> Optional[Class]:
+    ) -> Class | None:
         """Find the source type from the attr type and tag.
 
         Avoid conflicts by selecting any matching type by qname and preferably:

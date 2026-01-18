@@ -14,7 +14,7 @@ from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.formats.types import T
 from xsdata.models.enums import EventType
 
-Parsed = tuple[Optional[str], Any]
+Parsed = tuple[str | None, Any]
 
 
 @dataclass
@@ -35,8 +35,8 @@ class NodeParser(PushParser):
     def parse(
         self,
         source: Any,
-        clazz: Optional[type[T]] = None,
-        ns_map: Optional[dict[Optional[str], str]] = None,
+        clazz: type[T] | None = None,
+        ns_map: dict[str | None, str] | None = None,
     ) -> T:
         """Parse the input file or stream into the target class type.
 
@@ -67,7 +67,7 @@ class NodeParser(PushParser):
 
     def start(
         self,
-        clazz: Optional[type],
+        clazz: type | None,
         queue: list[XmlNode],
         objects: list[Parsed],
         qname: str,
@@ -133,8 +133,8 @@ class NodeParser(PushParser):
         queue: list[XmlNode],
         objects: list[Parsed],
         qname: str,
-        text: Optional[str],
-        tail: Optional[str],
+        text: str | None,
+        tail: str | None,
     ) -> bool:
         """Parse the last xml node and bind any intermediate objects.
 
@@ -153,12 +153,12 @@ class NodeParser(PushParser):
 
     def find_root_clazz(
         self,
-        clazz: Optional[type],
+        clazz: type | None,
         qname: str,
         attrs: dict,
         ns_map: dict,
-        xsi_type: Optional[str],
-    ) -> Optional[type]:
+        xsi_type: str | None,
+    ) -> type | None:
         """Obtain the root clazz, maybe from the provided clazz.
 
         Args:
@@ -193,7 +193,7 @@ class RecordParser(NodeParser):
 
     def start(
         self,
-        clazz: Optional[type],
+        clazz: type | None,
         queue: list[XmlNode],
         objects: list[Parsed],
         qname: str,
@@ -220,8 +220,8 @@ class RecordParser(NodeParser):
         queue: list[XmlNode],
         objects: list[Parsed],
         qname: str,
-        text: Optional[str],
-        tail: Optional[str],
+        text: str | None,
+        tail: str | None,
     ) -> Any:
         """Parse the last xml node and bind any intermediate objects.
 
@@ -241,7 +241,7 @@ class RecordParser(NodeParser):
         return super().end(queue, objects, qname, text, tail)
 
     def register_namespace(
-        self, ns_map: dict[Optional[str], str], prefix: Optional[str], uri: str
+        self, ns_map: dict[str | None, str], prefix: str | None, uri: str
     ) -> None:
         """Register the uri prefix in the namespace prefix-URI map.
 

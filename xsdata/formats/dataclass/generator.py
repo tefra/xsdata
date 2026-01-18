@@ -168,7 +168,7 @@ class DataclassGenerator(AbstractGenerator):
     def render_classes(
         self,
         classes: list[Class],
-        module_namespace: Optional[str],
+        module_namespace: str | None,
     ) -> str:
         """Render the classes source code in a module.
 
@@ -238,10 +238,13 @@ class DataclassGenerator(AbstractGenerator):
         Args:
             file_paths: A list of files/directories to format and check
         """
+        ruff_config = Path(__file__).parent.joinpath("ruff.toml")
         commands = [
             [
                 "ruff",
                 "format",
+                "--config",
+                str(ruff_config),
                 "--config",
                 f"line-length={self.config.output.max_line_length}",
                 *file_paths,
@@ -250,11 +253,9 @@ class DataclassGenerator(AbstractGenerator):
                 "ruff",
                 "check",
                 "--config",
+                str(ruff_config),
+                "--config",
                 f"line-length={self.config.output.max_line_length}",
-                "--config",
-                "lint.select = ['I']",
-                "--config",
-                "fixable = ['ALL']",
                 "--fix",
                 "--unsafe-fixes",
                 "--exit-zero",

@@ -1,11 +1,12 @@
 import re
 import warnings
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import Enum
 from io import TextIOBase
 from pathlib import Path
 from re import Pattern
-from typing import Any, Callable, Optional
+from typing import Any
 
 from xsdata import __version__
 from xsdata.codegen.exceptions import CodegenError, CodegenWarning
@@ -404,7 +405,7 @@ class GeneratorExtension:
     )
 
     parent_path: str = attribute(required=False, name="module")
-    parent_pattern: Optional[Pattern] = field(
+    parent_pattern: Pattern | None = field(
         init=False,
         metadata={"type": "Ignore"},
     )

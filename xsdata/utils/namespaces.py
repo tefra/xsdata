@@ -1,6 +1,5 @@
 import functools
 import re
-from typing import Optional
 
 from xsdata.models.enums import Namespace
 from xsdata.utils import text
@@ -14,7 +13,7 @@ URI_REGEX = re.compile(
 )
 
 
-def load_prefix(uri: str, ns_map: dict) -> Optional[str]:
+def load_prefix(uri: str, ns_map: dict) -> str | None:
     """Get or create a prefix for the uri in the prefix-URI map."""
     for prefix, ns in ns_map.items():
         if ns == uri:
@@ -79,7 +78,7 @@ def clean_uri(namespace: str) -> str:
 
 
 @functools.lru_cache(maxsize=50)
-def build_qname(tag_or_uri: Optional[str], tag: Optional[str] = None) -> str:
+def build_qname(tag_or_uri: str | None, tag: str | None = None) -> str:
     """Create namespace qualified strings."""
     if not tag_or_uri:
         if not tag:
@@ -101,7 +100,7 @@ def split_qname(qname: str) -> tuple:
     return None, qname
 
 
-def target_uri(qname: str) -> Optional[str]:
+def target_uri(qname: str) -> str | None:
     """Return the URI namespace of the qname."""
     return split_qname(qname)[0]
 
@@ -114,7 +113,7 @@ def local_name(qname: str) -> str:
 NCNAME_PUNCTUATION = {"\u00b7", "\u0387", ".", "-", "_"}
 
 
-def is_ncname(name: Optional[str]) -> bool:
+def is_ncname(name: str | None) -> bool:
     """Verify given string is a valid ncname."""
     if not name:
         return False
@@ -132,13 +131,13 @@ def is_ncname(name: Optional[str]) -> bool:
     return True
 
 
-def is_uri(uri: Optional[str]) -> bool:
+def is_uri(uri: str | None) -> bool:
     """Verify given string is a valid uri."""
     return bool(URI_REGEX.search(uri)) if uri else False
 
 
 @functools.lru_cache(maxsize=50)
-def to_package_name(uri: Optional[str]) -> str:
+def to_package_name(uri: str | None) -> str:
     """Util method to convert a namespace to a dot style package name."""
     if not uri:
         return ""

@@ -29,8 +29,8 @@ class PrimitiveNode(XmlNode):
     def bind(
         self,
         qname: str,
-        text: Optional[str],
-        tail: Optional[str],
+        text: str | None,
+        tail: str | None,
         objects: list,
     ) -> bool:
         """Bind the parsed data into an object for the ending element.

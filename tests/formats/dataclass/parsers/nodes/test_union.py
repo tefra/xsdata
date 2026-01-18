@@ -1,5 +1,4 @@
 from dataclasses import field, make_dataclass
-from typing import Union
 from unittest import TestCase
 
 from tests.fixtures.artists import Artist
@@ -70,7 +69,7 @@ class UnionNodeTests(TestCase):
             [("x", int, field(init=False, default=2, metadata={"type": "Attribute"}))],
         )
 
-        root = make_dataclass("Root", [("value", Union[a, b, int])])
+        root = make_dataclass("Root", [("value", a | b | int)])
         meta = self.context.build(root)
         var = next(meta.find_children("value"))
         node = UnionNode(
@@ -100,7 +99,7 @@ class UnionNodeTests(TestCase):
             "Item", [("value", str), ("a", int, attribute()), ("b", int, attribute())]
         )
         item2 = make_dataclass("Item2", [("a", int, attribute())])
-        root = make_dataclass("Root", [("item", Union[str, int, item2, item])])
+        root = make_dataclass("Root", [("item", str | int | item2 | item)])
 
         meta = self.context.build(root)
         var = next(meta.find_children("item"))

@@ -10,7 +10,7 @@ class Alphas:
         name = "alphas"
         namespace = "xsdata"
 
-    alpha: Optional[str] = field(
+    alpha: str | None = field(
         default=None,
         metadata={
             "type": "Element",
@@ -46,7 +46,7 @@ class Charlie:
             "required": True,
         },
     )
-    lang: Optional[object] = field(
+    lang: object | None = field(
         default=None,
         metadata={
             "type": "Attribute",
@@ -75,7 +75,7 @@ class Wrapper:
         name = "wrapper"
         namespace = "xsdata"
 
-    alpha: Optional[str] = field(
+    alpha: str | None = field(
         default=None,
         metadata={
             "wrapper": "alphas",

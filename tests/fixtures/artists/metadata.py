@@ -12,13 +12,13 @@ class Alias:
         name = "alias"
         namespace = "http://musicbrainz.org/ns/mmd-2.0#"
 
-    locale: Optional[str] = field(
+    locale: str | None = field(
         default=None,
         metadata={
             "type": "Attribute",
         },
     )
-    sort_name: Optional[str] = field(
+    sort_name: str | None = field(
         default=None,
         metadata={
             "name": "sort-name",
@@ -26,21 +26,21 @@ class Alias:
             "required": True,
         },
     )
-    type_value: Optional[str] = field(
+    type_value: str | None = field(
         default=None,
         metadata={
             "name": "type",
             "type": "Attribute",
         },
     )
-    type_id: Optional[str] = field(
+    type_id: str | None = field(
         default=None,
         metadata={
             "name": "type-id",
             "type": "Attribute",
         },
     )
-    primary: Optional[str] = field(
+    primary: str | None = field(
         default=None,
         metadata={
             "type": "Attribute",
@@ -60,21 +60,21 @@ class BeginArea:
         name = "begin-area"
         namespace = "http://musicbrainz.org/ns/mmd-2.0#"
 
-    id: Optional[str] = field(
+    id: str | None = field(
         default=None,
         metadata={
             "type": "Attribute",
             "required": True,
         },
     )
-    name: Optional[str] = field(
+    name: str | None = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    sort_name: Optional[str] = field(
+    sort_name: str | None = field(
         default=None,
         metadata={
             "name": "sort-name",
@@ -90,7 +90,7 @@ class Gender:
         name = "gender"
         namespace = "http://musicbrainz.org/ns/mmd-2.0#"
 
-    id: Optional[str] = field(
+    id: str | None = field(
         default=None,
         metadata={
             "type": "Attribute",
@@ -141,7 +141,7 @@ class Iso31661CodeList:
         name = "iso-3166-1-code-list"
         namespace = "http://musicbrainz.org/ns/mmd-2.0#"
 
-    iso_3166_1_code: Optional[str] = field(
+    iso_3166_1_code: str | None = field(
         default=None,
         metadata={
             "name": "iso-3166-1-code",
@@ -157,7 +157,7 @@ class Iso31662CodeList:
         name = "iso-3166-2-code-list"
         namespace = "http://musicbrainz.org/ns/mmd-2.0#"
 
-    iso_3166_2_code: Optional[str] = field(
+    iso_3166_2_code: str | None = field(
         default=None,
         metadata={
             "name": "iso-3166-2-code",
@@ -173,20 +173,20 @@ class LifeSpan:
         name = "life-span"
         namespace = "http://musicbrainz.org/ns/mmd-2.0#"
 
-    begin: Optional[Union[XmlDate, XmlPeriod]] = field(
+    begin: XmlDate | XmlPeriod | None = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    end: Optional[XmlDate] = field(
+    end: XmlDate | None = field(
         default=None,
         metadata={
             "type": "Element",
         },
     )
-    ended: Optional[bool] = field(
+    ended: bool | None = field(
         default=None,
         metadata={
             "type": "Element",
@@ -200,7 +200,7 @@ class AliasList:
         name = "alias-list"
         namespace = "http://musicbrainz.org/ns/mmd-2.0#"
 
-    count: Optional[int] = field(
+    count: int | None = field(
         default=None,
         metadata={
             "type": "Attribute",
@@ -222,21 +222,21 @@ class Area:
         name = "area"
         namespace = "http://musicbrainz.org/ns/mmd-2.0#"
 
-    id: Optional[str] = field(
+    id: str | None = field(
         default=None,
         metadata={
             "type": "Attribute",
             "required": True,
         },
     )
-    name: Optional[str] = field(
+    name: str | None = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    sort_name: Optional[str] = field(
+    sort_name: str | None = field(
         default=None,
         metadata={
             "name": "sort-name",
@@ -244,7 +244,7 @@ class Area:
             "required": True,
         },
     )
-    iso_3166_1_code_list: Optional[Iso31661CodeList] = field(
+    iso_3166_1_code_list: Iso31661CodeList | None = field(
         default=None,
         metadata={
             "name": "iso-3166-1-code-list",
@@ -260,21 +260,21 @@ class EndArea:
         name = "end-area"
         namespace = "http://musicbrainz.org/ns/mmd-2.0#"
 
-    id: Optional[str] = field(
+    id: str | None = field(
         default=None,
         metadata={
             "type": "Attribute",
             "required": True,
         },
     )
-    name: Optional[str] = field(
+    name: str | None = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    sort_name: Optional[str] = field(
+    sort_name: str | None = field(
         default=None,
         metadata={
             "name": "sort-name",
@@ -282,7 +282,7 @@ class EndArea:
             "required": True,
         },
     )
-    iso_3166_2_code_list: Optional[Iso31662CodeList] = field(
+    iso_3166_2_code_list: Iso31662CodeList | None = field(
         default=None,
         metadata={
             "name": "iso-3166-2-code-list",
@@ -298,14 +298,14 @@ class Artist:
         name = "artist"
         namespace = "http://musicbrainz.org/ns/mmd-2.0#"
 
-    id: Optional[str] = field(
+    id: str | None = field(
         default=None,
         metadata={
             "type": "Attribute",
             "required": True,
         },
     )
-    type_value: Optional[str] = field(
+    type_value: str | None = field(
         default=None,
         metadata={
             "name": "type",
@@ -313,7 +313,7 @@ class Artist:
             "required": True,
         },
     )
-    type_id: Optional[str] = field(
+    type_id: str | None = field(
         default=None,
         metadata={
             "name": "type-id",
@@ -321,14 +321,14 @@ class Artist:
             "required": True,
         },
     )
-    name: Optional[str] = field(
+    name: str | None = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    sort_name: Optional[str] = field(
+    sort_name: str | None = field(
         default=None,
         metadata={
             "name": "sort-name",
@@ -336,26 +336,26 @@ class Artist:
             "required": True,
         },
     )
-    disambiguation: Optional[str] = field(
+    disambiguation: str | None = field(
         default=None,
         metadata={
             "type": "Element",
         },
     )
-    ipi: Optional[str] = field(
+    ipi: str | None = field(
         default=None,
         metadata={
             "type": "Element",
         },
     )
-    ipi_list: Optional[IpiList] = field(
+    ipi_list: IpiList | None = field(
         default=None,
         metadata={
             "name": "ipi-list",
             "type": "Element",
         },
     )
-    isni_list: Optional[IsniList] = field(
+    isni_list: IsniList | None = field(
         default=None,
         metadata={
             "name": "isni-list",
@@ -363,27 +363,27 @@ class Artist:
             "required": True,
         },
     )
-    gender: Optional[Gender] = field(
+    gender: Gender | None = field(
         default=None,
         metadata={
             "type": "Element",
         },
     )
-    country: Optional[str] = field(
-        default=None,
-        metadata={
-            "type": "Element",
-            "required": True,
-        },
-    )
-    area: Optional[Area] = field(
+    country: str | None = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    begin_area: Optional[BeginArea] = field(
+    area: Area | None = field(
+        default=None,
+        metadata={
+            "type": "Element",
+            "required": True,
+        },
+    )
+    begin_area: BeginArea | None = field(
         default=None,
         metadata={
             "name": "begin-area",
@@ -391,14 +391,14 @@ class Artist:
             "required": True,
         },
     )
-    end_area: Optional[EndArea] = field(
+    end_area: EndArea | None = field(
         default=None,
         metadata={
             "name": "end-area",
             "type": "Element",
         },
     )
-    life_span: Optional[LifeSpan] = field(
+    life_span: LifeSpan | None = field(
         default=None,
         metadata={
             "name": "life-span",
@@ -406,7 +406,7 @@ class Artist:
             "required": True,
         },
     )
-    alias_list: Optional[AliasList] = field(
+    alias_list: AliasList | None = field(
         default=None,
         metadata={
             "name": "alias-list",
@@ -422,7 +422,7 @@ class Metadata:
         name = "metadata"
         namespace = "http://musicbrainz.org/ns/mmd-2.0#"
 
-    artist: Optional[Artist] = field(
+    artist: Artist | None = field(
         default=None,
         metadata={
             "type": "Element",

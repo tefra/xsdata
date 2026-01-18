@@ -5,8 +5,9 @@ import os
 import pickle
 import tempfile
 from collections import defaultdict
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable, NamedTuple, Optional
+from typing import NamedTuple
 
 from toposort import CircularDependencyError
 
@@ -214,7 +215,7 @@ class ResourceTransformer:
 
         self.classes.extend(classes)
 
-    def process_schema(self, uri: str, namespace: Optional[str] = None) -> None:
+    def process_schema(self, uri: str, namespace: str | None = None) -> None:
         """Parse and convert schema to codegen models.
 
         Args:
@@ -318,7 +319,7 @@ class ResourceTransformer:
 
         return classes
 
-    def parse_schema(self, uri: str, namespace: Optional[str]) -> Optional[Schema]:
+    def parse_schema(self, uri: str, namespace: str | None) -> Schema | None:
         """Parse the given URI and return the schema instance.
 
         Args:
@@ -336,8 +337,8 @@ class ResourceTransformer:
     def parse_definitions(
         self,
         uri: str,
-        namespace: Optional[str],
-    ) -> Optional[Definitions]:
+        namespace: str | None,
+    ) -> Definitions | None:
         """Parse recursively the given URI and return the definitions instance.
 
         Args:
@@ -365,7 +366,7 @@ class ResourceTransformer:
 
         return definitions
 
-    def load_resource(self, uri: str) -> Optional[bytes]:
+    def load_resource(self, uri: str) -> bytes | None:
         """Read and return the contents of the given URI.
 
         Args:

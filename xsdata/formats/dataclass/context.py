@@ -1,8 +1,8 @@
 import sys
 from collections import defaultdict
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import suppress
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.compat import class_types
@@ -46,7 +46,7 @@ class XmlContext:
         element_name_generator: Callable = return_input,
         attribute_name_generator: Callable = return_input,
         class_type: str = "dataclasses",
-        models_package: Optional[str] = None,
+        models_package: str | None = None,
     ):
         """Initialize the context."""
         self.element_name_generator = element_name_generator
@@ -66,7 +66,7 @@ class XmlContext:
 
     def get_builder(
         self,
-        globalns: Optional[dict[str, Callable]] = None,
+        globalns: dict[str, Callable] | None = None,
     ) -> XmlMetaBuilder:
         """Return a new xml meta builder instance."""
         return XmlMetaBuilder(
@@ -79,8 +79,8 @@ class XmlContext:
     def fetch(
         self,
         clazz: type,
-        parent_ns: Optional[str] = None,
-        xsi_type: Optional[str] = None,
+        parent_ns: str | None = None,
+        xsi_type: str | None = None,
     ) -> XmlMeta:
         """Build the model metadata for the given class.
 
@@ -158,7 +158,7 @@ class XmlContext:
 
         return []
 
-    def find_type(self, qname: str) -> Optional[type[T]]:
+    def find_type(self, qname: str) -> type[T] | None:
         """Return the last imported class that matches the given xsi:type qname.
 
         Args:
@@ -170,7 +170,7 @@ class XmlContext:
         types: list[type] = self.find_types(qname)
         return types[-1] if types else None
 
-    def find_type_by_fields(self, field_names: set[str]) -> Optional[type[T]]:
+    def find_type_by_fields(self, field_names: set[str]) -> type[T] | None:
         """Find a data class that matches best the given list of field names.
 
         Args:
@@ -198,7 +198,7 @@ class XmlContext:
         choices.sort(key=lambda x: (x[1], x[0].__name__))
         return choices[0][0] if choices else None
 
-    def find_subclass(self, clazz: type, qname: str) -> Optional[type]:
+    def find_subclass(self, clazz: type, qname: str) -> type | None:
         """Find a subclass for the given clazz and xsi:type qname.
 
         Compare all classes that match the given xsi:type qname and return the
@@ -229,8 +229,8 @@ class XmlContext:
     def build(
         self,
         clazz: type,
-        parent_ns: Optional[str] = None,
-        globalns: Optional[dict[str, Callable]] = None,
+        parent_ns: str | None = None,
+        globalns: dict[str, Callable] | None = None,
     ) -> XmlMeta:
         """Fetch or build the binding metadata for the given class.
 
@@ -247,7 +247,7 @@ class XmlContext:
             self.cache[clazz] = builder.build(clazz, parent_ns)
         return self.cache[clazz]
 
-    def build_recursive(self, clazz: type, parent_ns: Optional[str] = None) -> None:
+    def build_recursive(self, clazz: type, parent_ns: str | None = None) -> None:
         """Build the binding metadata for the given class and all of its dependencies.
 
         This method is used in benchmarks!

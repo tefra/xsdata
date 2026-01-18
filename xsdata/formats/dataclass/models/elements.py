@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 import itertools
 import operator
 import sys
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from typing import (
     Any,
-    Callable,
     Optional,
 )
 
@@ -48,7 +49,7 @@ class MetaMixin:
         return f"{self.__class__.__qualname__}({', '.join(params)})"
 
 
-def default_namespace(namespaces: Sequence[str]) -> Optional[str]:
+def default_namespace(namespaces: Sequence[str]) -> str | None:
     """Return the first valid namespace uri or None.
 
     Args:
@@ -148,24 +149,24 @@ class XmlVar(MetaMixin):
         index: int,
         name: str,
         local_name: str,
-        wrapper: Optional[str],
+        wrapper: str | None,
         types: Sequence[type],
-        clazz: Optional[type],
+        clazz: type | None,
         init: bool,
         mixed: bool,
-        factory: Optional[Callable],
-        tokens_factory: Optional[Callable],
-        format: Optional[str],
+        factory: Callable | None,
+        tokens_factory: Callable | None,
+        format: str | None,
         any_type: bool,
         process_contents: str,
         required: bool,
         nillable: bool,
-        sequence: Optional[int],
+        sequence: int | None,
         default: Any,
         xml_type: str,
         namespaces: Sequence[str],
-        elements: Mapping[str, "XmlVar"],
-        wildcards: Sequence["XmlVar"],
+        elements: Mapping[str, XmlVar],
+        wildcards: Sequence[XmlVar],
         **kwargs: Any,
     ):
         """Initialize the xml var."""
@@ -193,7 +194,7 @@ class XmlVar(MetaMixin):
         self.factory = factory
         self.tokens_factory = tokens_factory
 
-        self.namespace_matches: Optional[dict[str, bool]] = None
+        self.namespace_matches: dict[str, bool] | None = None
         self.is_clazz_union = self.clazz and len(types) > 1
 
         namespace = default_namespace(namespaces)
@@ -228,7 +229,7 @@ class XmlVar(MetaMixin):
         """Return the unique element types."""
         return {tp for element in self.elements.values() for tp in element.types}
 
-    def find_choice(self, qname: str) -> Optional["XmlVar"]:
+    def find_choice(self, qname: str) -> XmlVar | None:
         """Match and return a choice field by its qualified name.
 
         Args:
@@ -240,7 +241,7 @@ class XmlVar(MetaMixin):
         match = self.elements.get(qname)
         return match or find_by_namespace(self.wildcards, qname)
 
-    def find_value_choice(self, value: Any, is_class: bool) -> Optional["XmlVar"]:
+    def find_value_choice(self, value: Any, is_class: bool) -> XmlVar | None:
         """Match and return a choice field that matches the given value.
 
         Cases:
@@ -264,7 +265,7 @@ class XmlVar(MetaMixin):
 
         return self.find_primitive_choice(value, is_tokens)
 
-    def find_nillable_choice(self, is_tokens: bool) -> Optional["XmlVar"]:
+    def find_nillable_choice(self, is_tokens: bool) -> XmlVar | None:
         """Find the first nillable choice.
 
         Args:
@@ -279,7 +280,7 @@ class XmlVar(MetaMixin):
             if element.nillable and is_tokens == element.tokens
         )
 
-    def find_clazz_choice(self, clazz: type) -> Optional["XmlVar"]:
+    def find_clazz_choice(self, clazz: type) -> XmlVar | None:
         """Find the best matching choice for the given class.
 
         Best Matches:
@@ -305,7 +306,7 @@ class XmlVar(MetaMixin):
 
         return derived
 
-    def find_primitive_choice(self, value: Any, is_tokens: bool) -> Optional["XmlVar"]:
+    def find_primitive_choice(self, value: Any, is_tokens: bool) -> XmlVar | None:
         """Match and return a choice field that matches the given primitive value.
 
         Args:
@@ -427,9 +428,9 @@ class XmlMeta(MetaMixin):
         self,
         clazz: type,
         qname: str,
-        target_qname: Optional[str],
+        target_qname: str | None,
         nillable: bool,
-        text: Optional[XmlVar],
+        text: XmlVar | None,
         choices: Sequence[XmlVar],
         elements: Mapping[str, Sequence[XmlVar]],
         wildcards: Sequence[XmlVar],
@@ -494,7 +495,7 @@ class XmlMeta(MetaMixin):
 
         return sorted(result, key=get_index)
 
-    def find_attribute(self, qname: str) -> Optional[XmlVar]:
+    def find_attribute(self, qname: str) -> XmlVar | None:
         """Find an attribute var with the given qname.
 
         Args:
@@ -505,7 +506,7 @@ class XmlMeta(MetaMixin):
         """
         return self.attributes.get(qname)
 
-    def find_any_attributes(self, qname: str) -> Optional[XmlVar]:
+    def find_any_attributes(self, qname: str) -> XmlVar | None:
         """Find a wildcard attribute var that matches the given qname.
 
         Args:
@@ -516,7 +517,7 @@ class XmlMeta(MetaMixin):
         """
         return find_by_namespace(self.any_attributes, qname)
 
-    def find_wildcard(self, qname: str) -> Optional[XmlVar]:
+    def find_wildcard(self, qname: str) -> XmlVar | None:
         """Find a wildcard var that matches the given qname.
 
         If the wildcard has choices, attempt to match and return
@@ -537,7 +538,7 @@ class XmlMeta(MetaMixin):
 
         return wildcard
 
-    def find_any_wildcard(self) -> Optional[XmlVar]:
+    def find_any_wildcard(self) -> XmlVar | None:
         """Return the first declared wildcard var.
 
         Returns:
@@ -573,7 +574,7 @@ class XmlMeta(MetaMixin):
             yield chd
 
 
-def find_by_namespace(vars: Sequence[XmlVar], qname: str) -> Optional[XmlVar]:
+def find_by_namespace(vars: Sequence[XmlVar], qname: str) -> XmlVar | None:
     """Match the given qname to one of the given vars.
 
     Args:

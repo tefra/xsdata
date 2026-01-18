@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import abc
 import io
 import pathlib
@@ -22,13 +24,13 @@ class PushParser:
     """
 
     config: ParserConfig = field(default_factory=ParserConfig)
-    ns_map: dict[Optional[str], str] = field(init=False, default_factory=dict)
+    ns_map: dict[str | None, str] = field(init=False, default_factory=dict)
 
     def from_path(
         self,
         path: pathlib.Path,
-        clazz: Optional[type[T]] = None,
-        ns_map: Optional[dict[Optional[str], str]] = None,
+        clazz: type[T] | None = None,
+        ns_map: dict[str | None, str] | None = None,
     ) -> T:
         """Parse the input file into the target class type.
 
@@ -48,8 +50,8 @@ class PushParser:
     def from_string(
         self,
         source: str,
-        clazz: Optional[type[T]] = None,
-        ns_map: Optional[dict[Optional[str], str]] = None,
+        clazz: type[T] | None = None,
+        ns_map: dict[str | None, str] | None = None,
     ) -> T:
         """Parse the input source string into the target class type.
 
@@ -69,8 +71,8 @@ class PushParser:
     def from_bytes(
         self,
         source: bytes,
-        clazz: Optional[type[T]] = None,
-        ns_map: Optional[dict[Optional[str], str]] = None,
+        clazz: type[T] | None = None,
+        ns_map: dict[str | None, str] | None = None,
     ) -> T:
         """Parse the input source bytes object into the target class type.
 
@@ -91,8 +93,8 @@ class PushParser:
     def parse(
         self,
         source: Any,
-        clazz: Optional[type[T]] = None,
-        ns_map: Optional[dict[Optional[str], str]] = None,
+        clazz: type[T] | None = None,
+        ns_map: dict[str | None, str] | None = None,
     ) -> T:
         """Parse the input file or stream into the target class type.
 
@@ -111,12 +113,12 @@ class PushParser:
     @abc.abstractmethod
     def start(
         self,
-        clazz: Optional[type],
+        clazz: type | None,
         queue: list[Any],
         objects: list[Any],
         qname: str,
         attrs: dict[str, str],
-        ns_map: dict[Optional[str], str],
+        ns_map: dict[str | None, str],
     ) -> None:
         """Build and queue the XmlNode for the starting element.
 
@@ -135,8 +137,8 @@ class PushParser:
         queue: list,
         objects: list,
         qname: str,
-        text: Optional[str],
-        tail: Optional[str],
+        text: str | None,
+        tail: str | None,
     ) -> bool:
         """Parse the last xml node and bind any intermediate objects.
 
@@ -152,7 +154,7 @@ class PushParser:
         """
 
     def register_namespace(
-        self, ns_map: dict[Optional[str], str], prefix: Optional[str], uri: str
+        self, ns_map: dict[str | None, str], prefix: str | None, uri: str
     ) -> None:
         """Register the uri prefix in the namespace prefix-URI map.
 
@@ -177,7 +179,7 @@ class XmlNode(abc.ABC):
     __slots__ = ()
 
     @abc.abstractmethod
-    def child(self, qname: str, attrs: dict, ns_map: dict, position: int) -> "XmlNode":
+    def child(self, qname: str, attrs: dict, ns_map: dict, position: int) -> XmlNode:
         """Initialize the next child node to be queued, when an element starts.
 
         This entry point is responsible to create the next node type
@@ -198,8 +200,8 @@ class XmlNode(abc.ABC):
     def bind(
         self,
         qname: str,
-        text: Optional[str],
-        tail: Optional[str],
+        text: str | None,
+        tail: str | None,
         objects: list[Any],
     ) -> bool:
         """Bind the parsed data into an object for the ending element.
@@ -233,14 +235,14 @@ class XmlHandler:
 
     __slots__ = ("clazz", "objects", "parser", "queue")
 
-    def __init__(self, parser: PushParser, clazz: Optional[type]):
+    def __init__(self, parser: PushParser, clazz: type | None):
         """Initialize the handler."""
         self.parser = parser
         self.clazz = clazz
         self.queue: list = []
         self.objects: list = []
 
-    def parse(self, source: Any, ns_map: dict[Optional[str], str]) -> Any:
+    def parse(self, source: Any, ns_map: dict[str | None, str]) -> Any:
         """Parse the source XML document.
 
         Args:
@@ -256,7 +258,7 @@ class XmlHandler:
 class EventsHandler(XmlHandler):
     """Sax content handler for pre-recorded events."""
 
-    def parse(self, source: list[tuple], ns_map: dict[Optional[str], str]) -> Any:
+    def parse(self, source: list[tuple], ns_map: dict[str | None, str]) -> Any:
         """Forward the pre-recorded events to the main parser.
 
         Args:

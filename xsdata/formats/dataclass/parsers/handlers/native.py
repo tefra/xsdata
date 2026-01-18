@@ -16,7 +16,7 @@ EVENTS = (EventType.START, EventType.END, EventType.START_NS)
 class XmlEventHandler(XmlHandler):
     """A native xml event handler."""
 
-    def parse(self, source: Any, ns_map: dict[Optional[str], str]) -> Any:
+    def parse(self, source: Any, ns_map: dict[str | None, str]) -> Any:
         """Parse the source XML document.
 
         Args:
@@ -45,7 +45,7 @@ class XmlEventHandler(XmlHandler):
         return self.process_context(ctx, ns_map)
 
     def process_context(
-        self, context: Iterable[tuple[str, Any]], ns_map: dict[Optional[str], str]
+        self, context: Iterable[tuple[str, Any]], ns_map: dict[str | None, str]
     ) -> Any:
         """Iterate context and push events to main parser.
 
@@ -88,7 +88,7 @@ class XmlEventHandler(XmlHandler):
 
         return self.objects[-1][1] if self.objects else None
 
-    def merge_parent_namespaces(self, ns_map: dict[Optional[str], str]) -> dict:
+    def merge_parent_namespaces(self, ns_map: dict[str | None, str]) -> dict:
         """Merge the given prefix-URI map with the parent node map.
 
         This method also registers new prefixes with the parser.
@@ -141,7 +141,7 @@ def iterwalk(element: etree.Element, ns_map: dict) -> Iterator[tuple[str, Any]]:
     yield EventType.END, element
 
 
-def get_base_url(base_url: Optional[str], source: Any) -> Optional[str]:
+def get_base_url(base_url: str | None, source: Any) -> str | None:
     """Return the base url of the source.
 
     Args:
@@ -161,8 +161,8 @@ def get_base_url(base_url: Optional[str], source: Any) -> Optional[str]:
 def xinclude_loader(
     href: str,
     parse: Literal["xml"],
-    encoding: Optional[str] = None,
-    base_url: Optional[str] = None,
+    encoding: str | None = None,
+    base_url: str | None = None,
 ) -> Any:
     """Custom loader for xinclude parsing.
 

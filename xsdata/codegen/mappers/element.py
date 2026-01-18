@@ -1,5 +1,4 @@
 from collections import defaultdict
-from typing import Optional
 
 from xsdata.codegen.mappers.mixins import RawDocumentMapper
 from xsdata.codegen.models import AttrType, Class
@@ -35,7 +34,7 @@ class ElementMapper(RawDocumentMapper):
         return list(ClassUtils.flatten(target, f"{location}/{name}"))
 
     @classmethod
-    def build_class(cls, element: AnyElement, parent_namespace: Optional[str]) -> Class:
+    def build_class(cls, element: AnyElement, parent_namespace: str | None) -> Class:
         """Build a Class instance for the given generic element.
 
         Args:
@@ -67,7 +66,7 @@ class ElementMapper(RawDocumentMapper):
         cls,
         target: Class,
         element: AnyElement,
-        namespace: Optional[str],
+        namespace: str | None,
     ):
         """Build attributes for the given Class instance based on AnyElement attributes.
 
@@ -89,7 +88,7 @@ class ElementMapper(RawDocumentMapper):
         cls,
         target: Class,
         element: AnyElement,
-        namespace: Optional[str],
+        namespace: str | None,
     ):
         """Build elements for the given Class instance based on AnyElement children.
 

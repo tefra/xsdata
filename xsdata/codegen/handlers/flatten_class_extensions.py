@@ -1,5 +1,3 @@
-from typing import Optional
-
 from xsdata.codegen.mixins import RelativeHandlerInterface
 from xsdata.codegen.models import Attr, AttrType, Class, Extension
 from xsdata.codegen.utils import ClassUtils
@@ -82,7 +80,7 @@ class FlattenClassExtensions(RelativeHandlerInterface):
         self,
         source: Class,
         target: Class,
-        extension: Optional[Extension],
+        extension: Extension | None,
     ) -> None:
         """Process an enumeration class extension.
 
@@ -212,7 +210,7 @@ class FlattenClassExtensions(RelativeHandlerInterface):
         else:
             ext.type.reference = id(source)
 
-    def find_dependency(self, attr_type: AttrType) -> Optional[Class]:
+    def find_dependency(self, attr_type: AttrType) -> Class | None:
         """Find dependency for the given extension type with priority.
 
         Search priority: xs:SimpleType >  xs:ComplexType

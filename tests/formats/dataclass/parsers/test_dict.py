@@ -1,7 +1,6 @@
 import json
 from dataclasses import asdict, dataclass, field
 from decimal import Decimal
-from typing import Optional, Union
 from xml.etree.ElementTree import QName
 
 from tests import fixtures_dir
@@ -147,8 +146,8 @@ class DictDecoderTests(FactoryTestCase):
             ({}, list[BookForm], "Document is object, expected array"),
             (
                 {},
-                Optional[ChoiceType],
-                f"Invalid clazz argument: {Optional[ChoiceType]}",
+                None | ChoiceType,
+                f"Invalid clazz argument: {None | ChoiceType}",
             ),
             ([], list[int], f"Invalid clazz argument: {list[int]}"),
         ]
@@ -418,7 +417,7 @@ class DictDecoderTests(FactoryTestCase):
     def test_bind_text_with_unions(self) -> None:
         @dataclass
         class Fixture:
-            x: list[Union[int, float, str, bool]] = field(metadata={"tokens": True})
+            x: list[int | float | str | bool] = field(metadata={"tokens": True})
 
         values = ["foo", 12.2, "12.2", 12, "12", True, "false"]
 

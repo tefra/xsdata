@@ -1,5 +1,4 @@
-from collections.abc import Iterator
-from typing import Callable, Optional
+from collections.abc import Callable, Iterator
 
 from xsdata.codegen.handlers import (
     AddAttributeSubstitutions,
@@ -114,7 +113,7 @@ class ClassContainer(ContainerInterface):
         for items in list(self.data.values()):
             yield from items
 
-    def find(self, qname: str, condition: Callable = return_true) -> Optional[Class]:
+    def find(self, qname: str, condition: Callable = return_true) -> Class | None:
         """Find class that matches the given qualified name and condition callable.
 
         Classes are allowed to have the same qualified name, e.g. xsd:Element

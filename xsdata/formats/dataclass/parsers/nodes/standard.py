@@ -39,7 +39,7 @@ class StandardNode(XmlNode):
         ns_map: dict,
         config: ParserConfig,
         nillable: bool,
-        derived_factory: Optional[type],
+        derived_factory: type | None,
     ):
         """Initialize the xml node."""
         self.meta = meta
@@ -53,8 +53,8 @@ class StandardNode(XmlNode):
     def bind(
         self,
         qname: str,
-        text: Optional[str],
-        tail: Optional[str],
+        text: str | None,
+        tail: str | None,
         objects: list,
     ) -> bool:
         """Bind the parsed data into an object for the ending element.

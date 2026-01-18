@@ -18,9 +18,9 @@ class AnyElement:
         attributes: The element's key-value attribute mappings.
     """
 
-    qname: Optional[str] = field(default=None)
-    text: Optional[str] = field(default=None)
-    tail: Optional[str] = field(default=None)
+    qname: str | None = field(default=None)
+    text: str | None = field(default=None)
+    tail: str | None = field(default=None)
     children: list[object] = field(
         default_factory=list, metadata={"type": XmlType.WILDCARD}
     )
@@ -43,4 +43,4 @@ class DerivedElement(Generic[T]):
 
     qname: str
     value: T
-    type: Optional[str] = None
+    type: str | None = None

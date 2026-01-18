@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
@@ -78,7 +80,7 @@ class Root:
     class Meta:
         namespace = "urn:docs"
 
-    a: Optional["Root.A"] = field(
+    a: Root.A | None = field(
         default=None,
         metadata={
             "type": "Element",
@@ -86,7 +88,7 @@ class Root:
             "required": True,
         },
     )
-    b: Optional[RootB] = field(
+    b: RootB | None = field(
         default=None,
         metadata={
             "type": "Element",
@@ -94,7 +96,7 @@ class Root:
             "required": True,
         },
     )
-    c: Optional[RootEnum] = field(
+    c: RootEnum | None = field(
         default=None,
         metadata={
             "type": "Element",
@@ -102,7 +104,7 @@ class Root:
             "required": True,
         },
     )
-    d: Optional[RootD] = field(
+    d: RootD | None = field(
         default=None,
         metadata={
             "type": "Element",
@@ -122,7 +124,7 @@ class Root:
                 Vivamus efficitur. My\\Ipsum
         """
 
-        sub_a: Optional[str] = field(
+        sub_a: str | None = field(
             default=None,
             metadata={
                 "type": "Element",

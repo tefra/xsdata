@@ -17,7 +17,7 @@ class TreeParser(NodeParser):
 
     def start(
         self,
-        clazz: Optional[type],
+        clazz: type | None,
         queue: list[XmlNode],
         objects: list[Parsed],
         qname: str,

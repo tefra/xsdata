@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass, fields
 from typing import Any, Optional, Union
 
@@ -27,10 +29,10 @@ class Config:
     soap_action: str
     input: type
     output: type
-    encoding: Optional[str] = None
+    encoding: str | None = None
 
     @classmethod
-    def from_service(cls, obj: Any, **kwargs: Any) -> "Config":
+    def from_service(cls, obj: Any, **kwargs: Any) -> Config:
         """Instantiate from a generated service class.
 
         Args:
@@ -75,9 +77,9 @@ class Client:
     def __init__(
         self,
         config: Config,
-        transport: Optional[Transport] = None,
-        parser: Optional[XmlParser] = None,
-        serializer: Optional[XmlSerializer] = None,
+        transport: Transport | None = None,
+        parser: XmlParser | None = None,
+        serializer: XmlSerializer | None = None,
     ):
         """Initialize the client."""
         self.config = config
@@ -98,7 +100,7 @@ class Client:
         self.serializer = serializer
 
     @classmethod
-    def from_service(cls, obj: type, **kwargs: Any) -> "Client":
+    def from_service(cls, obj: type, **kwargs: Any) -> Client:
         """Instantiate client from a service class.
 
         Args:
@@ -116,7 +118,7 @@ class Client:
         """
         return cls(config=Config.from_service(obj, **kwargs))
 
-    def send(self, obj: Any, headers: Optional[dict] = None) -> Any:
+    def send(self, obj: Any, headers: dict | None = None) -> Any:
         """Build and send a request for the input object.
 
         ```py
@@ -126,8 +128,7 @@ class Client:
         Is equivalent with:
 
         ```py
-        req = CalculatorSoapAddInput(
-        body=CalculatorSoapAddInput.Body(add=Add(3, 4)))
+        req = CalculatorSoapAddInput(body=CalculatorSoapAddInput.Body(add=Add(3, 4)))
         res = client.send(req)
         ```
 
@@ -164,7 +165,7 @@ class Client:
 
         return result
 
-    def prepare_payload(self, obj: Any) -> Union[str, bytes]:
+    def prepare_payload(self, obj: Any) -> str | bytes:
         """Prepare and serialize the payload to be sent.
 
         If the obj is a pure dictionary, it will be converted

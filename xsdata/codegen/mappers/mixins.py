@@ -1,5 +1,5 @@
 import sys
-from typing import Any, Optional
+from typing import Any
 
 from xsdata.codegen.models import Attr, AttrType, Class
 from xsdata.formats.converter import converter
@@ -19,7 +19,7 @@ class RawDocumentMapper:
         target: Class,
         qname: str,
         attr_type: AttrType,
-        parent_namespace: Optional[str] = None,
+        parent_namespace: str | None = None,
         tag: str = Tag.ELEMENT,
         sequence: int = 0,
         value: Any = _UNSET,
@@ -87,10 +87,10 @@ class RawDocumentMapper:
     @classmethod
     def select_namespace(
         cls,
-        namespace: Optional[str],
-        parent_namespace: Optional[str],
+        namespace: str | None,
+        parent_namespace: str | None,
         tag: str = Tag.ELEMENT,
-    ) -> Optional[str]:
+    ) -> str | None:
         """Select the namespace based on the tag and namespace.
 
         Args:

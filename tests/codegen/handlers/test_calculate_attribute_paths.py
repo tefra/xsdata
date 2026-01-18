@@ -102,8 +102,8 @@ class CalculateAttributePathsTests(FactoryTestCase):
             (1, 3, 1, 1),
             (1, None, 0, 1),
             (1, None, 0, 1),
-            (1, None, 2, 2),
-            (1, None, 2, 2),
-            (1, None, 1, 21),
+            (1, None, 2, 2),  # choice min_occurs=2, so element stays required
+            (1, None, 2, 2),  # choice min_occurs=2, so element stays required
+            (1, None, 0, 21),  # choice min_occurs=1, so element becomes optional
         ]
         self.assertEqual(expected, actual)

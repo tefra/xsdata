@@ -1,8 +1,6 @@
 from collections.abc import Iterable
 from typing import Dict, List, Literal, Optional, Set, Tuple
 
-from tests.formats.dataclass.cases import PY310
-
 cases = [
     (int, False),
     (Dict[int, int], False),
@@ -14,13 +12,7 @@ cases = [
     (Tuple[object, ...], ((object,), tuple, None)),
     (Iterable[object, ...], ((object,), list, None)),
     (Optional[object], ((object,), None, None)),
+    (list[object], ((object,), list, None)),
+    (tuple[object, ...], ((object,), tuple, None)),
+    (object | None, ((object,), None, None)),
 ]
-
-if PY310:
-    cases.extend(
-        [
-            (list[object], ((object,), list, None)),
-            (tuple[object, ...], ((object,), tuple, None)),
-            (object | None, ((object,), None, None)),
-        ]
-    )

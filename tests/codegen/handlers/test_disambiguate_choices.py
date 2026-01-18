@@ -185,7 +185,7 @@ class DisambiguateChoicesTest(FactoryTestCase):
 
         self.assertTrue(result.local_type)
         self.assertEqual("{test}attr_B", result.qname)
-        self.assertEqual(source.status, result.status)
+        self.assertEqual(Status.RAW, result.status)
         self.assertEqual(Tag.ELEMENT, result.tag)
         self.assertEqual(source.location, result.location)
         self.assertEqual(source.ns_map, result.ns_map)

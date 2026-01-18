@@ -91,7 +91,6 @@ class ClassContainer(ContainerInterface):
             Steps.SANITIZE: [
                 ResetAttributeSequences(),
                 RenameDuplicateAttributes(),
-                SanitizeAttributesDefaultValue(self),
             ],
             Steps.RESOLVE: [
                 ValidateAttributesOverrides(self),
@@ -104,6 +103,7 @@ class ClassContainer(ContainerInterface):
                 CreateCompoundFields(self),
                 CreateWrapperFields(self),
                 DisambiguateChoices(self),
+                SanitizeAttributesDefaultValue(self),
                 ResetAttributeSequenceNumbers(self),
             ],
         }

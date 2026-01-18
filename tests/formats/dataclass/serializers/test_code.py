@@ -4,6 +4,7 @@ from tests.fixtures.books import BookForm, Books
 from tests.fixtures.books.fixtures import books
 from tests.fixtures.models import Parent
 from xsdata.formats.dataclass.serializers import PycodeSerializer
+from xsdata.models.datatype import XmlDate
 from xsdata.models.enums import Namespace
 
 
@@ -47,17 +48,34 @@ class PycodeSerializerTests(TestCase):
         self.assertEqual(expected, result)
 
     def test_write_class_with_default_values(self) -> None:
-        books = Books(book=[BookForm(author="me")])
+        books = Books(
+            book=[
+                BookForm(
+                    author="me",
+                    title="My Book",
+                    genre="Fiction",
+                    price=9.99,
+                    pub_date=XmlDate.from_string("2020-01-01"),
+                    review="Great!",
+                )
+            ]
+        )
         result = self.serializer.render(books, var_name="books")
         expected = (
             "from tests.fixtures.books.books import BookForm\n"
             "from tests.fixtures.books.books import Books\n"
+            "from xsdata.models.datatype import XmlDate\n"
             "\n"
             "\n"
             "books = Books(\n"
             "    book=[\n"
             "        BookForm(\n"
-            "            author='me'\n"
+            "            author='me',\n"
+            "            title='My Book',\n"
+            "            genre='Fiction',\n"
+            "            price=9.99,\n"
+            "            pub_date=XmlDate(2020, 1, 1),\n"
+            "            review='Great!'\n"
             "        ),\n"
             "    ]\n"
             ")\n"
@@ -65,17 +83,34 @@ class PycodeSerializerTests(TestCase):
         self.assertEqual(expected, result)
 
     def test_write_string_with_unicode_characters(self) -> None:
-        books = Books(book=[BookForm(author="Backslashes \\ One Two \x12 Three")])
+        books = Books(
+            book=[
+                BookForm(
+                    author="Backslashes \\ One Two \x12 Three",
+                    title="Test",
+                    genre="Test",
+                    price=1.0,
+                    pub_date=XmlDate.from_string("2020-01-01"),
+                    review="Test",
+                )
+            ]
+        )
         result = self.serializer.render(books, var_name="books")
         expected = (
             "from tests.fixtures.books.books import BookForm\n"
             "from tests.fixtures.books.books import Books\n"
+            "from xsdata.models.datatype import XmlDate\n"
             "\n"
             "\n"
             "books = Books(\n"
             "    book=[\n"
             "        BookForm(\n"
-            "            author='Backslashes \\\\ One Two \\x12 Three'\n"
+            "            author='Backslashes \\\\ One Two \\x12 Three',\n"
+            "            title='Test',\n"
+            "            genre='Test',\n"
+            "            price=1.0,\n"
+            "            pub_date=XmlDate(2020, 1, 1),\n"
+            "            review='Test'\n"
             "        ),\n"
             "    ]\n"
             ")\n"

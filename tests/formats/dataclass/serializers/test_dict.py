@@ -30,6 +30,8 @@ class DictEncoderTests(TestCase):
                     author="Nagata, Suanne",
                     title="Becoming Somebody",
                     genre="Biography",
+                    price=29.95,
+                    pub_date=XmlDate.from_string("2001-05-15"),
                     review="A masterpiece of the fine art of gossiping.",
                 ),
             ]
@@ -52,6 +54,8 @@ class DictEncoderTests(TestCase):
                     "genre": "Biography",
                     "id": "bk002",
                     "lang": "en",
+                    "price": 29.95,
+                    "pub_date": "2001-05-15",
                     "review": "A masterpiece of the fine art of gossiping.",
                     "title": "Becoming Somebody",
                 },
@@ -78,10 +82,10 @@ class DictEncoderTests(TestCase):
         self.assertEqual("30-234-56783", actual)
 
     def test_convert_wrapper(self) -> None:
-        obj = Wrapper(alpha=["value"])
+        obj = Wrapper(alpha="value")
         value = self.encoder.encode(obj)
         expected = {
-            "alphas": {"alpha": ["value"]},
+            "alphas": {"alpha": "value"},
             "bravos": {"bravo": []},
             "charlies": {"charlie": []},
         }

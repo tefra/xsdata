@@ -18,8 +18,19 @@ from xsdata.formats.dataclass.serializers.mixins import (
     EventGenerator,
     XmlWriter,
 )
+from xsdata.models.datatype import XmlDate
 from xsdata.models.enums import DataType, QNames
 from xsdata.utils.testing import XmlVarFactory
+
+# Default values for BookForm required fields
+BOOK_DEFAULTS = {
+    "author": "Test Author",
+    "title": "Test Title",
+    "genre": "Fiction",
+    "price": 9.99,
+    "pub_date": XmlDate(2020, 1, 1),
+    "review": "Test review",
+}
 
 
 class XmlWriterImpl(XmlWriter):
@@ -302,7 +313,7 @@ class EventGeneratorTests(TestCase):
         self.assertEqual(expected, list(events))
 
     def test_with_derived_element(self) -> None:
-        book = BookForm(id="123")
+        book = BookForm(**BOOK_DEFAULTS, id="123")
         obj = DerivedElement(qname="item", value=book)
 
         result = self.generator.generate(obj)
@@ -311,6 +322,24 @@ class EventGeneratorTests(TestCase):
             ("attr", "id", "123"),
             ("attr", "lang", "en"),
             ("attr", QNames.XSI_TYPE, "{urn:books}BookForm"),
+            ("start", "author"),
+            ("data", "Test Author"),
+            ("end", "author"),
+            ("start", "title"),
+            ("data", "Test Title"),
+            ("end", "title"),
+            ("start", "genre"),
+            ("data", "Fiction"),
+            ("end", "genre"),
+            ("start", "price"),
+            ("data", "9.99"),
+            ("end", "price"),
+            ("start", "pub_date"),
+            ("data", "2020-01-01"),
+            ("end", "pub_date"),
+            ("start", "review"),
+            ("data", "Test review"),
+            ("end", "review"),
             ("end", "item"),
         ]
         self.assertIsInstance(result, Generator)
@@ -322,31 +351,77 @@ class EventGeneratorTests(TestCase):
             ("start", "{urn:books}BookForm"),
             ("attr", "id", "123"),
             ("attr", "lang", "en"),
+            ("start", "author"),
+            ("data", "Test Author"),
+            ("end", "author"),
+            ("start", "title"),
+            ("data", "Test Title"),
+            ("end", "title"),
+            ("start", "genre"),
+            ("data", "Fiction"),
+            ("end", "genre"),
+            ("start", "price"),
+            ("data", "9.99"),
+            ("end", "price"),
+            ("start", "pub_date"),
+            ("data", "2020-01-01"),
+            ("end", "pub_date"),
+            ("start", "review"),
+            ("data", "Test review"),
+            ("end", "review"),
             ("end", "{urn:books}BookForm"),
         ]
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
     def test_with_dataclass(self) -> None:
-        book = BookForm(id="123", title="Misterioso: A Crime Novel", price=19.5)
+        book = BookForm(
+            author="Test Author",
+            title="Misterioso: A Crime Novel",
+            genre="Fiction",
+            price=19.5,
+            pub_date=XmlDate(2020, 1, 1),
+            review="Test review",
+            id="123",
+        )
         result = self.generator.generate(book)
         expected = [
             ("start", "BookForm"),
             ("attr", "id", "123"),
             ("attr", "lang", "en"),
+            ("start", "author"),
+            ("data", "Test Author"),
+            ("end", "author"),
             ("start", "title"),
             ("data", "Misterioso: A Crime Novel"),
             ("end", "title"),
+            ("start", "genre"),
+            ("data", "Fiction"),
+            ("end", "genre"),
             ("start", "price"),
             ("data", "19.5"),
             ("end", "price"),
+            ("start", "pub_date"),
+            ("data", "2020-01-01"),
+            ("end", "pub_date"),
+            ("start", "review"),
+            ("data", "Test review"),
+            ("end", "review"),
             ("end", "BookForm"),
         ]
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
     def test_convert_dataclass_can_overwrite_params(self) -> None:
-        book = BookForm(id="123", title="Misterioso: A Crime Novel", price=19.5)
+        book = BookForm(
+            author="Test Author",
+            title="Misterioso: A Crime Novel",
+            genre="Fiction",
+            price=19.5,
+            pub_date=XmlDate(2020, 1, 1),
+            review="Test review",
+            id="123",
+        )
         result = self.generator.convert_dataclass(
             book, "xsdata", "book", True, "foo:book"
         )
@@ -356,12 +431,24 @@ class EventGeneratorTests(TestCase):
             ("attr", "lang", "en"),
             ("attr", QNames.XSI_TYPE, "foo:book"),
             ("attr", QNames.XSI_NIL, "true"),
+            ("start", "author"),
+            ("data", "Test Author"),
+            ("end", "author"),
             ("start", "title"),
             ("data", "Misterioso: A Crime Novel"),
             ("end", "title"),
+            ("start", "genre"),
+            ("data", "Fiction"),
+            ("end", "genre"),
             ("start", "price"),
             ("data", "19.5"),
             ("end", "price"),
+            ("start", "pub_date"),
+            ("data", "2020-01-01"),
+            ("end", "pub_date"),
+            ("start", "review"),
+            ("data", "Test review"),
+            ("end", "review"),
             ("end", "book"),
         ]
         self.assertIsInstance(result, Generator)
@@ -374,8 +461,8 @@ class EventGeneratorTests(TestCase):
 
     def test_convert_mixed_content(self) -> None:
         var = XmlVarFactory.create(xml_type=XmlType.WILDCARD, name="a", mixed=True)
-        book = BookForm(id="123")
-        ebook = DerivedElement("ebook", BookForm(id="123"))
+        book = BookForm(**BOOK_DEFAULTS, id="123")
+        ebook = DerivedElement("ebook", BookForm(**BOOK_DEFAULTS, id="123"))
         value = ["text", AnyElement(qname="br"), book, ebook, "tail"]
         result = self.generator.convert_value(value, var, "xsdata")
         expected = [
@@ -386,11 +473,47 @@ class EventGeneratorTests(TestCase):
             ("start", "{xsdata}BookForm"),
             ("attr", "id", "123"),
             ("attr", "lang", "en"),
+            ("start", "author"),
+            ("data", "Test Author"),
+            ("end", "author"),
+            ("start", "title"),
+            ("data", "Test Title"),
+            ("end", "title"),
+            ("start", "genre"),
+            ("data", "Fiction"),
+            ("end", "genre"),
+            ("start", "price"),
+            ("data", "9.99"),
+            ("end", "price"),
+            ("start", "pub_date"),
+            ("data", "2020-01-01"),
+            ("end", "pub_date"),
+            ("start", "review"),
+            ("data", "Test review"),
+            ("end", "review"),
             ("end", "{xsdata}BookForm"),
             ("start", "ebook"),
             ("attr", "id", "123"),
             ("attr", "lang", "en"),
-            ("attr", QNames.XSI_TYPE, "{urn:books}BookForm"),
+            ("attr", QNames.XSI_TYPE, QName("{urn:books}BookForm")),
+            ("start", "author"),
+            ("data", "Test Author"),
+            ("end", "author"),
+            ("start", "title"),
+            ("data", "Test Title"),
+            ("end", "title"),
+            ("start", "genre"),
+            ("data", "Fiction"),
+            ("end", "genre"),
+            ("start", "price"),
+            ("data", "9.99"),
+            ("end", "price"),
+            ("start", "pub_date"),
+            ("data", "2020-01-01"),
+            ("end", "pub_date"),
+            ("start", "review"),
+            ("data", "Test review"),
+            ("end", "review"),
             ("end", "ebook"),
             ("data", "tail"),
         ]
@@ -523,15 +646,39 @@ class EventGeneratorTests(TestCase):
     def test_convert_any_type_with_derived_element_dataclass(self) -> None:
         var = XmlVarFactory.create(xml_type=XmlType.WILDCARD, name="a")
         value = DerivedElement(
-            qname="a", value=BookForm(title="def"), type="{urn:books}BookForm"
+            qname="a",
+            value=BookForm(
+                author="Test Author",
+                title="def",
+                genre="Fiction",
+                price=9.99,
+                pub_date=XmlDate(2020, 1, 1),
+                review="Test review",
+            ),
+            type="{urn:books}BookForm",
         )
         expected = [
             ("start", "a"),
             ("attr", "lang", "en"),
             ("attr", QNames.XSI_TYPE, QName("{urn:books}BookForm")),
+            ("start", "author"),
+            ("data", "Test Author"),
+            ("end", "author"),
             ("start", "title"),
             ("data", "def"),
             ("end", "title"),
+            ("start", "genre"),
+            ("data", "Fiction"),
+            ("end", "genre"),
+            ("start", "price"),
+            ("data", "9.99"),
+            ("end", "price"),
+            ("start", "pub_date"),
+            ("data", "2020-01-01"),
+            ("end", "pub_date"),
+            ("start", "review"),
+            ("data", "Test review"),
+            ("end", "review"),
             ("end", "a"),
         ]
 
@@ -545,11 +692,29 @@ class EventGeneratorTests(TestCase):
             name="a",
             types=(BookForm,),
         )
-        value = BookForm(id="123")
+        value = BookForm(**BOOK_DEFAULTS, id="123")
         expected = [
             ("start", "a"),
             ("attr", "id", "123"),
             ("attr", "lang", "en"),
+            ("start", "author"),
+            ("data", "Test Author"),
+            ("end", "author"),
+            ("start", "title"),
+            ("data", "Test Title"),
+            ("end", "title"),
+            ("start", "genre"),
+            ("data", "Fiction"),
+            ("end", "genre"),
+            ("start", "price"),
+            ("data", "9.99"),
+            ("end", "price"),
+            ("start", "pub_date"),
+            ("data", "2020-01-01"),
+            ("end", "pub_date"),
+            ("start", "review"),
+            ("data", "Test review"),
+            ("end", "review"),
             ("end", "a"),
         ]
 
@@ -563,16 +728,35 @@ class EventGeneratorTests(TestCase):
             name="a",
             types=(BookForm,),
         )
-        ebook = make_dataclass("eBook", [], bases=(BookForm,))
+        eBookClass = make_dataclass("eBook", [], bases=(BookForm,))
+        ebook = eBookClass(**BOOK_DEFAULTS, id="123")
         expected = [
             ("start", "a"),
             ("attr", "id", "123"),
             ("attr", "lang", "en"),
             ("attr", QNames.XSI_TYPE, QName("eBook")),
+            ("start", "author"),
+            ("data", "Test Author"),
+            ("end", "author"),
+            ("start", "title"),
+            ("data", "Test Title"),
+            ("end", "title"),
+            ("start", "genre"),
+            ("data", "Fiction"),
+            ("end", "genre"),
+            ("start", "price"),
+            ("data", "9.99"),
+            ("end", "price"),
+            ("start", "pub_date"),
+            ("data", "2020-01-01"),
+            ("end", "pub_date"),
+            ("start", "review"),
+            ("data", "Test review"),
+            ("end", "review"),
             ("end", "a"),
         ]
 
-        result = self.generator.convert_value(ebook(id="123"), var, "xsdata")
+        result = self.generator.convert_value(ebook, var, "xsdata")
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
@@ -767,14 +951,33 @@ class EventGeneratorTests(TestCase):
             },
         )
 
-        ebook = make_dataclass("eBook", [], bases=(BookForm,))
+        eBookClass = make_dataclass("eBook", [], bases=(BookForm,))
+        ebook = eBookClass(**BOOK_DEFAULTS)
         expected = [
             ("start", "eBook"),
             ("attr", "lang", "en"),
+            ("start", "author"),
+            ("data", "Test Author"),
+            ("end", "author"),
+            ("start", "title"),
+            ("data", "Test Title"),
+            ("end", "title"),
+            ("start", "genre"),
+            ("data", "Fiction"),
+            ("end", "genre"),
+            ("start", "price"),
+            ("data", "9.99"),
+            ("end", "price"),
+            ("start", "pub_date"),
+            ("data", "2020-01-01"),
+            ("end", "pub_date"),
+            ("start", "review"),
+            ("data", "Test review"),
+            ("end", "review"),
             ("end", "eBook"),
         ]
 
-        result = self.generator.convert_value(ebook(), var, None)
+        result = self.generator.convert_value(ebook, var, None)
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 

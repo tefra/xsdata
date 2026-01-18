@@ -26,12 +26,14 @@
 ...            title="The First Book",
 ...            genre="Fiction",
 ...            price=44.95,
+...            pub_date=XmlDate(2000, 10, 1),
 ...            review="An amazing story of nothing.",
 ...        ),
 ...        BookForm(
 ...            id="bk002",
 ...            author="Nagata, Suanne",
 ...            title="Becoming Somebody",
+...            genre="Biography",
 ...            price=33.95,
 ...            pub_date=XmlDate(2001, 1, 10),
 ...            review="A masterpiece of the fine art of gossiping.",
@@ -46,7 +48,7 @@
       "title": "The First Book",
       "genre": "Fiction",
       "price": 44.95,
-      "pub_date": null,
+      "pub_date": "2000-10-01",
       "review": "An amazing story of nothing.",
       "id": "bk001",
       "lang": "en"
@@ -54,7 +56,7 @@
     {
       "author": "Nagata, Suanne",
       "title": "Becoming Somebody",
-      "genre": null,
+      "genre": "Biography",
       "price": 33.95,
       "pub_date": "2001-01-10",
       "review": "A masterpiece of the fine art of gossiping.",
@@ -83,7 +85,7 @@
       "title": "The First Book",
       "genre": "Fiction",
       "price": 44.95,
-      "pub_date": null,
+      "pub_date": "2000-10-01",
       "review": "An amazing story of nothing.",
       "id": "bk001",
       "lang": "en"
@@ -91,7 +93,7 @@
     {
       "author": "Nagata, Suanne",
       "title": "Becoming Somebody",
-      "genre": null,
+      "genre": "Biography",
       "price": 33.95,
       "pub_date": "2001-01-10",
       "review": "A masterpiece of the fine art of gossiping.",
@@ -116,15 +118,16 @@ By using a custom dict factory you can change the output behaviour, like filter 
 >>> def filter_none(x: Tuple) -> Dict:
 ...     return {k: v for k, v in x if v is not None}
 >>>
->>> books.book[0].genre = None
+>>> books.book[0].id = None
 >>> serializer = JsonSerializer(dict_factory=filter_none, config=config)
 >>> print(serializer.render(books.book[0]))
 {
   "author": "Hightower, Kim",
   "title": "The First Book",
+  "genre": "Fiction",
   "price": 44.95,
+  "pub_date": "2000-10-01",
   "review": "An amazing story of nothing.",
-  "id": "bk001",
   "lang": "en"
 }
 

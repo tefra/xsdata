@@ -71,10 +71,12 @@ class SanitizeAttributesDefaultValueTests(FactoryTestCase):
             False,
             False,
             False,
+            False,
         ]
         mock_should_reset_default.side_effect = [
             False,
             True,
+            False,
             False,
             False,
             False,
@@ -105,6 +107,12 @@ class SanitizeAttributesDefaultValueTests(FactoryTestCase):
         attr = AttrFactory.extension(types=[AttrTypeFactory.native(DataType.INTEGER)])
         self.processor.process_attribute(target, attr)
         self.assertIsNone(attr.default)
+
+        attr = AttrFactory.extension(
+            types=[AttrTypeFactory.native(DataType.BASE64_BINARY)]
+        )
+        self.processor.process_attribute(target, attr)
+        self.assertEqual("", attr.default)
 
     def test_should_reset_required(self) -> None:
         attr = AttrFactory.create()

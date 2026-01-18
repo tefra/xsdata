@@ -54,9 +54,12 @@ class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
 
         if attr.default is not None:
             self.process_types(target, attr)
-        elif attr.xml_type is None and str in attr.native_types:
-            # String text nodes get an empty string as default!
-            attr.default = ""
+        elif attr.xml_type is None:
+            # Text nodes get an empty default value
+            if str in attr.native_types:
+                attr.default = ""
+            elif bytes in attr.native_types:
+                attr.default = ""  # Will be converted to b"" during codegen
 
     def process_types(self, target: Class, attr: Attr) -> None:
         """Reset attr types if default value doesn't pass validation.

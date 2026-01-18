@@ -211,7 +211,6 @@ class GeneratorOutput:
         wrapper_fields: Generate wrapper fields
         max_line_length: Adjust the maximum line length
         generic_collections: Use generic collections (Iterable, Mapping)
-        union_type: Use PEP-604 union type, python>=3.10 Only
         unnest_classes: Move inner classes to upper level
         ignore_patterns: Ignore pattern restrictions
         include_header: Include a header with codegen information in the output
@@ -228,7 +227,6 @@ class GeneratorOutput:
     wrapper_fields: bool = element(default=False)
     max_line_length: int = attribute(default=79)
     generic_collections: bool = attribute(default=False)
-    union_type: bool = attribute(default=False)
     unnest_classes: bool = element(default=False)
     ignore_patterns: bool = element(default=False)
     include_header: bool = element(default=False)

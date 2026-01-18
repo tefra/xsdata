@@ -10,7 +10,7 @@ class Add:
     class Meta:
         namespace = "http://tempuri.org/"
 
-    int_a: int | None = field(
+    int_a: None | int = field(
         default=None,
         metadata={
             "name": "intA",
@@ -18,7 +18,7 @@ class Add:
             "required": True,
         },
     )
-    int_b: int | None = field(
+    int_b: None | int = field(
         default=None,
         metadata={
             "name": "intB",
@@ -33,7 +33,7 @@ class AddResponse:
     class Meta:
         namespace = "http://tempuri.org/"
 
-    add_result: int | None = field(
+    add_result: None | int = field(
         default=None,
         metadata={
             "name": "AddResult",
@@ -48,7 +48,7 @@ class Divide:
     class Meta:
         namespace = "http://tempuri.org/"
 
-    int_a: int | None = field(
+    int_a: None | int = field(
         default=None,
         metadata={
             "name": "intA",
@@ -56,7 +56,7 @@ class Divide:
             "required": True,
         },
     )
-    int_b: int | None = field(
+    int_b: None | int = field(
         default=None,
         metadata={
             "name": "intB",
@@ -71,7 +71,7 @@ class DivideResponse:
     class Meta:
         namespace = "http://tempuri.org/"
 
-    divide_result: int | None = field(
+    divide_result: None | int = field(
         default=None,
         metadata={
             "name": "DivideResult",
@@ -86,7 +86,7 @@ class Multiply:
     class Meta:
         namespace = "http://tempuri.org/"
 
-    int_a: int | None = field(
+    int_a: None | int = field(
         default=None,
         metadata={
             "name": "intA",
@@ -94,7 +94,7 @@ class Multiply:
             "required": True,
         },
     )
-    int_b: int | None = field(
+    int_b: None | int = field(
         default=None,
         metadata={
             "name": "intB",
@@ -109,7 +109,7 @@ class MultiplyResponse:
     class Meta:
         namespace = "http://tempuri.org/"
 
-    multiply_result: int | None = field(
+    multiply_result: None | int = field(
         default=None,
         metadata={
             "name": "MultiplyResult",
@@ -124,7 +124,7 @@ class Subtract:
     class Meta:
         namespace = "http://tempuri.org/"
 
-    int_a: int | None = field(
+    int_a: None | int = field(
         default=None,
         metadata={
             "name": "intA",
@@ -132,7 +132,7 @@ class Subtract:
             "required": True,
         },
     )
-    int_b: int | None = field(
+    int_b: None | int = field(
         default=None,
         metadata={
             "name": "intB",
@@ -147,7 +147,7 @@ class SubtractResponse:
     class Meta:
         namespace = "http://tempuri.org/"
 
-    subtract_result: int | None = field(
+    subtract_result: None | int = field(
         default=None,
         metadata={
             "name": "SubtractResult",
@@ -163,7 +163,7 @@ class CalculatorSoapAddInput:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
-    body: CalculatorSoapAddInput.Body | None = field(
+    body: None | CalculatorSoapAddInput.Body = field(
         default=None,
         metadata={
             "name": "Body",
@@ -173,7 +173,7 @@ class CalculatorSoapAddInput:
 
     @dataclass
     class Body:
-        add: Add | None = field(
+        add: None | Add = field(
             default=None,
             metadata={
                 "name": "Add",
@@ -189,7 +189,7 @@ class CalculatorSoapAddOutput:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
-    body: CalculatorSoapAddOutput.Body | None = field(
+    body: None | CalculatorSoapAddOutput.Body = field(
         default=None,
         metadata={
             "name": "Body",
@@ -199,7 +199,7 @@ class CalculatorSoapAddOutput:
 
     @dataclass
     class Body:
-        add_response: AddResponse | None = field(
+        add_response: None | AddResponse = field(
             default=None,
             metadata={
                 "name": "AddResponse",
@@ -207,7 +207,7 @@ class CalculatorSoapAddOutput:
                 "namespace": "http://tempuri.org/",
             },
         )
-        fault: CalculatorSoapAddOutput.Body.Fault | None = field(
+        fault: None | CalculatorSoapAddOutput.Body.Fault = field(
             default=None,
             metadata={
                 "name": "Fault",
@@ -217,28 +217,28 @@ class CalculatorSoapAddOutput:
 
         @dataclass
         class Fault:
-            faultcode: str | None = field(
+            faultcode: None | str = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultstring: str | None = field(
+            faultstring: None | str = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultactor: str | None = field(
+            faultactor: None | str = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            detail: str | None = field(
+            detail: None | str = field(
                 default=None,
                 metadata={
                     "type": "Element",
@@ -253,7 +253,7 @@ class CalculatorSoapDivideInput:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
-    body: CalculatorSoapDivideInput.Body | None = field(
+    body: None | CalculatorSoapDivideInput.Body = field(
         default=None,
         metadata={
             "name": "Body",
@@ -263,7 +263,7 @@ class CalculatorSoapDivideInput:
 
     @dataclass
     class Body:
-        divide: Divide | None = field(
+        divide: None | Divide = field(
             default=None,
             metadata={
                 "name": "Divide",
@@ -279,7 +279,7 @@ class CalculatorSoapDivideOutput:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
-    body: CalculatorSoapDivideOutput.Body | None = field(
+    body: None | CalculatorSoapDivideOutput.Body = field(
         default=None,
         metadata={
             "name": "Body",
@@ -289,7 +289,7 @@ class CalculatorSoapDivideOutput:
 
     @dataclass
     class Body:
-        divide_response: DivideResponse | None = field(
+        divide_response: None | DivideResponse = field(
             default=None,
             metadata={
                 "name": "DivideResponse",
@@ -297,7 +297,7 @@ class CalculatorSoapDivideOutput:
                 "namespace": "http://tempuri.org/",
             },
         )
-        fault: CalculatorSoapDivideOutput.Body.Fault | None = field(
+        fault: None | CalculatorSoapDivideOutput.Body.Fault = field(
             default=None,
             metadata={
                 "name": "Fault",
@@ -307,28 +307,28 @@ class CalculatorSoapDivideOutput:
 
         @dataclass
         class Fault:
-            faultcode: str | None = field(
+            faultcode: None | str = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultstring: str | None = field(
+            faultstring: None | str = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultactor: str | None = field(
+            faultactor: None | str = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            detail: str | None = field(
+            detail: None | str = field(
                 default=None,
                 metadata={
                     "type": "Element",
@@ -343,7 +343,7 @@ class CalculatorSoapMultiplyInput:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
-    body: CalculatorSoapMultiplyInput.Body | None = field(
+    body: None | CalculatorSoapMultiplyInput.Body = field(
         default=None,
         metadata={
             "name": "Body",
@@ -353,7 +353,7 @@ class CalculatorSoapMultiplyInput:
 
     @dataclass
     class Body:
-        multiply: Multiply | None = field(
+        multiply: None | Multiply = field(
             default=None,
             metadata={
                 "name": "Multiply",
@@ -369,7 +369,7 @@ class CalculatorSoapMultiplyOutput:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
-    body: CalculatorSoapMultiplyOutput.Body | None = field(
+    body: None | CalculatorSoapMultiplyOutput.Body = field(
         default=None,
         metadata={
             "name": "Body",
@@ -379,7 +379,7 @@ class CalculatorSoapMultiplyOutput:
 
     @dataclass
     class Body:
-        multiply_response: MultiplyResponse | None = field(
+        multiply_response: None | MultiplyResponse = field(
             default=None,
             metadata={
                 "name": "MultiplyResponse",
@@ -387,7 +387,7 @@ class CalculatorSoapMultiplyOutput:
                 "namespace": "http://tempuri.org/",
             },
         )
-        fault: CalculatorSoapMultiplyOutput.Body.Fault | None = field(
+        fault: None | CalculatorSoapMultiplyOutput.Body.Fault = field(
             default=None,
             metadata={
                 "name": "Fault",
@@ -397,28 +397,28 @@ class CalculatorSoapMultiplyOutput:
 
         @dataclass
         class Fault:
-            faultcode: str | None = field(
+            faultcode: None | str = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultstring: str | None = field(
+            faultstring: None | str = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultactor: str | None = field(
+            faultactor: None | str = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            detail: str | None = field(
+            detail: None | str = field(
                 default=None,
                 metadata={
                     "type": "Element",
@@ -433,7 +433,7 @@ class CalculatorSoapSubtractInput:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
-    body: CalculatorSoapSubtractInput.Body | None = field(
+    body: None | CalculatorSoapSubtractInput.Body = field(
         default=None,
         metadata={
             "name": "Body",
@@ -443,7 +443,7 @@ class CalculatorSoapSubtractInput:
 
     @dataclass
     class Body:
-        subtract: Subtract | None = field(
+        subtract: None | Subtract = field(
             default=None,
             metadata={
                 "name": "Subtract",
@@ -459,7 +459,7 @@ class CalculatorSoapSubtractOutput:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
-    body: CalculatorSoapSubtractOutput.Body | None = field(
+    body: None | CalculatorSoapSubtractOutput.Body = field(
         default=None,
         metadata={
             "name": "Body",
@@ -469,7 +469,7 @@ class CalculatorSoapSubtractOutput:
 
     @dataclass
     class Body:
-        subtract_response: SubtractResponse | None = field(
+        subtract_response: None | SubtractResponse = field(
             default=None,
             metadata={
                 "name": "SubtractResponse",
@@ -477,7 +477,7 @@ class CalculatorSoapSubtractOutput:
                 "namespace": "http://tempuri.org/",
             },
         )
-        fault: CalculatorSoapSubtractOutput.Body.Fault | None = field(
+        fault: None | CalculatorSoapSubtractOutput.Body.Fault = field(
             default=None,
             metadata={
                 "name": "Fault",
@@ -487,28 +487,28 @@ class CalculatorSoapSubtractOutput:
 
         @dataclass
         class Fault:
-            faultcode: str | None = field(
+            faultcode: None | str = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultstring: str | None = field(
+            faultstring: None | str = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultactor: str | None = field(
+            faultactor: None | str = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            detail: str | None = field(
+            detail: None | str = field(
                 default=None,
                 metadata={
                     "type": "Element",

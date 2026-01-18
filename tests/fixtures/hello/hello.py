@@ -10,7 +10,7 @@ class HelloByeError:
     class Meta:
         namespace = "http://hello/"
 
-    message: str | None = field(
+    message: None | str = field(
         default=None,
         metadata={
             "type": "Element",
@@ -24,7 +24,7 @@ class HelloError:
     class Meta:
         namespace = "http://hello/"
 
-    message: str | None = field(
+    message: None | str = field(
         default=None,
         metadata={
             "type": "Element",
@@ -39,7 +39,7 @@ class GetHelloAsString:
         name = "getHelloAsString"
         namespace = "http://hello/"
 
-    arg0: str | None = field(
+    arg0: None | str = field(
         default=None,
         metadata={
             "type": "Element",
@@ -54,7 +54,7 @@ class GetHelloAsStringResponse:
         name = "getHelloAsStringResponse"
         namespace = "http://hello/"
 
-    return_value: str | None = field(
+    return_value: None | str = field(
         default=None,
         metadata={
             "name": "return",
@@ -70,7 +70,7 @@ class HelloGetHelloAsStringInput:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
-    body: HelloGetHelloAsStringInput.Body | None = field(
+    body: None | HelloGetHelloAsStringInput.Body = field(
         default=None,
         metadata={
             "name": "Body",
@@ -80,7 +80,7 @@ class HelloGetHelloAsStringInput:
 
     @dataclass
     class Body:
-        get_hello_as_string: GetHelloAsString | None = field(
+        get_hello_as_string: None | GetHelloAsString = field(
             default=None,
             metadata={
                 "name": "getHelloAsString",
@@ -96,7 +96,7 @@ class HelloGetHelloAsStringOutput:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
-    body: HelloGetHelloAsStringOutput.Body | None = field(
+    body: None | HelloGetHelloAsStringOutput.Body = field(
         default=None,
         metadata={
             "name": "Body",
@@ -106,7 +106,7 @@ class HelloGetHelloAsStringOutput:
 
     @dataclass
     class Body:
-        get_hello_as_string_response: GetHelloAsStringResponse | None = field(
+        get_hello_as_string_response: None | GetHelloAsStringResponse = field(
             default=None,
             metadata={
                 "name": "getHelloAsStringResponse",
@@ -114,7 +114,7 @@ class HelloGetHelloAsStringOutput:
                 "namespace": "http://hello/",
             },
         )
-        fault: HelloGetHelloAsStringOutput.Body.Fault | None = field(
+        fault: None | HelloGetHelloAsStringOutput.Body.Fault = field(
             default=None,
             metadata={
                 "name": "Fault",
@@ -124,28 +124,28 @@ class HelloGetHelloAsStringOutput:
 
         @dataclass
         class Fault:
-            faultcode: str | None = field(
+            faultcode: None | str = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultstring: str | None = field(
+            faultstring: None | str = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultactor: str | None = field(
+            faultactor: None | str = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            detail: HelloGetHelloAsStringOutput.Body.Fault.Detail | None = (
+            detail: None | HelloGetHelloAsStringOutput.Body.Fault.Detail = (
                 field(
                     default=None,
                     metadata={
@@ -157,7 +157,7 @@ class HelloGetHelloAsStringOutput:
 
             @dataclass
             class Detail:
-                hello_error: HelloError | None = field(
+                hello_error: None | HelloError = field(
                     default=None,
                     metadata={
                         "name": "HelloError",
@@ -165,7 +165,7 @@ class HelloGetHelloAsStringOutput:
                         "namespace": "http://hello/",
                     },
                 )
-                hello_bye_error: HelloByeError | None = field(
+                hello_bye_error: None | HelloByeError = field(
                     default=None,
                     metadata={
                         "name": "HelloByeError",

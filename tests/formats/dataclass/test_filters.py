@@ -595,23 +595,16 @@ class FiltersTests(FactoryTestCase):
         self.assertEqual("FooBar", self.filters.field_type(self.obj, attr))
 
         attr.restrictions.nillable = True
-        self.assertEqual("Optional[FooBar]", self.filters.field_type(self.obj, attr))
-
-        self.filters.union_type = True
         self.assertEqual("None | FooBar", self.filters.field_type(self.obj, attr))
 
     def test_field_type_with_optional_value(self) -> None:
         attr = AttrFactory.create(types=AttrTypeFactory.list(1, qname="foo_bar"))
-
-        self.assertEqual("Optional[FooBar]", self.filters.field_type(self.obj, attr))
+        self.assertEqual("None | FooBar", self.filters.field_type(self.obj, attr))
 
         self.filters.format.kw_only = True
         self.assertEqual("FooBar", self.filters.field_type(self.obj, attr))
 
         attr.restrictions.min_occurs = 0
-        self.assertEqual("Optional[FooBar]", self.filters.field_type(self.obj, attr))
-
-        self.filters.union_type = True
         self.assertEqual("None | FooBar", self.filters.field_type(self.obj, attr))
 
     def test_field_type_with_circular_reference(self) -> None:
@@ -620,7 +613,7 @@ class FiltersTests(FactoryTestCase):
         )
 
         self.assertEqual(
-            "Optional[C]",
+            "None | C",
             self.filters.field_type(self.obj_nested_nested_nested, attr),
         )
 
@@ -628,12 +621,6 @@ class FiltersTests(FactoryTestCase):
         attr = AttrFactory.create(
             types=AttrTypeFactory.list(1, qname="b", forward=True)
         )
-        self.assertEqual(
-            "Optional[A.B]",
-            self.filters.field_type(self.obj_nested_nested, attr),
-        )
-
-        self.filters.union_type = True
         self.assertEqual(
             "None | A.B", self.filters.field_type(self.obj_nested_nested, attr)
         )
@@ -694,13 +681,6 @@ class FiltersTests(FactoryTestCase):
             ]
         )
         attr.restrictions.max_occurs = 2
-
-        self.assertEqual(
-            "list[Union[A.B.BossLife, int]]",
-            self.filters.field_type(self.obj_nested_nested_nested, attr),
-        )
-
-        self.filters.union_type = True
         self.assertEqual(
             "list[A.B.BossLife | int]",
             self.filters.field_type(self.obj_nested_nested_nested, attr),
@@ -722,11 +702,6 @@ class FiltersTests(FactoryTestCase):
                 AttrTypeFactory.native(DataType.STRING),
             ]
         )
-        self.assertEqual(
-            "Optional[Union[int, str]]", self.filters.field_type(self.obj, attr)
-        )
-
-        self.filters.union_type = True
         self.assertEqual("None | int | str", self.filters.field_type(self.obj, attr))
 
     def test_field_type_with_prohibited_attr(self) -> None:
@@ -753,16 +728,16 @@ class FiltersTests(FactoryTestCase):
             restrictions=Restrictions(min_occurs=0, max_occurs=1),
         )
 
-        expected = "Optional[Union[str, int, list[Decimal]]]"
+        expected = "None | str | int | list[Decimal]"
         self.assertEqual(expected, self.filters.field_type(self.obj, attr))
 
         attr.restrictions.max_occurs = 2
-        expected = "list[Union[str, int, list[Decimal]]]"
+        expected = "list[str | int | list[Decimal]]"
         self.assertEqual(expected, self.filters.field_type(self.obj, attr))
 
         attr.restrictions.min_occurs = attr.restrictions.max_occurs = 1
         self.filters.format.kw_only = True
-        expected = "Union[str, int, list[Decimal]]"
+        expected = "str | int | list[Decimal]"
         self.assertEqual(expected, self.filters.field_type(self.obj, attr))
 
     def test_choice_type(self) -> None:
@@ -792,10 +767,6 @@ class FiltersTests(FactoryTestCase):
         choice = AttrFactory.create(types=[type_str, type_bool])
         target = ClassFactory.create()
         actual = self.filters.choice_type(target, choice)
-        self.assertEqual("Type[Union[str, bool]]", actual)
-
-        self.filters.union_type = True
-        actual = self.filters.choice_type(target, choice)
         self.assertEqual("Type[str | bool]", actual)
 
     def test_choice_type_with_list_types_are_ignored(self) -> None:
@@ -803,20 +774,16 @@ class FiltersTests(FactoryTestCase):
         choice.restrictions.max_occurs = 200
         target = ClassFactory.create()
         actual = self.filters.choice_type(target, choice)
-        self.assertEqual("Type[Union[str, bool]]", actual)
+        self.assertEqual("Type[str | bool]", actual)
 
     def test_choice_type_with_restrictions_tokens_true(self) -> None:
         choice = AttrFactory.create(types=[type_str, type_bool])
         choice.restrictions.tokens = True
         target = ClassFactory.create()
         actual = self.filters.choice_type(target, choice)
-        self.assertEqual("Type[list[Union[str, bool]]]", actual)
+        self.assertEqual("Type[list[str | bool]]", actual)
 
         self.filters.format.frozen = True
-        actual = self.filters.choice_type(target, choice)
-        self.assertEqual("Type[tuple[Union[str, bool], ...]]", actual)
-
-        self.filters.union_type = True
         actual = self.filters.choice_type(target, choice)
         self.assertEqual("Type[tuple[str | bool, ...]]", actual)
 

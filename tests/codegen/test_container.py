@@ -50,7 +50,6 @@ class ClassContainerTests(FactoryTestCase):
             30: [
                 "ResetAttributeSequences",
                 "RenameDuplicateAttributes",
-                "SanitizeAttributesDefaultValue",
             ],
             40: ["ValidateAttributesOverrides"],
             50: ["VacuumInnerClasses"],
@@ -59,6 +58,7 @@ class ClassContainerTests(FactoryTestCase):
                 "CreateCompoundFields",
                 "CreateWrapperFields",
                 "DisambiguateChoices",
+                "SanitizeAttributesDefaultValue",
                 "ResetAttributeSequenceNumbers",
             ],
         }

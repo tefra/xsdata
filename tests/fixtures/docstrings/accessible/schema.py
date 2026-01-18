@@ -71,7 +71,7 @@ class Root:
     class Meta:
         namespace = "urn:docs"
 
-    a: Root.A | None = field(
+    a: None | Root.A = field(
         default=None,
         metadata={
             "type": "Element",
@@ -84,7 +84,7 @@ class Root:
             ),
         },
     )
-    b: RootB | None = field(
+    b: None | RootB = field(
         default=None,
         metadata={
             "type": "Element",
@@ -93,7 +93,7 @@ class Root:
             "doc": "This is a second root type field documentation.",
         },
     )
-    c: RootEnum | None = field(
+    c: None | RootEnum = field(
         default=None,
         metadata={
             "type": "Element",
@@ -101,7 +101,7 @@ class Root:
             "required": True,
         },
     )
-    d: RootD | None = field(
+    d: None | RootD = field(
         default=None,
         metadata={
             "type": "Element",
@@ -116,7 +116,7 @@ class Root:
         This is an inner type documentation.
         """
 
-        sub_a: str | None = field(
+        sub_a: None | str = field(
             default=None,
             metadata={
                 "type": "Element",

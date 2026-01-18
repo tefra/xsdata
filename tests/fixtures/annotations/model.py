@@ -9,13 +9,13 @@ __NAMESPACE__ = "http://domain.org/schema/model"
 
 @dataclass
 class Measurement:
-    value: float | None = field(
+    value: None | float = field(
         default=None,
         metadata={
             "required": True,
         },
     )
-    unit: unit | None = field(
+    unit: None | unit = field(
         default=None,
         metadata={
             "type": "Attribute",

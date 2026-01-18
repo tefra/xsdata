@@ -10,21 +10,21 @@ class Country:
     class Meta:
         name = "country"
 
-    name: str | None = field(
+    name: None | str = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    code: str | None = field(
+    code: None | str = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    timezone: str | None = field(
+    timezone: None | str = field(
         default=None,
         metadata={
             "type": "Element",
@@ -37,20 +37,20 @@ class Externals:
     class Meta:
         name = "externals"
 
-    tvrage: int | None = field(
+    tvrage: None | int = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    thetvdb: int | None = field(
+    thetvdb: None | int = field(
         default=None,
         metadata={
             "type": "Element",
         },
     )
-    imdb: str | None = field(
+    imdb: None | str = field(
         default=None,
         metadata={
             "type": "Element",
@@ -64,14 +64,14 @@ class Image:
     class Meta:
         name = "image"
 
-    medium: str | None = field(
+    medium: None | str = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    original: str | None = field(
+    original: None | str = field(
         default=None,
         metadata={
             "type": "Element",
@@ -85,7 +85,7 @@ class Previousepisode:
     class Meta:
         name = "previousepisode"
 
-    href: str | None = field(
+    href: None | str = field(
         default=None,
         metadata={
             "type": "Element",
@@ -99,7 +99,7 @@ class Rating:
     class Meta:
         name = "rating"
 
-    average: float | None = field(
+    average: None | float = field(
         default=None,
         metadata={
             "type": "Element",
@@ -113,7 +113,7 @@ class Schedule:
     class Meta:
         name = "schedule"
 
-    time: str | None = field(
+    time: None | str = field(
         default=None,
         metadata={
             "type": "Element",
@@ -134,7 +134,7 @@ class Self:
     class Meta:
         name = "self"
 
-    href: str | None = field(
+    href: None | str = field(
         default=None,
         metadata={
             "type": "Element",
@@ -148,7 +148,7 @@ class Links:
     class Meta:
         name = "_links"
 
-    self_value: Self | None = field(
+    self_value: None | Self = field(
         default=None,
         metadata={
             "name": "self",
@@ -156,7 +156,7 @@ class Links:
             "required": True,
         },
     )
-    previousepisode: Previousepisode | None = field(
+    previousepisode: None | Previousepisode = field(
         default=None,
         metadata={
             "type": "Element",
@@ -170,20 +170,20 @@ class Network:
     class Meta:
         name = "network"
 
-    id: int | None = field(
+    id: None | int = field(
         default=None,
         metadata={
             "type": "Element",
         },
     )
-    name: str | None = field(
+    name: None | str = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    country: Country | None = field(
+    country: None | Country = field(
         default=None,
         metadata={
             "type": "Element",
@@ -197,27 +197,27 @@ class Series:
     class Meta:
         name = "series"
 
-    id: int | None = field(
+    id: None | int = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    url: str | None = field(
+    url: None | str = field(
         default=None,
         metadata={
             "type": "Element",
         },
     )
-    name: str | None = field(
+    name: None | str = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    type_value: str | None = field(
+    type_value: None | str = field(
         default=None,
         metadata={
             "name": "type",
@@ -225,7 +225,7 @@ class Series:
             "required": True,
         },
     )
-    language: str | None = field(
+    language: None | str = field(
         default=None,
         metadata={
             "type": "Element",
@@ -239,28 +239,28 @@ class Series:
             "min_occurs": 1,
         },
     )
-    status: str | None = field(
+    status: None | str = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    runtime: int | None = field(
+    runtime: None | int = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    premiered: XmlDate | None = field(
+    premiered: None | XmlDate = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    official_site: str | None = field(
+    official_site: None | str = field(
         default=None,
         metadata={
             "name": "officialSite",
@@ -268,68 +268,68 @@ class Series:
             "required": True,
         },
     )
-    schedule: Schedule | None = field(
+    schedule: None | Schedule = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    rating: Rating | None = field(
+    rating: None | Rating = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    weight: int | None = field(
+    weight: None | int = field(
         default=None,
         metadata={
             "type": "Element",
         },
     )
-    network: Network | None = field(
+    network: None | Network = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    web_channel: object | None = field(
+    web_channel: None | object = field(
         default=None,
         metadata={
             "name": "webChannel",
             "type": "Element",
         },
     )
-    externals: Externals | None = field(
+    externals: None | Externals = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    image: Image | None = field(
+    image: None | Image = field(
         default=None,
         metadata={
             "type": "Element",
         },
     )
-    summary: str | None = field(
-        default=None,
-        metadata={
-            "type": "Element",
-            "required": True,
-        },
-    )
-    updated: int | None = field(
+    summary: None | str = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    links: Links | None = field(
+    updated: None | int = field(
+        default=None,
+        metadata={
+            "type": "Element",
+            "required": True,
+        },
+    )
+    links: None | Links = field(
         default=None,
         metadata={
             "name": "_links",

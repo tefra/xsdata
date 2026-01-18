@@ -49,7 +49,6 @@ class Filters:
         "package_safe_prefix",
         "relative_imports",
         "substitutions",
-        "union_type",
     )
 
     def __init__(self, config: GeneratorConfig):
@@ -93,7 +92,6 @@ class Filters:
         self.module_safe_prefix: str = config.conventions.module_name.safe_prefix
         self.docstring_style: DocstringStyle = config.output.docstring_style
         self.max_line_length: int = config.output.max_line_length
-        self.union_type: bool = config.output.union_type
         self.generic_collections: bool = config.output.generic_collections
         self.relative_imports: bool = config.output.relative_imports
         self.format = config.output.format
@@ -823,7 +821,7 @@ class Filters:
         if attr.is_nillable or (
             attr.default is None and (attr.is_optional or not self.format.kw_only)
         ):
-            return f"None | {result}" if self.union_type else f"Optional[{result}]"
+            return f"None | {result}"
 
         return result
 
@@ -851,7 +849,7 @@ class Filters:
             return iterable_fmt.format(result)
 
         if attr.is_optional or not self.format.kw_only:
-            return f"None | {result}" if self.union_type else f"Optional[{result}]"
+            return f"None | {result}"
 
         return result
 
@@ -897,10 +895,7 @@ class Filters:
         if len(type_names) == 1:
             return type_names[0]
 
-        if self.union_type:
-            return " | ".join(type_names)
-
-        return f"Union[{', '.join(type_names)}]"
+        return " | ".join(type_names)
 
     def _field_type_name(
         self, obj: Class, attr_type: AttrType, choice: bool = False

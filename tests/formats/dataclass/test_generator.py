@@ -107,7 +107,6 @@ class DataclassGeneratorTests(FactoryTestCase):
             "from __future__ import annotations\n"
             "from dataclasses import dataclass, field\n"
             "from enum import Enum\n"
-            "from typing import Optional\n"
             "\n"
             '__NAMESPACE__ = "xsdata"\n'
             "\n"
@@ -130,14 +129,14 @@ class DataclassGeneratorTests(FactoryTestCase):
             "    class Meta:\n"
             '        name = "class_C"\n'
             "\n"
-            "    attr_d: Optional[str] = field(\n"
+            "    attr_d: None | str = field(\n"
             "        default=None,\n"
             "        metadata={\n"
             '            "name": "attr_D",\n'
             '            "type": "Element",\n'
             "        }\n"
             "    )\n"
-            "    attr_e: Optional[str] = field(\n"
+            "    attr_e: None | str = field(\n"
             "        default=None,\n"
             "        metadata={\n"
             '            "name": "attr_E",\n'
@@ -162,7 +161,6 @@ class DataclassGeneratorTests(FactoryTestCase):
         expected = (
             "from __future__ import annotations\n"
             "from dataclasses import dataclass, field\n"
-            "from typing import Optional\n"
             "\n"
             "\n"
             "@dataclass\n"
@@ -171,7 +169,7 @@ class DataclassGeneratorTests(FactoryTestCase):
             '        name = "foo"\n'
             '        target_namespace = "bar"\n'
             "\n"
-            "    attr_c: Optional[str] = field(\n"
+            "    attr_c: None | str = field(\n"
             "        default=None,\n"
             "        metadata={\n"
             '            "name": "attr_C",\n'
@@ -184,7 +182,7 @@ class DataclassGeneratorTests(FactoryTestCase):
             '        name = "bar"\n'
             '        target_namespace = "foo"\n'
             "\n"
-            "    attr_b: Optional[str] = field(\n"
+            "    attr_b: None | str = field(\n"
             "        default=None,\n"
             "        metadata={\n"
             '            "name": "attr_B",\n'

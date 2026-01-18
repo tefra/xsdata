@@ -11,7 +11,7 @@ class Usaddress:
     class Meta:
         name = "USAddress"
 
-    name: str | None = field(
+    name: None | str = field(
         default=None,
         metadata={
             "type": "Element",
@@ -19,7 +19,7 @@ class Usaddress:
             "required": True,
         },
     )
-    street: str | None = field(
+    street: None | str = field(
         default=None,
         metadata={
             "type": "Element",
@@ -27,7 +27,7 @@ class Usaddress:
             "required": True,
         },
     )
-    city: str | None = field(
+    city: None | str = field(
         default=None,
         metadata={
             "type": "Element",
@@ -35,7 +35,7 @@ class Usaddress:
             "required": True,
         },
     )
-    state: str | None = field(
+    state: None | str = field(
         default=None,
         metadata={
             "type": "Element",
@@ -43,7 +43,7 @@ class Usaddress:
             "required": True,
         },
     )
-    zip: Decimal | None = field(
+    zip: None | Decimal = field(
         default=None,
         metadata={
             "type": "Element",
@@ -98,7 +98,7 @@ class Items:
             Stock Keeping Unit
         """
 
-        product_name: str | None = field(
+        product_name: None | str = field(
             default=None,
             metadata={
                 "name": "productName",
@@ -107,7 +107,7 @@ class Items:
                 "required": True,
             },
         )
-        quantity: int | None = field(
+        quantity: None | int = field(
             default=None,
             metadata={
                 "type": "Element",
@@ -116,7 +116,7 @@ class Items:
                 "max_exclusive": 100,
             },
         )
-        usprice: Decimal | None = field(
+        usprice: None | Decimal = field(
             default=None,
             metadata={
                 "name": "USPrice",
@@ -125,13 +125,13 @@ class Items:
                 "required": True,
             },
         )
-        comment: Comment | None = field(
+        comment: None | Comment = field(
             default=None,
             metadata={
                 "type": "Element",
             },
         )
-        ship_date: XmlDate | None = field(
+        ship_date: None | XmlDate = field(
             default=None,
             metadata={
                 "name": "shipDate",
@@ -139,7 +139,7 @@ class Items:
                 "namespace": "",
             },
         )
-        part_num: str | None = field(
+        part_num: None | str = field(
             default=None,
             metadata={
                 "name": "partNum",
@@ -168,7 +168,7 @@ class PurchaseOrderType:
     order_date
     """
 
-    ship_to: Usaddress | None = field(
+    ship_to: None | Usaddress = field(
         default=None,
         metadata={
             "name": "shipTo",
@@ -177,7 +177,7 @@ class PurchaseOrderType:
             "required": True,
         },
     )
-    bill_to: Usaddress | None = field(
+    bill_to: None | Usaddress = field(
         default=None,
         metadata={
             "name": "billTo",
@@ -186,13 +186,13 @@ class PurchaseOrderType:
             "required": True,
         },
     )
-    comment: Comment | None = field(
+    comment: None | Comment = field(
         default=None,
         metadata={
             "type": "Element",
         },
     )
-    items: Items | None = field(
+    items: None | Items = field(
         default=None,
         metadata={
             "type": "Element",
@@ -200,7 +200,7 @@ class PurchaseOrderType:
             "required": True,
         },
     )
-    order_date: XmlDate | None = field(
+    order_date: None | XmlDate = field(
         default=None,
         metadata={
             "name": "orderDate",

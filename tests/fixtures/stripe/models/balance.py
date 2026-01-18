@@ -8,14 +8,14 @@ class ConnectReserved:
     class Meta:
         name = "connect_reserved"
 
-    amount: int | None = field(
+    amount: None | int = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    currency: str | None = field(
+    currency: None | str = field(
         default=None,
         metadata={
             "type": "Element",
@@ -29,14 +29,14 @@ class SourceTypes:
     class Meta:
         name = "source_types"
 
-    bank_account: int | None = field(
+    bank_account: None | int = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    card: int | None = field(
+    card: None | int = field(
         default=None,
         metadata={
             "type": "Element",
@@ -50,21 +50,21 @@ class Available:
     class Meta:
         name = "available"
 
-    amount: int | None = field(
+    amount: None | int = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    currency: str | None = field(
+    currency: None | str = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    source_types: SourceTypes | None = field(
+    source_types: None | SourceTypes = field(
         default=None,
         metadata={
             "type": "Element",
@@ -78,21 +78,21 @@ class Pending:
     class Meta:
         name = "pending"
 
-    amount: int | None = field(
+    amount: None | int = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    currency: str | None = field(
+    currency: None | str = field(
         default=None,
         metadata={
             "type": "Element",
             "required": True,
         },
     )
-    source_types: SourceTypes | None = field(
+    source_types: None | SourceTypes = field(
         default=None,
         metadata={
             "type": "Element",
@@ -106,7 +106,7 @@ class Balance:
     class Meta:
         name = "balance"
 
-    object_value: str | None = field(
+    object_value: None | str = field(
         default=None,
         metadata={
             "name": "object",
@@ -128,7 +128,7 @@ class Balance:
             "min_occurs": 1,
         },
     )
-    livemode: bool | None = field(
+    livemode: None | bool = field(
         default=None,
         metadata={
             "type": "Element",

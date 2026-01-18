@@ -47,7 +47,6 @@ class Filters:
         "module_safe_prefix",
         "package_case",
         "package_safe_prefix",
-        "postponed_annotations",
         "relative_imports",
         "substitutions",
         "union_type",
@@ -97,7 +96,6 @@ class Filters:
         self.union_type: bool = config.output.union_type
         self.generic_collections: bool = config.output.generic_collections
         self.relative_imports: bool = config.output.relative_imports
-        self.postponed_annotations: bool = config.output.postponed_annotations
         self.format = config.output.format
 
         # Build things
@@ -915,7 +913,7 @@ class Filters:
         elif attr_type.circular:
             name = f'"{name}"'
 
-        if self.postponed_annotations and not choice:
+        if not choice:
             name = name.strip('"')
 
         return name
@@ -933,7 +931,7 @@ class Filters:
 
     def default_imports(self, output: str) -> str:
         """Generate the default imports for the given package output."""
-        imports = []
+        imports = ["from __future__ import annotations"]
         for library, types in self.import_patterns.items():
             names = [
                 name
@@ -945,9 +943,6 @@ class Filters:
                 imports.append(f"import {library}")
             elif names:
                 imports.append(f"from {library} import {', '.join(names)}")
-
-        if self.postponed_annotations:
-            imports.append("from __future__ import annotations")
 
         return "\n".join(collections.unique_sequence(imports))
 

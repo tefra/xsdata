@@ -212,7 +212,6 @@ class GeneratorOutput:
         max_line_length: Adjust the maximum line length
         generic_collections: Use generic collections (Iterable, Mapping)
         union_type: Use PEP-604 union type, python>=3.10 Only
-        postponed_annotations: Use 563 postponed evaluation of  annotations
         unnest_classes: Move inner classes to upper level
         ignore_patterns: Ignore pattern restrictions
         include_header: Include a header with codegen information in the output
@@ -230,7 +229,6 @@ class GeneratorOutput:
     max_line_length: int = attribute(default=79)
     generic_collections: bool = attribute(default=False)
     union_type: bool = attribute(default=False)
-    postponed_annotations: bool = element(default=False)
     unnest_classes: bool = element(default=False)
     ignore_patterns: bool = element(default=False)
     include_header: bool = element(default=False)
@@ -241,13 +239,6 @@ class GeneratorOutput:
 
     def validate(self) -> None:
         """Reset configuration conflicts."""
-        if self.union_type and not self.postponed_annotations:
-            self.postponed_annotations = True
-            warnings.warn(
-                "Enabling postponed annotations, because `union_type==True`",
-                CodegenWarning,
-            )
-
         if self.generic_collections and self.format.frozen:
             self.generic_collections = False
             warnings.warn(

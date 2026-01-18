@@ -36,7 +36,6 @@ class GeneratorConfigTests(TestCase):
             "    <RelativeImports>false</RelativeImports>\n"
             '    <CompoundFields defaultName="choice" useSubstitutionGroups="false" forceDefaultName="false" maxNameParts="3">false</CompoundFields>\n'
             "    <WrapperFields>false</WrapperFields>\n"
-            "    <PostponedAnnotations>false</PostponedAnnotations>\n"
             "    <UnnestClasses>false</UnnestClasses>\n"
             "    <IgnorePatterns>false</IgnorePatterns>\n"
             "    <IncludeHeader>false</IncludeHeader>\n"
@@ -98,7 +97,6 @@ class GeneratorConfigTests(TestCase):
             "    <RelativeImports>false</RelativeImports>\n"
             '    <CompoundFields defaultName="choice" useSubstitutionGroups="false" forceDefaultName="false" maxNameParts="3">false</CompoundFields>\n'
             "    <WrapperFields>false</WrapperFields>\n"
-            "    <PostponedAnnotations>false</PostponedAnnotations>\n"
             "    <UnnestClasses>false</UnnestClasses>\n"
             "    <IgnorePatterns>false</IgnorePatterns>\n"
             "    <IncludeHeader>false</IncludeHeader>\n"
@@ -135,16 +133,6 @@ class GeneratorConfigTests(TestCase):
             OutputFormat(eq=False, order=True)
 
         self.assertEqual("Enabling eq because order is true", str(w[-1].message))
-
-    def test_use_union_type_and_postponed_annotations(self) -> None:
-        with warnings.catch_warnings(record=True) as w:
-            output = GeneratorOutput(union_type=True)
-            self.assertTrue(output.postponed_annotations)
-
-            self.assertEqual(
-                "Enabling postponed annotations, because `union_type==True`",
-                str(w[-1].message),
-            )
 
     def test_generic_collections_requires_frozen_false(self) -> None:
         with warnings.catch_warnings(record=True) as w:

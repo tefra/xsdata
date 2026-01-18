@@ -4,7 +4,6 @@ import subprocess
 import sys
 from collections.abc import Iterator
 from pathlib import Path
-from typing import Optional
 
 from jinja2 import Environment, FileSystemLoader
 
@@ -242,15 +241,6 @@ class DataclassGenerator(AbstractGenerator):
         commands = [
             [
                 "ruff",
-                "format",
-                "--config",
-                str(ruff_config),
-                "--config",
-                f"line-length={self.config.output.max_line_length}",
-                *file_paths,
-            ],
-            [
-                "ruff",
                 "check",
                 "--config",
                 str(ruff_config),
@@ -259,6 +249,15 @@ class DataclassGenerator(AbstractGenerator):
                 "--fix",
                 "--unsafe-fixes",
                 "--exit-zero",
+                *file_paths,
+            ],
+            [
+                "ruff",
+                "format",
+                "--config",
+                str(ruff_config),
+                "--config",
+                f"line-length={self.config.output.max_line_length}",
                 *file_paths,
             ],
         ]

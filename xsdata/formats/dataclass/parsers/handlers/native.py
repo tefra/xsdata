@@ -1,6 +1,6 @@
 import functools
 from collections.abc import Iterable, Iterator
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 from urllib.parse import urljoin
 from xml.etree import ElementInclude as xinclude
 from xml.etree import ElementTree as etree

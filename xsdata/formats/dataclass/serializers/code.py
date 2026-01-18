@@ -2,7 +2,7 @@ from collections.abc import Iterator, Mapping
 from dataclasses import dataclass, field
 from enum import Enum
 from io import StringIO
-from typing import Any, TextIO, Union
+from typing import Any, TextIO
 
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.utils import collections

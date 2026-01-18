@@ -2,10 +2,7 @@ import re
 import textwrap
 from collections import defaultdict
 from collections.abc import Callable, Iterable, Iterator
-from typing import (
-    Any,
-    Optional,
-)
+from typing import Any
 
 from jinja2 import Environment
 

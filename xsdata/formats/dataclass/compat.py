@@ -4,7 +4,7 @@ import abc
 from collections.abc import Iterator
 from dataclasses import MISSING, fields, is_dataclass
 from types import MappingProxyType
-from typing import Any, Optional, Protocol
+from typing import Any, Protocol
 
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.models.generics import AnyElement, DerivedElement

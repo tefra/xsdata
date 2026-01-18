@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from decimal import Decimal
-from typing import Any, Optional, Union
+from typing import Any, Union, Optional
 from xml.etree.ElementTree import QName
 
 __NAMESPACE__ = "xsdata"

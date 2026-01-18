@@ -1,5 +1,3 @@
-from typing import Optional
-
 from xsdata.formats.dataclass.parsers.mixins import XmlNode
 
 

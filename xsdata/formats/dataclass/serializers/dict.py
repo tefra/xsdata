@@ -1,7 +1,7 @@
 from collections.abc import Callable, Iterator
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.context import XmlContext

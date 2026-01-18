@@ -8,9 +8,7 @@ from typing import (
     Any,
     Final,
     Literal,
-    Optional,
     TypeAlias,
-    Union,
 )
 from xml.etree.ElementTree import QName
 from xml.sax.handler import ContentHandler

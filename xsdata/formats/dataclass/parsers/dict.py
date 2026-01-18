@@ -1,7 +1,7 @@
 from collections.abc import Iterable
 from contextlib import suppress
 from dataclasses import dataclass, field, replace
-from typing import Any, Optional, Union, get_args, get_origin
+from typing import Any, get_args, get_origin
 
 from xsdata.exceptions import ParserError
 from xsdata.formats.converter import converter

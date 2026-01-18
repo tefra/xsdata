@@ -3,7 +3,7 @@ import json
 import pathlib
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Optional, Union
+from typing import Any
 
 from xsdata.formats.dataclass.parsers import DictDecoder
 from xsdata.formats.types import T

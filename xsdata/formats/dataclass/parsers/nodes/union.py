@@ -2,7 +2,7 @@ import copy
 import functools
 from contextlib import suppress
 from dataclasses import replace
-from typing import Any, Optional
+from typing import Any
 
 from xsdata.exceptions import ParserError
 from xsdata.formats.dataclass.context import XmlContext

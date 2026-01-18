@@ -2,7 +2,7 @@ import math
 import warnings
 from collections import UserList
 from collections.abc import Callable, Iterable, Sequence
-from typing import Any, Optional
+from typing import Any
 
 from xsdata.exceptions import ConverterError, ConverterWarning, ParserError
 from xsdata.formats.converter import QNameConverter, converter

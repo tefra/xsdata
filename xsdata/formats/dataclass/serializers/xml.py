@@ -1,9 +1,6 @@
 from dataclasses import dataclass, field
 from io import StringIO, TextIOBase
-from typing import (
-    Any,
-    Optional,
-)
+from typing import Any
 
 from xsdata.formats.dataclass.serializers.mixins import (
     EventGenerator,

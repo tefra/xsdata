@@ -3,7 +3,6 @@ from collections.abc import Callable, Iterable, Mapping
 from typing import (
     Any,
     NamedTuple,
-    Optional,
     TypeVar,
     Union,
     get_args,

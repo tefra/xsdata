@@ -60,14 +60,14 @@ plugins:
     handlers:
       python:
         load_external_modules: true
+        inventories:
+        - https://docs.python-requests.org/en/master/objects.inv
+        - https://docs.python.org/3/objects.inv
+        - https://lxml.de/apidoc/objects.inv
         options:
           members_order: source
           show_source: true
           show_root_heading: true
-        import:
-        - https://docs.python-requests.org/en/master/objects.inv
-        - https://docs.python.org/3/objects.inv
-        - https://lxml.de/apidoc/objects.inv
 
 markdown_extensions:
   - admonition

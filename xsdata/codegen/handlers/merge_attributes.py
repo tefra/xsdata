@@ -64,7 +64,25 @@ class MergeAttributes(HandlerInterface):
                 attr_max_occurs = a_res.max_occurs or 1
 
                 e_res.min_occurs = min(min_occurs, attr_min_occurs)
-                e_res.max_occurs = max_occurs + attr_max_occurs
+
+                # If attrs are in different choice groups AND have different
+                # indices AND have the same path depth, they're in sibling
+                # choice blocks (mutually exclusive) -> use max
+                # If attrs have same index, they're substitutions for same
+                # element -> use +
+                # If attrs have different path depths, one is nested deeper
+                # -> use +
+                # Otherwise, use + (default behavior for sequences)
+                if (
+                    e_res.choice is not None
+                    and a_res.choice is not None
+                    and e_res.choice != a_res.choice
+                    and existing.index != attr.index
+                    and len(e_res.path) == len(a_res.path)
+                ):
+                    e_res.max_occurs = max(max_occurs, attr_max_occurs)
+                else:
+                    e_res.max_occurs = max_occurs + attr_max_occurs
 
                 if a_res.sequence is not None:
                     e_res.sequence = a_res.sequence

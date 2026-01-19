@@ -129,3 +129,50 @@ class UpdateAttributesEffectiveChoiceTests(FactoryTestCase):
         self.processor.reset_effective_choice(paths, 3, 4)
 
         self.assertEqual([("g", 0, 1, 1), ("g", 1, 1, 1)], paths)
+
+    def test_process_elements_in_different_choice_blocks(self) -> None:
+        """Test that elements in different choice blocks are not merged."""
+        choice1_id = 12345
+        choice2_id = 67890
+
+        target = ClassFactory.create(
+            attrs=[
+                AttrFactory.element(
+                    name="configOption",
+                    namespace="",
+                    restrictions=Restrictions(
+                        min_occurs=0, max_occurs=1, choice=choice1_id
+                    ),
+                ),
+                AttrFactory.element(
+                    name="optionA",
+                    namespace="",
+                    restrictions=Restrictions(
+                        min_occurs=0, max_occurs=1, choice=choice1_id
+                    ),
+                ),
+                AttrFactory.element(
+                    name="configOption",
+                    namespace="",
+                    restrictions=Restrictions(
+                        min_occurs=0, max_occurs=1, choice=choice2_id
+                    ),
+                ),
+                AttrFactory.element(
+                    name="optionB",
+                    namespace="",
+                    restrictions=Restrictions(
+                        min_occurs=0, max_occurs=1, choice=choice2_id
+                    ),
+                ),
+            ]
+        )
+
+        self.processor.process(target)
+
+        # Should not merge configOption elements since they're in different choice blocks
+        self.assertEqual(4, len(target.attrs))
+        self.assertEqual(
+            ["configOption", "optionA", "configOption", "optionB"],
+            [x.name for x in target.attrs],
+        )

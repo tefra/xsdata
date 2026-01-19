@@ -55,6 +55,8 @@ attribute.
 
 `typing.Union`
 
+[PEP-604](https://peps.python.org/pep-0604/) union types as X | Y are also supported.
+
 | Case           | Example                                                         |
 | -------------- | --------------------------------------------------------------- |
 | Union          | `value: Union[str, int, float] = field()`                       |

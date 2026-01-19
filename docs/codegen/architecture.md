@@ -125,7 +125,6 @@ pass through each step before next one starts. The order of the steps is very im
 
 - [ResetAttributeSequences][xsdata.codegen.handlers.ResetAttributeSequences]
 - [RenameDuplicateAttributes][xsdata.codegen.handlers.RenameDuplicateAttributes]
-- [SanitizeAttributesDefaultValue][xsdata.codegen.handlers.SanitizeAttributesDefaultValue]
 
 ### Step: Resolve
 
@@ -141,6 +140,7 @@ pass through each step before next one starts. The order of the steps is very im
 - [CreateCompoundFields][xsdata.codegen.handlers.CreateCompoundFields]
 - [CreateWrapperFields][xsdata.codegen.handlers.CreateWrapperFields]
 - [DisambiguateChoices][xsdata.codegen.handlers.DisambiguateChoices]
+- [SanitizeAttributesDefaultValue][xsdata.codegen.handlers.SanitizeAttributesDefaultValue]
 - [ResetAttributeSequenceNumbers][xsdata.codegen.handlers.ResetAttributeSequenceNumbers]
 
 ### Step: Designate

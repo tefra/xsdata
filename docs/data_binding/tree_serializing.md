@@ -1,10 +1,10 @@
 # Element Tree Serializer
 
-The tree serializer will render an object into an element tree, that you can use to run
-XPATH evaluations or XSLT transformations.
+The tree serializer renders an object into an lxml element tree that you can use to run
+XPath evaluations or XSLT transformations.
 
-The [TreeSerializer][xsdata.formats.dataclass.serializers.TreeSerializer] depends on
-lxml. There is no native python ElementTree implementation because of limitations with
+The [TreeSerializer][xsdata.formats.dataclass.serializers.tree.TreeSerializer] depends
+on lxml. There is no native Python ElementTree implementation due to limitations with
 namespaces.
 
 ## Example

@@ -146,7 +146,7 @@ class OutputFormat:
         order: Generate __lt__, __le__, __gt__, and __ge__ methods
         unsafe_hash: Generate __hash__ method
         frozen: Enable read only properties
-        slots: Enable __slots__, python>=3.10 Only
+        slots: Enable __slots__
     """
 
     value: str = text_node(default="dataclasses", cli="output")

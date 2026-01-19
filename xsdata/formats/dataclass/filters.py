@@ -941,7 +941,7 @@ class Filters:
 
     def _get_iterable_format(self) -> str:
         if self.generic_collections:
-            return "Iterable[{}]"
+            return "Sequence[{}]"
 
         return "tuple[{}, ...]" if self.format.frozen else "list[{}]"
 
@@ -954,13 +954,11 @@ class Filters:
             "decimal": {"Decimal": type_patterns("Decimal")},
             "enum": {"Enum": ["(Enum)"]},
             "typing": {
-                "Optional": ["Optional["],
-                "Union": ["Union["],
                 "ForwardRef": [": ForwardRef("],
                 "Any": type_patterns("Any"),
             },
             "collections.abc": {
-                "Iterable": [": Iterable["],
+                "Sequence": [": Sequence["],
                 "Mapping": [": Mapping["],
             },
             "xml.etree.ElementTree": {"QName": type_patterns("QName")},

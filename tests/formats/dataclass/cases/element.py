@@ -1,4 +1,4 @@
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from typing import Dict, List, Optional, Set, Tuple, Union
 
 tokens = [
@@ -12,6 +12,7 @@ tokens = [
     (Optional[List[List[Union[str, int]]]], ((str, int), list, list)),
     (List[Tuple[str, ...]], ((str,), list, tuple)),
     (Iterable[Iterable[str, ...]], ((str,), list, list)),
+    (Sequence[Sequence[str, ...]], ((str,), list, list)),
     (Tuple[List[str], ...], ((str,), tuple, list)),
     (Optional[Tuple[List[str], ...]], ((str,), tuple, list)),
     (list[str], ((str,), None, list)),

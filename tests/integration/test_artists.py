@@ -16,7 +16,7 @@ def test_xml_documents() -> None:
     filepath = fixtures_dir.joinpath("artists")
     package = "tests.fixtures.artists"
     runner = CliRunner()
-    result = runner.invoke(cli, [str(filepath), "--package", package])
+    result = runner.invoke(cli, ["generate", str(filepath), "--package", package])
 
     if result.exception:
         raise result.exception

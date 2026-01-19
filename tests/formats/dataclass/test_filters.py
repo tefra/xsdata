@@ -542,6 +542,14 @@ class FiltersTests(FactoryTestCase):
 
         self.assertEqual(expected, actual["choices"])
 
+    def test_field_metadata_docs(self) -> None:
+        self.filters.docstring_style = DocstringStyle.ACCESSIBLE
+
+        attr = AttrFactory.element(name="a", help="help")
+        actual = self.filters.field_metadata(self.obj, attr, None)
+        expected = {"doc": "help", "type": "Element"}
+        self.assertEqual(expected, actual)
+
     def test_field_choices(self) -> None:
         attr = AttrFactory.create(
             choices=[

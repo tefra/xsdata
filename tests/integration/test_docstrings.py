@@ -15,6 +15,7 @@ def test_generate_restructured_docstrings() -> None:
     runner.invoke(
         cli,
         [
+            "generate",
             str(schema),
             "--package",
             package,
@@ -31,6 +32,7 @@ def test_generate_numpy_docstrings() -> None:
     runner.invoke(
         cli,
         [
+            "generate",
             str(schema),
             "--package",
             package,
@@ -47,6 +49,7 @@ def test_generate_google_docstrings() -> None:
     runner.invoke(
         cli,
         [
+            "generate",
             str(schema),
             "--package",
             package,
@@ -63,6 +66,7 @@ def test_generate_accessible_docstrings() -> None:
     runner.invoke(
         cli,
         [
+            "generate",
             str(schema),
             "--package",
             package,
@@ -79,6 +83,7 @@ def test_generate_blank_docstrings() -> None:
     runner.invoke(
         cli,
         [
+            "generate",
             str(schema),
             "--package",
             package,

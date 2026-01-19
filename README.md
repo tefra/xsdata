@@ -74,11 +74,29 @@ Check the [documentation](https://xsdata.readthedocs.io) for more ✨✨✨
 - Support xinclude statements and unknown properties
 - Customize behaviour through config
 
-## Changelog: 25.7 (2025-07-06)
+## Changelog: 26.1 (2026-01-20)
 
 **Fixes**
 
-- Ignore dynamic classes in auto-discovery mode.
-  ([#1144](https://github.com/tefra/xsdata/pull/1144))
-- Parsing tail content with nested mixed classes
-  ([#1151](https://github.com/tefra/xsdata/pull/1151))
+- Fixed missing imports on inheriting multiple mixins for the same class
+  ([#1156](https://github.com/tefra/xsdata/pull/1156))
+- Fixed choice elements with minOccurs <= 1 not marked as optional
+- Fixed incorrect max_occurs for elements in different choice blocks
+  ([#1179](https://github.com/tefra/xsdata/pull/1179))
+- Fixed AttributeError when retrieving subclasses from cython packages
+  ([#1200](https://github.com/tefra/xsdata/pull/1200))
+
+**Features**
+
+- Added flag for specifying extensions
+  ([#1168](https://github.com/tefra/xsdata/pull/1168))
+- Added support for python 3.14 ([#1173](https://github.com/tefra/xsdata/pull/1173))
+- Switched to Sequence when using generic containers
+  ([#1201](https://github.com/tefra/xsdata/pull/1201))
+
+**Deprecations**
+
+- Removed Python 3.9 support ([#1189](https://github.com/tefra/xsdata/pull/1189))
+  ([#1191](https://github.com/tefra/xsdata/pull/1191))
+- Removed cli options union-type, kw-only, postponed-annotations are now always enabled
+- Removed xsdata <SOURCE> shorthand ([#1128](https://github.com/tefra/xsdata/pull/1128))

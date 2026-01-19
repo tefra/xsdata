@@ -61,19 +61,6 @@ class RenameDuplicateClasses(ContainerHandlerInterface):
             or len(set(map(get_location, self.container))) == 1
         )
 
-    def merge_classes(self, classes: list[Class]) -> None:
-        """Remove the duplicate classes and update all references.
-
-        Args:
-            classes: A list of duplicate classes
-        """
-        keep = classes.pop()
-        replace = keep.ref
-        self.container.remove(*classes)
-
-        for item in classes:
-            self.merges[item.ref] = replace
-
     def rename_classes(self, classes: list[Class]) -> None:
         """Rename the classes in the list.
 

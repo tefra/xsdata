@@ -1,5 +1,6 @@
 import sys
 from collections.abc import Callable, Iterable, Mapping
+from types import UnionType
 from typing import (
     Any,
     NamedTuple,
@@ -8,11 +9,6 @@ from typing import (
     get_args,
     get_origin,
 )
-
-try:
-    from types import UnionType  # type: ignore
-except ImportError:
-    UnionType = ()  # type: ignore
 
 if (3, 9) <= sys.version_info[:2] <= (3, 10):
     # Backport this fix for python 3.9 and 3.10

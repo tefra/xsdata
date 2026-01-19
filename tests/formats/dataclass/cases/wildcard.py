@@ -1,4 +1,4 @@
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from typing import Dict, List, Literal, Optional, Set, Tuple
 
 cases = [
@@ -11,6 +11,7 @@ cases = [
     (List[object], ((object,), list, None)),
     (Tuple[object, ...], ((object,), tuple, None)),
     (Iterable[object, ...], ((object,), list, None)),
+    (Sequence[object, ...], ((object,), list, None)),
     (Optional[object], ((object,), None, None)),
     (list[object], ((object,), list, None)),
     (tuple[object, ...], ((object,), tuple, None)),

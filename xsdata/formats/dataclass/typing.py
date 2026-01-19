@@ -1,15 +1,9 @@
 import sys
-from collections.abc import Callable, Iterable, Mapping
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from types import UnionType
-from typing import (
-    Any,
-    NamedTuple,
-    TypeVar,
-    Union,
-    get_args,
-    get_origin,
-)
+from typing import Any, NamedTuple, TypeVar, Union, get_args, get_origin
 
+foo: Sequence = []
 if (3, 9) <= sys.version_info[:2] <= (3, 10):
     # Backport this fix for python 3.9 and 3.10
     # https://github.com/python/cpython/pull/30900
@@ -38,7 +32,8 @@ else:
 
 NONE_TYPE = type(None)
 UNION_TYPES = (Union, UnionType)
-ITERABLE_TYPES = (list, tuple, Iterable)
+ITERABLE_TYPES = (list, tuple, Iterable, Sequence)
+LIST_CONTAINERS = (Iterable, Sequence)
 
 
 def evaluate(tp: Any, globalns: Any, localns: Any = None) -> Any:
@@ -140,7 +135,7 @@ def evaluate_attribute(annotation: Any, tokens: bool = False) -> Result:
 
         args = analyze_token_args(origin, args)
         tokens_factory = origin
-        if tokens_factory is Iterable:
+        if tokens_factory in LIST_CONTAINERS:
             tokens_factory = list
 
         origin = get_origin(args[0])
@@ -221,10 +216,10 @@ def evaluate_element(annotation: Any, tokens: bool = False) -> Result:
     elif origin:
         raise TypeError
 
-    if factory is Iterable:
+    if factory in LIST_CONTAINERS:
         factory = list
 
-    if tokens_factory is Iterable:
+    if tokens_factory in LIST_CONTAINERS:
         tokens_factory = list
 
     return Result(types=types, factory=factory, tokens_factory=tokens_factory)
@@ -252,7 +247,7 @@ def evaluate_wildcard(annotation: Any, **_: Any) -> Result:
     if origin in UNION_TYPES:
         types = filter_none_type(get_args(annotation))
     elif origin in ITERABLE_TYPES:
-        factory = list if origin is Iterable else origin
+        factory = list if origin in LIST_CONTAINERS else origin
         types = filter_ellipsis(get_args(annotation))
     elif origin is None:
         types = (annotation,)

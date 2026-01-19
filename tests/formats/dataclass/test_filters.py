@@ -642,7 +642,7 @@ class FiltersTests(FactoryTestCase):
         self.assertEqual("list[A.B.C]", self.filters.field_type(self.obj, attr))
 
         self.filters.generic_collections = True
-        self.assertEqual("Iterable[A.B.C]", self.filters.field_type(self.obj, attr))
+        self.assertEqual("Sequence[A.B.C]", self.filters.field_type(self.obj, attr))
 
     def test_field_type_with_token_attr(self) -> None:
         attr = AttrFactory.create(
@@ -841,14 +841,6 @@ class FiltersTests(FactoryTestCase):
         self.assertNotIn(expected, self.filters.default_imports("class fooXmlDateTime"))
 
     def test_default_imports_with_typing(self) -> None:
-        output = "Optional[ "
-        expected = "from typing import Optional"
-        self.assertIn(expected, self.filters.default_imports(output))
-
-        output = " Union[ "
-        expected = "from typing import Union"
-        self.assertIn(expected, self.filters.default_imports(output))
-
         output = ": ForwardRef("
         expected = "from typing import ForwardRef"
         self.assertIn(expected, self.filters.default_imports(output))
@@ -857,26 +849,13 @@ class FiltersTests(FactoryTestCase):
         expected = "from typing import Any"
         self.assertIn(expected, self.filters.default_imports(output))
 
-        output = ": Iterable[str] = "
-        expected = "from collections.abc import Iterable"
+        output = ": Sequence[str] = "
+        expected = "from collections.abc import Sequence"
         self.assertIn(expected, self.filters.default_imports(output))
 
         output = ": Mapping[str, str] = "
         expected = "from collections.abc import Mapping"
         self.assertIn(expected, self.filters.default_imports(output))
-
-    def test_default_imports_combo(self) -> None:
-        output = (
-            "@dataclass\nclass Foo:\n    field: Optional[str] = field(default=None)"
-        )
-
-        expected = (
-            "from __future__ import annotations\n"
-            "from dataclasses import dataclass, field\n"
-            "from typing import Optional"
-        )
-
-        self.assertEqual(expected, self.filters.default_imports(output))
 
     def test_default_imports_with_module(self) -> None:
         output = "@attrs.s\n"

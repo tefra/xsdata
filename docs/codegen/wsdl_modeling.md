@@ -3,10 +3,10 @@
 The implementation is experimental and currently only **WSDL 1.1 and SOAP 1.1** bindings
 have been implemented.
 
-The code generator in addition to models derived from xml schemas will also generate
+In addition to models derived from XML schemas, the code generator also generates
 dataclasses for messages and simple classes to describe the unique operations.
 
-Make sure you install both cli and soap requirements.
+Make sure you install both the CLI and SOAP requirements.
 
 ```console
 $ pip install xsdata[cli,soap]
@@ -18,10 +18,10 @@ $ xsdata generate --package calculator http://www.dneonline.com/calculator.asmx?
 
 ## Message Model
 
-The message models are not any different to xsd derived classes and include the complete
+The message models are no different from XSD-derived classes and include the complete
 structure of the `Envelope` wrapper.
 
-```python show_lines="159:182"
+```python show_lines="148:169"
 --8<-- "tests/fixtures/calculator/services.py"
 ```
 
@@ -30,7 +30,7 @@ structure of the `Envelope` wrapper.
 The [DefinitionsMapper][xsdata.codegen.mappers.DefinitionsMapper] will generate simple
 static classes to describe all the unique operations and the binding procedure.
 
-```python show_lines="519:525"
+```python show_lines="488:494"
 --8<-- "tests/fixtures/calculator/services.py"
 ```
 
@@ -41,7 +41,7 @@ services. The client needs a web service
 [Config][xsdata.formats.dataclass.client.Config] with the directives to process requests
 and responses.
 
-**Optionally you can also provide and override**
+**You can also optionally provide and override:**
 
 - A [Transport][xsdata.formats.dataclass.transports.Transport] implementation
 - An [XmlParser][xsdata.formats.dataclass.parsers.XmlParser] instance
@@ -49,7 +49,7 @@ and responses.
 
 ### Creating instances
 
-The client can be initialized from the operation class directly
+The client can be initialized from the operation class directly:
 
 ```python
 >>> from xsdata.formats.dataclass.client import Client
@@ -60,7 +60,7 @@ Config(style='document', location='http://www.dneonline.com/calculator.asmx', tr
 
 ```
 
-But you can also override any properties as you see fit
+You can also override any properties as needed:
 
 ```python
 >>> client = Client.from_service(CalculatorSoapAdd, location="http://testurl.com")
@@ -69,7 +69,7 @@ Config(style='document', location='http://testurl.com', transport='http://schema
 
 ```
 
-Or if you know what you are doing
+Or you can configure the client manually:
 
 ```python
 config = Config(
@@ -85,7 +85,7 @@ client = Client(config=config)
 
 ### Override transport
 
-Initialize transport with a custom requests session instance.
+Initialize the transport with a custom requests session instance:
 
 ```python
 from requests import Session
@@ -112,14 +112,14 @@ client.send(params)
 # CalculatorSoapAddOutput(body=CalculatorSoapAddOutput.Body(add_response=AddResponse(add_result=7)))
 ```
 
-You can also provide a dictionary of custom headers as well, although the headers that
-are needed for the webservice to work can not be overwritten.,
+You can also provide a dictionary of custom headers, although headers required for the
+web service to function cannot be overwritten:
 
 ```python
 client.send(params, headers={"User-Agent": "xsdata"})
 ```
 
-You will need to encode the payload if you intend to send non-ascii characters.
+You need to specify an encoding if you intend to send non-ASCII characters:
 
 ```python
 client = Client.from_service(encoding="utf-8")

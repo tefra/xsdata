@@ -9,9 +9,10 @@ from typing import (
     TypeVar,
     get_type_hints,
 )
+from urllib.parse import urlparse
 
 import click
-from click import Command
+from click import Command, Context, Parameter
 
 from xsdata.codegen.writer import CodeWriter
 from xsdata.utils import text
@@ -167,3 +168,33 @@ class LogHandler(logging.Handler):
                 click.echo(msg, err=True)
 
             self.warnings.clear()
+
+
+class URL(click.ParamType):
+    """Click parameter type for validating HTTP/HTTPS URLs.
+
+    This ensures that only remote HTTP or HTTPS URLs are accepted,
+    rejecting local file paths or file:// URIs.
+    """
+
+    name = "url"
+
+    def convert(self, value: str, param: Parameter | None, ctx: Context | None) -> str:
+        """Validate that the value is an HTTP or HTTPS URL.
+
+        Args:
+            value: The parameter value to validate
+            param: The parameter object
+            ctx: The click context
+
+        Returns:
+            The validated URL string
+
+        Raises:
+            click.BadParameter: If the URL scheme is not http or https
+        """
+        parsed = urlparse(value)
+        if parsed.scheme not in ("http", "https"):
+            self.fail(f"Source must be an HTTP URL, got: {value}\n", param, ctx)
+
+        return value

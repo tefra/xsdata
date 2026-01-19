@@ -57,24 +57,21 @@ class DownloaderTests(TestCase):
             ]
         )
 
-    def test_adjust_base_path(self) -> None:
-        first = "file:///schemas/air_v48_0/Air.wsdl"
-        second = "file:///schemas/air_v48_0/AirAbstract.wsdl"
-        third = "file:///schemas/common_v48_0/CommonReqRsp.xsd"
-        fourth = "http://www.w3.org/2001/xml.xsd"
-        path = Path(first)
+    def test_write_file_uses_full_url_path(self) -> None:
+        """Test that HTTP URLs preserve full domain/path structure."""
+        uri = "http://www.w3.org/2001/xml.xsd"
+        content = "foo"
 
-        self.downloader.adjust_base_path(first)
-        self.assertEqual(path.parent, self.downloader.base_path)
+        with tempfile.TemporaryDirectory() as dir:
+            output_path = Path(dir)
+            # New behavior: always uses full URL path structure
+            file_path = output_path.joinpath("www.w3.org/2001/xml.xsd")
+            self.downloader.output = output_path
+            self.downloader.write_file(uri, None, content)
 
-        self.downloader.adjust_base_path(second)
-        self.assertEqual(path.parent, self.downloader.base_path)
-
-        self.downloader.adjust_base_path(third)
-        self.assertEqual(path.parent.parent, self.downloader.base_path)
-
-        self.downloader.adjust_base_path(fourth)
-        self.assertEqual(path.parent.parent, self.downloader.base_path)
+            self.assertTrue(file_path.exists())
+            self.assertEqual(content, file_path.read_text())
+            self.assertEqual(file_path, self.downloader.downloaded[uri])
 
     def test_adjust_imports(self) -> None:
         content = (
@@ -86,7 +83,6 @@ class DownloaderTests(TestCase):
 
         with tempfile.TemporaryDirectory() as dir:
             dir_path = Path(dir)
-            self.downloader.base_path = "http://foo.com/"
             self.downloader.output = dir_path
 
             self.downloader.downloaded.update(
@@ -114,30 +110,30 @@ class DownloaderTests(TestCase):
             )
             self.assertEqual(expected, result)
 
-    def test_write_external_file(self) -> None:
-        uri = "http://www.w3.org/2001/xml.xsd"
+    def test_write_file_with_bundled_schema(self) -> None:
+        file_uri = fixtures_dir.joinpath("books/schema.xsd").as_uri()
+        http_location = "http://www.example.com/schemas/v1/schema.xsd"
         content = "foo"
 
         with tempfile.TemporaryDirectory() as dir:
             output_path = Path(dir)
-            file_path = output_path.joinpath("xml.xsd")
+            file_path = output_path.joinpath("www.example.com/schemas/v1/schema.xsd")
             self.downloader.output = output_path
-            self.downloader.write_file(uri, "foo", content)
+            self.downloader.write_file(file_uri, http_location, content)
 
+            self.assertTrue(file_path.exists())
             self.assertEqual(content, file_path.read_text())
-            self.assertEqual(file_path, self.downloader.downloaded[uri])
-            self.assertEqual(file_path, self.downloader.downloaded["foo"])
+            self.assertEqual(file_path, self.downloader.downloaded[file_uri])
 
-    def test_write_relative_file(self) -> None:
-        uri = "http://www.w3.org/2001/xml.xsd"
+    def test_write_file_raises_for_local_without_location(self) -> None:
+        file_uri = fixtures_dir.joinpath("books/schema.xsd").as_uri()
         content = "foo"
-        self.downloader.base_path = "http://www.w3.org"
 
         with tempfile.TemporaryDirectory() as dir:
             output_path = Path(dir)
-            file_path = output_path.joinpath("2001/xml.xsd")
             self.downloader.output = output_path
-            self.downloader.write_file(uri, None, content)
 
-            self.assertEqual(content, file_path.read_text())
-            self.assertEqual(file_path, self.downloader.downloaded[uri])
+            with self.assertRaises(ValueError) as cm:
+                self.downloader.write_file(file_uri, None, content)
+
+            self.assertIn("Cannot download local file", str(cm.exception))

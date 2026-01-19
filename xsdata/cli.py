@@ -12,7 +12,7 @@ from xsdata import __version__
 from xsdata.codegen.transformer import ResourceTransformer
 from xsdata.logger import logger
 from xsdata.models.config import GeneratorConfig, GeneratorOutput
-from xsdata.utils.click import LogFormatter, LogHandler, model_options
+from xsdata.utils.click import URL, LogFormatter, LogHandler, model_options
 from xsdata.utils.downloader import Downloader
 from xsdata.utils.hooks import load_entry_points
 
@@ -82,7 +82,7 @@ def init_config(**kwargs: Any) -> None:
 
 
 @cli.command("download")
-@click.argument("source", required=True)
+@click.argument("source", type=URL(), required=True)
 @click.option(
     "-o",
     "--output",

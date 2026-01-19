@@ -1,6 +1,7 @@
 import os
 import re
 from pathlib import Path
+from urllib.parse import urlparse
 
 from xsdata.codegen import opener
 from xsdata.codegen.parsers import DefinitionsParser, SchemaParser
@@ -28,16 +29,12 @@ class Downloader:
     def __init__(self, output: Path):
         """Initialize the downloader."""
         self.output = output
-        self.base_path: Path | None = None
         self.downloaded: dict = {}
 
     def wget(self, uri: str, location: str | None = None) -> None:
         """Download handler for any uri input with circular protection."""
-        if not (uri in self.downloaded or (location and location in self.downloaded)):
+        if uri not in self.downloaded:
             self.downloaded[uri] = None
-            self.downloaded[location] = None
-            self.adjust_base_path(uri)
-
             logger.info("Fetching %s", uri)
 
             input_stream = opener.open(uri).read()  # nosec
@@ -70,39 +67,6 @@ class Downloader:
                 schema_location = getattr(included, "schema_location", None)
                 self.wget(included.location, schema_location)
 
-    def adjust_base_path(self, uri: str) -> None:
-        """Adjust base path for every new uri loaded.
-
-        Example runs:
-            - file:///schemas/air_v48_0/Air.wsdl -> file:///schemas/air_v48_0
-            - file:///schemas/common_v48_0/CommonReqRsp.xsd -> file:///schemas
-
-        Args:
-            uri: A resource location URI
-        """
-        if not self.base_path:
-            self.base_path = Path(uri).parent
-            logger.info("Setting base path to %s", self.base_path)
-        else:
-            common_path = os.path.commonpath((self.base_path, uri))
-
-            if common_path:
-                common_path_path = Path(common_path)
-                if common_path_path < self.base_path:
-                    self.base_path = Path(common_path)
-                    logger.info("Adjusting base path to %s", self.base_path)
-
-    def adjust_imports(self, path: Path, content: str) -> str:
-        """Update the location of the imports to point to the downloaded files."""
-        matches = re.findall(r"ocation=\"(.*)\"", content)
-        for match in matches:
-            if isinstance(self.downloaded.get(match), Path):
-                location = os.path.relpath(self.downloaded[match], path)
-                replace = location.replace("\\", "/")
-                content = content.replace(f'ocation="{match}"', f'ocation="{replace}"')
-
-        return content
-
     def write_file(self, uri: str, location: str | None, content: str) -> None:
         """Write the downloaded uri to a local file.
 
@@ -115,11 +79,20 @@ class Downloader:
             location: The import location of the resource
             content: The raw content string
         """
-        common_path = os.path.commonpath((self.base_path or "", uri))
-        if common_path:
-            file_path = self.output.joinpath(Path(uri).relative_to(common_path))
+        if uri.startswith("file:"):
+            # This happens for bundled schemas (xlink.xsd, xml.xsd)
+            # which are intercepted by opener and returned as file://
+            if not location or location.startswith("file:"):
+                raise ValueError(
+                    f"Cannot download local file without HTTP location: {uri}\n"
+                )
+
+            parsed = urlparse(location)
         else:
-            file_path = self.output.joinpath(Path(uri).name)
+            parsed = urlparse(uri)
+
+        rel_path = parsed.netloc + "/" + parsed.path.lstrip("/")
+        file_path = self.output.joinpath(rel_path)
 
         content = self.adjust_imports(file_path.parent, content)
         file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -128,5 +101,13 @@ class Downloader:
         logger.info("Writing %s", file_path)
         self.downloaded[uri] = file_path
 
-        if location:
-            self.downloaded[location] = file_path
+    def adjust_imports(self, path: Path, content: str) -> str:
+        """Update the location of the imports to point to the downloaded files."""
+        matches = re.findall(r"ocation=\"(.*)\"", content)
+        for match in matches:
+            if isinstance(self.downloaded.get(match), Path):
+                location = os.path.relpath(self.downloaded[match], path)
+                replace = location.replace("\\", "/")
+                content = content.replace(f'ocation="{match}"', f'ocation="{replace}"')
+
+        return content

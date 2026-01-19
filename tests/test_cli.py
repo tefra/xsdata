@@ -160,6 +160,33 @@ class CliTests(TestCase):
         mock_init.assert_called_once_with(output=Path("here/schemas").resolve())
         mock_wget.assert_called_once_with(uri)
 
+    def test_download_rejects_file_uri(self) -> None:
+        result = self.runner.invoke(cli, ["download", "file:///path/to/schema.xsd"])
+
+        self.assertIsNotNone(result.exception)
+        self.assertEqual(result.exit_code, 2)
+        self.assertIn("Source must be an HTTP URL", result.output)
+
+    @mock.patch.object(Downloader, "wget")
+    @mock.patch.object(Downloader, "__init__", return_value=None)
+    def test_download_accepts_http(self, mock_init, mock_wget) -> None:
+        """Test that download command accepts HTTPS URLs."""
+        uri = "https://example.com/schema.xsd"
+        result = self.runner.invoke(cli, ["download", uri])
+
+        self.assertIsNone(result.exception)
+        mock_wget.assert_called_once_with(uri)
+
+    @mock.patch.object(Downloader, "wget")
+    @mock.patch.object(Downloader, "__init__", return_value=None)
+    def test_download_accepts_https(self, mock_init, mock_wget) -> None:
+        """Test that download command accepts HTTPS URLs."""
+        uri = "http://example.com/schema.xsd"
+        result = self.runner.invoke(cli, ["download", uri])
+
+        self.assertIsNone(result.exception)
+        mock_wget.assert_called_once_with(uri)
+
     def test_resolve_source(self) -> None:
         hello_path = fixtures_dir.joinpath("hello")
 

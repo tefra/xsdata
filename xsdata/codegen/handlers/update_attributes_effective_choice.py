@@ -142,4 +142,18 @@ class UpdateAttributesEffectiveChoice(HandlerInterface):
             if not attr.is_attribute:
                 counters[attr.key].append(index)
 
-        return [list(range(x[0], x[-1] + 1)) for x in counters.values() if len(x) > 1]
+        result = []
+        for indices in counters.values():
+            if len(indices) > 1:
+                # Check if all occurrences have the same choice ID
+                # If they have different choice IDs (and both are not None),
+                # they're in different choice blocks and shouldn't be merged
+                choice_ids = {target.attrs[i].restrictions.choice for i in indices}
+                # Allow grouping if:
+                # 1. All have the same choice ID, OR
+                # 2. At least one has choice=None (not in a choice block)
+                if len(choice_ids) == 1 or None in choice_ids:
+                    # Group them
+                    result.append(list(range(indices[0], indices[-1] + 1)))
+
+        return result

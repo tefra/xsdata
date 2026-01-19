@@ -82,3 +82,29 @@ class MergeAttributesTests(FactoryTestCase):
         self.assertEqual(0, five.restrictions.min_occurs)
         self.assertEqual(3, five.restrictions.max_occurs)
         self.assertEqual(["int", "float"], [x.name for x in five.types])
+
+    def test_process_elements_in_different_choice_groups(self) -> None:
+        """Test that elements in different choice groups use max, not sum."""
+        choice1_id = 12345
+        choice2_id = 67890
+
+        attr1 = AttrFactory.element(
+            name="configOption",
+            index=5,
+            restrictions=Restrictions(min_occurs=0, max_occurs=1, choice=choice1_id),
+        )
+        attr2 = AttrFactory.element(
+            name="configOption",
+            index=8,
+            restrictions=Restrictions(min_occurs=0, max_occurs=1, choice=choice2_id),
+        )
+
+        target = ClassFactory.create(attrs=[attr1, attr2])
+
+        self.processor.process(target)
+
+        # Should merge into one attr with max_occurs=1 (not 2)
+        self.assertEqual(1, len(target.attrs))
+        self.assertEqual("configOption", target.attrs[0].name)
+        self.assertEqual(0, target.attrs[0].restrictions.min_occurs)
+        self.assertEqual(1, target.attrs[0].restrictions.max_occurs)

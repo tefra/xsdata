@@ -29,10 +29,9 @@ features.
 
 The local name of the XML/JSON element.
 
-```python show_lines="8:"
+```python
 >>> from dataclasses import dataclass, field
 >>> from xsdata.formats.dataclass.serializers import XmlSerializer
->>> from xsdata.utils.text import camel_case
 >>> serializer = XmlSerializer()
 >>> serializer.config.indent = "  "
 >>> serializer.config.xml_declaration = False
@@ -121,6 +120,8 @@ auto-type discovery.
 A callable to convert element names when no explicit names are defined.
 
 ```python
+>>> from xsdata.utils.text import camel_case
+>>>
 >>> @dataclass
 ... class RootType:
 ...     class Meta:

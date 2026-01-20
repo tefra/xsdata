@@ -10,13 +10,10 @@ features.
 
 The local name of the XML/JSON field.
 
-```python show_lines="11:"
->>> import datetime
->>> from typing import Optional, List, Union
+```python
 >>> from dataclasses import dataclass, field
 >>> from xsdata.formats.dataclass.serializers import XmlSerializer
->>> from xsdata.formats.dataclass.parsers import XmlParser
->>> parser = XmlParser()
+>>>
 >>> serializer = XmlSerializer()
 >>> serializer.config.indent = "  "
 >>> serializer.config.xml_declaration = False
@@ -68,8 +65,8 @@ have any meaningful content. If the field is not required the serializer will ig
 ```python
 >>> @dataclass
 ... class Root:
-...     first: Optional[str] = field(metadata={"nillable": True, "required": True}, default=None)
-...     second: Optional[str] = field(default=None)
+...     first: None | str = field(metadata={"nillable": True, "required": True}, default=None)
+...     second: None | str = field(default=None)
 ...
 >>> print(serializer.render(Root()))
 <Root>
@@ -89,9 +86,9 @@ Fields will the same sequence number are rendered sequentially.
 ```python
 >>> @dataclass
 ... class Root:
-...     a: List[int] = field(metadata={"sequence": 1})
+...     a: list[int] = field(metadata={"sequence": 1})
 ...     b: int = field(metadata={"sequence": 1})
-...     c: List[int] = field(metadata={"sequence": 1})
+...     c: list[int] = field(metadata={"sequence": 1})
 ...
 >>> root = Root(a=[1, 2, 3], b=4, c=[6, 7, 8])
 >>> print(serializer.render(root))
@@ -118,7 +115,7 @@ Specify if the field value is a whitespace concatenated sequence.
 ```python
 >>> @dataclass
 ... class Root:
-...     child: List[int] = field(metadata={"type": "Element", "tokens": True})
+...     child: list[int] = field(metadata={"type": "Element", "tokens": True})
 ...
 >>> root = Root([1, 2, 3])
 >>> print(serializer.render(root))
@@ -137,6 +134,8 @@ Specify if the field value is a whitespace concatenated sequence.
 The field format option for types like datetime, or bytes.
 
 ```python
+>>> import datetime
+>>>
 >>> @dataclass
 ... class Root:
 ...     base16: bytes = field(metadata={"format": "base16"})
@@ -217,7 +216,7 @@ Elements type represents repeatable choice elements. It's more commonly referred
 ```python
 >>> @dataclass
 ... class Root:
-...     value: List[Union[str, int, bool]] = field(
+...     value: list[str | int | bool] = field(
 ...         metadata={
 ...             "type": "Elements",
 ...             "choices": (
@@ -279,11 +278,14 @@ Wildcards can have a normal uri namespace or use one of xml schema generics.
 - `##targetNamespace`: element from the namespace of the parent can be present
 
 ```python
+>>> from xsdata.formats.dataclass.parsers import XmlParser
+>>>
 >>> @dataclass
 ... class Root:
 ...     any: object = field(metadata={"type": "Wildcard"})
 ...
 >>> xml = '<Root><child a="b">foo</child></Root>'
+>>> parser = XmlParser()
 >>> parser.from_string(xml, clazz=Root)
 Root(any=AnyElement(qname='child', text='foo', tail=None, children=[], attributes={'a': 'b'}))
 
@@ -336,12 +338,9 @@ The element name to wrap a single or a collection of elements or primitives, in 
 avoid having a dedicated wrapper class.
 
 ```python
->>> from dataclasses import dataclass, field
->>> from typing import List
->>>
 >>> @dataclass
 ... class Library:
-...     books: List[str] = field(
+...     books: list[str] = field(
 ...         metadata={
 ...             "wrapper": "Books",
 ...             "name": "Title",

@@ -21,8 +21,8 @@ $ xsdata generate --package calculator http://www.dneonline.com/calculator.asmx?
 The message models are no different from XSD-derived classes and include the complete
 structure of the `Envelope` wrapper.
 
-```python show_lines="148:169"
---8<-- "tests/fixtures/calculator/services.py"
+```python
+--8<-- "tests/fixtures/calculator/services.py:148:169"
 ```
 
 ## Operation Class
@@ -30,8 +30,8 @@ structure of the `Envelope` wrapper.
 The [DefinitionsMapper][xsdata.codegen.mappers.DefinitionsMapper] will generate simple
 static classes to describe all the unique operations and the binding procedure.
 
-```python show_lines="488:494"
---8<-- "tests/fixtures/calculator/services.py"
+```python
+--8<-- "tests/fixtures/calculator/services.py:488:494"
 ```
 
 ## Client

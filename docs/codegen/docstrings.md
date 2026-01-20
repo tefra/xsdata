@@ -6,30 +6,30 @@ them completely.
 
 === "reStructuredText"
 
-    ```python show_lines="31:"
-    --8<-- "tests/fixtures/docstrings/rst/schema.py"
+    ```python
+    --8<-- "tests/fixtures/docstrings/rst/schema.py:31:"
     ```
 
 === "NumPy"
 
-    ```python show_lines="31:"
-    --8<-- "tests/fixtures/docstrings/numpy/schema.py"
+    ```python
+    --8<-- "tests/fixtures/docstrings/numpy/schema.py:31:"
     ```
 
 === "Google"
 
-    ```python show_lines="31:"
-    --8<-- "tests/fixtures/docstrings/google/schema.py"
+    ```python
+    --8<-- "tests/fixtures/docstrings/google/schema.py:31:"
     ```
 
 === "Accessible"
 
-    ```python show_lines="31:"
-    --8<-- "tests/fixtures/docstrings/accessible/schema.py"
+    ```python
+    --8<-- "tests/fixtures/docstrings/accessible/schema.py:31:"
     ```
 
 === "Blank"
 
-    ```python show_lines="21:"
-    --8<-- "tests/fixtures/docstrings/blank/schema.py"
+    ```python
+    --8<-- "tests/fixtures/docstrings/blank/schema.py:21:"
     ```

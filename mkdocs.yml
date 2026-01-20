@@ -76,10 +76,6 @@ markdown_extensions:
       dedent_subsections: true
   - pymdownx.superfences:
       custom_fences:
-        - name: "*"
-          class: "highlight"
-          format: !!python/name:pymdownx_superfence_filter_lines.do_format
-          validator: !!python/name:pymdownx_superfence_filter_lines.do_validate
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format

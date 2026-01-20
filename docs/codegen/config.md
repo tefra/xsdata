@@ -135,8 +135,8 @@ xsdata relies on the field ordering for serialization. This process fails for re
 choice or complex sequence elements. When you enable compound fields, these elements are
 grouped into a single field.
 
-```xml show_lines="2:10"
---8<-- "tests/fixtures/compound/schema.xsd"
+```xml
+--8<-- "tests/fixtures/compound/schema.xsd:2:10"
 ```
 
 **Default Value:** `False`
@@ -173,8 +173,8 @@ complex elements.
 The wrapper and wrapped elements can't be optional. If the wrapped value is a list it
 must have minimum `occurs >= 1`.
 
-```xml show_lines="2:17"
---8<-- "tests/fixtures/wrapper/schema.xsd"
+```xml
+--8<-- "tests/fixtures/wrapper/schema.xsd:2:17"
 ```
 
 **Default Value:** `False`

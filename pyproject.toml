@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.2"]
+requires = ["setuptools>=77.0.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
@@ -9,10 +9,10 @@ include = ["xsdata*"]
 name = "xsdata"
 description = "Python XML Binding"
 authors = [{name = "Christodoulos Tsoulloftas", email = "chris@komposta.net"}]
-license = {text = "MIT"}
+license = "MIT"
+license-files = ["LICENSE"]
 classifiers = [
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
@@ -30,7 +30,7 @@ classifiers = [
 keywords = ["xsd", "wsdl", "schema", "dtd", "binding", "xml", "json", "dataclasses", "generator", "cli"]
 requires-python = ">=3.10"
 dependencies = [
-    "typing-extensions>=4.7.0",
+    "typing-extensions>=4.12.0",
 ]
 dynamic = ["version"]
 
@@ -46,9 +46,9 @@ Changelog = "https://xsdata.readthedocs.io/en/latest/changelog/"
 
 [project.optional-dependencies]
 cli = [
-    "click>=5.0",
-    "jinja2>=2.10",
-    "toposort>=1.5",
+    "click>=8.0.0",
+    "jinja2>=3.0.0",
+    "toposort>=1.9",
     "ruff>=0.9.8"
 ]
 docs = [
@@ -61,13 +61,13 @@ docs = [
     "markdown-exec[ansi]",
     "pymdownx-superfence-filter-lines",
 ]
-lxml = ["lxml>=4.5.0"]
-soap = ["requests"]
+lxml = ["lxml>=5.0.0"]
+soap = ["requests>=2.28.0"]
 test = [
-    "pre-commit",
-    "pytest",
-    "pytest-benchmark",
-    "pytest-cov",
+    "pre-commit>=3.0.0",
+    "pytest>=8.0.0",
+    "pytest-benchmark>=4.0.0",
+    "pytest-cov>=5.0.0",
 ]
 
 [project.scripts]
@@ -75,7 +75,6 @@ xsdata = "xsdata.__main__:main"
 
 [tool.setuptools]
 include-package-data = true
-license-files = ["LICENSE"]
 
 [tool.setuptools.dynamic]
 version = {attr = "xsdata.__version__"}

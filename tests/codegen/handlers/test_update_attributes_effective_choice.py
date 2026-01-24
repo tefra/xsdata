@@ -176,3 +176,82 @@ class UpdateAttributesEffectiveChoiceTests(FactoryTestCase):
             ["configOption", "optionA", "configOption", "optionB"],
             [x.name for x in target.attrs],
         )
+
+    def test_process_elements_in_same_choice_different_branches(self) -> None:
+        """Test that elements in same choice but different branches are not merged.
+
+        This tests the case where an element appears in multiple branches of the
+        same choice, but at different nesting levels (different path lengths).
+        Example XSD pattern:
+            <xs:choice>
+                <xs:sequence>
+                    <xs:element name="a"/>
+                    <xs:element name="b" minOccurs="0"/>
+                </xs:sequence>
+                <xs:element name="b"/>
+            </xs:choice>
+        The two 'b' elements are mutually exclusive (different branches of the
+        same choice) and should not be grouped as repeating elements.
+        """
+        choice_id = 12345
+        outer_seq_id = 11111
+        inner_seq_id = 22222
+
+        target = ClassFactory.create(
+            attrs=[
+                AttrFactory.element(
+                    name="a",
+                    namespace="ns",
+                    restrictions=Restrictions(
+                        min_occurs=1,
+                        max_occurs=1,
+                        choice=choice_id,
+                        sequence=outer_seq_id,
+                        path=[
+                            ("s", outer_seq_id, 0, 1),
+                            ("c", choice_id, 1, 1),
+                            ("s", inner_seq_id, 1, 1),
+                        ],
+                    ),
+                ),
+                AttrFactory.element(
+                    name="b",
+                    namespace="ns",
+                    restrictions=Restrictions(
+                        min_occurs=0,
+                        max_occurs=1,
+                        choice=choice_id,
+                        sequence=outer_seq_id,
+                        path=[
+                            ("s", outer_seq_id, 0, 1),
+                            ("c", choice_id, 1, 1),
+                            ("s", inner_seq_id, 1, 1),
+                        ],
+                    ),
+                ),
+                AttrFactory.element(
+                    name="b",
+                    namespace="ns",
+                    restrictions=Restrictions(
+                        min_occurs=1,
+                        max_occurs=1,
+                        choice=choice_id,
+                        sequence=outer_seq_id,
+                        path=[
+                            ("s", outer_seq_id, 0, 1),
+                            ("c", choice_id, 1, 1),
+                        ],
+                    ),
+                ),
+            ]
+        )
+
+        self.processor.process(target)
+
+        # Should not merge 'b' elements since they have different path lengths
+        # (different nesting levels within the same choice)
+        self.assertEqual(3, len(target.attrs))
+        self.assertEqual(["a", "b", "b"], [x.name for x in target.attrs])
+        # Both 'b' elements should retain their original max_occurs=1
+        self.assertEqual(1, target.attrs[1].restrictions.max_occurs)
+        self.assertEqual(1, target.attrs[2].restrictions.max_occurs)

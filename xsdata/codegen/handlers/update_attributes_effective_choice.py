@@ -149,11 +149,21 @@ class UpdateAttributesEffectiveChoice(HandlerInterface):
                 # If they have different choice IDs (and both are not None),
                 # they're in different choice blocks and shouldn't be merged
                 choice_ids = {target.attrs[i].restrictions.choice for i in indices}
-                # Allow grouping if:
-                # 1. All have the same choice ID, OR
-                # 2. At least one has choice=None (not in a choice block)
-                if len(choice_ids) == 1 or None in choice_ids:
-                    # Group them
+
+                # Also check if all occurrences have the same path length
+                # If they have different path lengths within the same choice,
+                # they're in different branches (mutually exclusive)
+                path_lengths = {len(target.attrs[i].restrictions.path) for i in indices}
+
+                if None in choice_ids:
+                    # At least one element is outside a choice, so they can co-exist
+                    # (e.g., one in outer sequence, one in inner choice branch)
                     result.append(list(range(indices[0], indices[-1] + 1)))
+                elif len(choice_ids) == 1 and len(path_lengths) == 1:
+                    # All elements in the same choice at the same nesting level
+                    # This is a repeating pattern, group them
+                    result.append(list(range(indices[0], indices[-1] + 1)))
+                # else: different choices or same choice but different nesting levels
+                # = mutually exclusive branches, don't group
 
         return result

@@ -108,3 +108,34 @@ class MergeAttributesTests(FactoryTestCase):
         self.assertEqual("configOption", target.attrs[0].name)
         self.assertEqual(0, target.attrs[0].restrictions.min_occurs)
         self.assertEqual(1, target.attrs[0].restrictions.max_occurs)
+
+    def test_process_elements_in_same_choice_different_branches(self) -> None:
+        """Test that elements in the same choice but different branches use max.
+
+        This tests the case where an element appears in multiple branches of the
+        same choice. Since only one branch is selected at runtime, they are
+        mutually exclusive and max_occurs should use max(), not sum().
+        """
+        choice_id = 12345
+
+        attr1 = AttrFactory.element(
+            name="b",
+            index=10,
+            restrictions=Restrictions(min_occurs=0, max_occurs=1, choice=choice_id),
+        )
+        attr2 = AttrFactory.element(
+            name="b",
+            index=11,
+            restrictions=Restrictions(min_occurs=1, max_occurs=1, choice=choice_id),
+        )
+
+        target = ClassFactory.create(attrs=[attr1, attr2])
+
+        self.processor.process(target)
+
+        # Should merge into one attr with max_occurs=1 (not 2)
+        # because both are in different branches of the same choice
+        self.assertEqual(1, len(target.attrs))
+        self.assertEqual("b", target.attrs[0].name)
+        self.assertEqual(0, target.attrs[0].restrictions.min_occurs)
+        self.assertEqual(1, target.attrs[0].restrictions.max_occurs)

@@ -74,29 +74,16 @@ Check the [documentation](https://xsdata.readthedocs.io) for more ✨✨✨
 - Support xinclude statements and unknown properties
 - Customize behaviour through config
 
-## Changelog: 26.1 (2026-01-20)
+## Changelog: 26.2 (2026-02-15)
 
 **Fixes**
 
-- Fixed missing imports on inheriting multiple mixins for the same class
-  ([#1156](https://github.com/tefra/xsdata/pull/1156))
-- Fixed choice elements with minOccurs <= 1 not marked as optional
-- Fixed incorrect max_occurs for elements in different choice blocks
-  ([#1179](https://github.com/tefra/xsdata/pull/1179))
-- Fixed AttributeError when retrieving subclasses from cython packages
-  ([#1200](https://github.com/tefra/xsdata/pull/1200))
+- Fix elements in same choice different branches incorrectly merged as list
+  ([#1206](https://github.com/tefra/xsdata/pull/1206))
 
 **Features**
 
-- Added flag for specifying extensions
-  ([#1168](https://github.com/tefra/xsdata/pull/1168))
-- Added support for python 3.14 ([#1173](https://github.com/tefra/xsdata/pull/1173))
-- Switched to Sequence when using generic containers
-  ([#1201](https://github.com/tefra/xsdata/pull/1201))
-
-**Deprecations**
-
-- Removed Python 3.9 support ([#1189](https://github.com/tefra/xsdata/pull/1189))
-  ([#1191](https://github.com/tefra/xsdata/pull/1191))
-- Removed cli options union-type, kw-only, postponed-annotations are now always enabled
-- Removed xsdata <SOURCE> shorthand ([#1128](https://github.com/tefra/xsdata/pull/1128))
+- Infer XML required property from typing annotations
+  ([#1208](https://github.com/tefra/xsdata/pull/1208))
+- Generate required metadata only for attributes without default values
+  ([#1208](https://github.com/tefra/xsdata/pull/1208))

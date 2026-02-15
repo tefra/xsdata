@@ -140,9 +140,11 @@ class ProcessAttributeTypes(RelativeHandlerInterface):
             conditions = (lambda obj: obj.ref == attr_type.reference,)
         else:
             conditions = (
-                lambda obj: tag == Tag.ELEMENT
-                and obj.tag == Tag.COMPLEX_TYPE
-                and obj is not target,
+                lambda obj: (
+                    tag == Tag.ELEMENT
+                    and obj.tag == Tag.COMPLEX_TYPE
+                    and obj is not target
+                ),
                 lambda obj: obj.tag == tag,
                 lambda obj: not obj.is_complex_type,
                 lambda x: True,

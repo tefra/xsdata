@@ -1,3 +1,17 @@
+## 26.2 (2026-02-15)
+
+**Fixes**
+
+- Fix elements in same choice different branches incorrectly merged as list
+  ([#1206](https://github.com/tefra/xsdata/pull/1206))
+
+**Features**
+
+- Infer XML required property from typing annotations
+  ([#1208](https://github.com/tefra/xsdata/pull/1208))
+- Generate required metadata only for attributes without default values
+  ([#1208](https://github.com/tefra/xsdata/pull/1208))
+
 ## 26.1 (2026-01-20)
 
 **Fixes**

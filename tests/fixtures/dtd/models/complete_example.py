@@ -6,12 +6,12 @@ from enum import Enum
 
 @dataclass(kw_only=True)
 class Body:
-    value: str = field(default="")
+    value: str = field()
 
 
 @dataclass(kw_only=True)
 class Origin:
-    value: str = field(default="")
+    value: str = field()
 
 
 class PostStatus(Enum):
@@ -21,17 +21,17 @@ class PostStatus(Enum):
 
 @dataclass(kw_only=True)
 class Source:
-    value: str = field(default="")
+    value: str = field()
 
 
 @dataclass(kw_only=True)
 class Tag:
-    value: str = field(default="")
+    value: str = field()
 
 
 @dataclass(kw_only=True)
 class Title:
-    value: str = field(default="")
+    value: str = field()
 
 
 @dataclass(kw_only=True)

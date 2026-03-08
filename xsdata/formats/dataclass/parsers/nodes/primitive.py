@@ -46,16 +46,16 @@ class PrimitiveNode(XmlNode):
         Returns:
             Whether the binding process was successful or not.
         """
-        obj = ParserUtils.parse_var(
-            meta=self.meta,
-            var=self.var,
-            config=self.config,
-            value=text,
-            ns_map=self.ns_map,
-        )
-
-        if obj is None and not self.var.nillable:
-            obj = b"" if bytes in self.var.types else ""
+        if text is None and self.var.nillable:
+            obj = None
+        else:
+            obj = ParserUtils.parse_text_var(
+                meta=self.meta,
+                var=self.var,
+                config=self.config,
+                text=text,
+                ns_map=self.ns_map,
+            )
 
         objects.append((qname, obj))
 

@@ -98,7 +98,7 @@ class SanitizeAttributesDefaultValueTests(FactoryTestCase):
 
         attr = AttrFactory.extension()
         self.processor.process_attribute(target, attr)
-        self.assertEqual("", attr.default)
+        self.assertIsNone(attr.default)
 
         attr = AttrFactory.extension(default="abc")
         self.processor.process_attribute(target, attr)
@@ -112,7 +112,7 @@ class SanitizeAttributesDefaultValueTests(FactoryTestCase):
             types=[AttrTypeFactory.native(DataType.BASE64_BINARY)]
         )
         self.processor.process_attribute(target, attr)
-        self.assertEqual("", attr.default)
+        self.assertIsNone(attr.default)
 
     def test_should_reset_required(self) -> None:
         attr = AttrFactory.create()

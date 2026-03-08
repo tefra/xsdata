@@ -70,18 +70,19 @@ class StandardNode(XmlNode):
             Always true, it's not possible to fail during parsing
             for this node.
         """
-        obj = ParserUtils.parse_var(
-            meta=self.meta,
-            var=self.var,
-            config=self.config,
-            value=text,
-            types=[self.datatype.type],
-            ns_map=self.ns_map,
-            format=self.datatype.format,
-        )
 
-        if obj is None and not self.nillable:
-            obj = ""
+        if text is None and self.nillable:
+            obj = None
+        else:
+            obj = ParserUtils.parse_text_var(
+                meta=self.meta,
+                var=self.var,
+                config=self.config,
+                text=text,
+                types=[self.datatype.type],
+                ns_map=self.ns_map,
+                format=self.datatype.format,
+            )
 
         if self.datatype.wrapper:
             obj = self.datatype.wrapper(obj)

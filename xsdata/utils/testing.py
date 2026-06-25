@@ -460,6 +460,7 @@ class XmlMetaFactory(Factory):
         clazz: type,
         qname: str | None = None,
         target_qname: str | None = None,
+        key: Sequence[str] | None = None,
         nillable: bool = False,
         text: XmlVar | None = None,
         choices: Sequence[XmlVar] | None = None,
@@ -474,6 +475,9 @@ class XmlMetaFactory(Factory):
 
         if target_qname is None:
             target_qname = qname
+
+        if key is None:
+            key = []
 
         if choices is None:
             choices = []
@@ -494,6 +498,7 @@ class XmlMetaFactory(Factory):
             clazz=clazz,
             qname=qname,
             target_qname=target_qname,
+            key=key,
             nillable=nillable,
             text=text,
             choices=choices,

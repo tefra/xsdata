@@ -393,6 +393,7 @@ class XmlMeta(MetaMixin):
         clazz: The binding model
         qname: The namespace-qualified name
         target_qname: The target namespace-qualified name
+        key: The attributes that together make the XMLID of this class
         nillable: Specifies whether this class supports nillable content
         text: A text variable
         choices: A list of compound variables
@@ -413,6 +414,7 @@ class XmlMeta(MetaMixin):
         "choices",
         "clazz",
         "elements",
+        "key",
         "mixed_content",
         # Calculated
         "namespace",
@@ -429,6 +431,7 @@ class XmlMeta(MetaMixin):
         clazz: type,
         qname: str,
         target_qname: str | None,
+        key: Sequence[str],
         nillable: bool,
         text: XmlVar | None,
         choices: Sequence[XmlVar],
@@ -444,6 +447,7 @@ class XmlMeta(MetaMixin):
         self.qname = qname
         self.namespace = target_uri(qname)
         self.target_qname = target_qname
+        self.key = list(key)
         self.nillable = nillable
         self.text = text
         self.choices = choices

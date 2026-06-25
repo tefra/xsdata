@@ -74,6 +74,23 @@ class XmlMetaBuilderTests(FactoryTestCase):
 
         self.assertEqual("book_form", result.qname)
 
+    def test_build_with_meta_key(self) -> None:
+        @dataclass
+        class Foo:
+            class Meta:
+                key = ["id", "lang"]
+
+        result = self.builder.build(Foo, None)
+        self.assertEqual(["id", "lang"], result.key)
+
+    def test_build_with_no_meta_key(self) -> None:
+        @dataclass
+        class Foo:
+            pass
+
+        result = self.builder.build(Foo, None)
+        self.assertEqual([], result.key)
+
     def test_build_block_meta_inheritance(self) -> None:
         @dataclass
         class Bar:

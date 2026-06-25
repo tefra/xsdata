@@ -44,6 +44,7 @@ class ClassMeta:
         attribute_name_generator: The attribute name generator
         qname: The namespace qualified name of the class
         local_name: The name of the element this class represents
+        key: The attributes that together make the XMLID of this class
         nillable: Specifies whether this class supports nillable content
         namespace: The class namespace
         target_qname: The class target namespace qualified name
@@ -52,6 +53,7 @@ class ClassMeta:
     __slots__ = (
         "attribute_name_generator",
         "element_name_generator",
+        "key",
         "local_name",
         "namespace",
         "nillable",
@@ -65,6 +67,7 @@ class ClassMeta:
         attribute_name_generator: Callable,
         qname: str,
         local_name: str,
+        key: list[str],
         nillable: bool,
         namespace: str | None,
         target_qname: str | None,
@@ -74,6 +77,7 @@ class ClassMeta:
         self.attribute_name_generator = attribute_name_generator
         self.qname = qname
         self.local_name = local_name
+        self.key = key
         self.nillable = nillable
         self.namespace = namespace
         self.target_qname = target_qname
@@ -157,6 +161,7 @@ class XmlMetaBuilder:
             clazz=clazz,
             qname=meta.qname,
             target_qname=meta.target_qname,
+            key=meta.key,
             nillable=meta.nillable,
             text=text,
             attributes=attributes,
@@ -239,6 +244,7 @@ class XmlMetaBuilder:
         global_type = getattr(meta, "global_type", True)
         local_name = getattr(meta, "name", None)
         local_name = local_name or element_name_generator(clazz.__name__)
+        key = list(getattr(meta, "key", []))
         nillable = getattr(meta, "nillable", False)
         namespace = getattr(meta, "namespace", parent_namespace)
         qname = build_qname(namespace, local_name)
@@ -255,6 +261,7 @@ class XmlMetaBuilder:
             attribute_name_generator,
             qname,
             local_name,
+            key,
             nillable,
             namespace,
             target_qname,

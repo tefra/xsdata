@@ -407,6 +407,7 @@ class XmlVarFactory(Factory):
         elements: dict[str, XmlVar] | None = None,
         wildcards: Sequence[XmlVar] | None = None,
         prefix: str = "field_",
+        idref: bool = False,
         **kwargs: Any,
     ) -> XmlVar:
         name = name or f"{prefix}{cls.next_letter()}"
@@ -446,6 +447,7 @@ class XmlVarFactory(Factory):
             namespaces=namespaces,
             elements=elements,
             wildcards=wildcards,
+            idref=idref,
         )
 
 

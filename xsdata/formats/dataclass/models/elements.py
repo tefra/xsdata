@@ -121,6 +121,7 @@ class XmlVar(MetaMixin):
         "is_elements",
         "is_text",
         "is_wildcard",
+        "is_idref",
         "list_element",
         "local_name",
         "mixed",
@@ -164,6 +165,7 @@ class XmlVar(MetaMixin):
         namespaces: Sequence[str],
         elements: Mapping[str, XmlVar],
         wildcards: Sequence[XmlVar],
+        idref: bool,
         **kwargs: Any,
     ):
         """Initialize the xml var."""
@@ -207,6 +209,7 @@ class XmlVar(MetaMixin):
         self.is_wildcard = False
         self.is_attribute = False
         self.is_attributes = False
+        self.is_idref = idref
 
         if xml_type == XmlType.ELEMENTS:
             self.is_elements = True

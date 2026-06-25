@@ -1,19 +1,18 @@
 from unittest import TestCase
 
-from tests.fixtures.references.sample import family
+
 from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
+from xsdata.formats.dataclass.parsers import XmlParser
+from xsdata.formats.dataclass.context import XmlContext
+from xsdata.formats.dataclass.parsers.config import ParserConfig
+
+from tests.fixtures.references.sample import family
+from tests.fixtures.references.model import  Family
+
 
 class XmlSerializerTests(TestCase):
-    def setUp(self) -> None:
-        config = SerializerConfig(indent="  ")
-        self.serializer = XmlSerializer(config=config)
-        super().setUp()
-
-    def test_render(self) -> None:
-        result = self.serializer.render(family, ns_map={"rel": "urn:relations", "xsi": "http://www.w3.org/2001/XMLSchema-instance"})
-        print(result)
-        expected = """<?xml version="1.0" encoding="UTF-8"?>
+    expected = """<?xml version="1.0" encoding="UTF-8"?>
 <rel:family xmlns:rel="urn:relations" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <rel:surname>fictional</rel:surname>
   <rel:members>
@@ -35,4 +34,19 @@ class XmlSerializerTests(TestCase):
   </rel:members>
 </rel:family>
 """
-        self.assertEqual(expected, result)
+    def setUp(self) -> None:
+        config = SerializerConfig(indent="  ")
+        self.serializer = XmlSerializer(config=config)
+        pconfig = ParserConfig()
+        context = XmlContext()
+        self.parser = XmlParser(config=pconfig, context=context)
+        super().setUp()
+
+    def test_render(self) -> None:
+        result = self.serializer.render(family, ns_map={"rel": "urn:relations", "xsi": "http://www.w3.org/2001/XMLSchema-instance"})
+        print(result)
+        self.assertEqual(self.expected, result)
+
+    def test_parse(self) -> None:
+        result = self.parser.from_string(self.expected, Family)
+        self.assertEqual(family, result)

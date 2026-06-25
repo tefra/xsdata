@@ -618,7 +618,9 @@ class EventGenerator:
         Yields:
             An iterator of sax events.
         """
-        if var.mixed:
+        if var.is_idref and self.context.class_type.is_model(value):
+            yield from self.convert_idref(value, var)
+        elif var.mixed:
             yield from self.convert_mixed_content(value, var, namespace)
         elif var.is_text:
             yield from self.convert_data(value, var)
@@ -630,6 +632,33 @@ class EventGenerator:
             yield from self.convert_list(value, var, namespace)
         else:
             yield from self.convert_any_type(value, var, namespace)
+
+    def convert_idref(self, value: Any, var: XmlVar) -> EventIterator:
+        """Convert an idref model value to a simple key element.
+
+        Instead of recursively serializing the referenced object, emit a
+        single element whose text content is the object's key fields joined
+        with ``_``.  The key is looked up by walking the class MRO so that
+        a ``key`` defined on a parent class is inherited by subclasses that
+        do not repeat it in their own ``Meta``.
+
+        Args:
+            value: A model instance that is referenced by ID
+            var: The field metadata instance
+
+        Yields:
+            An iterator of sax events.
+        """
+        key: list[str] = []
+        for cls in value.__class__.__mro__:
+            cls_meta = cls.__dict__.get("Meta")
+            if cls_meta is not None and hasattr(cls_meta, "key"):
+                key = list(cls_meta.key)
+                break
+        key_value = "_".join(str(getattr(value, k)) for k in key)
+        yield XmlWriterEvent.START, var.qname
+        yield XmlWriterEvent.DATA, key_value
+        yield XmlWriterEvent.END, var.qname
 
     def convert_list(
         self,

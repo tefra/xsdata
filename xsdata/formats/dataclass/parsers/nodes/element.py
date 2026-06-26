@@ -507,6 +507,8 @@ class ElementNode(XmlNode):
         derived_factory = self.context.class_type.derived_element
 
         if var.clazz:
+            if var.is_idref:
+                return nodes.IdRefNode(var)
             return self.build_element_node(
                 var.clazz,
                 False,

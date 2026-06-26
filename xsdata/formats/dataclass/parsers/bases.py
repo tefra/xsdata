@@ -54,14 +54,15 @@ class NodeParser(PushParser):
         handler = self.handler(clazz=clazz, parser=self)
 
         try:
+            self.context.reset_idrefs()
             ns_map = self.ns_map if ns_map is None else ns_map
             result = handler.parse(source, ns_map)
         except SyntaxError as e:
             raise ParserError(e)
+        finally:
+            self.context.reset_idrefs()
 
         if result is not None:
-            from xsdata.formats.dataclass.parsers.idref import resolve_idrefs
-            resolve_idrefs(result, self.context)
             return result
 
         target_class = clazz.__name__ if clazz else ""

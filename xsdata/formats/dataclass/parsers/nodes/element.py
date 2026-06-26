@@ -113,12 +113,78 @@ class ElementNode(XmlNode):
 
         objects.append((qname, obj))
 
+        # Register the new object in the IDREF registry and resolve any
+        # pending forward references that were waiting for it.
+        inner = obj.value if (self.derived_factory and hasattr(obj, "value")) else obj
+        if inner is not None and self.context.class_type.is_model(inner):
+            self._register_and_resolve_idrefs(inner)
+
         if not self.tail_processed:
             tail = ParserUtils.normalize_content(tail)
             if tail:
                 objects.append((None, tail))
 
         return True
+
+    def _register_and_resolve_idrefs(self, obj: Any) -> None:
+        """Register *obj* in the context IDREF registry and resolve pending IDREFs.
+
+        Two things happen inline as each object is created:
+
+        1. **Scan** the object's IDREF fields for :class:`_IdRefPlaceholder`
+           instances left by forward references and either replace them
+           immediately (if the target is already registered) or record a
+           pending slot to be filled once the target appears.
+
+        2. **Register** the object itself under its composite key so that
+           later :class:`IdRefNode` bindings (backward references) can emit
+           the real object directly without a placeholder.
+
+        Args:
+            obj: The newly-created model instance.
+        """
+        from xsdata.formats.dataclass.parsers.nodes.idref import (
+            _IdRefPlaceholder,
+            get_obj_key,
+        )
+
+        registry = self.context.idref_registry
+        pending = self.context.idref_pending
+        meta = self.context.build(obj.__class__)
+
+        # --- step 1: scan IDREF fields for placeholders ---
+        for var in meta.get_element_vars():
+            if not var.is_idref:
+                continue
+            value = getattr(obj, var.name, None)
+            if value is None:
+                continue
+            if isinstance(value, list):
+                for i, item in enumerate(value):
+                    if isinstance(item, _IdRefPlaceholder):
+                        if item.key in registry:
+                            value[i] = registry[item.key]
+                        else:
+                            pending.setdefault(item.key, []).append(
+                                (obj, var.name, i)
+                            )
+            elif isinstance(value, _IdRefPlaceholder):
+                if value.key in registry:
+                    setattr(obj, var.name, registry[value.key])
+                else:
+                    pending.setdefault(value.key, []).append(
+                        (obj, var.name, None)
+                    )
+
+        # --- step 2: register this object, resolve any pending refs ---
+        key = get_obj_key(obj)
+        if key:
+            registry[key] = obj
+            for parent_obj, field_name, idx in pending.pop(key, []):
+                if idx is not None:
+                    getattr(parent_obj, field_name)[idx] = obj
+                else:
+                    setattr(parent_obj, field_name, obj)
 
     def bind_content(
         self,
@@ -508,7 +574,7 @@ class ElementNode(XmlNode):
 
         if var.clazz:
             if var.is_idref:
-                return nodes.IdRefNode(var)
+                return nodes.IdRefNode(var, self.context)
             return self.build_element_node(
                 var.clazz,
                 False,

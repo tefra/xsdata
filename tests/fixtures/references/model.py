@@ -64,3 +64,8 @@ class Family:
             "type": "Element",
             "wrapper": "members",
         }  )
+    favorite: Member = field(
+        metadata={
+            "type": "Element",
+            "idref": True,
+        })

@@ -1,15 +1,13 @@
 from unittest import TestCase
 
-
+from xsdata.formats.dataclass.context import XmlContext
+from xsdata.formats.dataclass.parsers import XmlParser
+from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
-from xsdata.formats.dataclass.parsers import XmlParser
-from xsdata.formats.dataclass.context import XmlContext
-from xsdata.formats.dataclass.parsers.config import ParserConfig
 
+from tests.fixtures.references.model import Family
 from tests.fixtures.references.sample import family
-from tests.fixtures.references.model import  Family
-
 
 class XmlSerializerTests(TestCase):
     expected = """<?xml version="1.0" encoding="UTF-8"?>
@@ -50,6 +48,7 @@ class XmlSerializerTests(TestCase):
       </children>
     </rel:member>
   </rel:members>
+  <rel:favorite>albert_fictional</rel:favorite>
 </rel:family>
 """
     def setUp(self) -> None:
@@ -68,3 +67,4 @@ class XmlSerializerTests(TestCase):
     def test_parse(self) -> None:
         result = self.parser.from_string(self.expected, Family)
         self.assertEqual(family, result)
+        self.assertEqual(7, result.favorite.age)

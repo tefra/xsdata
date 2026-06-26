@@ -165,16 +165,12 @@ class ElementNode(XmlNode):
                         if item.key in registry:
                             value[i] = registry[item.key]
                         else:
-                            pending.setdefault(item.key, []).append(
-                                (obj, var.name, i)
-                            )
+                            pending.setdefault(item.key, []).append((obj, var.name, i))
             elif isinstance(value, _IdRefPlaceholder):
                 if value.key in registry:
                     setattr(obj, var.name, registry[value.key])
                 else:
-                    pending.setdefault(value.key, []).append(
-                        (obj, var.name, None)
-                    )
+                    pending.setdefault(value.key, []).append((obj, var.name, None))
 
         # --- step 2: register this object, resolve any pending refs ---
         key = get_obj_key(obj)

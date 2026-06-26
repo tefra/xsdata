@@ -1,13 +1,13 @@
 from unittest import TestCase
 
+from tests.fixtures.references.model import Family
+from tests.fixtures.references.sample import family
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers import XmlParser
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
 
-from tests.fixtures.references.model import Family
-from tests.fixtures.references.sample import family
 
 class XmlSerializerTests(TestCase):
     expected = """<?xml version="1.0" encoding="UTF-8"?>
@@ -51,6 +51,7 @@ class XmlSerializerTests(TestCase):
   <rel:favorite>albert_fictional</rel:favorite>
 </rel:family>
 """
+
     def setUp(self) -> None:
         config = SerializerConfig(indent="  ")
         self.serializer = XmlSerializer(config=config)
@@ -60,7 +61,13 @@ class XmlSerializerTests(TestCase):
         super().setUp()
 
     def test_render(self) -> None:
-        result = self.serializer.render(family, ns_map={"rel": "urn:relations", "xsi": "http://www.w3.org/2001/XMLSchema-instance"})
+        result = self.serializer.render(
+            family,
+            ns_map={
+                "rel": "urn:relations",
+                "xsi": "http://www.w3.org/2001/XMLSchema-instance",
+            },
+        )
         print(result)
         self.assertEqual(self.expected, result)
 

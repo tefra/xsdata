@@ -9,9 +9,15 @@ class Member:
         name = "member"
         namespace = "urn:relations"
         abstract = True
-        key = ["name"]
+        key = ["name", "surname"]
 
     name: str = field(
+        metadata={
+            "type": "Element",
+            "namespace": "",
+        }
+    )
+    surname: str = field(
         metadata={
             "type": "Element",
             "namespace": "",
@@ -51,11 +57,7 @@ class Family:
     class Meta:
         name = "family"
         namespace = "urn:relations"
-        key = ["surname"]
 
-    surname: str = field(metadata={
-         "type": "Element",
-    })
     member: list[Member] = field(
         default_factory=list,
         metadata={

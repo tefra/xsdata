@@ -14,21 +14,23 @@ from tests.fixtures.references.model import  Family
 class XmlSerializerTests(TestCase):
     expected = """<?xml version="1.0" encoding="UTF-8"?>
 <rel:family xmlns:rel="urn:relations" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <rel:surname>fictional</rel:surname>
   <rel:members>
     <rel:member xsi:type="parent">
       <name>peter</name>
+      <surname>fictional</surname>
       <children>
-        <child>albert</child>
-        <child>bertha</child>
+        <child>albert_fictional</child>
+        <child>bertha_fictional</child>
       </children>
     </rel:member>
     <rel:member xsi:type="child">
       <name>albert</name>
+      <surname>fictional</surname>
       <age>7</age>
     </rel:member>
     <rel:member xsi:type="child">
       <name>bertha</name>
+      <surname>fictional</surname>
       <age>5</age>
     </rel:member>
   </rel:members>

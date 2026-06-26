@@ -28,10 +28,26 @@ class XmlSerializerTests(TestCase):
       <surname>fictional</surname>
       <age>7</age>
     </rel:member>
+    <rel:member xsi:type="parent">
+      <name>deceased</name>
+      <surname>fictional</surname>
+      <children>
+        <child>albert_fictional</child>
+        <child>bertha_fictional</child>
+      </children>
+    </rel:member>
     <rel:member xsi:type="child">
       <name>bertha</name>
       <surname>fictional</surname>
       <age>5</age>
+    </rel:member>
+    <rel:member xsi:type="parent">
+      <name>penny</name>
+      <surname>fictional</surname>
+      <children>
+        <child>albert_fictional</child>
+        <child>bertha_fictional</child>
+      </children>
     </rel:member>
   </rel:members>
 </rel:family>

@@ -25,9 +25,9 @@ class Member:
     )
 
 @dataclass(kw_only=True)
-class Child(Member):
+class OffSpring(Member):
     class Meta:
-        name = "child"
+        name = "offspring"
 
     age: int = field(
         metadata={
@@ -41,7 +41,7 @@ class Parent(Member):
     class Meta:
         name = "parent"
 
-    children: list[Child] = field(
+    children: list[OffSpring] = field(
         default_factory=list,
         metadata={
             "type": "Element",

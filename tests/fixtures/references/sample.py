@@ -1,9 +1,9 @@
-from tests.fixtures.references.model import Child
+from tests.fixtures.references.model import OffSpring
 from tests.fixtures.references.model import Parent
 from tests.fixtures.references.model import Family
 
-child1 = Child(name="albert", surname="fictional", age=7)
-child2 = Child(name="bertha", surname="fictional", age=5)
+child1 = OffSpring(name="albert", surname="fictional", age=7)
+child2 = OffSpring(name="bertha", surname="fictional", age=5)
 parent = Parent(name="peter", surname="fictional", children=[child1, child2])
 parent2 = Parent(name="penny",surname="fictional", children=[child1, child2])
 parent3 =  Parent(name="deceased",surname="fictional", children=[child1, child2])

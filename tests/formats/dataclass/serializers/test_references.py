@@ -21,7 +21,7 @@ class XmlSerializerTests(TestCase):
         <child>bertha_fictional</child>
       </children>
     </rel:member>
-    <rel:member xsi:type="child">
+    <rel:member xsi:type="offspring">
       <name>albert</name>
       <surname>fictional</surname>
       <age>7</age>
@@ -34,7 +34,7 @@ class XmlSerializerTests(TestCase):
         <child>bertha_fictional</child>
       </children>
     </rel:member>
-    <rel:member xsi:type="child">
+    <rel:member xsi:type="offspring">
       <name>bertha</name>
       <surname>fictional</surname>
       <age>5</age>

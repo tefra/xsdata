@@ -35,6 +35,8 @@ class ElementNode(XmlNode):
     Attributes:
         assigned: A set to store the processed sub-nodes
         tail_processed: Whether the tail process is consumed
+        wrappers: A mapping of child item qname to the queue of wrapper
+            qnames the items were parsed under, in document order
     """
 
     __slots__ = (
@@ -48,6 +50,7 @@ class ElementNode(XmlNode):
         "ns_map",
         "position",
         "tail_processed",
+        "wrappers",
         "xsi_nil",
         "xsi_type",
     )
@@ -78,6 +81,11 @@ class ElementNode(XmlNode):
         self.xsi_nil = xsi_nil
         self.assigned: set[int] = set()
         self.tail_processed: bool = False
+        # Queue of wrapper qnames per child item qname, recorded in document
+        # order as children are built. It lets binding disambiguate sibling
+        # wrappers that reuse the same item element name (e.g. two wrappers
+        # whose items are both named ``Property``).
+        self.wrappers: dict[str, list[str]] = {}
 
     def bind(
         self,
@@ -250,7 +258,11 @@ class ElementNode(XmlNode):
             Whether the parsed object can fit in one of class
             parameters or not.
         """
+        wrapper = self.pop_wrapper(qname)
         for var in self.meta.find_children(qname):
+            if wrapper and var.wrapper_qname != wrapper:
+                continue
+
             if var.is_wildcard:
                 return self.bind_wild_var(params, var, qname, value)
 
@@ -258,6 +270,26 @@ class ElementNode(XmlNode):
                 return True
 
         return False
+
+    def pop_wrapper(self, qname: str) -> str | None:
+        """Return the wrapper qname for the next child object of the qname.
+
+        The wrapper qnames are recorded in document order as children
+        are built, so popping the first one keeps binding aligned with
+        the parsed objects and lets sibling wrappers that reuse the same
+        item element name route to the correct field.
+
+        Args:
+            qname: The qualified name of the child element
+
+        Returns:
+            The wrapper qualified name or None if the child isn't wrapped.
+        """
+        wrappers = self.wrappers.get(qname)
+        if wrappers:
+            return wrappers.pop(0)
+
+        return None
 
     @classmethod
     def bind_var(cls, params: dict, var: XmlVar, value: Any) -> bool:
@@ -438,7 +470,14 @@ class ElementNode(XmlNode):
 
         return True
 
-    def child(self, qname: str, attrs: dict, ns_map: dict, position: int) -> XmlNode:
+    def child(
+        self,
+        qname: str,
+        attrs: dict,
+        ns_map: dict,
+        position: int,
+        wrapper: str | None = None,
+    ) -> XmlNode:
         """Initialize the next child node to be queued, when an element starts.
 
         This entry point is responsible to create the next node type
@@ -450,11 +489,16 @@ class ElementNode(XmlNode):
             attrs: The element attributes
             ns_map: The element namespace prefix-URI map
             position: The current length of the intermediate objects
+            wrapper: The qualified name of the wrapper element the child
+                is nested under, if any
 
         Raises:
             ParserError: If the child element is unknown
         """
         for var in self.meta.find_children(qname):
+            if wrapper and var.wrapper_qname != wrapper:
+                continue
+
             unique = 0 if not var.is_element or var.list_element else var.index
             if not unique or unique not in self.assigned:
                 node = self.build_node(qname, var, attrs, ns_map, position)
@@ -462,6 +506,9 @@ class ElementNode(XmlNode):
                 if node:
                     if unique:
                         self.assigned.add(unique)
+
+                    if wrapper:
+                        self.wrappers.setdefault(qname, []).append(wrapper)
 
                     return node
 

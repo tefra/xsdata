@@ -67,3 +67,37 @@ class WrapperTests(TestCase):
         self.assertIsInstance(obj.elements[1], ElementObject)
         self.assertEqual(obj.elements[0].content, "Hello")
         self.assertEqual(obj.elements[1].content, "World")
+
+    def test_reused_item_name(self) -> None:
+        @dataclass
+        class Foo:
+            class Meta:
+                name = "Property"
+
+            foo_id: int = field(metadata={"name": "Foo-Id", "type": "Attribute"})
+
+        @dataclass
+        class Bar:
+            class Meta:
+                name = "Property"
+
+            bar_id: str = field(metadata={"name": "Bar-Id", "type": "Attribute"})
+
+        @dataclass
+        class Response:
+            foos: list[Foo] = field(
+                metadata={"wrapper": "Foos", "name": "Property", "type": "Element"}
+            )
+            bars: list[Bar] = field(
+                metadata={"wrapper": "Bars", "name": "Property", "type": "Element"}
+            )
+
+        xml = (
+            "<Response>"
+            '<Foos><Property Foo-Id="1"/><Property Foo-Id="2"/></Foos>'
+            '<Bars><Property Bar-Id="3"/><Property Bar-Id="4"/></Bars>'
+            "</Response>"
+        )
+        obj = self.parser.from_string(xml, clazz=Response)
+        self.assertEqual([Foo(foo_id=1), Foo(foo_id=2)], obj.foos)
+        self.assertEqual([Bar(bar_id="3"), Bar(bar_id="4")], obj.bars)

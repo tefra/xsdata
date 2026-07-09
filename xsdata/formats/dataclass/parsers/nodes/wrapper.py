@@ -14,14 +14,16 @@ class WrapperNode(XmlNode):
 
     Args:
         parent: The parent node
+        qname: The wrapper element qualified name
 
     Attributes:
         ns_map: The node namespace prefix-URI map
     """
 
-    def __init__(self, parent: ElementNode):
+    def __init__(self, parent: ElementNode, qname: str):
         """Initialize the xml node."""
         self.parent = parent
+        self.qname = qname
         self.ns_map = parent.ns_map
 
     def bind(
@@ -52,4 +54,4 @@ class WrapperNode(XmlNode):
         Returns:
             The child xml node instance.
         """
-        return self.parent.child(qname, attrs, ns_map, position)
+        return self.parent.child(qname, attrs, ns_map, position, wrapper=self.qname)

@@ -1138,10 +1138,12 @@ class EventGeneratorTests(TestCase):
         from dataclasses import field as _f
 
         @_dc
-        class _Ref:
+        class _Base:
             class Meta:
                 key: ClassVar[list[str]] = ["first", "last"]
 
+        @_dc
+        class _Ref(_Base):
             first: str = _f(default="", metadata={"type": "Element"})
             last: str = _f(default="", metadata={"type": "Element"})
 

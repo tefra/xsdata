@@ -1,5 +1,5 @@
 import copy
-from dataclasses import make_dataclass
+from dataclasses import dataclass, field, make_dataclass
 from unittest import mock
 
 from tests.fixtures.books import Books
@@ -28,6 +28,7 @@ from xsdata.formats.dataclass.parsers.nodes import (
     StandardNode,
     UnionNode,
     WildcardNode,
+    _IdRefPlaceholder,
 )
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.models.enums import DataType, Namespace, QNames
@@ -615,3 +616,158 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual(ns_map, actual.ns_map)
         self.assertEqual(self.meta, actual.meta)
         self.assertEqual(var, actual.var)
+
+
+# ---------------------------------------------------------------------------
+# Fixtures for IDREF tests
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class _Member:
+    """Minimal model with a composite key used by IDREF tests."""
+
+    class Meta:
+        key = ["name", "code"]
+
+    name: str = field(
+        default="",
+        metadata={"type": "Element", "namespace": ""},
+    )
+    code: str = field(
+        default="",
+        metadata={"type": "Element", "namespace": ""},
+    )
+
+
+@dataclass
+class _Container:
+    """Model with both a scalar and a list IDREF field pointing at _Member."""
+
+    class Meta:
+        name = "container"
+
+    single_ref: _Member | None = field(
+        default=None,
+        metadata={"type": "Element", "idref": True},
+    )
+    list_refs: list[_Member] = field(
+        default_factory=list,
+        metadata={"type": "Element", "name": "item", "idref": True},
+    )
+
+
+# ---------------------------------------------------------------------------
+# _register_and_resolve_idrefs tests
+# ---------------------------------------------------------------------------
+
+
+class RegisterAndResolveIdrefs(FactoryTestCase):
+    """Unit tests for ElementNode._register_and_resolve_idrefs."""
+
+    def _make_node(self, clazz: type) -> ElementNode:
+        self.context = XmlContext()
+        return ElementNode(
+            position=0,
+            meta=self.context.build(clazz),
+            context=self.context,
+            config=ParserConfig(),
+            attrs={},
+            ns_map={},
+        )
+
+    def test_scalar_backward_ref_resolved_immediately(self) -> None:
+        """Scalar placeholder replaced inline when target already in registry (line 179)."""
+        node = self._make_node(_Container)
+        target = _Member(name="albert", code="fictional")
+        self.context.idref_registry["albert_fictional"] = target
+
+        placeholder = _IdRefPlaceholder("albert_fictional")
+        obj = _Container(single_ref=placeholder, list_refs=[])  # type: ignore[arg-type]
+        node._register_and_resolve_idrefs(obj)
+
+        self.assertIs(target, obj.single_ref)
+
+    def test_idref_var_with_none_value_is_skipped(self) -> None:
+        """IDREF field whose value is None hits the `continue` branch (line 169)."""
+        node = self._make_node(_Container)
+        obj = _Container(single_ref=None, list_refs=[])
+        # Should not raise; the None value is silently skipped.
+        node._register_and_resolve_idrefs(obj)
+        self.assertIsNone(obj.single_ref)
+
+    def test_list_placeholder_resolved_immediately_when_key_in_registry(self) -> None:
+        """List placeholder replaced inline when target already in registry (line 174)."""
+        node = self._make_node(_Container)
+        target = _Member(name="albert", code="fictional")
+        self.context.idref_registry["albert_fictional"] = target
+
+        placeholder = _IdRefPlaceholder("albert_fictional")
+        obj = _Container(single_ref=None, list_refs=[placeholder])  # type: ignore[list-item]
+        node._register_and_resolve_idrefs(obj)
+
+        self.assertIs(target, obj.list_refs[0])
+
+    def test_list_placeholder_added_to_pending_when_key_absent(self) -> None:
+        """List placeholder not in registry → recorded in pending (lines 178-181)."""
+        node = self._make_node(_Container)
+        placeholder = _IdRefPlaceholder("albert_fictional")
+        obj = _Container(single_ref=None, list_refs=[placeholder])  # type: ignore[list-item]
+        node._register_and_resolve_idrefs(obj)
+
+        # Placeholder must still be there — resolution deferred
+        self.assertIs(placeholder, obj.list_refs[0])
+        self.assertIn("albert_fictional", self.context.idref_pending)
+
+    def test_scalar_forward_ref_resolved_via_setattr(self) -> None:
+        """Pending scalar IDREF (idx=None) is resolved with setattr (line 191).
+
+        Sequence:
+        1. _Container with a _IdRefPlaceholder in single_ref is processed first.
+        2. The placeholder goes into pending because the target isn't in the registry yet.
+        3. When _Member is processed, ElementNode registers it and calls setattr on
+           the pending container, replacing the placeholder with the real object.
+        """
+        node = self._make_node(_Container)
+        placeholder = _IdRefPlaceholder("albert_fictional")
+        container = _Container(single_ref=placeholder, list_refs=[])  # type: ignore[arg-type]
+        # Process container first → placeholder goes to pending
+        node._register_and_resolve_idrefs(container)
+        self.assertIs(placeholder, container.single_ref)
+
+        # Now process the target member → should resolve the pending reference
+        member = _Member(name="albert", code="fictional")
+        node._register_and_resolve_idrefs(member)
+        self.assertIs(member, container.single_ref)
+
+
+# ---------------------------------------------------------------------------
+# pop_wrapper tests
+# ---------------------------------------------------------------------------
+
+
+class PopWrapperTests(FactoryTestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        self.context = XmlContext()
+        self.meta = XmlMetaFactory.create(clazz=_Container, qname="container")
+        self.node = ElementNode(
+            position=0,
+            meta=self.meta,
+            context=self.context,
+            config=ParserConfig(),
+            attrs={},
+            ns_map={},
+        )
+
+    def test_pop_wrapper_returns_first_entry_and_removes_it(self) -> None:
+        """pop_wrapper returns the first queued wrapper qname and removes it."""
+        self.node.wrappers["item"] = ["wrapper_a", "wrapper_b"]
+        result = self.node.pop_wrapper("item")
+        self.assertEqual("wrapper_a", result)
+        self.assertEqual(["wrapper_b"], self.node.wrappers["item"])
+
+    def test_pop_wrapper_returns_none_when_qname_absent(self) -> None:
+        """pop_wrapper returns None when qname has no registered wrappers."""
+        result = self.node.pop_wrapper("unknown")
+        self.assertIsNone(result)

@@ -92,7 +92,7 @@ class NodeParser(PushParser):
         try:
             item = queue[-1]
             if isinstance(item, ElementNode) and qname in item.meta.wrappers:
-                child = cast(XmlNode, WrapperNode(parent=item))
+                child = cast(XmlNode, WrapperNode(parent=item, qname=qname))
             else:
                 child = item.child(qname, attrs, ns_map, len(objects))
         except IndexError:

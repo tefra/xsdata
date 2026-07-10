@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from typing import ClassVar
 from unittest import TestCase
 
 from xsdata.exceptions import XmlContextError
@@ -13,7 +14,6 @@ from xsdata.formats.dataclass.parsers.nodes.idref import (
 )
 from xsdata.utils.testing import XmlVarFactory
 
-
 # ---------------------------------------------------------------------------
 # Minimal dataclass fixtures
 # ---------------------------------------------------------------------------
@@ -24,7 +24,7 @@ class _WithKey:
     """Object whose Meta defines a composite key."""
 
     class Meta:
-        key = ["name", "code"]
+        key: ClassVar[list[str]] = ["name", "code"]
 
     name: str = ""
     code: str = ""
@@ -35,7 +35,7 @@ class _WithEmptyKey:
     """Object whose Meta.key is explicitly empty — should return None."""
 
     class Meta:
-        key = []
+        key: ClassVar[list[str]] = []
 
     name: str = ""
 
@@ -45,7 +45,7 @@ class _WithKeyMissingAttr:
     """Meta.key references a field that doesn't exist on the object."""
 
     class Meta:
-        key = ["nonexistent_field"]
+        key: ClassVar[list[str]] = ["nonexistent_field"]
 
     name: str = ""
 

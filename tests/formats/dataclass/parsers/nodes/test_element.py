@@ -1,5 +1,6 @@
 import copy
 from dataclasses import dataclass, field, make_dataclass
+from typing import ClassVar
 from unittest import mock
 
 from tests.fixtures.books import Books
@@ -628,7 +629,7 @@ class _Member:
     """Minimal model with a composite key used by IDREF tests."""
 
     class Meta:
-        key = ["name", "code"]
+        key: ClassVar[list[str]] = ["name", "code"]
 
     name: str = field(
         default="",

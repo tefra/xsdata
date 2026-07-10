@@ -2,7 +2,7 @@ import sys
 from collections.abc import Iterator
 from dataclasses import dataclass, field, fields, make_dataclass
 from decimal import Decimal
-from typing import get_type_hints
+from typing import ClassVar, get_type_hints
 from unittest import TestCase, mock
 from xml.etree.ElementTree import QName
 
@@ -78,7 +78,7 @@ class XmlMetaBuilderTests(FactoryTestCase):
         @dataclass
         class Foo:
             class Meta:
-                key = ["id", "lang"]
+                key: ClassVar[list[str]] = ["id", "lang"]
 
         result = self.builder.build(Foo, None)
         self.assertEqual(["id", "lang"], result.key)

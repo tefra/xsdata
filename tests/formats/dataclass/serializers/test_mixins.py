@@ -1,6 +1,7 @@
 from collections.abc import Generator
 from dataclasses import dataclass, field, make_dataclass
 from io import StringIO
+from typing import ClassVar
 from unittest import TestCase
 from xml.etree.ElementTree import QName
 from xml.sax import ContentHandler
@@ -1133,12 +1134,13 @@ class EventGeneratorTests(TestCase):
 
     def test_convert_idref_emits_key_as_text(self) -> None:
         """convert_idref emits START/DATA/END with the object's joined key value."""
-        from dataclasses import dataclass as _dc, field as _f
+        from dataclasses import dataclass as _dc
+        from dataclasses import field as _f
 
         @_dc
         class _Ref:
             class Meta:
-                key = ["first", "last"]
+                key: ClassVar[list[str]] = ["first", "last"]
 
             first: str = _f(default="", metadata={"type": "Element"})
             last: str = _f(default="", metadata={"type": "Element"})
@@ -1156,12 +1158,13 @@ class EventGeneratorTests(TestCase):
 
     def test_convert_element_routes_idref_model_to_convert_idref(self) -> None:
         """convert_element dispatches to convert_idref when is_idref=True and value is a model."""
-        from dataclasses import dataclass as _dc, field as _f
+        from dataclasses import dataclass as _dc
+        from dataclasses import field as _f
 
         @_dc
         class _Ref:
             class Meta:
-                key = ["name"]
+                key: ClassVar[list[str]] = ["name"]
 
             name: str = _f(default="", metadata={"type": "Element"})
 

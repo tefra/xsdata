@@ -378,6 +378,10 @@ class XmlTimeTests(TestCase):
             datetime(2010, 9, 20, 0, 0, 0, 0, tzinfo=timezone.utc),
             XmlDateTime.from_string("2010-09-19T24:00:00Z").to_datetime(),
         )
+        with self.assertRaises(ValueError):
+            XmlTime(24, 1, 0, 0, 0).to_time()
+        with self.assertRaises(ValueError):
+            XmlDateTime(2010, 9, 19, 24, 30, 0, 0, 0).to_datetime()
 
     def test_comparisons(self) -> None:
         a = XmlTime.from_string("12:00:00Z")

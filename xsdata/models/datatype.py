@@ -242,6 +242,7 @@ class XmlDateTime(NamedTuple):
 
     def to_datetime(self) -> datetime.datetime:
         """Return a `datetime.datetime` instance."""
+        validate_time(self.hour, self.minute, self.second, self.fractional_second)
         year, month, day = self.year, self.month, self.day
         hour = self.hour
         # XSD allows 24:00:00 as end-of-day; map to next calendar day 00:00:00.
@@ -440,6 +441,7 @@ class XmlTime(NamedTuple):
 
     def to_time(self) -> datetime.time:
         """Convert to a `datetime.time` instance."""
+        validate_time(self.hour, self.minute, self.second, self.fractional_second)
         # XSD allows 24:00:00 as end-of-day; stdlib time is 0..23.
         hour = 0 if self.hour == 24 else self.hour
         return datetime.time(

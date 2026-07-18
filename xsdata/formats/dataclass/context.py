@@ -132,11 +132,17 @@ class XmlContext:
         if not self.class_type.is_model(clazz):
             return False
 
-        return not self.models_package or (
+        has_valid_module = (
             hasattr(clazz, "__module__")
             and isinstance(clazz.__module__, str)
-            and clazz.__module__.startswith(self.models_package)
             and clazz.__module__ in sys.modules
+        )
+
+        if not has_valid_module:
+            return False
+
+        return not self.models_package or clazz.__module__.startswith(
+            self.models_package
         )
 
     def find_types(self, qname: str) -> list[type[T]]:

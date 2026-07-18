@@ -369,6 +369,16 @@ class XmlTimeTests(TestCase):
             XmlTime.utcnow().replace(fractional_second=0, second=0, minute=1),
         )
 
+        # XSD end-of-day 24:00:00 → stdlib 00:00:00
+        self.assertEqual(
+            time(0, 0, 0, 0, tzinfo=timezone.utc),
+            XmlTime.from_string("24:00:00Z").to_time(),
+        )
+        self.assertEqual(
+            datetime(2010, 9, 20, 0, 0, 0, 0, tzinfo=timezone.utc),
+            XmlDateTime.from_string("2010-09-19T24:00:00Z").to_datetime(),
+        )
+
     def test_comparisons(self) -> None:
         a = XmlTime.from_string("12:00:00Z")
         b = XmlTime.from_string("13:00:00.000+01:00")

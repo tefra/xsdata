@@ -369,7 +369,8 @@ class XmlTimeTests(TestCase):
             XmlTime.utcnow().replace(fractional_second=0, second=0, minute=1),
         )
 
-        # XSD end-of-day 24:00:00 → stdlib 00:00:00
+    def test_xsd_end_of_day_24(self) -> None:
+        # XSD allows 24:00:00; stdlib time/datetime do not.
         self.assertEqual(
             time(0, 0, 0, 0, tzinfo=timezone.utc),
             XmlTime.from_string("24:00:00Z").to_time(),

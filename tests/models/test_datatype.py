@@ -29,6 +29,10 @@ class XmlDateTests(TestCase):
             "2002/01-01",
             "2002/01/01",
             "2002-01-01U",
+            "2019-02-29",
+            "2001-13-45",
+            "2001-00-00",
+            "2001-10-32",
         ]
         for example in examples:
             with self.assertRaises(ValueError, msg=example):

@@ -88,6 +88,7 @@ class XmlDate(NamedTuple):
         assert year is not None
         assert month is not None
         assert day is not None
+        validate_date(year, month, day)
         return cls(year, month, day, offset)
 
     @classmethod

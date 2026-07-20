@@ -1,6 +1,7 @@
 from collections.abc import Generator
 from dataclasses import dataclass, field, make_dataclass
 from io import StringIO
+from typing import ClassVar
 from unittest import TestCase
 from xml.etree.ElementTree import QName
 from xml.sax import ContentHandler
@@ -1119,3 +1120,80 @@ class EventGeneratorTests(TestCase):
         var = XmlVarFactory.create(types=(Telephone,))
         actual = XmlSerializer.encode_primitive(Telephone(30, 234, 56783), var)
         self.assertEqual("30-234-56783", actual)
+
+    def test_encode_primitive_with_enum(self) -> None:
+        """encode_primitive recursively unwraps Enum values (line 1062)."""
+        from enum import Enum
+
+        class Color(Enum):
+            RED = "red"
+
+        var = XmlVarFactory.create(types=(str,))
+        actual = XmlSerializer.encode_primitive(Color.RED, var)
+        self.assertEqual("red", actual)
+
+    def test_convert_idref_emits_key_as_text(self) -> None:
+        """convert_idref emits START/DATA/END with the object's joined key value."""
+        from dataclasses import dataclass as _dc
+        from dataclasses import field as _f
+
+        @_dc
+        class _Base:
+            class Meta:
+                key: ClassVar[list[str]] = ["first", "last"]
+
+        @_dc
+        class _Ref(_Base):
+            first: str = _f(default="", metadata={"type": "Element"})
+            last: str = _f(default="", metadata={"type": "Element"})
+
+        var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, name="ref", idref=True)
+        obj = _Ref(first="albert", last="fictional")
+
+        result = list(self.generator.convert_idref(obj, var))
+        expected = [
+            ("start", var.qname),
+            ("data", "albert_fictional"),
+            ("end", var.qname),
+        ]
+        self.assertEqual(expected, result)
+
+    def test_convert_element_routes_idref_model_to_convert_idref(self) -> None:
+        """convert_element dispatches to convert_idref when is_idref=True and value is a model."""
+        from dataclasses import dataclass as _dc
+        from dataclasses import field as _f
+
+        @_dc
+        class _Ref:
+            class Meta:
+                key: ClassVar[list[str]] = ["name"]
+
+            name: str = _f(default="", metadata={"type": "Element"})
+
+        var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, name="ref", idref=True)
+        obj = _Ref(name="peter")
+
+        result = list(self.generator.convert_value(obj, var, None))
+        expected = [
+            ("start", var.qname),
+            ("data", "peter"),
+            ("end", var.qname),
+        ]
+        self.assertEqual(expected, result)
+
+    def test_convert_idref_no_key(self) -> None:
+        from dataclasses import dataclass as _dc
+
+        @_dc
+        class _RefNoKey:
+            first: str = "albert"
+
+        var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, name="ref", idref=True)
+        obj = _RefNoKey()
+        result = list(self.generator.convert_idref(obj, var))
+        expected = [
+            ("start", var.qname),
+            ("data", ""),
+            ("end", var.qname),
+        ]
+        self.assertEqual(expected, result)

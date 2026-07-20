@@ -1180,3 +1180,17 @@ class EventGeneratorTests(TestCase):
             ("end", var.qname),
         ]
         self.assertEqual(expected, result)
+    def test_convert_idref_no_key(self) -> None:
+        from dataclasses import dataclass as _dc
+        @_dc
+        class _RefNoKey:
+            first: str = "albert"
+        var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, name="ref", idref=True)
+        obj = _RefNoKey()
+        result = list(self.generator.convert_idref(obj, var))
+        expected = [
+            ("start", var.qname),
+            ("data", ""),
+            ("end", var.qname),
+        ]
+        self.assertEqual(expected, result)

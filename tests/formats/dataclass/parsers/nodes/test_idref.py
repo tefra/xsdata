@@ -12,7 +12,8 @@ from xsdata.formats.dataclass.parsers.nodes.idref import (
     _IdRefPlaceholder,
     get_obj_key,
 )
-from xsdata.utils.testing import XmlVarFactory
+from xsdata.utils.testing import XmlVarFactory, FactoryTestCase, XmlMetaFactory
+
 
 # ---------------------------------------------------------------------------
 # Minimal dataclass fixtures
@@ -162,3 +163,20 @@ class IdRefNodeTests(TestCase):
         """IDREF nodes must not have children (covers line 86)."""
         with self.assertRaises(XmlContextError):
             self.node.child("anything", {}, {}, 0)
+
+class IdRefKeysTests(FactoryTestCase):
+    """Tests with the XmlMetaFactory."""
+    def setUp(self) -> None:
+        super().setUp()
+        self.context = XmlContext()
+
+
+    def test_get_obj_key_with_composite_key(self) -> None:
+        meta = self.context.build(_WithKey)
+        expected = XmlMetaFactory.create(clazz=_WithKey, key=["name", "code"])
+        self.assertEqual(expected.key, meta.key)
+
+    def test_get_obj_no_key(self) -> None:
+        meta = self.context.build(_WithoutMeta)
+        expected = XmlMetaFactory.create(clazz=_WithoutMeta,)
+        self.assertEqual(expected.key, meta.key)

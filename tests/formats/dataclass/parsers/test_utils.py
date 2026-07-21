@@ -120,6 +120,19 @@ class ParserUtilsTests(FactoryTestCase):
         var = XmlVarFactory.create("fixed", default=lambda: ProcessType.LAX)
         ParserUtils.validate_fixed_value(meta, var, "lax")
 
+    def test_parse_text_var(self) -> None:
+        meta = XmlMetaFactory.create(clazz=TypeA, qname="foo")
+        config = ParserConfig()
+
+        var = XmlVarFactory.create("text", types=(str,))
+        self.assertEqual(
+            "hello", ParserUtils.parse_text_var(meta, var, config, "hello")
+        )
+        self.assertEqual("", ParserUtils.parse_text_var(meta, var, config, None))
+
+        var = XmlVarFactory.create("text", types=(bytes,), format="base64")
+        self.assertEqual(b"", ParserUtils.parse_text_var(meta, var, config, None))
+
     def test_parse_var_with_error(self) -> None:
         meta = XmlMetaFactory.create(clazz=TypeA, qname="foo")
         var = XmlVarFactory.create("fixed", default="a")

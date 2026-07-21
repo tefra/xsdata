@@ -397,17 +397,17 @@ class ElementNode(XmlNode):
         """
         var = self.meta.text
 
-        if not var or (text is None and not self.xsi_nil):
+        if not var:
             return False
 
-        if self.xsi_nil and not text:
+        if self.xsi_nil and text is None:
             value = None
         else:
-            value = ParserUtils.parse_var(
+            value = ParserUtils.parse_text_var(
                 meta=self.meta,
                 var=var,
                 config=self.config,
-                value=text,
+                text=text,
                 ns_map=self.ns_map,
             )
 

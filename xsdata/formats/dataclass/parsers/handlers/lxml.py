@@ -37,6 +37,7 @@ class LxmlEventHandler(XmlHandler):
                 recover=True,
                 remove_comments=True,
                 load_dtd=self.parser.config.load_dtd,
+                resolve_entities=self.parser.config.resolve_entities,
             )
 
         return self.process_context(ctx, ns_map)

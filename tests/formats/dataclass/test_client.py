@@ -150,6 +150,13 @@ class ClientTests(TestCase):
         result = client.prepare_headers({})
         self.assertEqual({"SOAPAction": "add", "content-type": "text/xml"}, result)
 
+        config = replace(config, encoding="utf-8")
+        client = Client(config=config)
+        result = client.prepare_headers({})
+        self.assertEqual(
+            {"SOAPAction": "add", "content-type": "text/xml; charset=utf-8"}, result
+        )
+
     def test_prepare_headers_raises_error_with_unsupported_binding_transport(
         self,
     ) -> None:

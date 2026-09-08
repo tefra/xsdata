@@ -98,6 +98,17 @@ Enable loading external dtd with
 
 **Default:** `False`
 
+### `resolve_entities`
+
+Enable loading of external reference within XML documents with
+[LxmlEventHandler][xsdata.formats.dataclass.parsers.handlers.LxmlEventHandler]. Enabling
+this option has security implications: the code becomes vulnerable for External Entity
+Injection (XXE).
+
+**Type:** `bool`
+
+**Default:** `False`
+
 ### `class_factory`
 
 Override default object instantiation, to apply pre/post-initialization logic.

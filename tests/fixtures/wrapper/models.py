@@ -39,7 +39,7 @@ class Charlie:
         name = "charlie"
         namespace = "xsdata"
 
-    value: str = field(default="")
+    value: str = field()
     lang: None | object = field(
         default=None,
         metadata={

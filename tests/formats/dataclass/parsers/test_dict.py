@@ -134,6 +134,10 @@ class DictDecoderTests(FactoryTestCase):
         )
         self.assertEqual(expected, actual)
 
+    def test_bind_dataclass_missing_text_field(self) -> None:
+        result = self.decoder.decode({"lang": "en"}, Charlie)
+        self.assertEqual(Charlie(value="", lang="en"), result)
+
     def test_verify_type(self) -> None:
         invalid_cases = [
             (

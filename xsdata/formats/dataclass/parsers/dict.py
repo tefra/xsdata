@@ -120,6 +120,9 @@ class DictDecoder:
         meta = self.context.build(clazz)
         xml_vars = meta.get_all_vars()
 
+        if meta.text and meta.text.local_name not in data:
+            data[meta.text.local_name] = ""
+
         params = {}
         for key, value in data.items():
             var = self.find_var(xml_vars, key, value)
@@ -295,6 +298,9 @@ class DictDecoder:
         if var.any_type or var.is_wildcard:
             # field can support any object return the value as it is
             return value
+
+        if value is None:
+            return None
 
         value = converter.serialize(value)
 

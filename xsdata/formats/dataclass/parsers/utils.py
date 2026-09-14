@@ -89,9 +89,7 @@ class ParserUtils:
         config: ParserConfig,
         value: Any,
         ns_map: dict | None = None,
-        default: Any = None,
         types: Sequence[type] | None = None,
-        tokens_factory: Callable | None = None,
         format: str | None = None,
     ) -> Any:
         """Convert a value to a python primitive type.
@@ -102,9 +100,7 @@ class ParserUtils:
             config: The parser config instance
             value: A primitive value or a list of primitive values
             ns_map: The element namespace prefix-URI map
-            default: Override the var default value
             types: Override the var types
-            tokens_factory: Override the var tokens factory
             format: Override the var format
 
         Returns:
@@ -114,9 +110,9 @@ class ParserUtils:
             value = cls.parse_value(
                 value=value,
                 types=types or var.types,
-                default=default or var.default,
+                default=var.default,
                 ns_map=ns_map,
-                tokens_factory=tokens_factory or var.tokens_factory,
+                tokens_factory=var.tokens_factory,
                 format=format or var.format,
             )
         except ConverterError as ex:
@@ -128,6 +124,41 @@ class ParserUtils:
                 raise ParserError(message)
 
             warnings.warn(message, ConverterWarning)
+
+        return value
+
+    @classmethod
+    def parse_text_var(
+        cls,
+        meta: XmlMeta,
+        var: XmlVar,
+        config: ParserConfig,
+        text: str | None,
+        ns_map: dict | None = None,
+        types: Sequence[type] | None = None,
+        format: str | None = None,
+    ) -> Any:
+        """Parse a text node value with empty-string fallback.
+
+        Args:
+            meta: The xml meta instance
+            var: The xml var instance
+            config: The parser config instance
+            text: The element text content
+            ns_map: The element namespace prefix-URI map
+            types: Override the var types
+            format: Override the var format
+
+        Returns:
+            The converted value or values.
+        """
+        value = cls.parse_var(
+            meta, var, config, text, ns_map=ns_map, types=types, format=format
+        )
+        if value is None:
+            value = cls.parse_var(
+                meta, var, config, "", ns_map=ns_map, types=types, format=format
+            )
 
         return value
 

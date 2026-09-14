@@ -1,11 +1,10 @@
-from unittest import TestCase, mock
+from unittest import TestCase
 
 from tests.fixtures.artists import Artist
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.nodes import PrimitiveNode
-from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.utils.testing import XmlMetaFactory, XmlVarFactory
 
 
@@ -15,9 +14,7 @@ class PrimitiveNodeTests(TestCase):
         self.meta = XmlMetaFactory.create(clazz=Artist)
         self.config = ParserConfig()
 
-    @mock.patch.object(ParserUtils, "parse_var")
-    def test_bind(self, mock_parse_var) -> None:
-        mock_parse_var.return_value = 13
+    def test_bind(self) -> None:
         var = XmlVarFactory.create(
             xml_type=XmlType.TEXT, name="foo", types=(int,), format="Nope"
         )
@@ -27,10 +24,6 @@ class PrimitiveNodeTests(TestCase):
 
         self.assertTrue(node.bind("foo", "13", "Impossible", objects))
         self.assertEqual(("foo", 13), objects[-1])
-
-        mock_parse_var.assert_called_once_with(
-            meta=self.meta, var=var, config=self.config, value="13", ns_map=ns_map
-        )
 
     def test_bind_nillable_content(self) -> None:
         var = XmlVarFactory.create(
@@ -53,6 +46,7 @@ class PrimitiveNodeTests(TestCase):
             name="foo",
             types=(bytes,),
             nillable=False,
+            format="base64",
         )
         ns_map = {"foo": "bar"}
         node = PrimitiveNode(self.meta, var, ns_map, self.config)

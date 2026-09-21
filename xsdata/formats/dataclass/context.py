@@ -36,6 +36,8 @@ class XmlContext:
         "cache",
         "class_type",
         "element_name_generator",
+        "idref_pending",
+        "idref_registry",
         "models_package",
         "sys_modules",
         "xsi_cache",
@@ -57,12 +59,21 @@ class XmlContext:
         self.xsi_cache: dict[str, list[type]] = defaultdict(list)
         self.models_package = models_package
         self.sys_modules = 0
+        self.idref_registry: dict[str, Any] = {}
+        self.idref_pending: dict[str, list] = {}
 
     def reset(self) -> None:
         """Reset all internal caches."""
         self.cache.clear()
         self.xsi_cache.clear()
         self.sys_modules = 0
+        self.idref_registry.clear()
+        self.idref_pending.clear()
+
+    def reset_idrefs(self) -> None:
+        """Clear per-parse IDREF state without discarding binding metadata."""
+        self.idref_registry.clear()
+        self.idref_pending.clear()
 
     def get_builder(
         self,

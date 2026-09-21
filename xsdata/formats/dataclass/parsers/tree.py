@@ -61,6 +61,7 @@ class TreeParser(NodeParser):
                 namespaces=(namespace,),
                 elements={},
                 wildcards=(),
+                idref=False,
             )
 
             child = WildcardNode(

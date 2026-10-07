@@ -3,11 +3,13 @@ import io
 import json
 import os
 import pickle
+import re
 import tempfile
 from collections import defaultdict
 from collections.abc import Callable
 from pathlib import Path
 from typing import NamedTuple
+from urllib.parse import urljoin
 
 from toposort import CircularDependencyError
 
@@ -191,11 +193,69 @@ class ResourceTransformer:
     def process_schemas(self, uris: list[str]) -> None:
         """Process a list of xsd resources.
 
+        Chameleon schemas (no targetNamespace) that are xs:included by another
+        schema in the batch are skipped as top-level sources: they are compiled
+        through the include with the including schema's namespace. Processing
+        them standalone first would compile their types with no namespace and
+        break references from the schemas that include them.
+
         Args:
             uris: A list of xsd URI strings to process
         """
+        skip = self.find_included_chameleons(uris)
         for uri in uris:
-            self.process_schema(uri)
+            if uri not in skip:
+                self.process_schema(uri)
+
+    def find_included_chameleons(self, uris: list[str]) -> set[str]:
+        """Return the chameleon schemas that are xs:included by a namespaced one.
+
+        A chameleon schema declares no targetNamespace. When it is included by
+        a schema that does, it must be compiled through that include so its
+        types inherit the namespace. Each source is read once; the content is
+        cached in ``preloaded`` so the subsequent compilation reuses it.
+
+        Args:
+            uris: A list of xsd URI strings to inspect
+
+        Returns:
+            The subset of ``uris`` to skip as top-level sources.
+        """
+        has_ns: dict[str, bool] = {}
+        includes: dict[str, set[str]] = {}
+        for uri in uris:
+            try:
+                data = opener.open(uri).read()  # nosec
+            except OSError:
+                continue
+
+            self.preloaded[uri] = data
+            text = data.decode("utf-8", errors="ignore")
+            header = re.search(
+                r"<(?:\w+:)?schema\b[^>]*>", text, re.IGNORECASE | re.DOTALL
+            )
+            has_ns[uri] = bool(
+                header and re.search(r"targetNamespace\s*=", header.group(0))
+            )
+            includes[uri] = {
+                urljoin(uri, loc)
+                for loc in re.findall(
+                    r'<(?:\w+:)?include\b[^>]*schemaLocation="([^"]+)"',
+                    text,
+                    re.IGNORECASE,
+                )
+            }
+
+        included_by_ns: set[str] = set()
+        for uri, namespaced in has_ns.items():
+            if namespaced:
+                included_by_ns |= includes[uri]
+
+        return {
+            uri
+            for uri, namespaced in has_ns.items()
+            if not namespaced and uri in included_by_ns
+        }
 
     def process_dtds(self, uris: list[str]) -> None:
         """Process a list of dtd resources.

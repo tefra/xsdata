@@ -543,7 +543,9 @@ class EventGenerator:
             globalns=self.config.globalns,
         )
         qname = qname or meta.qname
-        nillable = nillable or meta.nillable
+        # A type without text or child elements has no content to be nil,
+        # so a present instance of it in a nillable field is not nil
+        nillable = meta.nillable or (nillable and bool(meta.get_element_vars()))
         namespace, _tag = namespaces.split_qname(qname)
 
         yield XmlWriterEvent.START, qname

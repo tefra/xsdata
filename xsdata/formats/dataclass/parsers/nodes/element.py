@@ -448,6 +448,9 @@ class ElementNode(XmlNode):
             return False
 
         if var.list_element:
+            if text is None:
+                return False
+
             items = params.get(var.name)
             if items is None:
                 params[var.name] = items = PendingCollection(None, var.factory)

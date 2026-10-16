@@ -311,6 +311,7 @@ class XmlContext:
     @classmethod
     def get_subclasses(cls, clazz: type) -> Iterator[type]:
         """Return an iterator of the given class subclasses."""
+        subclass: type
         with suppress(TypeError, AttributeError):
             for subclass in clazz.__subclasses__():
                 yield from cls.get_subclasses(subclass)

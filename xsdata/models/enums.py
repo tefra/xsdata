@@ -3,7 +3,7 @@ from collections.abc import Callable
 from decimal import Decimal
 from enum import Enum
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Final, Optional
 from xml.etree.ElementTree import QName
 
 from xsdata.models.datatype import (
@@ -266,9 +266,9 @@ __DataTypeCodeIndex__ = {dt.code.lower(): dt for dt in DataType}
 class EventType:
     """XmlParsing event types."""
 
-    START = sys.intern("start")
-    START_NS = sys.intern("start-ns")
-    END = sys.intern("end")
+    START: Final = "start"
+    START_NS: Final = "start-ns"
+    END: Final = "end"
 
 
 class Tag:

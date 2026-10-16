@@ -1,6 +1,6 @@
 import functools
 from collections.abc import Iterable, Iterator
-from typing import Any, Literal
+from typing import Any, Final, Literal
 from urllib.parse import urljoin
 from xml.etree import ElementInclude as xinclude
 from xml.etree import ElementTree as etree
@@ -10,7 +10,7 @@ from xsdata.formats.dataclass.parsers.mixins import XmlHandler
 from xsdata.models.enums import EventType
 from xsdata.utils import namespaces
 
-EVENTS = (EventType.START, EventType.END, EventType.START_NS)
+EVENTS: Final = (EventType.START, EventType.END, EventType.START_NS)
 
 
 class XmlEventHandler(XmlHandler):

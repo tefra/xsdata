@@ -30,6 +30,7 @@ class ParserConfig:
         base_url: Specify a base URL when parsing from memory, and
             you need support for relative links e.g. xinclude
         load_dtd: Enable loading external dtd (lxml only)
+        resolve_entities: Enable resoling external entities (lxml only)
         process_xinclude: Enable xinclude statements processing
         class_factory: Override default object instantiation
         fail_on_unknown_properties: Skip unknown properties or fail with exception
@@ -39,6 +40,7 @@ class ParserConfig:
 
     base_url: str | None = None
     load_dtd: bool = False
+    resolve_entities: bool = False
     process_xinclude: bool = False
     class_factory: Callable[[type[T], dict[str, Any]], T] = field(
         default=default_class_factory

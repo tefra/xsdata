@@ -1,3 +1,5 @@
+import tempfile
+from pathlib import Path
 from unittest.case import TestCase
 
 from lxml import etree
@@ -53,6 +55,26 @@ class LxmlEventHandlerTests(TestCase):
         self.parser.config.base_url = path.as_uri()
         self.assertEqual(books, self.parser.from_bytes(path.read_bytes(), Books))
         self.assertEqual(ns_map, self.parser.ns_map)
+
+    def test_parse_with_external_entities(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            secret = Path(tmp).joinpath("secret.txt")
+            secret.write_text("leaked")
+            xml = (
+                f'<!DOCTYPE books [<!ENTITY xxe SYSTEM "{secret.as_uri()}">]>'
+                '<brk:books xmlns:brk="urn:books"><book id="bk001">'
+                "<author>Hightower, Kim</author><title>&xxe;</title>"
+                "<genre>Fiction</genre><price>44.95</price>"
+                "<pub_date>2000-10-01</pub_date><review>Nothing</review>"
+                "</book></brk:books>"
+            )
+
+            result = self.parser.from_string(xml, Books)
+            self.assertEqual("", result.book[0].title)
+
+            self.parser.config.resolve_entities = True
+            result = self.parser.from_string(xml, Books)
+            self.assertEqual("leaked", result.book[0].title)
 
     def test_parse_context_with_unhandled_event(self) -> None:
         handler = LxmlEventHandler(clazz=Books, parser=self.parser)

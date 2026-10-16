@@ -8,7 +8,7 @@ from xml.sax.saxutils import XMLGenerator
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.datatypes import Telephone
-from tests.fixtures.models import Paragraph, SequentialType, Span, TypeA
+from tests.fixtures.models import AttrsType, Paragraph, SequentialType, Span, TypeA
 from xsdata.exceptions import SerializerError, XmlContextError, XmlWriterError
 from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.formats.dataclass.models.generics import AnyElement, DerivedElement
@@ -452,6 +452,17 @@ class EventGeneratorTests(TestCase):
             ("end", "book"),
         ]
         self.assertIsInstance(result, Generator)
+        self.assertEqual(expected, list(result))
+
+    def test_convert_dataclass_with_empty_content_in_nillable_field(self) -> None:
+        obj = AttrsType(index=1, attrs={})
+        result = self.generator.convert_dataclass(obj, qname="a", nillable=True)
+        expected = [
+            ("start", "a"),
+            ("attr", "index", "1"),
+            ("attr", "fixed", "ignored"),
+            ("end", "a"),
+        ]
         self.assertEqual(expected, list(result))
 
     def test_convert_dataclass_with_no_dataclass(self) -> None:

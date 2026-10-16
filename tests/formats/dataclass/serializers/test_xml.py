@@ -1,8 +1,22 @@
+from dataclasses import dataclass, field
 from unittest import TestCase
 
 from tests.fixtures.books.fixtures import books
+from xsdata.formats.dataclass.parsers import XmlParser
 from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
+
+
+@dataclass
+class Country:
+    code: str = field(metadata={"type": "Attribute"})
+
+
+@dataclass
+class Address:
+    country: Country | None = field(
+        default=None, metadata={"type": "Element", "nillable": True}
+    )
 
 
 class XmlSerializerTests(TestCase):
@@ -36,3 +50,21 @@ class XmlSerializerTests(TestCase):
         )
 
         self.assertEqual(expected, result)
+
+    def test_render_nillable_field_with_attributes_only_type(self) -> None:
+        serializer = XmlSerializer(config=SerializerConfig(xml_declaration=False))
+        present = serializer.render(Address(country=Country(code="DE")))
+        absent = serializer.render(Address())
+
+        self.assertEqual('<Address><country code="DE"/></Address>', present)
+        self.assertEqual(
+            "<Address>"
+            '<country xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>'
+            "</Address>",
+            absent,
+        )
+        parser = XmlParser()
+        self.assertEqual(
+            Country(code="DE"), parser.from_string(present, Address).country
+        )
+        self.assertIsNone(parser.from_string(absent, Address).country)

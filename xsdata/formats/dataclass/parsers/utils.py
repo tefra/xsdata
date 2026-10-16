@@ -89,9 +89,7 @@ class ParserUtils:
         config: ParserConfig,
         value: Any,
         ns_map: dict | None = None,
-        default: Any = None,
         types: Sequence[type] | None = None,
-        tokens_factory: Callable | None = None,
         format: str | None = None,
     ) -> Any:
         """Convert a value to a python primitive type.
@@ -102,9 +100,7 @@ class ParserUtils:
             config: The parser config instance
             value: A primitive value or a list of primitive values
             ns_map: The element namespace prefix-URI map
-            default: Override the var default value
             types: Override the var types
-            tokens_factory: Override the var tokens factory
             format: Override the var format
 
         Returns:
@@ -114,9 +110,9 @@ class ParserUtils:
             value = cls.parse_value(
                 value=value,
                 types=types or var.types,
-                default=default or var.default,
+                default=var.default,
                 ns_map=ns_map,
-                tokens_factory=tokens_factory or var.tokens_factory,
+                tokens_factory=var.tokens_factory,
                 format=format or var.format,
             )
         except ConverterError as ex:
@@ -225,6 +221,24 @@ class ParserUtils:
             value = build_qname(ns_map[prefix], suffix)
 
         return value
+
+    @classmethod
+    def accepts_empty_text(cls, var: XmlVar) -> bool:
+        """Return whether missing text content should bind as empty.
+
+        Only required str/bytes fields without a default qualify,
+        every other field keeps its default or stays unset.
+
+        Args:
+            var: The xml var instance
+
+        Returns:
+            The boolean result.
+        """
+        if not var.required or var.default is not None:
+            return False
+
+        return str in var.types or bytes in var.types
 
     @classmethod
     def validate_fixed_value(cls, meta: XmlMeta, var: XmlVar, value: Any):

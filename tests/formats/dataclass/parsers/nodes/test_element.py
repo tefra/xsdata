@@ -1,5 +1,5 @@
 import copy
-from dataclasses import make_dataclass
+from dataclasses import field, make_dataclass
 from unittest import mock
 
 from tests.fixtures.books import Books
@@ -142,6 +142,33 @@ class ElementNodeTests(FactoryTestCase):
 
         self.assertTrue(self.node.bind("foo", "text", "tail", objects))
         self.assertListEqual([("foo", expected), (None, "tail")], objects)
+
+    def test_bind_text_with_missing_text(self) -> None:
+        text = {"type": "Text"}
+        fixture = make_dataclass("Fixture", [("value", str, field(metadata=text))])
+        self.node.meta = self.context.build(fixture)
+
+        params = {}
+        self.assertTrue(self.node.bind_text(params, None))
+        self.assertEqual({"value": ""}, params)
+
+    def test_bind_text_with_missing_bytes_text(self) -> None:
+        text = {"type": "Text", "format": "base64"}
+        fixture = make_dataclass("Fixture", [("value", bytes, field(metadata=text))])
+        self.node.meta = self.context.build(fixture)
+
+        params = {}
+        self.assertTrue(self.node.bind_text(params, None))
+        self.assertEqual({"value": b""}, params)
+
+    def test_bind_text_with_missing_text_and_unsupported_var(self) -> None:
+        text = {"type": "Text"}
+        fixture = make_dataclass("Fixture", [("value", int, field(metadata=text))])
+        self.node.meta = self.context.build(fixture)
+
+        params = {}
+        self.assertFalse(self.node.bind_text(params, None))
+        self.assertEqual({}, params)
 
     def test_bind_wild_text(self) -> None:
         self.node.meta = self.context.build(ExtendedType)

@@ -55,7 +55,7 @@ class Comment:
     class Meta:
         name = "comment"
 
-    value: str = field(default="")
+    value: str = field()
 
 
 @dataclass(kw_only=True)

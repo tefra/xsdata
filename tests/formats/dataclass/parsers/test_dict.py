@@ -1,5 +1,5 @@
 import json
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, make_dataclass
 from decimal import Decimal
 from xml.etree.ElementTree import QName
 
@@ -184,6 +184,19 @@ class DictDecoderTests(FactoryTestCase):
 
         with self.assertRaises(ParserError):
             self.decoder.bind_dataclass({"value": "abcd"}, FixedType)
+
+    def test_bind_dataclass_with_missing_text(self) -> None:
+        text = {"type": "Text"}
+        fixture = make_dataclass("Fixture", [("value", str, field(metadata=text))])
+        data = {}
+
+        obj = self.decoder.bind_dataclass(data, fixture)
+        self.assertEqual(fixture(value=""), obj)
+        self.assertEqual({}, data)
+
+        fixture = make_dataclass("Fixture", [("value", int, field(metadata=text))])
+        with self.assertRaises(ParserError):
+            self.decoder.bind_dataclass({}, fixture)
 
     def test_bind_derived_dataclass(self) -> None:
         data = {

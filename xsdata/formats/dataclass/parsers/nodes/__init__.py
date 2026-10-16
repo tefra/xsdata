@@ -1,4 +1,5 @@
 from xsdata.formats.dataclass.parsers.nodes.element import ElementNode
+from xsdata.formats.dataclass.parsers.nodes.idref import IdRefNode, _IdRefPlaceholder
 from xsdata.formats.dataclass.parsers.nodes.primitive import PrimitiveNode
 from xsdata.formats.dataclass.parsers.nodes.skip import SkipNode
 from xsdata.formats.dataclass.parsers.nodes.standard import StandardNode
@@ -8,6 +9,8 @@ from xsdata.formats.dataclass.parsers.nodes.wrapper import WrapperNode
 
 __all__ = [
     "ElementNode",
+    "IdRefNode",
+    "_IdRefPlaceholder",
     "PrimitiveNode",
     "SkipNode",
     "StandardNode",

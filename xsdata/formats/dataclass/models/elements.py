@@ -121,6 +121,7 @@ class XmlVar(MetaMixin):
         "is_elements",
         "is_text",
         "is_wildcard",
+        "is_idref",
         "list_element",
         "local_name",
         "mixed",
@@ -164,6 +165,7 @@ class XmlVar(MetaMixin):
         namespaces: Sequence[str],
         elements: Mapping[str, XmlVar],
         wildcards: Sequence[XmlVar],
+        idref: bool,
         **kwargs: Any,
     ):
         """Initialize the xml var."""
@@ -207,6 +209,7 @@ class XmlVar(MetaMixin):
         self.is_wildcard = False
         self.is_attribute = False
         self.is_attributes = False
+        self.is_idref = idref
 
         if xml_type == XmlType.ELEMENTS:
             self.is_elements = True
@@ -390,6 +393,7 @@ class XmlMeta(MetaMixin):
         clazz: The binding model
         qname: The namespace-qualified name
         target_qname: The target namespace-qualified name
+        key: The attributes that together make the XMLID of this class
         nillable: Specifies whether this class supports nillable content
         text: A text variable
         choices: A list of compound variables
@@ -410,6 +414,7 @@ class XmlMeta(MetaMixin):
         "choices",
         "clazz",
         "elements",
+        "key",
         "mixed_content",
         # Calculated
         "namespace",
@@ -426,6 +431,7 @@ class XmlMeta(MetaMixin):
         clazz: type,
         qname: str,
         target_qname: str | None,
+        key: Sequence[str],
         nillable: bool,
         text: XmlVar | None,
         choices: Sequence[XmlVar],
@@ -441,6 +447,7 @@ class XmlMeta(MetaMixin):
         self.qname = qname
         self.namespace = target_uri(qname)
         self.target_qname = target_qname
+        self.key = list(key)
         self.nillable = nillable
         self.text = text
         self.choices = choices

@@ -45,7 +45,7 @@ class Alias:
             "type": "Attribute",
         },
     )
-    value: str = field(default="")
+    value: str = field()
 
 
 @dataclass(kw_only=True)
@@ -83,7 +83,7 @@ class Gender:
             "type": "Attribute",
         }
     )
-    value: str = field(default="")
+    value: str = field()
 
 
 @dataclass(kw_only=True)

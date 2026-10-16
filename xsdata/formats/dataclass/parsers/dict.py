@@ -138,6 +138,16 @@ class DictDecoder:
             else:
                 ParserUtils.validate_fixed_value(meta, var, value)
 
+        text = meta.text
+        if text and text.name not in params and ParserUtils.accepts_empty_text(text):
+            params[text.name] = ParserUtils.parse_var(
+                meta=meta,
+                var=text,
+                config=self.config,
+                value="",
+                ns_map=EMPTY_MAP,
+            )
+
         try:
             return self.config.class_factory(clazz, params)
         except TypeError as e:

@@ -99,6 +99,27 @@ class ParserUtilsTests(FactoryTestCase):
         value = ParserUtils.parse_any_attribute("http://www.com", ns_map)
         self.assertEqual("http://www.com", value)
 
+    def test_accepts_empty_text(self) -> None:
+        var = XmlVarFactory.create("value", types=(str,), required=True)
+        self.assertTrue(ParserUtils.accepts_empty_text(var))
+
+        var = XmlVarFactory.create("value", types=(int, bytes), required=True)
+        self.assertTrue(ParserUtils.accepts_empty_text(var))
+
+        var = XmlVarFactory.create("value", types=(int,), required=True)
+        self.assertFalse(ParserUtils.accepts_empty_text(var))
+
+        var = XmlVarFactory.create("value", types=(str,))
+        self.assertFalse(ParserUtils.accepts_empty_text(var))
+
+        var = XmlVarFactory.create("value", types=(str,), required=True, default="a")
+        self.assertFalse(ParserUtils.accepts_empty_text(var))
+
+        var = XmlVarFactory.create(
+            "value", types=(str,), required=True, default=lambda: "a"
+        )
+        self.assertFalse(ParserUtils.accepts_empty_text(var))
+
     def test_validate_fixed_value(self) -> None:
         meta = XmlMetaFactory.create(clazz=TypeA, qname="foo")
         var = XmlVarFactory.create("fixed", default="a")

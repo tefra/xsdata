@@ -74,16 +74,31 @@ Check the [documentation](https://xsdata.readthedocs.io) for more ✨✨✨
 - Support xinclude statements and unknown properties
 - Customize behaviour through config
 
-## Changelog: 26.2 (2026-02-15)
+## Changelog: 26.10 (2026-10-16)
+
+**Security**
+
+- Disable external entity resolution in LxmlEventHandler by default
+  ([#1228](https://github.com/tefra/xsdata/pull/1228))
 
 **Fixes**
 
-- Fix elements in same choice different branches incorrectly merged as list
-  ([#1206](https://github.com/tefra/xsdata/pull/1206))
+- Fix wrapper binding when collection item element name is reused
+  ([#1224](https://github.com/tefra/xsdata/pull/1224))
+- Fix KeyError in is_binding_model when models_package is not set
+  ([#1219](https://github.com/tefra/xsdata/pull/1219))
+- Validate calendar date in XmlDate.from_string
+  ([#1227](https://github.com/tefra/xsdata/pull/1227))
+- Add charset to the SOAP client content-type header
+  ([#1231](https://github.com/tefra/xsdata/pull/1231))
+- Skip xsi:nil for a present instance of a type without content
+  ([#1234](https://github.com/tefra/xsdata/pull/1234))
+- Skip None text when binding wildcard list elements
+  ([#1237](https://github.com/tefra/xsdata/pull/1237))
 
 **Features**
 
-- Infer XML required property from typing annotations
-  ([#1208](https://github.com/tefra/xsdata/pull/1208))
-- Generate required metadata only for attributes without default values
-  ([#1208](https://github.com/tefra/xsdata/pull/1208))
+- Share compiled jinja templates across generators
+  ([#1235](https://github.com/tefra/xsdata/pull/1235))
+- Add third-party license notices for bundled schemas and graphs util
+  ([#1238](https://github.com/tefra/xsdata/pull/1238))

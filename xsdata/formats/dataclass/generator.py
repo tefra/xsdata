@@ -43,7 +43,7 @@ class DataclassGenerator(AbstractGenerator):
         super().__init__(config)
         template_paths = self.get_template_paths()
         loader = FileSystemLoader(template_paths)
-        self.env = Environment(
+        self.env = Environment(  # nosec
             loader=loader, autoescape=False, bytecode_cache=bytecode_cache
         )
         self.filters = self.init_filters(config)

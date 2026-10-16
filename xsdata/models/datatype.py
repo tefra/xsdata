@@ -239,7 +239,7 @@ class XmlDateTime(NamedTuple):
     @classmethod
     def utcnow(cls) -> "XmlDateTime":
         """Initialize with the current datetime and utc timezone."""
-        return cls.from_datetime(datetime.datetime.now(datetime.timezone.utc))
+        return cls.from_datetime(datetime.datetime.now(datetime.UTC))
 
     def to_datetime(self) -> datetime.datetime:
         """Return a `datetime.datetime` instance."""
@@ -430,7 +430,7 @@ class XmlTime(NamedTuple):
     @classmethod
     def utcnow(cls) -> "XmlTime":
         """Initialize with the current time and utc timezone."""
-        return cls.from_time(datetime.datetime.now(datetime.timezone.utc).time())
+        return cls.from_time(datetime.datetime.now(datetime.UTC).time())
 
     def to_time(self) -> datetime.time:
         """Convert to a `datetime.time` instance."""

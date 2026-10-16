@@ -3,23 +3,7 @@ from collections.abc import Callable, Iterable, Mapping, Sequence
 from types import UnionType
 from typing import Any, NamedTuple, TypeVar, Union, get_args, get_origin
 
-if (3, 9) <= sys.version_info[:2] <= (3, 10):
-    # Backport this fix for python 3.9 and 3.10
-    # https://github.com/python/cpython/pull/30900
-
-    from types import GenericAlias
-    from typing import ForwardRef
-    from typing import _eval_type as __eval_type  # type: ignore
-
-    def _eval_type(tp: Any, globalns: Any, localns: Any) -> Any:
-        if isinstance(tp, GenericAlias):
-            args = tuple(
-                ForwardRef(arg) if isinstance(arg, str) else arg for arg in tp.__args__
-            )
-            tp = tp.__origin__[args]  # type: ignore
-
-        return __eval_type(tp, globalns, localns)
-elif sys.version_info[:2] >= (3, 13):
+if sys.version_info[:2] >= (3, 13):
     # python 3.13+ requires type_params argument
     from typing import _eval_type as __eval_type  # type: ignore
 

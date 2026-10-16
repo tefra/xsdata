@@ -6,16 +6,13 @@ on:
     types: [released]
 
 jobs:
-  build-n-publish:
-    name: Build and publish Python 🐍 distributions 📦 to PyPI and TestPyPI
+  build:
+    name: Build Python 🐍 distributions 📦
     runs-on: ubuntu-latest
-    environment:
-      name: release
-      url: https://pypi.org/p/xsdata
-    permissions:
-      id-token: write
     steps:
     - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
     - name: Set up Python 3.11
       uses: actions/setup-python@v7
       with:
@@ -33,17 +30,29 @@ jobs:
       with:
         name: python-package-distributions
         path: dist/
+
+  publish:
+    name: Publish Python 🐍 distributions 📦 to PyPI and TestPyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: release
+      url: https://pypi.org/p/xsdata
+    permissions:
+      id-token: write
+    steps:
     - name: Download all the dists
       uses: actions/download-artifact@v8
       with:
         name: python-package-distributions
-        path: dist
+        path: dist/
     - name: Publish distribution 📦 to Test PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         repository-url: https://test.pypi.org/legacy/
-    - name: Publish distribution 📦 to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        # Temporary workaround for https://github.com/pypa/gh-action-pypi-publish/issues/283
+        # Attestations are written into dist/ and would clash with the PyPI upload
         attestations: false
+    - name: Publish distribution 📦 to PyPI
+      # Manual runs stop at TestPyPI, only releases reach PyPI
+      if: github.event_name == 'release'
+      uses: pypa/gh-action-pypi-publish@release/v1

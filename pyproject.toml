@@ -29,9 +29,6 @@ classifiers = [
 ]
 keywords = ["xsd", "wsdl", "schema", "dtd", "binding", "xml", "json", "dataclasses", "generator", "cli"]
 requires-python = ">=3.11"
-dependencies = [
-    "typing-extensions>=4.12.0",
-]
 dynamic = ["version"]
 
 [project.readme]

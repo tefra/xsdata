@@ -60,7 +60,11 @@ jobs:
           python -m pip install .[lxml,cli]
       - name: Test
         run: |
-          pytest -n auto --mode xsd w3c-tests/tests
+          pytest -n auto --mode=build w3c-tests/tests
+          pytest -n auto --mode=xsd w3c-tests/tests
+      - name: Generated models diff
+        run: |
+          git -C w3c-tests diff --stat output
   benchmark:
     name: Benchmarks
     runs-on: ubuntu-latest

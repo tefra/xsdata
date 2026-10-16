@@ -1,4 +1,4 @@
-include LICENSE README.md LICENSE CHANGES.md
+include LICENSE README.md LICENSE CHANGES.md THIRD_PARTY_LICENSES.md
 recursive-include docs *
 recursive-include tests *
 recursive-include xsdata *

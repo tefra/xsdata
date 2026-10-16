@@ -1,11 +1,19 @@
+# strongly_connected_components is derived from:
+#
+#   https://code.activestate.com/recipes/578507/
+#   Copyright 2013 Mark Dickinson
+#
+#   https://github.com/python/mypy/blob/master/mypy/graph_utils.py
+#   Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+#   Copyright (c) 2015-2023 Dropbox, Inc.
+#
+# Both are distributed under the MIT License, see THIRD_PARTY_LICENSES.md.
+
 from collections.abc import Iterator
 
 
 def strongly_connected_components(edges: dict[str, list[str]]) -> Iterator[set[str]]:
     """Compute Strongly Connected Components of a directed graph.
-
-    From https://code.activestate.com/recipes/578507/ From
-    https://github.com/python/mypy/blob/master/mypy/build.py
 
     Args:
         edges: A vertex-edges map

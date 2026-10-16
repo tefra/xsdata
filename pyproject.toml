@@ -10,7 +10,7 @@ name = "xsdata"
 description = "Python XML Binding"
 authors = [{name = "Christodoulos Tsoulloftas", email = "chris@komposta.net"}]
 license = "MIT"
-license-files = ["LICENSE"]
+license-files = ["LICENSE", "THIRD_PARTY_LICENSES.md"]
 classifiers = [
     "Intended Audience :: Developers",
     "Operating System :: OS Independent",

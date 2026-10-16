@@ -79,6 +79,7 @@ The output format for the generated code, e.g. `code.models`
 
 The [dataclass][dataclasses.dataclass] parameters.
 
+<!-- prettier-ignore-start -->
 - `repr`: Generate the [**repr**][object.__repr__] method.
 - `eq`: Generate the [**eq**][object.__eq__] method.
 - `order`: Generates the [**lt**][object.__lt__], [**le**][object.__le__],
@@ -87,6 +88,7 @@ The [dataclass][dataclasses.dataclass] parameters.
 - `unsafeHash`: Generates a [**hash**][object.__hash__] method according to how `eq` and
   `frozen` are set.
 - `slots`: Generates the class [**slots**][object.__slots__] attribute. `python >= 3.10`
+<!-- prettier-ignore-end -->
 
 !!! Warning
 

@@ -1025,14 +1025,14 @@ class EventGenerator:
         Returns:
             The encoded value.
         """
+        if isinstance(value, Enum):
+            return cls.encode_primitive(value.value, var)
+
         if isinstance(value, (str, QName)) or var is None:
             return value
 
         if collections.is_array(value):
             return [cls.encode_primitive(v, var) for v in value]
-
-        if isinstance(value, Enum):
-            return cls.encode_primitive(value.value, var)
 
         return converter.serialize(value, format=var.format)
 

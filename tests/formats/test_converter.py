@@ -2,7 +2,7 @@ import sys
 import unittest
 from datetime import date, datetime, time
 from decimal import Decimal
-from enum import Enum
+from enum import Enum, IntEnum, StrEnum
 from typing import Any
 from xml.etree.ElementTree import QName
 
@@ -76,6 +76,30 @@ class ConverterFactoryTests(unittest.TestCase):
         self.assertEqual(
             f"No converter registered for `{A.__qualname__}`", str(cm.exception)
         )
+
+    def test_type_converter_with_unregistered_base(self) -> None:
+        class Base(int):
+            pass
+
+        class Child(Base):
+            pass
+
+        self.assertIs(converter.type_converter(int), converter.type_converter(Child))
+
+    def test_type_converter_with_mixin_enums(self) -> None:
+        class Color(StrEnum):
+            RED = "red"
+
+        class Level(IntEnum):
+            ONE = 1
+
+        self.assertIs(Color.RED, converter.deserialize(" red ", [Color]))
+        self.assertIs(Level.ONE, converter.deserialize("1", [Level]))
+        self.assertEqual("red", converter.serialize(Color.RED))
+        self.assertEqual("1", converter.serialize(Level.ONE))
+
+        with self.assertRaises(ConverterError):
+            converter.deserialize("blue", [Color])
 
     def test_register_converter(self) -> None:
         class MinusOneInt(int):

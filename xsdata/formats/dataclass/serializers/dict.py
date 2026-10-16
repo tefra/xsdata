@@ -76,11 +76,11 @@ class DictEncoder:
         if collections.is_array(value):
             return type(value)(self.encode(val, var, wrapped) for val in value)
 
-        if isinstance(value, (dict, int, float, str, bool)):
-            return value
-
         if isinstance(value, Enum):
             return self.encode(value.value, var, wrapped)
+
+        if isinstance(value, (dict, int, float, str, bool)):
+            return value
 
         return converter.serialize(value, format=var.format)
 

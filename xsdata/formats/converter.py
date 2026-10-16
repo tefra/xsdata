@@ -187,7 +187,9 @@ class ConverterFactory:
         """Find a suitable converter for given data type.
 
         Iterate over all but last mro items and check for registered
-        converters.
+        converters. Enums resolve to the enum converter first, because
+        mixin enums like StrEnum and IntEnum list their data type
+        before Enum in their mro.
 
         Args:
             data_type: The data type
@@ -201,6 +203,9 @@ class ConverterFactory:
         with suppress(KeyError):
             # Quick in and out, without checking the whole mro.
             return self.registry[data_type]
+
+        if isinstance(data_type, EnumMeta):
+            return self.registry[Enum]
 
         # We tested the first, ignore the object
         for mro in data_type.__mro__[1:-1]:

@@ -1,3 +1,4 @@
+from enum import StrEnum
 from unittest import TestCase
 
 from tests.fixtures.books import BookForm, Books
@@ -137,6 +138,11 @@ class PycodeSerializerTests(TestCase):
     def test_write_object_with_enum(self) -> None:
         iterator = self.serializer.repr_object(Namespace.SOAP11, 0, set())
         self.assertEqual("Namespace.SOAP11", "".join(iterator))
+
+    def test_write_object_with_str_enum(self) -> None:
+        color = StrEnum("Color", {"RED": "red"})
+        iterator = self.serializer.repr_object(color.RED, 0, set())
+        self.assertEqual("Color.RED", "".join(iterator))
 
     def test_build_imports_with_nested_types(self) -> None:
         expected = "from tests.fixtures.models import Parent\n"

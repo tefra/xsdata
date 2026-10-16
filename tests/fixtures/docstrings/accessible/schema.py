@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 
 __NAMESPACE__ = "urn:docs"
 
@@ -28,7 +28,7 @@ class DoubleQuotesSummary:
         namespace = "urn:docs"
 
 
-class RootEnum(Enum):
+class RootEnum(StrEnum):
     A = "A"
     B = "B"
 
@@ -40,7 +40,7 @@ RootEnum.B.__doc__ = (
 )
 
 
-class RootB(Enum):
+class RootB(StrEnum):
     YES = "Yes"
     NO = "No"
 
@@ -52,7 +52,7 @@ RootB.YES.__doc__ = (
 RootB.NO.__doc__ = "Lorem ipsum dolor\nMy\\Ipsum"
 
 
-class RootD(Enum):
+class RootD(StrEnum):
     TRUE = "true"
     FALSE = "false"
 

@@ -4,7 +4,7 @@
 {% endset -%}
 {% set class_name = obj.name | class_name %}
 
-class {{ class_name }}(Enum):
+class {{ class_name }}({{ obj | enum_base }}):
 {%- if help %}
 {{ help | indent(4, first=True) }}
 {%- endif -%}

@@ -102,7 +102,7 @@ class PycodeSerializer:
         elif self.context.class_type.is_model(obj):
             yield from self.repr_model(obj, level, types)
         elif isinstance(obj, Enum):
-            yield str(obj)
+            yield f"{type(obj).__qualname__}.{obj.name}"
         else:
             yield literal_value(obj)
 

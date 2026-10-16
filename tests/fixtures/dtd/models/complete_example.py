@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 
 
 @dataclass(kw_only=True)
@@ -14,7 +14,7 @@ class Origin:
     value: str = field()
 
 
-class PostStatus(Enum):
+class PostStatus(StrEnum):
     DRAFT = "draft"
     PUBLISHED = "published"
 

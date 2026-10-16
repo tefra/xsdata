@@ -10,10 +10,13 @@ from jinja2 import Environment, FileSystemLoader
 from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.models import Class, Import
 from xsdata.codegen.resolver import DependenciesResolver
+from xsdata.formats.dataclass.bytecode import MemoryBytecodeCache
 from xsdata.formats.dataclass.filters import Filters
 from xsdata.formats.mixins import AbstractGenerator, GeneratorResult
 from xsdata.logger import logger
 from xsdata.models.config import GeneratorConfig
+
+bytecode_cache = MemoryBytecodeCache()
 
 
 class DataclassGenerator(AbstractGenerator):
@@ -40,7 +43,9 @@ class DataclassGenerator(AbstractGenerator):
         super().__init__(config)
         template_paths = self.get_template_paths()
         loader = FileSystemLoader(template_paths)
-        self.env = Environment(loader=loader, autoescape=False)
+        self.env = Environment(
+            loader=loader, autoescape=False, bytecode_cache=bytecode_cache
+        )
         self.filters = self.init_filters(config)
         self.filters.register(self.env)
 

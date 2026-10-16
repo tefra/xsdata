@@ -5,7 +5,7 @@ from unittest import mock
 
 from xsdata.codegen.exceptions import CodegenError
 from xsdata.codegen.resolver import DependenciesResolver
-from xsdata.formats.dataclass.generator import DataclassGenerator
+from xsdata.formats.dataclass.generator import DataclassGenerator, bytecode_cache
 from xsdata.models.config import GeneratorConfig
 from xsdata.utils.testing import ClassFactory, FactoryTestCase
 
@@ -16,6 +16,12 @@ class DataclassGeneratorTests(FactoryTestCase):
         self.maxDiff = None
         config = GeneratorConfig()
         self.generator = DataclassGenerator(config)
+
+    def test_init_shares_bytecode_cache(self) -> None:
+        other = DataclassGenerator(GeneratorConfig())
+
+        self.assertIs(bytecode_cache, self.generator.env.bytecode_cache)
+        self.assertIs(bytecode_cache, other.env.bytecode_cache)
 
     @mock.patch.object(DataclassGenerator, "ruff_code")
     @mock.patch.object(DataclassGenerator, "validate_imports")

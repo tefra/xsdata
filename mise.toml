@@ -1,0 +1,15 @@
+[tools]
+python = "3.11"
+
+
+[env]
+_.python.venv = { path = ".venv", create = true }
+
+
+[settings]
+python.venv_stdlib = true
+
+[tasks.install]
+description = "Install dependencies"
+alias = "i"
+run = "pip install -e .[docs,cli,soap,test,lxml]"

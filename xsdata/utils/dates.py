@@ -19,7 +19,7 @@ def calculate_timezone(offset: int | None) -> datetime.timezone | None:
         return None
 
     if offset == 0:
-        return datetime.timezone.utc
+        return datetime.UTC
 
     return datetime.timezone(datetime.timedelta(minutes=offset))
 

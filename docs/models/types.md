@@ -221,9 +221,12 @@ The fields must provide the `format` metadata property.
 
 ### Enum
 
-**Python Type**: [enum.Enum][]
+**Python Type**: [enum.Enum][], [enum.StrEnum][], [enum.IntEnum][]
 
 **XML Type:**: [enumeration](https://www.w3.org/TR/xmlschema11-2/#rf-enumeration)
+
+The code generator uses `StrEnum` when every member value is a string, `IntEnum` when
+every member value is an integer, and `Enum` for everything else.
 
 ## User Types
 

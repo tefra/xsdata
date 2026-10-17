@@ -114,6 +114,71 @@ class FiltersTests(FactoryTestCase):
         expected = self.filters.class_bases(target, "FooBar")
         self.assertEqual(["d", "c", "b"], expected)
 
+    def test_enum_base_with_str_members(self) -> None:
+        obj = ClassFactory.create(
+            attrs=[
+                AttrFactory.native(DataType.STRING, tag=Tag.ENUMERATION),
+                AttrFactory.native(DataType.TOKEN, tag=Tag.ENUMERATION),
+            ]
+        )
+        self.assertEqual("StrEnum", self.filters.enum_base(obj))
+
+    def test_enum_base_with_int_members(self) -> None:
+        obj = ClassFactory.create(
+            attrs=[
+                AttrFactory.native(DataType.INT, tag=Tag.ENUMERATION),
+                AttrFactory.native(DataType.POSITIVE_INTEGER, tag=Tag.ENUMERATION),
+            ]
+        )
+        self.assertEqual("IntEnum", self.filters.enum_base(obj))
+
+    def test_enum_base_with_other_native_members(self) -> None:
+        for datatype in (DataType.BOOLEAN, DataType.DECIMAL, DataType.QNAME):
+            obj = ClassFactory.create(
+                attrs=[AttrFactory.native(datatype, tag=Tag.ENUMERATION)]
+            )
+            self.assertEqual("Enum", self.filters.enum_base(obj))
+
+    def test_enum_base_with_mixed_members(self) -> None:
+        obj = ClassFactory.create(
+            attrs=[
+                AttrFactory.native(DataType.STRING, tag=Tag.ENUMERATION),
+                AttrFactory.native(DataType.INT, tag=Tag.ENUMERATION),
+            ]
+        )
+        self.assertEqual("Enum", self.filters.enum_base(obj))
+
+    def test_enum_base_with_tokens_member(self) -> None:
+        obj = ClassFactory.create(
+            attrs=[
+                AttrFactory.native(
+                    DataType.STRING,
+                    tag=Tag.ENUMERATION,
+                    restrictions=Restrictions(tokens=True),
+                )
+            ]
+        )
+        self.assertEqual("Enum", self.filters.enum_base(obj))
+
+    def test_enum_base_with_union_member(self) -> None:
+        obj = ClassFactory.create(
+            attrs=[
+                AttrFactory.enumeration(
+                    types=[
+                        AttrTypeFactory.native(DataType.STRING),
+                        AttrTypeFactory.native(DataType.INT),
+                    ]
+                )
+            ]
+        )
+        self.assertEqual("Enum", self.filters.enum_base(obj))
+
+    def test_enum_base_with_user_type_member(self) -> None:
+        obj = ClassFactory.create(
+            attrs=[AttrFactory.enumeration(types=[AttrTypeFactory.create()])]
+        )
+        self.assertEqual("Enum", self.filters.enum_base(obj))
+
     def test_class_annotations(self) -> None:
         etp = ExtensionType.DECORATOR
         self.filters.extensions[etp] = [
@@ -818,6 +883,10 @@ class FiltersTests(FactoryTestCase):
         output = " (Enum) "
 
         expected = "from enum import Enum"
+        self.assertIn(expected, self.filters.default_imports(output))
+
+        output = " (StrEnum) (IntEnum) "
+        expected = "from enum import IntEnum, StrEnum"
         self.assertIn(expected, self.filters.default_imports(output))
 
     def test_default_imports_with_dataclasses(self) -> None:

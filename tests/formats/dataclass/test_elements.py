@@ -1,5 +1,6 @@
 from dataclasses import make_dataclass
 from decimal import Decimal
+from enum import StrEnum
 from unittest import mock
 from unittest.case import TestCase
 from xml.etree.ElementTree import QName
@@ -99,6 +100,23 @@ class XmlValTests(TestCase):
         self.assertEqual(var.elements["a"], var.find_value_choice(TypeA(1), True))
         der = make_dataclass("Der", fields=[], bases=(TypeA,))
         self.assertEqual(var.elements["a"], var.find_value_choice(der(1), True))
+
+    def test_find_value_choice_with_str_enum(self) -> None:
+        color = StrEnum("Color", {"RED": "red"})
+        name = XmlVarFactory.create(name="name", types=(str,))
+        colors = XmlVarFactory.create(
+            name="colors", types=(color,), tokens_factory=list
+        )
+        choice = XmlVarFactory.create(name="color", types=(color,))
+        var = XmlVarFactory.create(
+            xml_type=XmlType.ELEMENTS,
+            name="compound",
+            elements={"name": name, "colors": colors, "color": choice},
+        )
+
+        self.assertEqual(choice, var.find_value_choice(color.RED, False))
+        self.assertEqual(colors, var.find_value_choice([color.RED], False))
+        self.assertEqual(name, var.find_value_choice("red", False))
 
     def test_is_optional(self) -> None:
         var = XmlVarFactory.create(xml_type=XmlType.ATTRIBUTE, name="att")

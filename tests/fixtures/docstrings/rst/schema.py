@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 
 __NAMESPACE__ = "urn:docs"
 
@@ -28,7 +28,7 @@ class DoubleQuotesSummary:
         namespace = "urn:docs"
 
 
-class RootEnum(Enum):
+class RootEnum(StrEnum):
     """
     :cvar A: Lorem ipsum dolor
     :cvar B: Lorem ipsum dolor '''sit''' amet, consectetur adipiscing
@@ -39,7 +39,7 @@ class RootEnum(Enum):
     B = "B"
 
 
-class RootB(Enum):
+class RootB(StrEnum):
     """
     :cvar YES: This is an inner enum member documentation. Lorem ipsum
         dolor sit amet, consectetur adipiscing elit. Etiam mollis.
@@ -50,7 +50,7 @@ class RootB(Enum):
     NO = "No"
 
 
-class RootD(Enum):
+class RootD(StrEnum):
     TRUE = "true"
     FALSE = "false"
 

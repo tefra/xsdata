@@ -4,6 +4,7 @@ import itertools
 import operator
 import sys
 from collections.abc import Callable, Iterator, Mapping, Sequence
+from enum import Enum
 from typing import Any
 
 from xsdata.formats.converter import converter
@@ -320,6 +321,10 @@ class XmlVar(MetaMixin):
 
             if tp in element.types:
                 return element
+
+            # Enum members, e.g. StrEnum, only match their own type
+            if issubclass(tp, Enum):
+                continue
 
             if is_tokens and all(converter.test(val, element.types) for val in value):
                 return element

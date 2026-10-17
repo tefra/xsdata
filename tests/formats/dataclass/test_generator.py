@@ -112,12 +112,12 @@ class DataclassGeneratorTests(FactoryTestCase):
         expected = (
             "from __future__ import annotations\n"
             "from dataclasses import dataclass, field\n"
-            "from enum import Enum\n"
+            "from enum import StrEnum\n"
             "\n"
             '__NAMESPACE__ = "xsdata"\n'
             "\n"
             "\n"
-            "class ClassB(Enum):\n"
+            "class ClassB(StrEnum):\n"
             '    """\n'
             "    I am enum.\n"
             "\n"

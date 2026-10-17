@@ -1,3 +1,4 @@
+from enum import StrEnum
 from unittest.case import TestCase
 
 from tests.fixtures.books import BookForm, Books
@@ -75,6 +76,14 @@ class DictEncoderTests(TestCase):
         actual = self.encoder.encode(obj)
 
         self.assertEqual("optional", actual["use"])
+
+    def test_encode_with_str_enum(self) -> None:
+        color = StrEnum("Color", {"RED": "red"})
+        var = XmlVarFactory.create(types=(color,))
+        actual = self.encoder.encode(color.RED, var)
+
+        self.assertIs(str, type(actual))
+        self.assertEqual("red", actual)
 
     def test_convert_namedtuple(self) -> None:
         var = XmlVarFactory.create(types=(Telephone,))

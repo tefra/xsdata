@@ -1,5 +1,6 @@
 from collections.abc import Generator
 from dataclasses import dataclass, field, make_dataclass
+from enum import StrEnum
 from io import StringIO
 from unittest import TestCase
 from xml.etree.ElementTree import QName
@@ -1130,3 +1131,11 @@ class EventGeneratorTests(TestCase):
         var = XmlVarFactory.create(types=(Telephone,))
         actual = XmlSerializer.encode_primitive(Telephone(30, 234, 56783), var)
         self.assertEqual("30-234-56783", actual)
+
+    def test_encode_primitive_with_str_enum(self) -> None:
+        color = StrEnum("Color", {"RED": "red"})
+        var = XmlVarFactory.create(types=(color,))
+        actual = XmlSerializer.encode_primitive(color.RED, var)
+
+        self.assertIs(str, type(actual))
+        self.assertEqual("red", actual)

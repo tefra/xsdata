@@ -119,6 +119,7 @@ class Filters:
                 "field_definition": self.field_definition,
                 "class_name": self.class_name,
                 "class_bases": self.class_bases,
+                "enum_base": self.enum_base,
                 "class_annotations": self.class_annotations,
                 "class_params": self.class_params,
                 "format_string": self.format_string,
@@ -200,6 +201,27 @@ class Filters:
                     bases.append(ext.func_name)
 
         return collections.unique_sequence(bases)
+
+    @staticmethod
+    def enum_base(obj: Class) -> str:
+        """Return the enum base class name for the given enumeration class.
+
+        Members with a single native type that is exactly str or int
+        across the whole class pick StrEnum or IntEnum. Everything else,
+        e.g. bool, Decimal, QName, tokens or mixed types, stays Enum.
+        """
+        bases = {str: "StrEnum", int: "IntEnum"}
+        types = set()
+        for attr in obj.attrs:
+            if attr.is_tokens or len(attr.types) != 1 or not attr.types[0].native:
+                return "Enum"
+
+            types.update(attr.native_types)
+
+        if len(types) == 1:
+            return bases.get(types.pop(), "Enum")
+
+        return "Enum"
 
     @classmethod
     def _parent_match(clazz, ext: GeneratorExtension, obj: Class) -> bool:
@@ -955,7 +977,11 @@ class Filters:
         return {
             "dataclasses": {"dataclass": ["@dataclass"], "field": [" = field("]},
             "decimal": {"Decimal": type_patterns("Decimal")},
-            "enum": {"Enum": ["(Enum)"]},
+            "enum": {
+                "Enum": ["(Enum)"],
+                "IntEnum": ["(IntEnum)"],
+                "StrEnum": ["(StrEnum)"],
+            },
             "typing": {
                 "ForwardRef": [": ForwardRef("],
                 "Any": type_patterns("Any"),

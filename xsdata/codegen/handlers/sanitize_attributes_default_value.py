@@ -37,7 +37,7 @@ class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
 
         Cases:
             - Reset min_occurs
-            - Reset default value
+            - Reset default value, elements keep it for empty content
             - Validate default value against types
 
         Args:
@@ -48,6 +48,9 @@ class SanitizeAttributesDefaultValue(RelativeHandlerInterface):
             attr.restrictions.min_occurs = 0
 
         if self.should_reset_default(attr):
+            if attr.is_element:
+                attr.empty_value = attr.default
+
             attr.fixed = False
             attr.default = None
 

@@ -86,6 +86,7 @@ class XmlVar(MetaMixin):
         nillable: Indicates if the field supports nillable content
         sequence: Specifies rendering values in sequential mode
         default: Default value or factory for the field
+        empty_value: The text value of an element with empty content
         xml_type: Type of the XML field (element, attribute, etc.)
         namespaces: List of supported namespaces
         elements: Mapping of qualified name-repeatable elements
@@ -111,6 +112,7 @@ class XmlVar(MetaMixin):
         "clazz",
         "default",
         "elements",
+        "empty_value",
         "factory",
         "format",
         "index",
@@ -161,6 +163,7 @@ class XmlVar(MetaMixin):
         nillable: bool,
         sequence: int | None,
         default: Any,
+        empty_value: str | None,
         xml_type: str,
         namespaces: Sequence[str],
         elements: Mapping[str, XmlVar],
@@ -185,6 +188,7 @@ class XmlVar(MetaMixin):
         self.sequence = sequence
         self.list_element = factory in (list, tuple)
         self.default = default
+        self.empty_value = empty_value
         self.namespaces = namespaces
         self.elements = elements
         self.wildcards = wildcards

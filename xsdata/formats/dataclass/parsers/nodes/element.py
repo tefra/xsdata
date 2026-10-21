@@ -579,7 +579,7 @@ class ElementNode(XmlNode):
             )
 
         if not var.any_type and not var.is_wildcard:
-            return nodes.PrimitiveNode(self.meta, var, ns_map, self.config)
+            return nodes.PrimitiveNode(self.meta, var, ns_map, self.config, xsi_nil)
 
         datatype = DataType.from_qname(xsi_type) if xsi_type else None
         derived = var.is_wildcard

@@ -58,6 +58,7 @@ class TreeParser(NodeParser):
                 nillable=False,
                 sequence=None,
                 default=None,
+                empty_value=None,
                 namespaces=(namespace,),
                 elements={},
                 wildcards=(),

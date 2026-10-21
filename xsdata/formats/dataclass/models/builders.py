@@ -394,6 +394,7 @@ class XmlVarBuilder:
         format_str = metadata.get("format", None)
         sequence = metadata.get("sequence", None)
         wrapper = metadata.get("wrapper", None)
+        empty_value = metadata.get("empty_value", None)
 
         annotation = evaluate(type_hint, globalns)
 
@@ -452,6 +453,7 @@ class XmlVarBuilder:
             factory=factory,
             tokens_factory=tokens_factory,
             default=default_value,
+            empty_value=empty_value,
             types=types,
             elements=elements,
             wildcards=wildcards,

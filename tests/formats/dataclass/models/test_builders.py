@@ -264,6 +264,13 @@ class XmlVarBuilderTests(TestCase):
 
         super().setUp()
 
+    def test_build_with_empty(self) -> None:
+        actual = self.builder.build(
+            TypeA, "x", int, {"empty_value": "1"}, True, None, None, {}
+        )
+
+        self.assertEqual("1", actual.empty_value)
+
     def test_build_with_choice_field(self) -> None:
         globalns = sys.modules[ChoiceType.__module__].__dict__
         type_hints = get_type_hints(ChoiceType)

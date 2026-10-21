@@ -1,5 +1,6 @@
 import logging
 import re
+from collections.abc import Iterator
 
 from toposort import toposort_flatten
 
@@ -71,31 +72,42 @@ class DependenciesResolver:
         Update attr and extension types to point to the
         new class aliases. Process inner classes too!
 
+        Forward references point to inner classes, which may
+        share the qualified name of an aliased import, skip them.
+
         Args:
             target: The target class instance to process
         """
-        for attr in target.attrs:
-            for attr_type in attr.types:
+        for attr_type in target.types():
+            if attr_type.forward:
+                attr_type.alias = None
+            else:
                 attr_type.alias = self.aliases.get(attr_type.qname)
 
-            for choice in attr.choices:
-                for choice_type in choice.types:
-                    choice_type.alias = self.aliases.get(choice_type.qname)
-
-        for ext in target.extensions:
-            ext.type.alias = self.aliases.get(ext.type.qname)
-
-        collections.apply(target.inner, self.apply_aliases)
-
     def resolve_imports(self) -> None:
-        """Build the list of class imports and set aliases if necessary."""
+        """Build the list of class imports and set aliases if necessary.
+
+        Protect the names of the module classes and their inner
+        classes. Inner class names shadow module names when type
+        hints are evaluated in the class namespace, e.g. pydantic.
+        """
         self.imports = [
             Import(qname=qname, source=self.get_class_module(qname))
             for qname in self.import_classes()
         ]
-        protected = {obj.slug for obj in self.class_map.values()}
+        protected: set[str] = set()
+        for obj in self.class_map.values():
+            protected.update(self.class_slugs(obj))
+
         self.resolve_conflicts(self.imports, protected)
         self.set_aliases()
+
+    @classmethod
+    def class_slugs(cls, target: Class) -> Iterator[str]:
+        """Yield the slugs of the target class and its inner classes."""
+        yield target.slug
+        for inner in target.inner:
+            yield from cls.class_slugs(inner)
 
     def set_aliases(self) -> None:
         """Store generated aliases."""

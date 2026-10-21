@@ -85,6 +85,10 @@ class DependenciesResolverTest(FactoryTestCase):
                 AttrFactory.create(name="a", types=[type_a]),
                 AttrFactory.create(name="b", types=[type_b]),
                 AttrFactory.create(name="c", types=[type_a, type_d]),
+                AttrFactory.create(
+                    name="d",
+                    types=[AttrTypeFactory.create(qname="{xsdata}a", forward=True)],
+                ),
             ],
             inner=[
                 ClassFactory.create(
@@ -107,7 +111,7 @@ class DependenciesResolverTest(FactoryTestCase):
 
         self.resolver.apply_aliases(obj)
 
-        self.assertEqual(3, len(obj.attrs))
+        self.assertEqual(4, len(obj.attrs))
         self.assertEqual(1, len(obj.attrs[0].types))
         self.assertEqual(1, len(obj.attrs[1].types))
         self.assertEqual(2, len(obj.attrs[2].types))
@@ -116,6 +120,7 @@ class DependenciesResolverTest(FactoryTestCase):
         self.assertIsNone(obj.attrs[1].types[0].alias)
         self.assertEqual("IamA", obj.attrs[2].types[0].alias)
         self.assertEqual("IamD", obj.attrs[2].types[1].alias)
+        self.assertIsNone(obj.attrs[3].types[0].alias)
         self.assertEqual("IamA", obj.extensions[0].type.alias)
 
         self.assertEqual(1, len(obj.inner))
@@ -140,7 +145,9 @@ class DependenciesResolverTest(FactoryTestCase):
         mock_resolve_conflicts,
         mock_set_aliases,
     ) -> None:
-        class_life = ClassFactory.create(qname="life")
+        class_life = ClassFactory.create(
+            qname="life", inner=[ClassFactory.create(qname="{thug}type")]
+        )
         import_names = [
             "foo_1",  # cool
             "bar",  # cool
@@ -160,7 +167,7 @@ class DependenciesResolverTest(FactoryTestCase):
 
         self.resolver.resolve_imports()
         mock_resolve_conflicts.assert_called_once_with(
-            self.resolver.imports, {class_life.slug}
+            self.resolver.imports, {"life", "type"}
         )
         mock_set_aliases.assert_called_once_with()
 
@@ -179,6 +186,17 @@ class DependenciesResolverTest(FactoryTestCase):
         self.assertEqual("ba:a", imports[1].alias)
         self.assertEqual(None, imports[2].alias)
         self.assertEqual("common:penalty", imports[3].alias)
+
+    def test_class_slugs(self) -> None:
+        obj = ClassFactory.create(
+            qname="a",
+            inner=[
+                ClassFactory.create(qname="b", inner=[ClassFactory.create(qname="c")]),
+                ClassFactory.create(qname="d"),
+            ],
+        )
+
+        self.assertEqual(["a", "b", "c", "d"], list(self.resolver.class_slugs(obj)))
 
     def test_set_aliases(self) -> None:
         self.resolver.imports = [

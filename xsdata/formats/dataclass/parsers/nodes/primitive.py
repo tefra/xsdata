@@ -13,16 +13,25 @@ class PrimitiveNode(XmlNode):
         var: The xml var instance
         ns_map: The element namespace prefix-URI map
         config: The parser config instance
+        xsi_nil: Specifies whether the element has the xsi:nil attribute
     """
 
-    __slots__ = "config", "meta", "ns_map", "var"
+    __slots__ = "config", "meta", "ns_map", "var", "xsi_nil"
 
-    def __init__(self, meta: XmlMeta, var: XmlVar, ns_map: dict, config: ParserConfig):
+    def __init__(
+        self,
+        meta: XmlMeta,
+        var: XmlVar,
+        ns_map: dict,
+        config: ParserConfig,
+        xsi_nil: bool | None,
+    ):
         """Initialize the xml node."""
         self.meta = meta
         self.var = var
         self.ns_map = ns_map
         self.config = config
+        self.xsi_nil = xsi_nil
 
     def bind(
         self,
@@ -37,6 +46,9 @@ class PrimitiveNode(XmlNode):
         responsible to parse the current element attributes/text/tail
         content.
 
+        An element with empty content takes the value of the schema
+        default or fixed constraint, unless it's nil.
+
         Args:
             qname: The element qualified name
             text: The element text content
@@ -46,6 +58,9 @@ class PrimitiveNode(XmlNode):
         Returns:
             Whether the binding process was successful or not.
         """
+        if not text and not self.xsi_nil and self.var.empty_value is not None:
+            text = self.var.empty_value
+
         obj = ParserUtils.parse_var(
             meta=self.meta,
             var=self.var,

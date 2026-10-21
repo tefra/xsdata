@@ -526,6 +526,11 @@ class FiltersTests(FactoryTestCase):
         expected = {"name": "attr_B", "type": "Element"}
         self.assertEqual(expected, self.filters.field_metadata(self.obj, attr, None))
 
+    def test_field_metadata_empty(self) -> None:
+        attr = AttrFactory.element(empty_value="")
+        expected = {"name": "attr_B", "type": "Element", "empty_value": ""}
+        self.assertEqual(expected, self.filters.field_metadata(self.obj, attr, None))
+
     def test_field_metadata_namespace(self) -> None:
         attr = AttrFactory.element(namespace="foo")
         expected = {"name": "attr_B", "namespace": "foo", "type": "Element"}
@@ -631,7 +636,7 @@ class FiltersTests(FactoryTestCase):
                 ),
                 AttrFactory.element(namespace="bar"),
                 AttrFactory.any(namespace="##other"),
-                AttrFactory.element(name="bar", default="aa"),
+                AttrFactory.element(name="bar", default="aa", empty_value="bb"),
                 AttrFactory.element(name="tok", restrictions=Restrictions(tokens=True)),
             ]
         )
@@ -645,7 +650,7 @@ class FiltersTests(FactoryTestCase):
                 "wildcard": True,
                 "type": "Type[object]",
             },
-            {"name": "bar", "type": "Type[str]"},
+            {"name": "bar", "type": "Type[str]", "empty_value": "bb"},
             {
                 "default_factory": "list",
                 "name": "tok",

@@ -277,6 +277,7 @@ class Attr(CodegenModel):
         index: The index position of this attr in the class
         default: The default value
         fixed: Specifies if the default value is fixed
+        empty_value: The value of an element with empty content
         mixed: Specifies if the attr supports mixed content
         types: The attr types list
         choices: The attr choice list
@@ -294,6 +295,7 @@ class Attr(CodegenModel):
     index: int = field(compare=False, default_factory=int)
     default: str | None = field(default=None, compare=False)
     fixed: bool = field(default=False, compare=False)
+    empty_value: str | None = field(default=None, compare=False)
     mixed: bool = field(default=False, compare=False)
     types: list[AttrType] = field(default_factory=list, compare=False)
     choices: list["Attr"] = field(default_factory=list, compare=False)

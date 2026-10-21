@@ -467,6 +467,7 @@ class Filters:
             "type": attr.xml_type,
             "namespace": namespace,
             "mixed": attr.mixed,
+            "empty_value": attr.empty_value,
             "choices": self.field_choices(obj, attr, parent_namespace),
             **restrictions,
         }
@@ -502,6 +503,7 @@ class Filters:
                 "wildcard": choice.is_wildcard,
                 "type": self.choice_type(obj, choice),
                 "namespace": namespace,
+                "empty_value": choice.empty_value,
             }
 
             if choice.is_nameless:

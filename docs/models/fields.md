@@ -57,6 +57,28 @@ The namespace name of the XML element or attribute.
 
 **Default:** `None`
 
+### `empty_value`
+
+The value of an element with empty content, from the schema default or fixed value
+constraint. The field default still applies when the element is absent.
+
+```python
+>>> from xsdata.formats.dataclass.parsers import XmlParser
+>>>
+>>> @dataclass
+... class Root:
+...     first: None | int = field(default=None, metadata={"empty_value": "1"})
+...     second: None | int = field(default=None, metadata={"empty_value": "2"})
+...
+>>> XmlParser().from_string("<Root><first/></Root>", Root)
+Root(first=1, second=None)
+
+```
+
+**Type:** `str`
+
+**Default:** `None`
+
 ### `nillable`
 
 Specify if the field has to be present in the serialized result even when it doesn't
@@ -265,6 +287,7 @@ Elements type represents repeatable choice elements. It's more commonly referred
 | name            | str  | The local name of the XML/JSON field.                              |
 | type            | str  | The type hint.                                                     |
 | nillable        | bool | Specify if the choice has to be serialized when it has no content. |
+| empty_value     | str  | The value of the element when its content is empty.                |
 | wildcard        | bool | Wildcard element to match any xml string.                          |
 | tokens          | bool | Specify if the choice value is a whitespace concatenated sequence. |
 | namespace       | str  | The namespace name of the XML element.                             |

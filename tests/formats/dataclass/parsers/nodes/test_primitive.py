@@ -22,7 +22,7 @@ class PrimitiveNodeTests(TestCase):
             xml_type=XmlType.TEXT, name="foo", types=(int,), format="Nope"
         )
         ns_map = {"foo": "bar"}
-        node = PrimitiveNode(self.meta, var, ns_map, self.config)
+        node = PrimitiveNode(self.meta, var, ns_map, self.config, None)
         objects = []
 
         self.assertTrue(node.bind("foo", "13", "Impossible", objects))
@@ -37,13 +37,37 @@ class PrimitiveNodeTests(TestCase):
             xml_type=XmlType.TEXT, name="foo", types=(str,), nillable=False
         )
         ns_map = {"foo": "bar"}
-        node = PrimitiveNode(self.meta, var, ns_map, self.config)
+        node = PrimitiveNode(self.meta, var, ns_map, self.config, None)
         objects = []
 
         self.assertTrue(node.bind("foo", None, None, objects))
         self.assertEqual("", objects[-1][1])
 
         var.nillable = True
+        self.assertTrue(node.bind("foo", None, None, objects))
+        self.assertIsNone(objects[-1][1])
+
+    def test_bind_empty_content(self) -> None:
+        var = XmlVarFactory.create(
+            xml_type=XmlType.ELEMENT,
+            name="foo",
+            types=(int,),
+            nillable=True,
+            empty_value="5",
+        )
+        node = PrimitiveNode(self.meta, var, {}, self.config, None)
+        objects = []
+
+        self.assertTrue(node.bind("foo", None, None, objects))
+        self.assertEqual(5, objects[-1][1])
+
+        self.assertTrue(node.bind("foo", "", None, objects))
+        self.assertEqual(5, objects[-1][1])
+
+        self.assertTrue(node.bind("foo", "1", None, objects))
+        self.assertEqual(1, objects[-1][1])
+
+        node.xsi_nil = True
         self.assertTrue(node.bind("foo", None, None, objects))
         self.assertIsNone(objects[-1][1])
 
@@ -55,7 +79,7 @@ class PrimitiveNodeTests(TestCase):
             nillable=False,
         )
         ns_map = {"foo": "bar"}
-        node = PrimitiveNode(self.meta, var, ns_map, self.config)
+        node = PrimitiveNode(self.meta, var, ns_map, self.config, None)
         objects = []
 
         self.assertTrue(node.bind("foo", None, None, objects))
@@ -68,7 +92,7 @@ class PrimitiveNodeTests(TestCase):
     def test_bind_mixed_with_tail_content(self) -> None:
         self.meta.mixed_content = True
         var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo", types=(int,))
-        node = PrimitiveNode(self.meta, var, {}, self.config)
+        node = PrimitiveNode(self.meta, var, {}, self.config, None)
         objects = []
 
         self.assertTrue(node.bind("foo", "13", "tail", objects))
@@ -78,7 +102,7 @@ class PrimitiveNodeTests(TestCase):
     def test_bind_mixed_without_tail_content(self) -> None:
         self.meta.mixed_content = True
         var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo", types=(int,))
-        node = PrimitiveNode(self.meta, var, {}, self.config)
+        node = PrimitiveNode(self.meta, var, {}, self.config, None)
         objects = []
 
         self.assertTrue(node.bind("foo", "13", "", objects))
@@ -86,7 +110,7 @@ class PrimitiveNodeTests(TestCase):
 
     def test_child(self) -> None:
         var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo")
-        node = PrimitiveNode(self.meta, var, {}, self.config)
+        node = PrimitiveNode(self.meta, var, {}, self.config, None)
 
         with self.assertRaises(XmlContextError):
             node.child("foo", {}, {}, 0)

@@ -634,7 +634,7 @@ class ElementNodeTests(FactoryTestCase):
         var = XmlVarFactory.create(
             xml_type=XmlType.TEXT, name="a", types=(int,), default=100
         )
-        attrs = {"a": "b"}
+        attrs = {QNames.XSI_NIL: "true"}
         ns_map = {"ns0": "xsdata"}
         actual = self.node.build_node(var.qname, var, attrs, ns_map, 10)
 
@@ -642,3 +642,4 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual(ns_map, actual.ns_map)
         self.assertEqual(self.meta, actual.meta)
         self.assertEqual(var, actual.var)
+        self.assertTrue(actual.xsi_nil)

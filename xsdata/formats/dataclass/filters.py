@@ -832,10 +832,13 @@ class Filters:
             result = iterable_fmt.format(result)
 
         if attr.is_list:
+            if attr.is_nillable:
+                result = f"None | {result}"
+
             return iterable_fmt.format(result)
 
         if attr.is_tokens:
-            return result
+            return f"None | {result}" if attr.is_nillable else result
 
         if attr.is_dict:
             if self.generic_collections:

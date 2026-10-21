@@ -234,7 +234,7 @@ class DisambiguateChoicesTest(FactoryTestCase):
         self.assertFalse(last.restrictions.is_optional)
         self.assertFalse(last.restrictions.is_list)
         self.assertEqual([], last.restrictions.path)
-        self.assertFalse(last.restrictions.nillable)
+        self.assertTrue(last.restrictions.nillable)
 
     def test_add_extension(self) -> None:
         target = ClassFactory.create()

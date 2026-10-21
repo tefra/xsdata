@@ -264,7 +264,6 @@ class DisambiguateChoices(RelativeHandlerInterface):
                 min_occurs=1,
                 max_occurs=1,
                 path=[],
-                nillable=False,
             ),
             types=[tp.clone() for tp in choice.types],
         )

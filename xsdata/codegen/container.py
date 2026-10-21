@@ -2,6 +2,7 @@ from collections.abc import Callable, Iterator
 
 from xsdata.codegen.handlers import (
     AddAttributeSubstitutions,
+    AddNillableTextOverrides,
     CalculateAttributePaths,
     CreateCompoundFields,
     CreateWrapperFields,
@@ -93,6 +94,7 @@ class ClassContainer(ContainerInterface):
                 RenameDuplicateAttributes(),
             ],
             Steps.RESOLVE: [
+                AddNillableTextOverrides(self),
                 ValidateAttributesOverrides(self),
             ],
             Steps.CLEANUP: [

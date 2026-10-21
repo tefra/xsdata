@@ -51,7 +51,7 @@ class ClassContainerTests(FactoryTestCase):
                 "ResetAttributeSequences",
                 "RenameDuplicateAttributes",
             ],
-            40: ["ValidateAttributesOverrides"],
+            40: ["AddNillableTextOverrides", "ValidateAttributesOverrides"],
             50: ["VacuumInnerClasses"],
             60: [
                 "DetectCircularReferences",

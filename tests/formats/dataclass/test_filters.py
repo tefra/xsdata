@@ -733,6 +733,21 @@ class FiltersTests(FactoryTestCase):
             "tuple[tuple[FooBar, ...], ...]", self.filters.field_type(self.obj, attr)
         )
 
+    def test_field_type_with_nillable_array_type(self) -> None:
+        attr = AttrFactory.create(
+            types=AttrTypeFactory.list(1, qname="foo_bar"),
+            restrictions=Restrictions(max_occurs=2, nillable=True),
+        )
+        self.assertEqual("list[None | FooBar]", self.filters.field_type(self.obj, attr))
+
+        attr.restrictions.tokens = True
+        self.assertEqual(
+            "list[None | list[FooBar]]", self.filters.field_type(self.obj, attr)
+        )
+
+        attr.restrictions.max_occurs = 1
+        self.assertEqual("None | list[FooBar]", self.filters.field_type(self.obj, attr))
+
     def test_field_type_with_alias(self) -> None:
         attr = AttrFactory.create(
             types=AttrTypeFactory.list(1, qname="b", forward=True, alias="Boss:Life")

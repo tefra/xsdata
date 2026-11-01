@@ -113,4 +113,4 @@ jobs:
         uses: actions/setup-python@v7
         with:
           python-version: 3.11
-      - uses: hynek/build-and-inspect-python-package@v3.0.1
+      - uses: hynek/build-and-inspect-python-package@v3.0.2

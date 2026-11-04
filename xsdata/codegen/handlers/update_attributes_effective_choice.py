@@ -160,9 +160,14 @@ class UpdateAttributesEffectiveChoice(HandlerInterface):
                     # (e.g., one in outer sequence, one in inner choice branch)
                     result.append(list(range(indices[0], indices[-1] + 1)))
                 elif len(choice_ids) == 1 and len(path_lengths) == 1:
-                    # All elements in the same choice at the same nesting level
-                    # This is a repeating pattern, group them
-                    result.append(list(range(indices[0], indices[-1] + 1)))
+                    # Check if all occurrences have the same path
+                    # If they have different paths within the same choice,
+                    # they're in different branches (mutually exclusive)
+                    paths = {tuple(target.attrs[i].restrictions.path) for i in indices}
+                    if len(paths) == 1:
+                        # All elements in the same choice at the same nesting level
+                        # This is a repeating pattern, group them
+                        result.append(list(range(indices[0], indices[-1] + 1)))
                 # else: different choices or same choice but different nesting levels
                 # = mutually exclusive branches, don't group
 

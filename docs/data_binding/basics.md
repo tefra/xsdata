@@ -67,6 +67,32 @@ you want to use a parser/serializer.
 
 ```
 
+## NewType Annotations
+
+Fields annotated with `typing.NewType` use their underlying runtime type for XML and
+JSON binding. This also applies to nested nominal aliases, unions and supported
+collections of aliases. The model's annotations are left unchanged; parsed values have
+the underlying Python type, just as when calling the `NewType` directly.
+
+```python
+>>> from dataclasses import dataclass, field
+>>> from typing import NewType
+>>> from xsdata.formats.dataclass.parsers import XmlParser
+>>> Speed = NewType("Speed", float)
+>>> @dataclass
+... class Car:
+...     speed: Speed = field(metadata={"type": "Attribute"})
+>>> car = XmlParser().from_string('<Car speed="100.5"/>', Car)
+>>> car.speed
+100.5
+>>> type(car.speed) is float
+True
+
+```
+
+The underlying type must still be supported for that XML field kind. A nominal alias
+does not make an unsupported container annotation valid.
+
 ## Parser Config
 
 API: [ParserConfig][xsdata.formats.dataclass.parsers.config.ParserConfig]

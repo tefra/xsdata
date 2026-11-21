@@ -1080,6 +1080,11 @@ class FiltersTests(FactoryTestCase):
         result = self.filters.format_docstring(doc, level=1)
         self.assertEqual('"""\nLine one and line two.\n"""', result)
 
+    def test_quote(self) -> None:
+        self.assertEqual(
+            '"urn:x\\"; a\\\\ #\\n"', self.filters.quote('urn:x"; a\\ #\n')
+        )
+
     def test_format_metadata(self) -> None:
         data = {
             "num": 1,

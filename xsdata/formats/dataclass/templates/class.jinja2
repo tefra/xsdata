@@ -23,16 +23,16 @@ class {{ class_name }}{{"({})".format(base_classes) if base_classes }}:
         global_type = False
         {%- endif -%}
         {%- if local_name %}
-        name = "{{ local_name }}"
+        name = {{ local_name|quote }}
         {%- endif -%}
         {%- if obj.is_nillable %}
         nillable = True
         {%- endif -%}
         {%- if obj.namespace is not none %}
-        namespace = "{{ obj.namespace }}"
+        namespace = {{ obj.namespace|quote }}
         {%- endif %}
         {%- if target_namespace and target_namespace != obj.namespace %}
-        target_namespace = "{{ target_namespace }}"
+        target_namespace = {{ target_namespace|quote }}
         {%- endif %}
 {% elif obj.attrs|length == 0 and not help and not extra_output %}
     pass

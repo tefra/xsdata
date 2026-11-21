@@ -195,6 +195,48 @@ class DataclassGeneratorTests(FactoryTestCase):
 
         self.assertEqual(expected, actual)
 
+    def test_render_module_escapes_names_and_namespaces(self) -> None:
+        classes = [
+            ClassFactory.elements(1, qname='{urn:x"\\}a"b', namespace='urn:x"\\'),
+        ]
+        resolver = DependenciesResolver({})
+
+        actual = self.generator.render_module(resolver, classes)
+        expected = (
+            "from __future__ import annotations\n"
+            "from dataclasses import dataclass, field\n"
+            "\n"
+            '__NAMESPACE__ = "urn:x\\"\\\\"\n'
+            "\n"
+            "\n"
+            "@dataclass(kw_only=True)\n"
+            "class AB:\n"
+            "    class Meta:\n"
+            '        name = "a\\"b"\n'
+            '        namespace = "urn:x\\"\\\\"\n'
+            "\n"
+            "    attr_b: str = field(\n"
+            "        metadata={\n"
+            '            "name": "attr_B",\n'
+            '            "type": "Element",\n'
+            "        }\n"
+            "    )"
+        )
+
+        self.assertEqual(expected, actual)
+
+    def test_render_module_escapes_target_namespaces(self) -> None:
+        classes = [
+            ClassFactory.elements(1, qname='{a"}foo'),
+            ClassFactory.elements(1, qname='{b"}bar'),
+        ]
+        resolver = DependenciesResolver({})
+
+        actual = self.generator.render_module(resolver, classes)
+
+        self.assertIn('        target_namespace = "a\\""\n', actual)
+        self.assertIn('        target_namespace = "b\\""\n', actual)
+
     def test_module_name(self) -> None:
         self.assertEqual("foo_bar", self.generator.module_name("fooBar"))
         self.assertEqual("foo_bar_wtf", self.generator.module_name("fooBar.wtf"))

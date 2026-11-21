@@ -123,6 +123,7 @@ class Filters:
                 "class_annotations": self.class_annotations,
                 "class_params": self.class_params,
                 "format_string": self.format_string,
+                "quote": self.quote,
                 "format_docstring": self.format_docstring,
                 "constant_name": self.constant_name,
                 "constant_value": self.constant_value,
@@ -620,6 +621,11 @@ class Filters:
             )
         )
         return f"(\n{value}\n{' ' * indent})"
+
+    @staticmethod
+    def quote(value: str) -> str:
+        """Return the value as an escaped double-quoted string literal."""
+        return f'"{text.escape_string(value)}"'
 
     def text_wrap(
         self, string: str, offset: int = 0, subsequent_indent: str = "    "

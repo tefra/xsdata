@@ -1,7 +1,7 @@
 import sys
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from types import UnionType
-from typing import Any, NamedTuple, TypeVar, Union, get_args, get_origin
+from typing import Any, NamedTuple, NewType, TypeVar, Union, get_args, get_origin
 
 if sys.version_info[:2] >= (3, 13):
     # python 3.13+ requires type_params argument
@@ -19,14 +19,26 @@ ITERABLE_TYPES = (list, tuple, Iterable, Sequence)
 LIST_CONTAINERS = (Iterable, Sequence)
 
 
+def _unwrap_newtype(annotation: Any) -> Any:
+    """Resolve nominal NewType annotations to their runtime supertype."""
+    while isinstance(annotation, NewType):
+        annotation = annotation.__supertype__
+    return annotation
+
+
+def _get_args(annotation: Any) -> tuple[Any, ...]:
+    """Return type arguments with nominal aliases resolved."""
+    return tuple(_unwrap_newtype(arg) for arg in get_args(annotation))
+
+
 def evaluate(tp: Any, globalns: Any, localns: Any = None) -> Any:
     """Analyze/Validate the typing annotation."""
-    result = _eval_type(tp, globalns, localns)
+    result = _unwrap_newtype(_eval_type(tp, globalns, localns))
 
     # Ugly hack for the Type["str"]
     # Let's switch to ForwardRef("str")
     if get_origin(result) is type:
-        args = get_args(result)
+        args = _get_args(result)
         if len(args) != 1:
             raise TypeError
 
@@ -87,7 +99,7 @@ def analyze_optional_origin(
     if origin in UNION_TYPES:
         new_args = filter_none_type(args)
         if len(new_args) == 1:
-            return get_origin(new_args[0]), get_args(new_args[0]), new_args
+            return get_origin(new_args[0]), _get_args(new_args[0]), new_args
 
     return origin, args, types
 
@@ -109,9 +121,10 @@ def evaluate_text(annotation: Any, tokens: bool = False) -> Result:
 
 def evaluate_attribute(annotation: Any, tokens: bool = False) -> Result:
     """Validate annotations for an XML attribute."""
+    annotation = _unwrap_newtype(annotation)
     types = (annotation,)
     origin = get_origin(annotation)
-    args = get_args(annotation)
+    args = _get_args(annotation)
     tokens_factory = None
 
     if origin in UNION_TYPES:
@@ -130,7 +143,7 @@ def evaluate_attribute(annotation: Any, tokens: bool = False) -> Result:
         origin = get_origin(args[0])
 
         if origin in UNION_TYPES:
-            args = get_args(args[0])
+            args = _get_args(args[0])
         elif origin:
             raise TypeError
 
@@ -149,11 +162,12 @@ def evaluate_attribute(annotation: Any, tokens: bool = False) -> Result:
 
 def evaluate_attributes(annotation: Any, **_: Any) -> Result:
     """Validate annotations for XML wildcard attributes."""
+    annotation = _unwrap_newtype(annotation)
     if annotation is dict:
         args = ()
     else:
         origin = get_origin(annotation)
-        args = get_args(annotation)
+        args = _get_args(annotation)
 
         if origin is not dict and origin is not Mapping:
             raise TypeError
@@ -167,13 +181,14 @@ def evaluate_attributes(annotation: Any, **_: Any) -> Result:
 
 def evaluate_element(annotation: Any, tokens: bool = False) -> Result:
     """Validate annotations for an XML element."""
+    annotation = _unwrap_newtype(annotation)
     # Only the derived element value field is allowed a typevar
     if isinstance(annotation, TypeVar) and annotation.__bound__ is object:
         annotation = object
 
     types = (annotation,)
     origin = get_origin(annotation)
-    args = get_args(annotation)
+    args = _get_args(annotation)
     tokens_factory = factory = None
 
     # Compute optional status from original annotation before any processing
@@ -190,7 +205,7 @@ def evaluate_element(annotation: Any, tokens: bool = False) -> Result:
         tokens_factory = origin
         origin = get_origin(args[0])
         types = args
-        args = get_args(args[0])
+        args = _get_args(args[0])
 
     if origin in ITERABLE_TYPES:
         args = tuple(arg for arg in args if arg is not Ellipsis)
@@ -205,7 +220,7 @@ def evaluate_element(annotation: Any, tokens: bool = False) -> Result:
 
         types = args
         origin = get_origin(args[0])
-        args = get_args(args[0])
+        args = _get_args(args[0])
 
     if origin in UNION_TYPES:
         types = filter_none_type(args)
@@ -238,12 +253,13 @@ def evaluate_elements(annotation: Any, **_: Any) -> Result:
 
 def evaluate_wildcard(annotation: Any, **_: Any) -> Result:
     """Validate annotations for an XML wildcard."""
+    annotation = _unwrap_newtype(annotation)
     origin = get_origin(annotation)
     factory = None
 
     # Compute optional status from original annotation
     if origin in UNION_TYPES:
-        args = get_args(annotation)
+        args = _get_args(annotation)
         optional = NONE_TYPE in args
     else:
         optional = False
@@ -252,7 +268,7 @@ def evaluate_wildcard(annotation: Any, **_: Any) -> Result:
         types = filter_none_type(args)
     elif origin in ITERABLE_TYPES:
         factory = list if origin in LIST_CONTAINERS else origin
-        types = filter_ellipsis(get_args(annotation))
+        types = filter_ellipsis(_get_args(annotation))
     elif origin is None:
         types = (annotation,)
     else:

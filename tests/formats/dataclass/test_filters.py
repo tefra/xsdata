@@ -3,7 +3,7 @@ from unittest import mock
 
 from tests.fixtures.datatypes import Telephone
 from xsdata.codegen.models import Restrictions
-from xsdata.formats.dataclass.filters import Filters
+from xsdata.formats.dataclass.filters import Code, Filters
 from xsdata.models.config import (
     DocstringStyle,
     ExtensionType,
@@ -611,8 +611,8 @@ class FiltersTests(FactoryTestCase):
         attr = AttrFactory.create(choices=AttrFactory.list(2, tag=Tag.ELEMENT))
         actual = self.filters.field_metadata(self.obj, attr, "foo")
         expected = (
-            {"name": "attr_B", "type": "Type[str]"},
-            {"name": "attr_C", "type": "Type[str]"},
+            {"name": "attr_B", "type": Code("str")},
+            {"name": "attr_C", "type": Code("str")},
         )
 
         self.assertEqual(expected, actual["choices"])
@@ -643,19 +643,19 @@ class FiltersTests(FactoryTestCase):
 
         actual = self.filters.field_choices(self.obj, attr, "foo")
         expected = (
-            {"name": "$", "type": "Type[float]", "max_exclusive": 10.0},
-            {"name": "attr_B", "namespace": "bar", "type": "Type[str]"},
+            {"name": "$", "type": Code("float"), "max_exclusive": 10.0},
+            {"name": "attr_B", "namespace": "bar", "type": Code("str")},
             {
                 "namespace": "##other",
                 "wildcard": True,
-                "type": "Type[object]",
+                "type": Code("object"),
             },
-            {"name": "bar", "type": "Type[str]", "empty_value": "bb"},
+            {"name": "bar", "type": Code("str"), "empty_value": "bb"},
             {
                 "default_factory": "list",
                 "name": "tok",
                 "tokens": True,
-                "type": "Type[list[str]]",
+                "type": Code("list[str]"),
             },
         )
 
@@ -834,7 +834,7 @@ class FiltersTests(FactoryTestCase):
         choice = AttrFactory.create(types=[AttrTypeFactory.create("foobar")])
         target = ClassFactory.create()
         actual = self.filters.choice_type(target, choice)
-        self.assertEqual("Type[Foobar]", actual)
+        self.assertEqual(Code("Foobar"), actual)
 
     def test_choice_type_with_forward_reference(self) -> None:
         choice = AttrFactory.create(
@@ -846,36 +846,36 @@ class FiltersTests(FactoryTestCase):
         target.parent = parent
 
         actual = self.filters.choice_type(parent, choice)
-        self.assertEqual('ForwardRef("A.Foobar")', actual)
+        self.assertEqual(Code('ForwardRef("A.Foobar")'), actual)
 
     def test_choice_type_with_circular_reference(self) -> None:
         choice = AttrFactory.create(types=[AttrTypeFactory.create("c", circular=True)])
         actual = self.filters.choice_type(self.obj_nested_nested_nested, choice)
-        self.assertEqual('ForwardRef("C")', actual)
+        self.assertEqual(Code('ForwardRef("C")'), actual)
 
     def test_choice_type_with_multiple_types(self) -> None:
         choice = AttrFactory.create(types=[type_str, type_bool])
         target = ClassFactory.create()
         actual = self.filters.choice_type(target, choice)
-        self.assertEqual("Type[str | bool]", actual)
+        self.assertEqual(Code("str | bool"), actual)
 
     def test_choice_type_with_list_types_are_ignored(self) -> None:
         choice = AttrFactory.create(types=[type_str, type_bool])
         choice.restrictions.max_occurs = 200
         target = ClassFactory.create()
         actual = self.filters.choice_type(target, choice)
-        self.assertEqual("Type[str | bool]", actual)
+        self.assertEqual(Code("str | bool"), actual)
 
     def test_choice_type_with_restrictions_tokens_true(self) -> None:
         choice = AttrFactory.create(types=[type_str, type_bool])
         choice.restrictions.tokens = True
         target = ClassFactory.create()
         actual = self.filters.choice_type(target, choice)
-        self.assertEqual("Type[list[str | bool]]", actual)
+        self.assertEqual(Code("list[str | bool]"), actual)
 
         self.filters.format.frozen = True
         actual = self.filters.choice_type(target, choice)
-        self.assertEqual("Type[tuple[str | bool, ...]]", actual)
+        self.assertEqual(Code("tuple[str | bool, ...]"), actual)
 
     def test_default_imports_with_decimal(self) -> None:
         expected = "from decimal import Decimal"
@@ -1091,12 +1091,13 @@ class FiltersTests(FactoryTestCase):
             "text": "foo",
             "text_two": "fo'o",
             "text_three": 'fo"o',
+            "text_four": 'Literal["a"]',
             "pattern": "foo",
             "custom": Telephone(30, 123, 4567),
             "level_two": {"a": 1},
             "list": [
-                {"type": "Type[object]"},
-                {"type": 'ForwardRef("something")'},
+                {"type": Code("object")},
+                {"type": Code('ForwardRef("something")')},
             ],
             "default": "1",
             "default_factory": "list",
@@ -1108,6 +1109,7 @@ class FiltersTests(FactoryTestCase):
             '    "text": "foo",\n'
             '    "text_two": "fo\'o",\n'
             '    "text_three": "fo\\"o",\n'
+            '    "text_four": "Literal[\\"a\\"]",\n'
             "    \"pattern\": r'foo',\n"
             '    "custom": Telephone(country_code=30, area_code=123, number=4567),\n'
             '    "level_two": {\n'

@@ -23,6 +23,12 @@ from xsdata.utils import collections, namespaces, text
 from xsdata.utils.objects import literal_value
 
 
+class Code(str):
+    """A python expression, rendered verbatim instead of as a string literal."""
+
+    __slots__ = ()
+
+
 class Filters:
     """Jinja filters for code generation."""
 
@@ -550,6 +556,9 @@ class Filters:
         if collections.is_array(data):
             return self.format_iterable(data, indent)
 
+        if isinstance(data, Code):
+            return data
+
         if isinstance(data, str):
             return self.format_string(data, indent, key, 4)
 
@@ -583,15 +592,6 @@ class Filters:
         length and the additional pad is more than the max line length,
         wrap the text into multiple lines, avoiding breaking long words
         """
-        if data.startswith("ForwardRef("):
-            return data
-
-        if data.startswith("Type["):
-            return data[5:-1]
-
-        if data.startswith("Literal[") and data.endswith("]"):
-            return data[8:-1]
-
         if key in (self.FACTORY_KEY, self.DEFAULT_KEY):
             return data
 
@@ -800,7 +800,7 @@ class Filters:
 
         if attr.is_tokens:
             members = [
-                f"Literal[{class_name}.{self.constant_name(member, name)}]"
+                Code(f"{class_name}.{self.constant_name(member, name)}")
                 for member in reference.split("@")
             ]
             return f"lambda: {self.format_metadata(members, indent=8)}"
@@ -887,12 +887,12 @@ class Filters:
 
         return result
 
-    def choice_type(self, obj: Class, choice: Attr) -> str:
+    def choice_type(self, obj: Class, choice: Attr) -> Code:
         """Generate type hints for the given choice.
 
         Choices support a subset of features from normal attributes.
         First of all we don't have a proper type hint but a type
-        metadata key. That's why we always need to wrap as Type[xxx].
+        metadata key. That's why we always return code, never a string.
         The second big difference is that our choice belongs to a
         compound field that might be a list, that's why list restriction
         is also ignored.
@@ -911,9 +911,9 @@ class Filters:
             result = iterable_fmt.format(result)
 
         if result.startswith('"'):
-            return f"ForwardRef({result})"
+            return Code(f"ForwardRef({result})")
 
-        return f"Type[{result}]"
+        return Code(result)
 
     def _field_type_names(
         self,

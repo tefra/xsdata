@@ -74,31 +74,32 @@ Check the [documentation](https://xsdata.readthedocs.io) for more ✨✨✨
 - Support xinclude statements and unknown properties
 - Customize behaviour through config
 
-## Changelog: 26.10 (2026-10-16)
+## Changelog: 26.11 (2026-11-26)
 
 **Security**
 
-- Disable external entity resolution in LxmlEventHandler by default
-  ([#1228](https://github.com/tefra/xsdata/pull/1228))
+- Escape schema values in generated code
+  ([GHSA-vg6j-22r4-h39g](https://github.com/tefra/xsdata/security/advisories/GHSA-vg6j-22r4-h39g))
 
 **Fixes**
 
-- Fix wrapper binding when collection item element name is reused
-  ([#1224](https://github.com/tefra/xsdata/pull/1224))
-- Fix KeyError in is_binding_model when models_package is not set
-  ([#1219](https://github.com/tefra/xsdata/pull/1219))
-- Validate calendar date in XmlDate.from_string
-  ([#1227](https://github.com/tefra/xsdata/pull/1227))
-- Add charset to the SOAP client content-type header
-  ([#1231](https://github.com/tefra/xsdata/pull/1231))
-- Skip xsi:nil for a present instance of a type without content
-  ([#1234](https://github.com/tefra/xsdata/pull/1234))
-- Skip None text when binding wildcard list elements
-  ([#1237](https://github.com/tefra/xsdata/pull/1237))
+- Remove artificial defaults from text nodes
+  ([#1240](https://github.com/tefra/xsdata/pull/1240))
+- Accept nil values in nillable type hints
+  ([#1244](https://github.com/tefra/xsdata/pull/1244))
+- Alias imports that clash with inner class names
+  ([#1244](https://github.com/tefra/xsdata/pull/1244))
+- Bind the schema default of empty optional elements
+  ([#1244](https://github.com/tefra/xsdata/pull/1244))
 
 **Features**
 
-- Share compiled jinja templates across generators
-  ([#1235](https://github.com/tefra/xsdata/pull/1235))
-- Add third-party license notices for bundled schemas and graphs util
-  ([#1238](https://github.com/tefra/xsdata/pull/1238))
+- Generate StrEnum and IntEnum for typed enumerations
+  ([#1242](https://github.com/tefra/xsdata/pull/1242))
+- Add @generated marker to the codegen header
+  ([#1243](https://github.com/tefra/xsdata/pull/1243))
+- Add Python 3.15 support ([#1241](https://github.com/tefra/xsdata/pull/1241))
+
+**Deprecations**
+
+- Removed Python 3.10 support ([#1241](https://github.com/tefra/xsdata/pull/1241))

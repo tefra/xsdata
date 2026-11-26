@@ -1,4 +1,5 @@
 import pickle
+import shutil
 import tempfile
 from pathlib import Path
 from unittest import mock
@@ -152,12 +153,62 @@ class ResourceTransformerTests(FactoryTestCase):
         mock_convert_definitions.assert_called_once_with(fist_def)
 
     @mock.patch.object(ResourceTransformer, "process_schema")
-    def test_process_schemas(self, mock_process_schema) -> None:
+    @mock.patch.object(ResourceTransformer, "find_included_chameleons")
+    def test_process_schemas(
+        self, mock_find_included_chameleons, mock_process_schema
+    ) -> None:
         uris = ["http://xsdata/foo.xsd", "http://xsdata/bar.xsd"]
+        mock_find_included_chameleons.return_value = set()
 
         self.transformer.process_schemas(uris)
 
         mock_process_schema.assert_has_calls([mock.call(uri) for uri in uris])
+
+    @mock.patch.object(ResourceTransformer, "process_schema")
+    @mock.patch.object(ResourceTransformer, "find_included_chameleons")
+    def test_process_schemas_skips_included_chameleons(
+        self, mock_find_included_chameleons, mock_process_schema
+    ) -> None:
+        uris = ["http://xsdata/chameleon.xsd", "http://xsdata/main.xsd"]
+        mock_find_included_chameleons.return_value = {uris[0]}
+
+        self.transformer.process_schemas(uris)
+
+        mock_process_schema.assert_called_once_with(uris[1])
+
+    def test_find_included_chameleons(self) -> None:
+        tmp = Path(tempfile.mkdtemp())
+        try:
+            chameleon = tmp / "chameleon.xsd"
+            chameleon.write_text(
+                '<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">\n</xs:schema>'
+            )
+            main = tmp / "main.xsd"
+            main.write_text(
+                '<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" '
+                'targetNamespace="http://example.com/foo">'
+                '\n<xs:include schemaLocation="chameleon.xsd"/>'
+                "\n</xs:schema>"
+            )
+            # standalone chameleon that nobody includes must NOT be skipped
+            orphan = tmp / "orphan.xsd"
+            orphan.write_text(
+                '<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">\n</xs:schema>'
+            )
+
+            uris = [f.as_uri() for f in (chameleon, main, orphan)]
+            skip = self.transformer.find_included_chameleons(uris)
+
+            self.assertEqual({chameleon.as_uri()}, skip)
+            # the content is cached so compilation does not read the file twice
+            self.assertIn(chameleon.as_uri(), self.transformer.preloaded)
+        finally:
+            shutil.rmtree(tmp)
+
+    def test_find_included_chameleons_handles_missing_source(self) -> None:
+        self.assertEqual(
+            set(), self.transformer.find_included_chameleons(["file://nonexistent"])
+        )
 
     @mock.patch.object(ClassUtils, "reduce_classes")
     @mock.patch.object(ElementMapper, "map")

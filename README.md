@@ -74,32 +74,9 @@ Check the [documentation](https://xsdata.readthedocs.io) for more ✨✨✨
 - Support xinclude statements and unknown properties
 - Customize behaviour through config
 
-## Changelog: 26.11 (2026-11-26)
+## Changelog: 26.11.1 (2026-11-27)
 
 **Security**
 
-- Escape schema values in generated code
-  ([GHSA-vg6j-22r4-h39g](https://github.com/tefra/xsdata/security/advisories/GHSA-vg6j-22r4-h39g))
-
-**Fixes**
-
-- Remove artificial defaults from text nodes
-  ([#1240](https://github.com/tefra/xsdata/pull/1240))
-- Accept nil values in nillable type hints
-  ([#1244](https://github.com/tefra/xsdata/pull/1244))
-- Alias imports that clash with inner class names
-  ([#1244](https://github.com/tefra/xsdata/pull/1244))
-- Bind the schema default of empty optional elements
-  ([#1244](https://github.com/tefra/xsdata/pull/1244))
-
-**Features**
-
-- Generate StrEnum and IntEnum for typed enumerations
-  ([#1242](https://github.com/tefra/xsdata/pull/1242))
-- Add @generated marker to the codegen header
-  ([#1243](https://github.com/tefra/xsdata/pull/1243))
-- Add Python 3.15 support ([#1241](https://github.com/tefra/xsdata/pull/1241))
-
-**Deprecations**
-
-- Removed Python 3.10 support ([#1241](https://github.com/tefra/xsdata/pull/1241))
+- Escape QNames, WSDL service constants and patterns in generated code
+  ([GHSA-cx95-gjrm-h7hh](https://github.com/tefra/xsdata/security/advisories/GHSA-cx95-gjrm-h7hh))

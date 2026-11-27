@@ -2,6 +2,8 @@ import math
 from typing import Any
 from xml.etree.ElementTree import QName
 
+from xsdata.utils import text
+
 
 def update(obj: Any, **kwargs: Any) -> None:
     """Update an object from keyword arguments with dotted keys."""
@@ -24,6 +26,6 @@ def literal_value(value: Any) -> str:
         return str(value) if math.isfinite(value) else f'float("{value}")'
 
     if isinstance(value, QName):
-        return f'QName("{value.text}")'
+        return f'QName("{text.escape_string(value.text)}")'
 
     return repr(value)

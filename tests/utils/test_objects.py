@@ -1,5 +1,6 @@
 from types import SimpleNamespace
 from unittest import TestCase
+from xml.etree.ElementTree import QName
 
 from xsdata.utils import objects
 
@@ -15,3 +16,8 @@ class ObjectsTests(TestCase):
         objects.update(obj, **kwargs)
         self.assertEqual(1, obj.foo.bar)
         self.assertEqual(2, obj.bar)
+
+    def test_literal_value_escapes_qname(self) -> None:
+        self.assertEqual(
+            'QName("{urn:a\\"}b")', objects.literal_value(QName('{urn:a"}b'))
+        )

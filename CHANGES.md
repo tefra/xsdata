@@ -1,3 +1,10 @@
+## 26.11.1 (2026-11-27)
+
+**Security**
+
+- Escape QNames, WSDL service constants and patterns in generated code
+  ([GHSA-cx95-gjrm-h7hh](https://github.com/tefra/xsdata/security/advisories/GHSA-cx95-gjrm-h7hh))
+
 ## 26.11 (2026-11-26)
 
 **Security**

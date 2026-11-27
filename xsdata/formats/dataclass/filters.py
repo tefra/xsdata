@@ -1,3 +1,4 @@
+import ast
 import re
 import textwrap
 from collections import defaultdict
@@ -596,7 +597,7 @@ class Filters:
             return data
 
         if key == "pattern":
-            return f"r{data!r}".replace("\\\\", "\\")
+            return self.format_pattern(data)
 
         if data == "":
             return '""'
@@ -626,6 +627,26 @@ class Filters:
     def quote(value: str) -> str:
         """Return the value as an escaped double-quoted string literal."""
         return f'"{text.escape_string(value)}"'
+
+    @classmethod
+    def format_pattern(cls, value: str) -> str:
+        """Return the pattern as a raw string literal, when it is safe.
+
+        The raw literal keeps the regex readable and writes non-printable
+        characters as regex escapes. A crafted value can close the raw
+        literal early, so return an escaped string literal instead, unless
+        the raw literal parses as a single string constant.
+        """
+        literal = f"r{value!r}".replace("\\\\", "\\")
+        try:
+            node = ast.parse(literal, mode="eval").body
+        except (SyntaxError, ValueError):
+            return cls.quote(value)
+
+        if isinstance(node, ast.Constant) and isinstance(node.value, str):
+            return literal
+
+        return cls.quote(value)
 
     def text_wrap(
         self, string: str, offset: int = 0, subsequent_indent: str = "    "

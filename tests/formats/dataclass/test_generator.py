@@ -105,6 +105,8 @@ class DataclassGeneratorTests(FactoryTestCase):
         ]
         classes[0].attrs[0].help = "I am a member"
         classes[1].attrs[0].help = "I am a field"
+        classes[2].attrs[0].default = "http://x"
+        classes[2].attrs[1].default = "document"
 
         resolver = DependenciesResolver({})
 
@@ -148,8 +150,8 @@ class DataclassGeneratorTests(FactoryTestCase):
             "        }\n"
             "    )\n"
             "class ClassD:\n"
-            '    attr_f = "None"\n'
-            '    attr_g = "None"'
+            '    attr_f = "http://x"\n'
+            '    attr_g = "document"'
         )
 
         self.assertEqual(expected, actual)

@@ -309,6 +309,11 @@ class FiltersTests(FactoryTestCase):
         )
         self.assertEqual('"foo"', self.filters.constant_value(attr))
 
+        attr = AttrFactory.create(
+            types=[AttrTypeFactory.native(DataType.STRING)], default='a"; b'
+        )
+        self.assertEqual('"a\\"; b"', self.filters.constant_value(attr))
+
         attr = AttrFactory.create(types=[AttrTypeFactory.create(qname="foo")])
         self.assertEqual("Foo", self.filters.constant_value(attr))
 

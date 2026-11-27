@@ -951,7 +951,8 @@ class Filters:
         """Return the attr default value or type as constant value."""
         attr_type = attr.types[0]
         if attr_type.native:
-            return f'"{attr.default}"'
+            assert attr.default is not None
+            return self.quote(attr.default)
 
         if attr_type.alias:
             return self.class_name(attr_type.alias)

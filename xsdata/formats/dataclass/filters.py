@@ -591,7 +591,8 @@ class Filters:
 
         If the total length of the input string plus indent plus the key
         length and the additional pad is more than the max line length,
-        wrap the text into multiple lines, avoiding breaking long words
+        wrap the text into multiple lines. A line that ends inside an escape
+        sequence moves the partial escape to the next line.
         """
         if key in (self.FACTORY_KEY, self.DEFAULT_KEY):
             return data
@@ -611,16 +612,22 @@ class Filters:
             return f'"{value}"'
 
         next_indent = indent + 4
-        value = "\n".join(
-            f'{" " * next_indent}"{line}"'
-            for line in textwrap.wrap(
-                value,
-                width=self.max_line_length - next_indent - 2,  # plus quotes
-                drop_whitespace=False,
-                replace_whitespace=False,
-                break_long_words=True,
-            )
+        lines = textwrap.wrap(
+            value,
+            width=self.max_line_length - next_indent - 2,  # plus quotes
+            drop_whitespace=False,
+            replace_whitespace=False,
+            break_long_words=True,
         )
+        for i in range(len(lines) - 1):
+            # An odd run of backslashes, optionally a partial \uXXXX
+            partial = re.search(r"(?<!\\)(?:\\\\)*(\\(?:u[0-9a-f]{0,3})?)$", lines[i])
+            if partial:
+                cut = partial.start(1)
+                lines[i + 1] = lines[i][cut:] + lines[i + 1]
+                lines[i] = lines[i][:cut]
+
+        value = "\n".join(f'{" " * next_indent}"{line}"' for line in lines)
         return f"(\n{value}\n{' ' * indent})"
 
     @staticmethod

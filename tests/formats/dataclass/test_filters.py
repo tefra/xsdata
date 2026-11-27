@@ -1090,6 +1090,19 @@ class FiltersTests(FactoryTestCase):
             '"urn:x\\"; a\\\\ #\\n"', self.filters.quote('urn:x"; a\\ #\n')
         )
 
+    def test_format_string_moves_partial_escapes(self) -> None:
+        actual = self.filters.format_string("a " + '"' * 80, 0)
+        expected = (
+            '(\n    "a '
+            + '\\"' * 35
+            + '"\n    "'
+            + '\\"' * 37
+            + '"\n    "'
+            + '\\"' * 8
+            + '"\n)'
+        )
+        self.assertEqual(expected, actual)
+
     def test_format_pattern(self) -> None:
         self.assertEqual("r'\\d+'", self.filters.format_pattern("\\d+"))
         self.assertEqual("r'[\\u0fff]'", self.filters.format_pattern("[\u0fff]"))
